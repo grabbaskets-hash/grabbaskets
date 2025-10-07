@@ -2587,61 +2587,62 @@ li a{
     </div>
 
     <div class="row g-4 justify-content-center">
-      @foreach($blogProducts as $product)
-        <div class="col-12 col-sm-6 col-md-4">
-          <div class="card blog-card h-100 border-0 shadow-sm">
-            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/400' }}"
-              class="card-img-top" alt="{{ $product->name }}">
-            <div class="card-body">
-              <h5 class="card-title small fw-semibold text-success">
-                {{ $product->name }}
-              </h5>
-              <p class="card-text small text-muted">
-                {{ \Illuminate\Support\Str::limit($product->description ?? 'Consectetur adipiscing elit duis tristique sollicitudin nibh', 100) }}
-              </p>
-              <a href="{{ route('product.details', $product->id) }}" class="btn btn-outline-secondary btn-sm">
-                Read more
-              </a>
-            </div>
-          </div>
-        </div>
-      @endforeach
-    </div>
-  </section>
-
-
-
-
-
-
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 mb-3 mb-md-0">
-          <h5>grabbasket</h5>
-          <p>© {{ date('Y') }} grabbasket. All rights reserved.</p>
-        </div>
-        <div class="col-md-4 mb-3 mb-md-0">
-          <h6>Quick Links</h6>
-          <ul class="list-unstyled">
-            <li><a href="/">Home</a></li>
-            <li><a href="{{ route('buyer.dashboard') }}">Shop</a></li>
-            <li><a href="{{ route('login') }}">Login</a></li>
-            <li><a href="{{ route('logout.get') }}">Logout (Alt)</a></li>
-            <li>
-              <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn btn-link p-0"
-                  style="color:inherit; text-decoration:none;">Logout</button>
-              </form>
-            </li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <h6>Follow Us</h6>
-          <div class="d-flex gap-3">
+                    @foreach($categories as $category)
+                      @if(strtolower($category->name) !== 'furniture' && strtolower($category->name) !== 'mobillio')
+                        <div class="mega-category-card unique-3d-card" data-gender="{{ $category->gender ?? 'all' }}">
+                          <div class="mega-category-header">
+                            <div class="mega-category-emoji" style="box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff; background: #fff;">
+                              @php
+                                $modelImages = [
+                                  'ELECTRONICS' => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80',
+                                  'MEN\'S FASHION' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
+                                  'WOMEN\'S FASHION' => 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=80&q=80',
+                                  'HOME & KITCHEN' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
+                                  'BEAUTY & PERSONAL CARE' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
+                                  'SPORTS & FITNESS' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80',
+                                  'BOOKS & EDUCATION' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=80&q=80',
+                                  'KIDS & TOYS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
+                                  'AUTOMOTIVE' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
+                                  'HEALTH & WELLNESS' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80',
+                                  'JEWELRY & ACCESSORIES' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
+                                  'GROCERY & FOOD' => 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80',
+                                  'GARDEN & OUTDOOR' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
+                                  'PET SUPPLIES' => 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=80&q=80',
+                                  'BABY PRODUCTS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
+                                ];
+                                $catKey = strtoupper($category->name);
+                                $img = $category->image ?? ($modelImages[$catKey] ?? 'https://via.placeholder.com/80');
+                              @endphp
+                              <div class="category-3d-img" style="width:60px;height:60px;perspective:400px;display:flex;align-items:center;justify-content:center;">
+                                <img src="{{ $img }}" alt="{{ $category->name }}" style="width:60px;height:60px;object-fit:cover;border-radius:14px;box-shadow:0 8px 32px #ff9900cc,0 0 0 4px #fff;transform:rotateY(-18deg) rotateX(12deg) scale(1.08);transition:transform 0.4s cubic-bezier(.25,1.7,.45,.87);">
+                              </div>
+                            </div>
+                            <h6 class="mega-category-title">{{ $category->name }}</h6>
+                            <span class="mega-category-count">
+                              {{ $category->subcategories ? $category->subcategories->count() : 0 }}
+                            </span>
+                          </div>
+                          @if($category->subcategories && $category->subcategories->count())
+                            <div class="mega-subcategories">
+                              @foreach($category->subcategories->take(6) as $subcategory)
+                                <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" 
+                                   class="mega-subcategory-link">
+                                  {{ $subcategory->name }}
+                                </a>
+                              @endforeach
+                              @if($category->subcategories->count() > 6)
+                                <a href="{{ route('buyer.productsByCategory', $category->id) }}" 
+                                   class="mega-subcategory-link" style="font-weight: 600; color: #8B4513;">
+                                  +{{ $category->subcategories->count() - 6 }} more
+                                </a>
+                              @endif
+                            </div>
+                          @else
+                            <p class="text-muted small">No subcategories available</p>
+                          @endif
+                        </div>
+                      @endif
+                    @endforeach
             <a href="#" class="text-light"><i class="bi bi-facebook"></i></a>
             <a href="#" class="text-light"><i class="bi bi-twitter"></i></a>
             <a href="#" class="text-light"><i class="bi bi-instagram"></i></a>
