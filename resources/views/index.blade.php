@@ -825,9 +825,9 @@
       object-fit: cover;
       margin-bottom: 10px;
       border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(35, 47, 62, 0.22), 0 2px 0 #fff inset, 0 0 0 4px #ff9900333;
-      transform: perspective(600px) rotateY(-18deg) scale(1.12) rotateX(6deg);
-      transition: transform 0.4s cubic-bezier(.25, .8, .25, 1), box-shadow 0.4s;
+  box-shadow: 0 12px 32px rgba(35, 47, 62, 0.22), 0 2px 0 #fff inset, 0 0 0 4px #ff990033;
+  transform: perspective(600px) rotateY(-18deg) scale(1.12) rotateX(6deg);
+  transition: transform 0.4s cubic-bezier(.25, .8, .25, 1), box-shadow 0.4s;
     }
 
     .category-card:hover img {
@@ -1891,7 +1891,7 @@ li a{
         @foreach($products as $index => $product)
           <div class="carousel-item {{ $index === 0 ? '' : '' }}">
             <div class="py-5"
-              style="background: linear-gradient(90deg,#232f3e,#{{ sprintf('%06X', mt_rand(0, 0xFFFFFF)) }});">
+              style="background: linear-gradient(90deg,#232f3e,#ff9900);">
               <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div class="text-white">
                   <h2 class="h1 fw-bold mb-2">
