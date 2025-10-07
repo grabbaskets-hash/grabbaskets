@@ -50,12 +50,21 @@ class AuthenticatedSessionController extends Controller
         }
         
         if ($role === 'seller') {
-            return redirect()->route('seller.dashboard')->with('success', $greeting);
+            return redirect()->route('seller.dashboard')->with([
+                'success' => $greeting,
+                'tamil_greeting' => true
+            ]);
         }
         if ($role === 'buyer') {
-            return redirect()->route('home')->with('success', $greeting);
+            return redirect()->route('home')->with([
+                'success' => $greeting,
+                'tamil_greeting' => true
+            ]);
         }
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard', absolute: false))->with([
+            'success' => $greeting,
+            'tamil_greeting' => true
+        ]);
 
         
     }
@@ -93,13 +102,13 @@ class AuthenticatedSessionController extends Controller
     {
         switch ($gender) {
             case 'male':
-                return "Welcome back, Mr. {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             case 'female':
-                return "Welcome back, Ms or Mrs. {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             case 'other':
-                return "Welcome back, {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             default:
-                return "Welcome back, {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
         }
     }
 }

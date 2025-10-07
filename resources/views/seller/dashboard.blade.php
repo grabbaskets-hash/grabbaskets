@@ -290,7 +290,134 @@
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('show');
         });
+
+        // Tamil Voice Greeting Function
+        function playTamilGreeting(userName) {
+            if ('speechSynthesis' in window) {
+                // Tamil greeting message
+                const tamilMessage = `வணக்கம் ${userName}! கிராப்பாஸ்கெட்டுக்கு தங்களை அன்புடன் வரவேற்கிறோம்!`;
+                
+                const utterance = new SpeechSynthesisUtterance(tamilMessage);
+                
+                // Try to find Tamil voice
+                const voices = speechSynthesis.getVoices();
+                const tamilVoice = voices.find(voice => 
+                    voice.lang.includes('ta') || 
+                    voice.lang.includes('hi') || 
+                    voice.name.toLowerCase().includes('tamil')
+                );
+                
+                if (tamilVoice) {
+                    utterance.voice = tamilVoice;
+                } else {
+                    // Fallback to any available voice
+                    utterance.voice = voices[0] || null;
+                }
+                
+                utterance.rate = 0.8;
+                utterance.pitch = 1.1;
+                utterance.volume = 0.7;
+                
+                // Add visual feedback with enhanced Tamil styling
+                const notification = document.createElement('div');
+                notification.innerHTML = `
+                    <div class="alert alert-success d-flex align-items-center tamil-greeting-notification" style="
+                      position: fixed; 
+                      top: 20px; 
+                      right: 20px; 
+                      z-index: 9999; 
+                      border-radius: 15px; 
+                      box-shadow: 0 8px 32px rgba(0,123,255,0.3);
+                      background: linear-gradient(135deg, #28a745, #20c997);
+                      border: 2px solid #ffd700;
+                      min-width: 300px;
+                      animation: tamilSlideIn 0.8s ease-out;
+                    ">
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-volume-up-fill me-2" style="font-size: 1.5rem; color: #ffd700;"></i>
+                        <div>
+                          <div style="color: white; font-weight: bold; font-size: 1.1rem;">
+                            🔊 வணக்கம் ${userName}! 🎉
+                          </div>
+                          <div style="color: #f8f9fa; font-size: 0.9rem; margin-top: 2px;">
+                            கிராப்பாஸ்கெட்டுக்கு வரவேற்கிறோம்!
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove notification after 5 seconds with fade out
+                setTimeout(() => {
+                    notification.style.animation = 'tamilFadeOut 0.5s ease-in forwards';
+                    setTimeout(() => notification.remove(), 500);
+                }, 5000);
+                
+                // Play the speech
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Add Tamil greeting animations CSS
+        if (!document.querySelector('#tamilAnimations')) {
+            const style = document.createElement('style');
+            style.id = 'tamilAnimations';
+            style.textContent = `
+              @keyframes tamilSlideIn {
+                0% {
+                  opacity: 0;
+                  transform: translateX(100%) scale(0.8);
+                }
+                50% {
+                  transform: translateX(-10px) scale(1.05);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateX(0) scale(1);
+                }
+              }
+              
+              @keyframes tamilFadeOut {
+                0% {
+                  opacity: 1;
+                  transform: scale(1);
+                }
+                100% {
+                  opacity: 0;
+                  transform: scale(0.9) translateX(50px);
+                }
+              }
+              
+              .tamil-greeting-notification:hover {
+                transform: scale(1.02);
+                transition: transform 0.2s ease;
+              }
+            `;
+            document.head.appendChild(style);
+        }
     </script>
+
+    @if(session('tamil_greeting') && auth()->check())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for voices to be loaded
+            if (speechSynthesis.getVoices().length === 0) {
+                speechSynthesis.addEventListener('voiceschanged', function() {
+                    setTimeout(() => {
+                        playTamilGreeting('{{ auth()->user()->name }}');
+                    }, 1000);
+                });
+            } else {
+                setTimeout(() => {
+                    playTamilGreeting('{{ auth()->user()->name }}');
+                }, 1000);
+            }
+        });
+    </script>
+    @endif
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

@@ -78,7 +78,10 @@ class RegisteredUserController extends Controller
             
             // Gender-based welcome message
             $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
-            return redirect()->route('seller.dashboard')->with('success', $greeting);
+            return redirect()->route('seller.dashboard')->with([
+                'success' => $greeting,
+                'tamil_greeting' => true
+            ]);
         } else {
             $buyer = \App\Models\Buyer::create([
                 'name' => $request->name,
@@ -111,7 +114,10 @@ class RegisteredUserController extends Controller
             
             // Gender-based welcome message
             $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
-            return redirect()->route('home')->with('success', $greeting);
+            return redirect()->route('home')->with([
+                'success' => $greeting,
+                'tamil_greeting' => true
+            ]);
         }
     }
 
@@ -122,13 +128,13 @@ class RegisteredUserController extends Controller
     {
         switch ($gender) {
             case 'male':
-                return "Welcome aboard, Mr. {$name}! Ready to explore?";
+                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
             case 'female':
-                return "Welcome, Ms. {$name}! We're delighted to have you here!";
+                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
             case 'other':
-                return "Welcome, {$name}! We're excited to have you join us!";
+                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
             default:
-                return "Welcome, {$name}!";
+                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
         }
     }
 }

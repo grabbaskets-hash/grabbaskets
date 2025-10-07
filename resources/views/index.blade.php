@@ -554,6 +554,88 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Interactive User Greeting Styles */
+    .user-greeting-interactive {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .user-greeting-interactive:hover {
+      transform: scale(1.05);
+    }
+
+    .user-name-bounce {
+      animation: gentle-bounce 2s ease-in-out infinite;
+    }
+
+    .greeting-emoji {
+      font-size: 1.2em;
+      animation: rotate-sparkle 3s ease-in-out infinite;
+      transition: all 0.3s ease;
+    }
+
+    .user-greeting-interactive:hover .greeting-emoji {
+      animation: excited-bounce 0.6s ease-in-out;
+      transform: scale(1.3);
+    }
+
+    @keyframes gentle-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    @keyframes rotate-sparkle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(10deg); }
+      75% { transform: rotate(-10deg); }
+    }
+
+    @keyframes excited-bounce {
+      0%, 100% { transform: scale(1.3) translateY(0); }
+      25% { transform: scale(1.4) translateY(-4px); }
+      50% { transform: scale(1.5) translateY(-2px); }
+      75% { transform: scale(1.4) translateY(-4px); }
+    }
+
+    /* Enhanced Mega Menu Interactivity */
+    .mega-subcategory-link {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mega-subcategory-link::after {
+      content: '✨';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%) scale(0);
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .mega-subcategory-link:hover::after {
+      transform: translateY(-50%) scale(1);
+      opacity: 1;
+    }
+
+    .mega-category-emoji {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .mega-category-emoji:hover {
+      animation: emoji-dance 0.8s ease-in-out;
+    }
+
+    @keyframes emoji-dance {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(10deg) scale(1.1); }
+      50% { transform: rotate(-10deg) scale(1.2); }
+      75% { transform: rotate(5deg) scale(1.1); }
+    }
     .hero-section {
       background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 25%, #f5deb3 50%, #daa520 75%, #8B4513 100%);
       color: #2c1810;
@@ -1460,6 +1542,14 @@ li a{
   @endif
   --}}
   <!-- Modern Enhanced Navbar -->
+  <!-- Language Tab -->
+  <div class="d-flex justify-content-end align-items-center p-2" style="background: linear-gradient(90deg, #f5f5dc 0%, #faebd7 100%); border-bottom: 1px solid #e5e5e5;">
+    <div class="btn-group" role="group" aria-label="Language switcher" style="box-shadow: 0 2px 8px rgba(139,69,19,0.07); border-radius: 8px; overflow: hidden;">
+      <button class="btn btn-sm btn-outline-primary language-btn" data-lang="en" style="font-weight:600; background: #fff;">🇬🇧 English</button>
+      <button class="btn btn-sm btn-outline-success language-btn" data-lang="ta" style="font-weight:600; background: #fff;">🇮🇳 தமிழ்</button>
+      <button class="btn btn-sm btn-outline-warning language-btn" data-lang="te" style="font-weight:600; background: #fff;">🇮🇳 తెలుగు</button>
+    </div>
+  </div>
   <nav class="navbar navbar-expand-lg" id="mainNavbar">
     <div class="container">
       <!-- Logo -->
@@ -1518,67 +1608,64 @@ li a{
                 <div class="mega-categories-grid" id="megaCategoriesGrid">
                   @if(!empty($categories) && $categories->count())
                     @foreach($categories as $category)
-                      <div class="mega-category-card" data-gender="{{ $category->gender ?? 'all' }}">
+                      @if(strtolower($category->name) !== 'furniture' && strtolower($category->name) !== 'mobillio')
+                      <div class="mega-category-card unique-3d-card" data-gender="{{ $category->gender ?? 'all' }}">
                         <div class="mega-category-header">
-                          <div class="mega-category-emoji">
-                            @switch($category->name)
-                              @case('ELECTRONICS')
-                                📱
-                                @break
-                              @case('MEN\'S FASHION')
-                                👕
-                                @break
-                              @case('WOMEN\'S FASHION')
-                                👗
-                                @break
-                              @case('HOME & KITCHEN')
-                                🏠
-                                @break
-                              @case('BEAUTY & PERSONAL CARE')
-                                �
-                                @break
-                              @case('SPORTS & FITNESS')
-                                ⚽
-                                @break
-                              @case('BOOKS & EDUCATION')
-                                📚
-                                @break
-                              @case('KIDS & TOYS')
-                                🧸
-                                @break
-                              @case('AUTOMOTIVE')
-                                🚗
-                                @break
-                              @case('HEALTH & WELLNESS')
-                                🏥
-                                @break
-                              @case('JEWELRY & ACCESSORIES')
-                                💍
-                                @break
-                              @case('GROCERY & FOOD')
-                                🛒
-                                @break
-                              @case('FURNITURE')
-                                🪑
-                                @break
-                              @case('GARDEN & OUTDOOR')
-                                🌱
-                                @break
-                              @case('PET SUPPLIES')
-                                🐕
-                                @break
-                              @case('BABY PRODUCTS')
-                                👶
-                                @break
-                              @default
-                                🏷️
-                            @endswitch
+                          <div class="mega-category-emoji" style="box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff; background: #fff;">
+                            @php
+                              $modelImages = [
+                                'ELECTRONICS' => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80',
+                                'MEN\'S FASHION' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
+                                'WOMEN\'S FASHION' => 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=80&q=80',
+                                'HOME & KITCHEN' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
+                                'BEAUTY & PERSONAL CARE' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
+                                'SPORTS & FITNESS' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80',
+                                'BOOKS & EDUCATION' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=80&q=80',
+                                'KIDS & TOYS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
+                                'AUTOMOTIVE' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
+                                'HEALTH & WELLNESS' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80',
+                                'JEWELRY & ACCESSORIES' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
+                                'GROCERY & FOOD' => 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80',
+                                'GARDEN & OUTDOOR' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
+                                'PET SUPPLIES' => 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=80&q=80',
+                                'BABY PRODUCTS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
+                              ];
+                              $catKey = strtoupper($category->name);
+                              $img = $category->image ?? ($modelImages[$catKey] ?? 'https://via.placeholder.com/80');
+                            @endphp
+                            <div class="category-3d-img" style="width:60px;height:60px;perspective:400px;display:flex;align-items:center;justify-content:center;">
+                              <img src="{{ $img }}" alt="{{ $category->name }}" style="width:60px;height:60px;object-fit:cover;border-radius:14px;box-shadow:0 8px 32px #ff9900cc,0 0 0 4px #fff;transform:rotateY(-18deg) rotateX(12deg) scale(1.08);transition:transform 0.4s cubic-bezier(.25,1.7,.45,.87);">
+                            </div>
                           </div>
                           <h6 class="mega-category-title">{{ $category->name }}</h6>
                           <span class="mega-category-count">
                             {{ $category->subcategories ? $category->subcategories->count() : 0 }}
                           </span>
                         </div>
+    /* Unique 3D Card Effect for Categories */
+    .unique-3d-card {
+      box-shadow: 0 8px 32px #ff9900cc, 0 0 0 4px #fff;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(.25,1.7,.45,.87), box-shadow 0.3s;
+      background: linear-gradient(135deg, #fffbe6 0%, #f5f5dc 100%);
+      border: 2px solid #ffe066;
+      position: relative;
+    }
+    .unique-3d-card:hover {
+      transform: rotateY(12deg) rotateX(6deg) scale(1.04);
+      box-shadow: 0 16px 48px #ffb300cc, 0 0 0 6px #fff;
+      z-index: 2;
+    }
+    .category-3d-img img {
+      box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff;
+      border-radius: 14px;
+      background: #fff;
+      transition: transform 0.4s cubic-bezier(.25,1.7,.45,.87);
+    }
+    .unique-3d-card:hover .category-3d-img img {
+      transform: rotateY(0deg) rotateX(0deg) scale(1.13);
+      box-shadow: 0 16px 48px #ffb300cc,0 0 0 6px #fff;
+    }
                         
                         @if($category->subcategories && $category->subcategories->count())
                           <div class="mega-subcategories">
@@ -1636,13 +1723,32 @@ li a{
                  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @php
                   $gender = Auth::user()->sex ?? 'other';
+                  
+                  // Fancy queen names for female users
+                  $queenNames = [
+                    '👑 Queen Cinderella',
+                    '✨ Princess Aurora', 
+                    '🌹 Queen Isabella',
+                    '💎 Princess Anastasia',
+                    '🦋 Queen Seraphina',
+                    '🌺 Princess Arabella',
+                    '⭐ Queen Valentina',
+                    '🌙 Princess Luna',
+                    '💖 Queen Cordelia',
+                    '🌸 Princess Evangeline'
+                  ];
+                  
                   $greeting = match($gender) {
                     'male' => '👨 Mr.',
-                    'female' => '👩 Ms.',
-                    default => '👋'
+                    'female' => $queenNames[array_rand($queenNames)],
+                    default => '✨'
                   };
                 @endphp
-                {{ $greeting }} <span class="ms-1">{{ Str::limit(Auth::user()->name, 12) }}</span>
+                <span class="user-greeting-interactive">
+                  {{ $greeting }} 
+                  <span class="ms-1 user-name-bounce">{{ Str::limit(Auth::user()->name, 12) }}</span>
+                  <span class="greeting-emoji">{{ $gender === 'female' ? '👸' : ($gender === 'male' ? '🤴' : '🌟') }}</span>
+                </span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px;">
                 <li><a class="dropdown-item" href="{{ route('profile.show') }}">
@@ -1653,6 +1759,9 @@ li a{
                 </a></li>
                 <li><a class="dropdown-item" href="#">
                   <i class="bi bi-heart me-2"></i>Wishlist
+                </a></li>
+                <li><a class="dropdown-item" href="#" onclick="playTamilGreeting('{{ Auth::user()->name }}'); return false;">
+                  <i class="bi bi-volume-up me-2"></i>🇮🇳 Tamil Welcome
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
@@ -1987,11 +2096,114 @@ li a{
     </div>
   </section> --}}
 
-  <!-- Categories -->
-  <section class="categories">
-    <h2>SHOP BY CATEGORIES</h2>
-    <p>Start shopping based on the categories you are interested in</p>
-    <div class="items">
+  <!-- 3D Shop by Categories -->
+  <section class="categories-3d">
+    <div class="categories-header">
+      <h2 class="section-title">🏛️ SHOP BY CATEGORIES 🏛️</h2>
+      <div class="title-glow"></div>
+      <p class="section-subtitle">✨ Explore our luxurious 3D collections ✨</p>
+    </div>
+    
+    <div class="categories-3d-grid">
+      <!-- Living Room Palace -->
+      <div class="category-cube" data-category="living">
+        <div class="cube-face front">
+          <div class="category-icon">🛋️</div>
+          <h3>Living Palace</h3>
+          <p>Royal comfort</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqvWFTS8vzDHCgJKy5LPZm0-jPaw3LZ6c4RA&s" alt="Furniture">
+          <div class="category-overlay">
+            <span>Premium Collection</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bedroom Kingdom -->
+      <div class="category-cube" data-category="bedroom">
+        <div class="cube-face front">
+          <div class="category-icon">🏰</div>
+          <h3>Bedroom Kingdom</h3>
+          <p>Dreamy comfort</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://www.estre.in/cdn/shop/files/1-min_1a7b23d8-e00c-4bca-86fe-9c65a55bcd1d.jpg?v=1743763633" alt="Chairs">
+          <div class="category-overlay">
+            <span>Luxury Dreams</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dining Empire -->
+      <div class="category-cube" data-category="dining">
+        <div class="cube-face front">
+          <div class="category-icon">🍽️</div>
+          <h3>Dining Empire</h3>
+          <p>Feast in style</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://thetimberguy.com/cdn/shop/products/Buy-Compact-Wooden-Dining-table-with-1-Bench-3-chairs-furniture-set-for-modern-Home-2_1200x.jpg?v=1640455849" alt="Tables">
+          <div class="category-overlay">
+            <span>Elegant Dining</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lighting Sanctuary -->
+      <div class="category-cube" data-category="lighting">
+        <div class="cube-face front">
+          <div class="category-icon">💡</div>
+          <h3>Light Sanctuary</h3>
+          <p>Illuminate beauty</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://plus.unsplash.com/premium_photo-1668005190411-1042cd38522e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bGFtcHxlbnwwfHwwfHx8MA%3D%3D" alt="Lamps">
+          <div class="category-overlay">
+            <span>Ambient Glow</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Garden Paradise -->
+      <div class="category-cube" data-category="garden">
+        <div class="cube-face front">
+          <div class="category-icon">🌿</div>
+          <h3>Garden Paradise</h3>
+          <p>Nature's beauty</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://www.thespruce.com/thmb/ZhNUOJ4Pt0Bj422Pu_uEzZXa_j0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/increase-humidity-for-houseplants-1902801-6-eadf73df8284421ca827c073d8a43fd2.jpg" alt="Plants">
+          <div class="category-overlay">
+            <span>Green Haven</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decor Gallery -->
+      <div class="category-cube" data-category="decor">
+        <div class="cube-face front">
+          <div class="category-icon">🎨</div>
+          <h3>Decor Gallery</h3>
+          <p>Artistic flair</p>
+        </div>
+        <div class="cube-face back">
+          <img src="https://anilevents.in/wp-content/uploads/2021/03/20210204_100836-021-scaled.jpeg" alt="Decor">
+          <div class="category-overlay">
+            <span>Art Collection</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-actions">
+      <button class="fab-main" onclick="showCategoryMenu()">
+        <span class="fab-icon">🔮</span>
+        <span class="fab-text">Explore Magic</span>
+      </button>
+    </div>
+  </section>
       <!-- Existing items -->
       <div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqvWFTS8vzDHCgJKy5LPZm0-jPaw3LZ6c4RA&s"
           alt="Desk">
@@ -2444,6 +2656,28 @@ li a{
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Language tab switching
+    document.addEventListener('DOMContentLoaded', function() {
+      const langBtns = document.querySelectorAll('.language-btn');
+      const langKey = 'grabbasket_lang';
+      // Set active button from localStorage
+      const savedLang = localStorage.getItem(langKey) || 'en';
+      langBtns.forEach(btn => {
+        if (btn.dataset.lang === savedLang) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+        btn.addEventListener('click', function() {
+          localStorage.setItem(langKey, this.dataset.lang);
+          langBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          // Optionally, reload or trigger translation here
+        });
+      });
+    });
+  </script>
+  <script>
     function scrollShelf(key, dir) {
       const el = document.getElementById('shelf-' + key);
       if (!el) return;
@@ -2619,6 +2853,904 @@ li a{
           }, index * 100);
         });
       }, 300);
+
+      // Fix mega menu link interactions
+      const megaSubcategoryLinks = document.querySelectorAll('.mega-subcategory-link');
+      megaSubcategoryLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          // Allow the link to navigate naturally
+          // Add a small delay to allow the click to register
+          setTimeout(() => {
+            megaMenu.classList.remove('show');
+          }, 100);
+        });
+      });
+
+      // Interactive emoji effects
+      const categoryEmojis = document.querySelectorAll('.mega-category-emoji');
+      categoryEmojis.forEach(function(emoji) {
+        emoji.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent card click
+          
+          // Add fun interaction
+          this.style.animation = 'emoji-dance 0.8s ease-in-out';
+          
+          // Reset animation after completion
+          setTimeout(() => {
+            this.style.animation = '';
+          }, 800);
+        });
+      });
+
+      // Add sparkle effect on user greeting hover
+      const userGreeting = document.querySelector('.user-greeting-interactive');
+      if (userGreeting) {
+        userGreeting.addEventListener('mouseenter', function() {
+          // Create sparkle effect
+          for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+              createSparkle(this);
+            }, i * 200);
+          }
+        });
+      }
+
+      function createSparkle(element) {
+        const sparkle = document.createElement('span');
+        sparkle.innerHTML = '✨';
+        sparkle.style.position = 'absolute';
+        sparkle.style.pointerEvents = 'none';
+        sparkle.style.zIndex = '1000';
+        sparkle.style.fontSize = '12px';
+        sparkle.style.animation = 'sparkle-fly 1s ease-out forwards';
+        
+        const rect = element.getBoundingClientRect();
+        sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        
+        document.body.appendChild(sparkle);
+        
+        setTimeout(() => {
+          sparkle.remove();
+        }, 1000);
+      }
+
+      // Add sparkle animation CSS
+      if (!document.querySelector('#sparkleAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'sparkleAnimations';
+        style.textContent = `
+          @keyframes sparkle-fly {
+            0% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translateY(-30px) scale(0.5);
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Tamil Voice Greeting Function
+      function playTamilGreeting(userName) {
+        if ('speechSynthesis' in window) {
+          // Tamil greeting message
+          const tamilMessage = `வணக்கம் ${userName}! கிராப்பாஸ்கெட்டுக்கு தங்களை அன்புடன் வரவேற்கிறோம்!`;
+          
+          const utterance = new SpeechSynthesisUtterance(tamilMessage);
+          
+          // Try to find Tamil voice
+          const voices = speechSynthesis.getVoices();
+          const tamilVoice = voices.find(voice => 
+            voice.lang.includes('ta') || 
+            voice.lang.includes('hi') || 
+            voice.name.toLowerCase().includes('tamil')
+          );
+          
+          if (tamilVoice) {
+            utterance.voice = tamilVoice;
+          } else {
+            // Fallback to any available voice
+            utterance.voice = voices[0] || null;
+          }
+          
+          utterance.rate = 0.8;
+          utterance.pitch = 1.1;
+          utterance.volume = 0.7;
+          
+          // Add visual feedback with enhanced Tamil styling
+          const notification = document.createElement('div');
+          notification.innerHTML = `
+            <div class="alert alert-success d-flex align-items-center tamil-greeting-notification" style="
+              position: fixed; 
+              top: 20px; 
+              right: 20px; 
+              z-index: 9999; 
+              border-radius: 15px; 
+              box-shadow: 0 8px 32px rgba(0,123,255,0.3);
+              background: linear-gradient(135deg, #28a745, #20c997);
+              border: 2px solid #ffd700;
+              min-width: 300px;
+              animation: tamilSlideIn 0.8s ease-out;
+            ">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-volume-up-fill me-2" style="font-size: 1.5rem; color: #ffd700;"></i>
+                <div>
+                  <div style="color: white; font-weight: bold; font-size: 1.1rem;">
+                    🔊 வணக்கம் ${userName}! 🎉
+                  </div>
+                  <div style="color: #f8f9fa; font-size: 0.9rem; margin-top: 2px;">
+                    கிராப்பாஸ்கெட்டுக்கு வரவேற்கிறோம்!
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(notification);
+          
+          // Remove notification after 5 seconds with fade out
+          setTimeout(() => {
+            notification.style.animation = 'tamilFadeOut 0.5s ease-in forwards';
+            setTimeout(() => notification.remove(), 500);
+          }, 5000);
+          
+          // Play the speech
+          speechSynthesis.speak(utterance);
+        }
+      }
+
+      // Add Tamil greeting animations CSS
+      if (!document.querySelector('#tamilAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'tamilAnimations';
+        style.textContent = `
+          @keyframes tamilSlideIn {
+            0% {
+              opacity: 0;
+              transform: translateX(100%) scale(0.8);
+            }
+            50% {
+              transform: translateX(-10px) scale(1.05);
+            }
+            100% {
+              opacity: 1;
+              transform: translateX(0) scale(1);
+            }
+          }
+          
+          @keyframes tamilFadeOut {
+            0% {
+              opacity: 1;
+              transform: scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0.9) translateX(50px);
+            }
+          }
+          
+          .tamil-greeting-notification:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    });
+  </script>
+
+  @if(session('tamil_greeting') && auth()->check())
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait for voices to be loaded
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.addEventListener('voiceschanged', function() {
+          setTimeout(() => {
+            playTamilGreeting('{{ auth()->user()->name }}');
+          }, 1000);
+        });
+      } else {
+        setTimeout(() => {
+          playTamilGreeting('{{ auth()->user()->name }}');
+        }, 1000);
+      }
+    });
+  </script>
+  @endif
+
+  <!-- Chatbot Assistant Widget -->
+  <div id="chatbotWidget" class="chatbot-widget">
+    <!-- Chatbot Toggle Button -->
+    <div id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()">
+      <div class="robot-anim">
+        <i class="bi bi-robot"></i>
+        <div class="robot-leg left-leg"></div>
+        <div class="robot-leg right-leg"></div>
+      </div>
+      <span class="chat-pulse"></span>
+    /* Robot walking animation */
+    .robot-anim {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: robotFloat 3s ease-in-out infinite;
+    }
+    .robot-anim i {
+      font-size: 32px;
+      z-index: 2;
+      animation: robotWalk 1.2s steps(2) infinite;
+    }
+    .robot-leg {
+      position: absolute;
+      bottom: 0;
+      width: 6px;
+      height: 16px;
+      background: #007bff;
+      border-radius: 3px;
+      z-index: 1;
+      left: 7px;
+      opacity: 0.7;
+    }
+    .robot-leg.right-leg {
+      left: 19px;
+      animation: legMove 1.2s infinite alternate;
+    }
+    .robot-leg.left-leg {
+      left: 7px;
+      animation: legMove 1.2s 0.6s infinite alternate;
+    }
+    @keyframes robotWalk {
+      0% { filter: brightness(1); }
+      50% { filter: brightness(1.2) drop-shadow(0 2px 2px #0056b3); }
+      100% { filter: brightness(1); }
+    }
+    @keyframes legMove {
+      0% { transform: rotate(10deg); }
+      100% { transform: rotate(-20deg); }
+    }
+    @keyframes robotFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    /* Draggable chatbot toggle */
+    .chatbot-toggle.dragging {
+      opacity: 0.7;
+      box-shadow: 0 0 0 4px #007bff44;
+      cursor: grabbing;
+      z-index: 10000;
+      transition: none;
+    }
+  <script>
+    // Make chatbot toggle draggable
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatbotToggle = document.getElementById('chatbotToggle');
+      let isDragging = false, offsetX = 0, offsetY = 0;
+      chatbotToggle.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        chatbotToggle.classList.add('dragging');
+        offsetX = e.clientX - chatbotToggle.getBoundingClientRect().left;
+        offsetY = e.clientY - chatbotToggle.getBoundingClientRect().top;
+        document.body.style.userSelect = 'none';
+      });
+      document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        let x = e.clientX - offsetX;
+        let y = e.clientY - offsetY;
+        // Keep within viewport
+        x = Math.max(0, Math.min(window.innerWidth - chatbotToggle.offsetWidth, x));
+        y = Math.max(0, Math.min(window.innerHeight - chatbotToggle.offsetHeight, y));
+        chatbotToggle.parentElement.style.right = 'auto';
+        chatbotToggle.parentElement.style.left = x + 'px';
+        chatbotToggle.parentElement.style.top = y + 'px';
+        chatbotToggle.parentElement.style.bottom = 'auto';
+      });
+      document.addEventListener('mouseup', function() {
+        if (isDragging) {
+          isDragging = false;
+          chatbotToggle.classList.remove('dragging');
+          document.body.style.userSelect = '';
+        }
+      });
+      // Touch support
+      chatbotToggle.addEventListener('touchstart', function(e) {
+        isDragging = true;
+        chatbotToggle.classList.add('dragging');
+        const touch = e.touches[0];
+        offsetX = touch.clientX - chatbotToggle.getBoundingClientRect().left;
+        offsetY = touch.clientY - chatbotToggle.getBoundingClientRect().top;
+        document.body.style.userSelect = 'none';
+      });
+      document.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        let x = touch.clientX - offsetX;
+        let y = touch.clientY - offsetY;
+        x = Math.max(0, Math.min(window.innerWidth - chatbotToggle.offsetWidth, x));
+        y = Math.max(0, Math.min(window.innerHeight - chatbotToggle.offsetHeight, y));
+        chatbotToggle.parentElement.style.right = 'auto';
+        chatbotToggle.parentElement.style.left = x + 'px';
+        chatbotToggle.parentElement.style.top = y + 'px';
+        chatbotToggle.parentElement.style.bottom = 'auto';
+      });
+      document.addEventListener('touchend', function() {
+        if (isDragging) {
+          isDragging = false;
+          chatbotToggle.classList.remove('dragging');
+          document.body.style.userSelect = '';
+        }
+      });
+    });
+  </script>
+    </div>
+
+    <!-- Chatbot Window -->
+    <div id="chatbotWindow" class="chatbot-window">
+      <!-- Chatbot Header -->
+      <div class="chatbot-header">
+        <div class="d-flex align-items-center">
+          <div class="chatbot-avatar">
+            <i class="bi bi-robot"></i>
+          </div>
+          <div class="ms-2">
+            <h6 class="mb-0">GrabBasket Assistant</h6>
+            <small class="text-muted">🟢 Online</small>
+          </div>
+        </div>
+        <button class="btn btn-sm" onclick="closeChatbot()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Chatbot Messages -->
+      <div id="chatbotMessages" class="chatbot-messages">
+        <div class="message bot-message">
+          <div class="message-avatar">
+            <i class="bi bi-robot"></i>
+          </div>
+          <div class="message-content">
+            <p>🙏 வணக்கம்! Hello! I'm your GrabBasket Assistant. How can I help you today?</p>
+            <div class="quick-actions">
+              <button class="quick-btn" onclick="askQuestion('What products do you have?')">🛍️ Products</button>
+              <button class="quick-btn" onclick="askQuestion('How to place an order?')">📦 Orders</button>
+              <button class="quick-btn" onclick="askQuestion('What are delivery charges?')">🚚 Delivery</button>
+              <button class="quick-btn" onclick="askQuestion('Customer support contact')">📞 Support</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbot Input -->
+      <div class="chatbot-input">
+        <div class="input-group">
+          <input type="text" id="chatbotMessageInput" class="form-control" 
+                 placeholder="Ask me anything about GrabBasket..." 
+                 onkeypress="handleChatbotKeypress(event)">
+          <button class="btn btn-primary" onclick="sendMessage()">
+            <i class="bi bi-send"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Chatbot Widget Styles */
+    .chatbot-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .chatbot-toggle {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 123, 255, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      animation: chatbotBounce 2s infinite;
+    }
+
+    .chatbot-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0, 123, 255, 0.4);
+    }
+
+    .chatbot-toggle i {
+      font-size: 24px;
+    }
+
+    .chat-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(0, 123, 255, 0.4);
+      animation: chatbotPulse 2s infinite;
+    }
+
+    .chatbot-window {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 380px;
+      height: 500px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: chatbotSlideUp 0.3s ease-out;
+    }
+
+    .chatbot-header {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chatbot-avatar {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chatbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: #f8f9fa;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 16px;
+      animation: messageSlideIn 0.3s ease-out;
+    }
+
+    .bot-message {
+      align-items: flex-start;
+    }
+
+    .user-message {
+      align-items: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin: 0 8px;
+    }
+
+    .bot-message .message-avatar {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+    }
+
+    .user-message .message-avatar {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+    }
+
+    .message-content {
+      max-width: 70%;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-message .message-content {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+    }
+
+    .message-content p {
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quick-btn {
+      background: #e9ecef;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-btn:hover {
+      background: #007bff;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .chatbot-input {
+      padding: 16px;
+      background: white;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .chatbot-input .form-control {
+      border-radius: 25px;
+      border: 1px solid #e9ecef;
+      padding: 12px 16px;
+    }
+
+    .chatbot-input .btn {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      margin-left: 8px;
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 16px;
+      margin-left: 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #007bff;
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Animations */
+    @keyframes chatbotBounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+      60% { transform: translateY(-3px); }
+    }
+
+    @keyframes chatbotPulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    @keyframes chatbotSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes messageSlideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .chatbot-window {
+        width: 320px;
+        height: 450px;
+      }
+      
+      .chatbot-toggle {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .chatbot-toggle i {
+        font-size: 20px;
+      }
+    }
+  </style>
+
+  <script>
+    // Chatbot Knowledge Base
+    const chatbotKnowledge = {
+      // Products and Categories
+      'products': [
+        "We offer a wide range of products including furniture, home decor, electronics, and household items.",
+        "Our categories include Living Room furniture, Bedroom sets, Dining tables, Lighting, Plants, and Decorative items.",
+        "You can browse our 3D categories section to explore different product collections."
+      ],
+      'furniture': [
+        "We have premium furniture collections including sofas, chairs, tables, beds, and storage solutions.",
+        "Our furniture ranges from modern to traditional styles with competitive pricing and quality guarantee."
+      ],
+      'categories': [
+        "We have organized products into categories like Living Palace, Bedroom Kingdom, Dining Empire, Light Sanctuary, Garden Paradise, and Decor Gallery.",
+        "Each category is designed to help you find exactly what you're looking for."
+      ],
+      
+      // Orders and Shopping
+      'order': [
+        "To place an order: 1) Browse products 2) Add to cart 3) Proceed to checkout 4) Enter shipping details 5) Make payment",
+        "You can track your orders from your dashboard after logging in.",
+        "We accept multiple payment methods for your convenience."
+      ],
+      'cart': [
+        "Add products to cart by clicking the 'Add to Cart' button on product pages.",
+        "You can view and modify your cart contents before checkout.",
+        "Items remain in your cart even after logging out."
+      ],
+      'payment': [
+        "We accept credit cards, debit cards, UPI, and cash on delivery.",
+        "All payments are processed securely through encrypted channels.",
+        "You'll receive confirmation emails for all transactions."
+      ],
+      
+      // Delivery and Shipping
+      'delivery': [
+        "Delivery charges vary by location and product. Many items offer free delivery.",
+        "Standard delivery takes 3-7 business days depending on your location.",
+        "We provide tracking information once your order is shipped."
+      ],
+      'shipping': [
+        "We ship across India with reliable courier partners.",
+        "Express delivery options available for urgent orders.",
+        "Free shipping on orders above ₹999 in most areas."
+      ],
+      
+      // Account and Support
+      'account': [
+        "Create an account to track orders, save favorites, and get personalized recommendations.",
+        "You can manage your profile, addresses, and preferences in the dashboard.",
+        "Both buyer and seller accounts are available."
+      ],
+      'support': [
+        "For support, contact us through the website or call our helpline.",
+        "Our customer service team is available during business hours.",
+        "You can also use this chat for immediate assistance."
+      ],
+      'return': [
+        "We offer easy returns within 7 days of delivery for most products.",
+        "Items should be in original condition with packaging for returns.",
+        "Refunds are processed within 5-7 business days after return approval."
+      ],
+      
+      // Company Information
+      'about': [
+        "GrabBasket is your one-stop destination for quality furniture and home essentials.",
+        "We've been serving customers with premium products and excellent service.",
+        "Our mission is to make shopping convenient and affordable for everyone."
+      ],
+      'contact': [
+        "You can reach us through the contact form on our website.",
+        "Our customer service email and phone numbers are available in the footer.",
+        "We're here to help with any questions or concerns you may have."
+      ]
+    };
+
+    // Chatbot State
+    let chatbotOpen = false;
+
+    // Toggle Chatbot
+    function toggleChatbot() {
+      const window = document.getElementById('chatbotWindow');
+      const toggle = document.getElementById('chatbotToggle');
+      
+      if (chatbotOpen) {
+        closeChatbot();
+      } else {
+        window.style.display = 'flex';
+        chatbotOpen = true;
+        toggle.style.transform = 'scale(0.9)';
+      }
+    }
+
+    // Close Chatbot
+    function closeChatbot() {
+      const window = document.getElementById('chatbotWindow');
+      const toggle = document.getElementById('chatbotToggle');
+      
+      window.style.display = 'none';
+      chatbotOpen = false;
+      toggle.style.transform = 'scale(1)';
+    }
+
+    // Send Message
+    function sendMessage() {
+      const input = document.getElementById('chatbotMessageInput');
+      const message = input.value.trim();
+      
+      if (message) {
+        addUserMessage(message);
+        input.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Get bot response
+        setTimeout(() => {
+          hideTypingIndicator();
+          const response = getBotResponse(message);
+          addBotMessage(response);
+        }, 1000 + Math.random() * 1000);
+      }
+    }
+
+    // Handle Enter Key
+    function handleChatbotKeypress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    // Quick Question
+    function askQuestion(question) {
+      const input = document.getElementById('chatbotMessageInput');
+      input.value = question;
+      sendMessage();
+    }
+
+    // Add User Message
+    function addUserMessage(message) {
+      const messagesContainer = document.getElementById('chatbotMessages');
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message user-message';
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          <i class="bi bi-person"></i>
+        </div>
+        <div class="message-content">
+          <p>${message}</p>
+        </div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Add Bot Message
+    function addBotMessage(message) {
+      const messagesContainer = document.getElementById('chatbotMessages');
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message bot-message';
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="message-content">
+          <p>${message}</p>
+        </div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Show Typing Indicator
+    function showTypingIndicator() {
+      const messagesContainer = document.getElementById('chatbotMessages');
+      
+      const typingDiv = document.createElement('div');
+      typingDiv.id = 'typingIndicator';
+      typingDiv.className = 'typing-indicator';
+      typingDiv.innerHTML = `
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+        <span class="ms-2 text-muted">Assistant is typing...</span>
+      `;
+      
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Hide Typing Indicator
+    function hideTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    // Get Bot Response
+    function getBotResponse(userMessage) {
+      const message = userMessage.toLowerCase();
+      
+      // Check for greetings
+      if (message.includes('hello') || message.includes('hi') || message.includes('vanakkam') || message.includes('வணக்கம்')) {
+        return "🙏 வணக்கம்! Hello! Welcome to GrabBasket! How can I assist you today? You can ask about our products, orders, delivery, or anything else you'd like to know!";
+      }
+      
+      // Check for thanks
+      if (message.includes('thank') || message.includes('thanks')) {
+        return "😊 You're welcome! I'm always here to help. Is there anything else you'd like to know about GrabBasket?";
+      }
+      
+      // Search knowledge base
+      for (const [key, responses] of Object.entries(chatbotKnowledge)) {
+        if (message.includes(key)) {
+          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+          return randomResponse + "\n\n💬 Need more help? Feel free to ask anything else!";
+        }
+      }
+      
+      // Check for specific keywords
+      if (message.includes('price') || message.includes('cost')) {
+        return "💰 Our products have competitive prices with regular discounts! You can see the exact price on each product page. We also offer free delivery on orders above ₹999. Would you like to know about any specific product?";
+      }
+      
+      if (message.includes('discount') || message.includes('offer')) {
+        return "🎉 We regularly have amazing discounts and flash sales! Check our homepage for current offers. You can also sign up for our newsletter to get notified about exclusive deals!";
+      }
+      
+      if (message.includes('quality') || message.includes('genuine')) {
+        return "✅ We guarantee 100% genuine products with quality assurance. All our items go through strict quality checks before shipping. We also offer easy returns if you're not satisfied!";
+      }
+      
+      // Default responses
+      const defaultResponses = [
+        "🤔 I understand you're asking about that. Let me help you! Could you please be more specific? You can ask about products, orders, delivery, pricing, or support.",
+        "💡 That's a great question! I'm here to help with anything related to GrabBasket. Try asking about our products, how to place orders, delivery information, or customer support.",
+        "🌟 Thanks for your question! I can help you with product information, ordering process, delivery details, pricing, returns, or any other GrabBasket-related queries. What specifically would you like to know?",
+        "🛍️ I'd love to help you with that! I can assist with product categories, shopping guidance, account management, order tracking, or general information about GrabBasket. What can I help you find?"
+      ];
+      
+      return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    }
+
+    // Initialize chatbot on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add welcome animation to toggle button
+      setTimeout(() => {
+        const toggle = document.getElementById('chatbotToggle');
+        toggle.style.animation = 'chatbotBounce 2s infinite, chatbotPulse 3s infinite';
+      }, 2000);
     });
   </script>
 </body>
