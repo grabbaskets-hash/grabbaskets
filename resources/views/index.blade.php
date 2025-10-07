@@ -307,19 +307,23 @@
       border: none;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
       border-radius: 12px;
-      padding: 20px;
+      padding: 24px;
       background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
       backdrop-filter: blur(10px);
     }
 
     .mega-menu .category-section {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       padding: 16px;
       background: #fff;
       border-radius: 8px;
       border-left: 4px solid #8B4513;
       box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
       transition: all 0.3s ease;
+      height: auto;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
     }
 
     .mega-menu .category-section:hover {
@@ -337,6 +341,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     .mega-menu .category-icon {
@@ -353,18 +358,24 @@
 
     .mega-menu .subcategory-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 6px;
+      flex-grow: 1;
+      align-content: start;
     }
 
     .mega-menu .dropdown-item {
-      font-size: 13px;
-      padding: 8px 12px;
+      font-size: 12px;
+      padding: 6px 10px;
       color: #6c757d;
       border-radius: 6px;
       transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mega-menu .dropdown-item::before {
@@ -460,6 +471,31 @@
     }
 
     /* Responsive Design for Mega Menu */
+    @media (max-width: 1200px) {
+      .mega-menu {
+        width: 98vw;
+        max-width: 1000px;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .mega-menu {
+        width: 98vw;
+        padding: 16px;
+      }
+      
+      .mega-menu .category-section {
+        margin-bottom: 16px;
+        min-height: 180px;
+      }
+      
+      .mega-menu .subcategory-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 4px;
+      }
+    }
+
     @media (max-width: 768px) {
       .mega-menu {
         width: 98vw;
@@ -468,10 +504,12 @@
       
       .mega-menu .category-section {
         margin-bottom: 16px;
+        min-height: 160px;
       }
       
       .mega-menu .subcategory-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 4px;
       }
       
       .mega-menu .gender-tabs {
@@ -493,6 +531,10 @@
       
       .mega-menu {
         top: 60px;
+      }
+
+      .mega-menu .category-section {
+        min-height: 140px;
       }
     }
 
@@ -662,9 +704,13 @@ li a{
 
 }*/
     .navbar {
-      background: #f5f5dc;
-      box-shadow: 0 2px 8px rgba(35, 47, 62, 0.10);
-      /* border-radius: 0 0 16px 16px; */
+      background: linear-gradient(135deg, #f5f5dc 0%, #faf8f3 50%, #f5f5dc 100%);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+      border-bottom: 3px solid rgba(139, 69, 19, 0.1);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1040;
     }
 
     .navbar-brand {
@@ -673,18 +719,96 @@ li a{
       color: #8B4513;
       letter-spacing: 2px;
       text-shadow: 0 2px 8px rgba(139, 69, 19, 0.12);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      color: #654321;
+      transform: scale(1.02);
+      text-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
     }
 
     .nav-link {
       color: #8B4513 !important;
       font-weight: 500;
       border-radius: 12px;
-      transition: background 0.2s;
+      transition: all 0.3s ease;
+      padding: 8px 16px !important;
+      margin: 0 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      transition: left 0.3s ease;
+    }
+
+    .nav-link:hover::before {
+      left: 100%;
     }
 
     .nav-link:hover {
-      background: rgba(139, 69, 19, 0.15);
+      background: rgba(139, 69, 19, 0.1);
       color: #654321 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
+    }
+
+    .navbar-toggler {
+      border: 2px solid #8B4513;
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%238B4513' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* Navbar Dropdown Styling */
+    .navbar .dropdown-menu:not(.mega-menu) {
+      background: linear-gradient(135deg, #f5f5dc 0%, #faf8f3 100%);
+      border: 2px solid rgba(139, 69, 19, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(139, 69, 19, 0.15);
+      padding: 8px 0;
+      min-width: 200px;
+    }
+
+    .navbar .dropdown-item {
+      color: #8B4513;
+      padding: 8px 20px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      margin: 2px 8px;
+    }
+
+    .navbar .dropdown-item:hover {
+      background: rgba(139, 69, 19, 0.1);
+      color: #654321;
+      transform: translateX(4px);
+    }
+
+    .navbar .dropdown-divider {
+      border-color: rgba(139, 69, 19, 0.2);
+      margin: 8px 16px;
+    }
+
+    /* Navbar User Greeting */
+    .nav-link:has(.user-greeting) {
+      background: rgba(139, 69, 19, 0.05);
+      border: 1px solid rgba(139, 69, 19, 0.1);
     }
 
     /* 🌟 Diwali Theme Banner */
@@ -845,10 +969,10 @@ li a{
               </div>
 
               <!-- Categories Grid -->
-              <div class="row" id="categoriesGrid">
+              <div class="row g-3" id="categoriesGrid">
                 @if(!empty($categories) && $categories->count())
                   @foreach($categories as $category)
-                    <div class="col-md-3 category-section" data-gender="{{ $category->gender ?? 'all' }}">
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-12 category-section" data-gender="{{ $category->gender ?? 'all' }}">
                       <div class="category-title">
                         <div class="category-icon">
                           @switch($category->name)
@@ -995,11 +1119,38 @@ li a{
 
 
   <!-- Floating Menu Button -->
-  <button type="button" class="btn btn-lg btn-warning shadow position-fixed"
-    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;"
+  <button type="button" class="btn btn-lg btn-warning shadow position-fixed floating-menu-btn"
+    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;animation:bounce 2s infinite;"
     data-bs-toggle="modal" data-bs-target="#categoryMenuModal">
-    <span class="material-icons" style="font-size:2rem;">menu</span>
+    🛍️
   </button>
+
+  <style>
+    .floating-menu-btn {
+      transition: all 0.3s ease;
+      background: linear-gradient(45deg, #ffc107, #ffb300) !important;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 20px rgba(255, 193, 7, 0.4);
+    }
+    
+    .floating-menu-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(255, 193, 7, 0.6);
+      background: linear-gradient(45deg, #ffb300, #ffc107) !important;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-5px);
+      }
+      60% {
+        transform: translateY(-3px);
+      }
+    }
+  </style>
 
   <!-- Category Menu Modal -->
   <div class="modal fade" id="categoryMenuModal" tabindex="-1" aria-labelledby="categoryMenuModalLabel"
@@ -1007,7 +1158,7 @@ li a{
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-xl">
         <div class="modal-header bg-indigo-50 rounded-top-xl">
-          <h5 class="modal-title text-indigo-700" id="categoryMenuModalLabel">Browse Categories</h5>
+          <h5 class="modal-title text-indigo-700" id="categoryMenuModalLabel">🛍️ Browse Categories</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
