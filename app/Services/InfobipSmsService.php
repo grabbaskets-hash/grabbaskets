@@ -1,5 +1,4 @@
-git remote add origin <your-new-repo-url>git remote add origin <your-new-repo-url>git remote add origin <your-new-repo-url>git push -u origin maingit push -u origin main</your-new-repo-url><?php
-
+<?php
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
