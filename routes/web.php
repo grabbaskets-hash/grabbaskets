@@ -23,7 +23,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    $categories = \App\Models\Category::all();
+    $categories = \App\Models\Category::with('subcategories')->get();
     $products = \App\Models\Product::latest()->paginate(12);
     $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
     $lookbookProduct = \App\Models\Product::inRandomOrder()->first();

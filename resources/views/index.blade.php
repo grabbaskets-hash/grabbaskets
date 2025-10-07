@@ -298,50 +298,202 @@
       color: #232f3e;
     }
 
-    /* Mega Menu Styling */
+    /* Mega Menu Styling - Zepto Style */
     .mega-menu {
-      width: 800px;
-      /* adjust as needed */
-      left: 0;
-      right: 0;
-      margin: auto;
+      width: 95vw;
+      max-width: 1200px;
+      left: 50%;
+      transform: translateX(-50%);
       border: none;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      backdrop-filter: blur(10px);
     }
 
-    .mega-menu h6 {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 5px;
+    .mega-menu .category-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #fff;
+      border-radius: 8px;
+      border-left: 4px solid #8B4513;
+      box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .mega-menu .category-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139, 69, 19, 0.2);
+    }
+
+    .mega-menu .category-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #8B4513;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f5f5dc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mega-menu .category-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .mega-menu .subcategory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
     }
 
     .mega-menu .dropdown-item {
-      font-size: 14px;
-      padding: 3px 0;
-      color: #555;
-      font-family: Arial;
+      font-size: 13px;
+      padding: 8px 12px;
+      color: #6c757d;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mega-menu .dropdown-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      transition: left 0.3s ease;
+    }
+
+    .mega-menu .dropdown-item:hover::before {
+      left: 100%;
     }
 
     .mega-menu .dropdown-item:hover {
-      color: #ff6600;
-      background: none;
+      color: #8B4513;
+      background: rgba(139, 69, 19, 0.08);
+      transform: translateX(4px);
+    }
+
+    .mega-menu .gender-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: #f8f9fa;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .mega-menu .gender-tab {
+      flex: 1;
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6c757d;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mega-menu .gender-tab.active,
+    .mega-menu .gender-tab:hover {
+      background: #8B4513;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .mega-menu .view-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 16px;
+    }
+
+    .mega-menu .view-all-btn:hover {
+      background: linear-gradient(45deg, #A0522D, #8B4513);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+      color: white;
+    }
+
+    /* Categories Badge */
+    .category-badge {
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      margin-left: auto;
     }
 
     .navbar .dropdown-menu.mega-menu {
       position: fixed;
-      /* relative to screen */
       top: 70px;
-      /* adjust based on navbar height */
       left: 50%;
       transform: translateX(-50%);
-
-
-      width: 100vw;
-      /* responsive */
-      max-width: 1500px;
+      width: 95vw;
+      max-width: 1200px;
       z-index: 1050;
-      /* keep on top */
+    }
+
+    /* Responsive Design for Mega Menu */
+    @media (max-width: 768px) {
+      .mega-menu {
+        width: 98vw;
+        padding: 15px;
+      }
+      
+      .mega-menu .category-section {
+        margin-bottom: 16px;
+      }
+      
+      .mega-menu .subcategory-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+      
+      .mega-menu .gender-tabs {
+        flex-direction: column;
+        gap: 2px;
+      }
+      
+      .mega-menu .gender-tab {
+        text-align: center;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .mega-menu .subcategory-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .mega-menu {
+        top: 60px;
+      }
     }
 
     /* --------------------------- */
@@ -510,7 +662,7 @@ li a{
 
 }*/
     .navbar {
-      background: #232f3e;
+      background: #f5f5dc;
       box-shadow: 0 2px 8px rgba(35, 47, 62, 0.10);
       /* border-radius: 0 0 16px 16px; */
     }
@@ -518,21 +670,21 @@ li a{
     .navbar-brand {
       font-weight: bold;
       font-size: 2rem;
-      color: #ff9900;
+      color: #8B4513;
       letter-spacing: 2px;
-      text-shadow: 0 2px 8px rgba(255, 153, 0, 0.12);
+      text-shadow: 0 2px 8px rgba(139, 69, 19, 0.12);
     }
 
     .nav-link {
-      color: #fff !important;
+      color: #8B4513 !important;
       font-weight: 500;
       border-radius: 12px;
       transition: background 0.2s;
     }
 
     .nav-link:hover {
-      background: rgba(255, 153, 0, 0.15);
-      color: #ff9900 !important;
+      background: rgba(139, 69, 19, 0.15);
+      color: #654321 !important;
     }
 
     /* 🌟 Diwali Theme Banner */
@@ -683,22 +835,115 @@ li a{
               aria-expanded="false">
               Shop
             </a>
-            <div class="dropdown-menu mega-menu p-3" aria-labelledby="shopDropdown">
-              <div class="row g-3">
+            <div class="dropdown-menu mega-menu" id="categoriesMegaMenu">
+              <!-- Gender Filter Tabs -->
+              <div class="gender-tabs">
+                <button class="gender-tab active" data-gender="all">All Categories</button>
+                <button class="gender-tab" data-gender="men">Men's Collection</button>
+                <button class="gender-tab" data-gender="women">Women's Collection</button>
+                <button class="gender-tab" data-gender="kids">Kids Zone</button>
+              </div>
+
+              <!-- Categories Grid -->
+              <div class="row" id="categoriesGrid">
                 @if(!empty($categories) && $categories->count())
                   @foreach($categories as $category)
-                    <div class="col-12 col-md-6 col-lg-3">
-                      <h6 class="fw-bold">{{ $category->name }}</h6>
+                    <div class="col-md-3 category-section" data-gender="{{ $category->gender ?? 'all' }}">
+                      <div class="category-title">
+                        <div class="category-icon">
+                          @switch($category->name)
+                            @case('Electronics')
+                              📱
+                              @break
+                            @case('Fashion')
+                              👕
+                              @break
+                            @case('Home & Kitchen')
+                              🏠
+                              @break
+                            @case('Books')
+                              📚
+                              @break
+                            @case('Sports')
+                              ⚽
+                              @break
+                            @case('Beauty')
+                              💄
+                              @break
+                            @case('Toys')
+                              🧸
+                              @break
+                            @case('Automotive')
+                              🚗
+                              @break
+                            @case('Health')
+                              🏥
+                              @break
+                            @case('Garden')
+                              🌱
+                              @break
+                            @case('Jewelry')
+                              💍
+                              @break
+                            @case('Music')
+                              🎵
+                              @break
+                            @case('Pet Supplies')
+                              🐕
+                              @break
+                            @case('Office')
+                              🖥️
+                              @break
+                            @case('Travel')
+                              ✈️
+                              @break
+                            @case('Art & Crafts')
+                              🎨
+                              @break
+                            @default
+                              🏷️
+                          @endswitch
+                        </div>
+                        <span>{{ $category->name }}</span>
+                        <span class="category-badge">{{ $category->subcategories ? $category->subcategories->count() : 0 }}</span>
+                      </div>
+                      
                       @if($category->subcategories && $category->subcategories->count())
-                        @foreach($category->subcategories as $subcategory)
-                          <a class="dropdown-item" href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}">
-                            {{ $subcategory->name }}
+                        <div class="subcategory-grid">
+                          @foreach($category->subcategories->take(8) as $subcategory)
+                            <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="dropdown-item">
+                              {{ $subcategory->name }}
+                            </a>
+                          @endforeach
+                          @if($category->subcategories->count() > 8)
+                            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="dropdown-item" style="font-weight: 600; color: #8B4513;">
+                              +{{ $category->subcategories->count() - 8 }} more...
+                            </a>
+                          @endif
+                        </div>
+                      @else
+                        <div class="subcategory-grid">
+                          <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="dropdown-item">
+                            View All {{ $category->name }}
                           </a>
-                        @endforeach
+                        </div>
                       @endif
                     </div>
                   @endforeach
+                @else
+                  <div class="col-12 text-center py-4">
+                    <p class="text-muted">No categories available</p>
+                  </div>
                 @endif
+              </div>
+
+              <!-- View All Button -->
+              <div class="text-center">
+                <a href="{{ route('buyer.dashboard') }}" class="view-all-btn">
+                  <span>🛍️</span>
+                  View All Categories
+                  <span>→</span>
+                </a>
               </div>
             </div>
           </li>
@@ -1557,6 +1802,63 @@ li a{
             });
           });
         }
+      }
+    });
+
+    // Mega Menu Gender Filter Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const genderTabs = document.querySelectorAll('.gender-tab');
+      const categoryElements = document.querySelectorAll('.category-section');
+
+      function filterCategories(selectedGender) {
+        categoryElements.forEach(function(category) {
+          const categoryGender = category.getAttribute('data-gender');
+          
+          if (selectedGender === 'all' || categoryGender === selectedGender || categoryGender === 'all') {
+            category.style.display = 'block';
+            category.style.animation = 'fadeInUp 0.3s ease';
+          } else {
+            category.style.display = 'none';
+          }
+        });
+
+        // Update active tab
+        genderTabs.forEach(function(tab) {
+          tab.classList.remove('active');
+        });
+        document.querySelector(`[data-gender="${selectedGender}"]`).classList.add('active');
+      }
+
+      // Add click events to gender tabs
+      genderTabs.forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          const selectedGender = this.getAttribute('data-gender');
+          filterCategories(selectedGender);
+        });
+      });
+
+      // Add fadeIn animation keyframes to head
+      if (!document.querySelector('#megaMenuAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'megaMenuAnimations';
+        style.textContent = `
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .category-section {
+            animation: fadeInUp 0.3s ease;
+          }
+        `;
+        document.head.appendChild(style);
       }
     });
   </script>
