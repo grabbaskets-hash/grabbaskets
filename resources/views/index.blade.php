@@ -17,34 +17,566 @@
       overflow-x: hidden;
     }
 
-    /* .navbar {
-      background: #232f3e;
-      box-shadow: 0 2px 8px rgba(35,47,62,0.10);
-      border-radius: 0 0 16px 16px;
+    /* Modern Navbar Styling */
+    .navbar {
+      background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 50%, #f5deb3 100%);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(139, 69, 19, 0.1);
+      border-bottom: 3px solid rgba(139, 69, 19, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      transition: all 0.3s ease;
     }
+
+    .navbar.scrolled {
+      background: linear-gradient(135deg, rgba(245, 245, 220, 0.95) 0%, rgba(250, 235, 215, 0.95) 50%, rgba(245, 222, 179, 0.95) 100%);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 6px 30px rgba(139, 69, 19, 0.15);
+    }
+
     .navbar-brand {
-      font-weight: bold;
-      font-size: 2rem;
-      color: #ff9900;
-      letter-spacing: 2px;
-      text-shadow: 0 2px 8px rgba(255,153,0,0.12);
+      font-weight: 800;
+      font-size: 1.8rem;
+      background: linear-gradient(45deg, #8B4513, #D2691E, #8B4513);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
+      transition: all 0.3s ease;
     }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
     .nav-link {
-      color: #fff !important;
-      font-weight: 500;
-      border-radius: 12px;
-      transition: background 0.2s;
+      color: #8B4513 !important;
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 8px 16px !important;
+      margin: 0 4px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .nav-link:hover::before {
+      left: 100%;
+    }
+
     .nav-link:hover {
-      background: rgba(255,153,0,0.15);
-      color: #ff9900 !important;
-    } */
+      background: rgba(139, 69, 19, 0.08);
+      color: #654321 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
+    }
+
+    .navbar-toggler {
+      border: 2px solid #8B4513;
+      border-radius: 10px;
+      padding: 6px 10px;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:hover {
+      background: rgba(139, 69, 19, 0.1);
+      transform: scale(1.05);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23654321' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* Search Bar Enhancement */
+    .search-form {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 25px;
+      box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+      border: 2px solid rgba(139, 69, 19, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .search-form:focus-within {
+      transform: scale(1.02);
+      box-shadow: 0 6px 25px rgba(139, 69, 19, 0.2);
+      border-color: rgba(139, 69, 19, 0.3);
+    }
+
+    .search-form .form-control {
+      border: none;
+      background: transparent;
+      padding: 12px 20px;
+      font-size: 14px;
+      color: #8B4513;
+    }
+
+    .search-form .form-control:focus {
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .search-form .btn {
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .search-form .btn:hover {
+      background: linear-gradient(45deg, #A0522D, #8B4513);
+      transform: scale(1.05);
+    }
+
+    /* Advanced Mega Menu Styling */
+    .mega-menu-wrapper {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95vw;
+      max-width: 1400px;
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(139, 69, 19, 0.15);
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-20px);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 1040;
+      overflow: hidden;
+    }
+
+    .mega-menu-wrapper.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .mega-menu-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      border-bottom: none;
+      border-right: none;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .mega-menu-content {
+      padding: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mega-menu-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+    }
+
+    .mega-menu-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #8B4513, #D2691E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .mega-menu-subtitle {
+      color: #8B4513;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* Gender Filter Tabs */
+    .gender-filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 25px;
+      background: rgba(139, 69, 19, 0.05);
+      padding: 8px;
+      border-radius: 15px;
+      justify-content: center;
+    }
+
+    .gender-tab {
+      flex: 1;
+      max-width: 200px;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #8B4513;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gender-tab::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      transition: left 0.3s ease;
+      z-index: -1;
+    }
+
+    .gender-tab.active::before,
+    .gender-tab:hover::before {
+      left: 0;
+    }
+
+    .gender-tab.active,
+    .gender-tab:hover {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+    }
+
+    /* Categories Grid */
+    .mega-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .mega-category-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mega-category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(45deg, #8B4513, #D2691E);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .mega-category-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .mega-category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(139, 69, 19, 0.15);
+      border-color: rgba(139, 69, 19, 0.2);
+    }
+
+    .mega-category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+    }
+
+    .mega-category-emoji {
+      font-size: 24px;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(210, 105, 30, 0.1));
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .mega-category-card:hover .mega-category-emoji {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(45deg, rgba(139, 69, 19, 0.2), rgba(210, 105, 30, 0.2));
+    }
+
+    .mega-category-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #8B4513;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .mega-category-count {
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      color: white;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .mega-subcategories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .mega-subcategory-link {
+      display: block;
+      padding: 8px 12px;
+      color: #666;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mega-subcategory-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .mega-subcategory-link:hover::before {
+      left: 100%;
+    }
+
+    .mega-subcategory-link:hover {
+      background: rgba(139, 69, 19, 0.08);
+      color: #8B4513;
+      transform: translateX(5px);
+      text-decoration: none;
+    }
+
+    /* View All Button */
+    .mega-view-all {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(139, 69, 19, 0.1);
+    }
+
+    .mega-view-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 30px;
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .mega-view-all-btn:hover {
+      background: linear-gradient(45deg, #A0522D, #8B4513);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 1200px) {
+      .mega-menu-wrapper {
+        width: 98vw;
+        max-width: 1200px;
+      }
+
+      .mega-categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .navbar-brand {
+        font-size: 1.6rem;
+      }
+
+      .mega-menu-wrapper {
+        width: 98vw;
+        border-radius: 15px;
+      }
+
+      .mega-menu-content {
+        padding: 20px;
+      }
+
+      .mega-categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+      }
+
+      .gender-filter-tabs {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .gender-tab {
+        max-width: none;
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 8px 0;
+      }
+
+      .navbar-brand {
+        font-size: 1.4rem;
+      }
+
+      .mega-menu-wrapper {
+        position: fixed;
+        top: 70px;
+        left: 2vw;
+        width: 96vw;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        border-radius: 12px;
+      }
+
+      .mega-menu-content {
+        padding: 15px;
+      }
+
+      .mega-menu-title {
+        font-size: 1.4rem;
+      }
+
+      .mega-categories-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .mega-category-card {
+        padding: 15px;
+      }
+
+      .mega-subcategories {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 6px;
+      }
+
+      .gender-filter-tabs {
+        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        gap: 8px;
+      }
+
+      .gender-tab {
+        padding: 12px;
+        font-size: 12px;
+      }
+
+      .search-form {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .mega-menu-wrapper {
+        left: 1vw;
+        width: 98vw;
+        top: 65px;
+      }
+
+      .mega-categories-grid {
+        gap: 8px;
+      }
+
+      .mega-category-card {
+        padding: 12px;
+      }
+
+      .mega-category-emoji {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+      }
+
+      .mega-category-title {
+        font-size: 14px;
+      }
+
+      .mega-subcategories {
+        grid-template-columns: 1fr;
+      }
+
+      .gender-filter-tabs {
+        grid-template-columns: 1fr;
+      }
+    }
     .hero-section {
-      background: linear-gradient(90deg, #232f3e 0%, #37475a 100%);
-      color: #fff;
-      padding: 0px 0 0px 0;
-      /* border-radius: 0 0 24px 24px; */
-      /* box-shadow: 0 4px 16px 0 rgba(35,47,62,0.10); */
+      background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 25%, #f5deb3 50%, #daa520 75%, #8B4513 100%);
+      color: #2c1810;
+      padding: 60px 0 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><circle cx="20" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="40" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="60" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="80" cy="10" r="1" fill="rgba(139,69,19,0.1)"/></svg>') repeat;
+      opacity: 0.3;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
     }
 
     .hero-section h1 {
@@ -538,6 +1070,219 @@
       }
     }
 
+    /* Static Shop Menu Styling */
+    .static-shop-menu {
+      background: linear-gradient(135deg, #f5f5dc 0%, #faf8f3 100%);
+      border-bottom: 3px solid rgba(139, 69, 19, 0.1);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+      padding: 16px 0;
+      position: sticky;
+      top: 70px;
+      z-index: 1030;
+    }
+
+    .gender-tabs-static {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 0 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .gender-tabs-static::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gender-tab-static {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      background: rgba(139, 69, 19, 0.05);
+      border: 2px solid rgba(139, 69, 19, 0.1);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #8B4513;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .gender-tab-static.active,
+    .gender-tab-static:hover {
+      background: #8B4513;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+    }
+
+    .categories-scroll-container {
+      position: relative;
+    }
+
+    .scroll-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(139, 69, 19, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scroll-btn:hover {
+      background: #8B4513;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    }
+
+    .scroll-left {
+      left: -20px;
+    }
+
+    .scroll-right {
+      right: -20px;
+    }
+
+    .categories-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139, 69, 19, 0.3) transparent;
+      padding: 8px;
+      scroll-behavior: smooth;
+    }
+
+    .categories-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .categories-scroll::-webkit-scrollbar-track {
+      background: rgba(139, 69, 19, 0.1);
+      border-radius: 4px;
+    }
+
+    .categories-scroll::-webkit-scrollbar-thumb {
+      background: rgba(139, 69, 19, 0.3);
+      border-radius: 4px;
+    }
+
+    .categories-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 69, 19, 0.5);
+    }
+
+    .category-card-static {
+      flex-shrink: 0;
+      width: 220px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+      border: 2px solid rgba(139, 69, 19, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .category-card-static:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(139, 69, 19, 0.15);
+      border-color: rgba(139, 69, 19, 0.2);
+    }
+
+    .category-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f5f5dc;
+    }
+
+    .category-emoji {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(45deg, #8B4513, #A0522D);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .category-card-header h6 {
+      margin: 0;
+      font-weight: 700;
+      color: #8B4513;
+      font-size: 14px;
+      flex-grow: 1;
+    }
+
+    .subcategory-count {
+      background: #8B4513;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .subcategory-list-static {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .subcategory-link-static {
+      color: #6c757d;
+      text-decoration: none;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .subcategory-link-static:hover {
+      background: rgba(139, 69, 19, 0.08);
+      color: #8B4513;
+      transform: translateX(4px);
+      border-color: rgba(139, 69, 19, 0.1);
+    }
+
+    .subcategory-link-static.more-link {
+      color: #8B4513;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .static-shop-menu {
+        top: 60px;
+        padding: 12px 0;
+      }
+      
+      .category-card-static {
+        width: 180px;
+      }
+      
+      .gender-tabs-static {
+        margin-bottom: 12px;
+      }
+    }
+
     /* --------------------------- */
 
     .categories {
@@ -927,13 +1672,18 @@ li a{
   </div>
   @endif
   --}}
-  <!-- Navbar -->
-
-
-  <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+  <!-- Modern Enhanced Navbar -->
+  <nav class="navbar navbar-expand-lg" id="mainNavbar">
     <div class="container">
       <!-- Logo -->
-      <a href="{{ route('home') }}" class="navbar-brand fw-bold">grabbasket</a>
+      <a href="{{ route('home') }}" class="navbar-brand d-flex align-items-center">
+        🛒 grabbasket
+      </a>
+
+      <!-- Mobile Search Toggle -->
+      <button class="btn d-lg-none me-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch">
+        <i class="bi bi-search" style="color: #8B4513;"></i>
+      </button>
 
       <!-- Hamburger Button -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -942,132 +1692,138 @@ li a{
 
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
-
-        <!-- Search (stacked on mobile, inline on desktop) -->
-        <form action="{{ route('products.index') }}" method="GET" class="d-flex my-2 my-lg-0 ms-lg-3 w-100 w-lg-auto">
-          <input type="text" name="q" placeholder="Search products..." class="form-control me-2"
+        <!-- Desktop Search -->
+        <form action="{{ route('products.index') }}" method="GET" class="d-none d-lg-flex search-form mx-auto">
+          <input type="text" name="q" placeholder="🔍 Search for products..." class="form-control"
             value="{{ request('q') }}" />
-          <button class="btn btn-warning text-dark fw-semibold">Search</button>
+          <button class="btn" type="submit">
+            <i class="bi bi-search me-1"></i> Search
+          </button>
         </form>
 
         <!-- Nav Links -->
-        <ul class="navbar-nav ms-auto ">
-
-          <!-- Shop Dropdown (Mega Menu) -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="shopDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Shop
+        <ul class="navbar-nav ms-auto align-items-center">
+          <!-- Shop with Mega Menu -->
+          <li class="nav-item dropdown position-relative">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="shopMegaMenu" 
+               data-bs-toggle="dropdown" aria-expanded="false">
+              🛍️ <span class="ms-1">Shop</span>
             </a>
-            <div class="dropdown-menu mega-menu" id="categoriesMegaMenu">
-              <!-- Gender Filter Tabs -->
-              <div class="gender-tabs">
-                <button class="gender-tab active" data-gender="all">All Categories</button>
-                <button class="gender-tab" data-gender="men">Men's Collection</button>
-                <button class="gender-tab" data-gender="women">Women's Collection</button>
-                <button class="gender-tab" data-gender="kids">Kids Zone</button>
-              </div>
+            
+            <!-- Mega Menu -->
+            <div class="mega-menu-wrapper dropdown-menu" aria-labelledby="shopMegaMenu">
+              <div class="mega-menu-content">
+                <!-- Header -->
+                <div class="mega-menu-header">
+                  <h3 class="mega-menu-title">🛍️ Shop by Categories</h3>
+                  <p class="mega-menu-subtitle">Discover amazing products in every category</p>
+                </div>
 
-              <!-- Categories Grid -->
-              <div class="row g-3" id="categoriesGrid">
-                @if(!empty($categories) && $categories->count())
-                  @foreach($categories as $category)
-                    <div class="col-lg-3 col-md-4 col-sm-6 col-12 category-section" data-gender="{{ $category->gender ?? 'all' }}">
-                      <div class="category-title">
-                        <div class="category-icon">
-                          @switch($category->name)
-                            @case('Electronics')
-                              📱
-                              @break
-                            @case('Fashion')
-                              👕
-                              @break
-                            @case('Home & Kitchen')
-                              🏠
-                              @break
-                            @case('Books')
-                              📚
-                              @break
-                            @case('Sports')
-                              ⚽
-                              @break
-                            @case('Beauty')
-                              💄
-                              @break
-                            @case('Toys')
-                              🧸
-                              @break
-                            @case('Automotive')
-                              🚗
-                              @break
-                            @case('Health')
-                              🏥
-                              @break
-                            @case('Garden')
-                              🌱
-                              @break
-                            @case('Jewelry')
-                              💍
-                              @break
-                            @case('Music')
-                              🎵
-                              @break
-                            @case('Pet Supplies')
-                              🐕
-                              @break
-                            @case('Office')
-                              🖥️
-                              @break
-                            @case('Travel')
-                              ✈️
-                              @break
-                            @case('Art & Crafts')
-                              🎨
-                              @break
-                            @default
-                              🏷️
-                          @endswitch
+                <!-- Gender Filter Tabs -->
+                <div class="gender-filter-tabs">
+                  <button class="gender-tab active" data-gender="all">🌟 All Categories</button>
+                  <button class="gender-tab" data-gender="men">👨 Men's Collection</button>
+                  <button class="gender-tab" data-gender="women">👩 Women's Collection</button>
+                  <button class="gender-tab" data-gender="kids">👶 Kids Zone</button>
+                </div>
+
+                <!-- Categories Grid -->
+                <div class="mega-categories-grid" id="megaCategoriesGrid">
+                  @if(!empty($categories) && $categories->count())
+                    @foreach($categories as $category)
+                      <div class="mega-category-card" data-gender="{{ $category->gender ?? 'all' }}">
+                        <div class="mega-category-header">
+                          <div class="mega-category-emoji">
+                            @switch($category->name)
+                              @case('ELECTRONICS')
+                                📱
+                                @break
+                              @case('MEN\'S FASHION')
+                                👕
+                                @break
+                              @case('WOMEN\'S FASHION')
+                                👗
+                                @break
+                              @case('HOME & KITCHEN')
+                                🏠
+                                @break
+                              @case('BEAUTY & PERSONAL CARE')
+                                �
+                                @break
+                              @case('SPORTS & FITNESS')
+                                ⚽
+                                @break
+                              @case('BOOKS & EDUCATION')
+                                📚
+                                @break
+                              @case('KIDS & TOYS')
+                                🧸
+                                @break
+                              @case('AUTOMOTIVE')
+                                🚗
+                                @break
+                              @case('HEALTH & WELLNESS')
+                                🏥
+                                @break
+                              @case('JEWELRY & ACCESSORIES')
+                                💍
+                                @break
+                              @case('GROCERY & FOOD')
+                                🛒
+                                @break
+                              @case('FURNITURE')
+                                🪑
+                                @break
+                              @case('GARDEN & OUTDOOR')
+                                🌱
+                                @break
+                              @case('PET SUPPLIES')
+                                🐕
+                                @break
+                              @case('BABY PRODUCTS')
+                                👶
+                                @break
+                              @default
+                                🏷️
+                            @endswitch
+                          </div>
+                          <h6 class="mega-category-title">{{ $category->name }}</h6>
+                          <span class="mega-category-count">
+                            {{ $category->subcategories ? $category->subcategories->count() : 0 }}
+                          </span>
                         </div>
-                        <span>{{ $category->name }}</span>
-                        <span class="category-badge">{{ $category->subcategories ? $category->subcategories->count() : 0 }}</span>
+                        
+                        @if($category->subcategories && $category->subcategories->count())
+                          <div class="mega-subcategories">
+                            @foreach($category->subcategories->take(6) as $subcategory)
+                              <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" 
+                                 class="mega-subcategory-link">
+                                {{ $subcategory->name }}
+                              </a>
+                            @endforeach
+                            @if($category->subcategories->count() > 6)
+                              <a href="{{ route('buyer.productsByCategory', $category->id) }}" 
+                                 class="mega-subcategory-link" style="font-weight: 600; color: #8B4513;">
+                                +{{ $category->subcategories->count() - 6 }} more
+                              </a>
+                            @endif
+                          </div>
+                        @else
+                          <p class="text-muted small">No subcategories available</p>
+                        @endif
                       </div>
-                      
-                      @if($category->subcategories && $category->subcategories->count())
-                        <div class="subcategory-grid">
-                          @foreach($category->subcategories->take(8) as $subcategory)
-                            <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="dropdown-item">
-                              {{ $subcategory->name }}
-                            </a>
-                          @endforeach
-                          @if($category->subcategories->count() > 8)
-                            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="dropdown-item" style="font-weight: 600; color: #8B4513;">
-                              +{{ $category->subcategories->count() - 8 }} more...
-                            </a>
-                          @endif
-                        </div>
-                      @else
-                        <div class="subcategory-grid">
-                          <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="dropdown-item">
-                            View All {{ $category->name }}
-                          </a>
-                        </div>
-                      @endif
-                    </div>
-                  @endforeach
-                @else
-                  <div class="col-12 text-center py-4">
-                    <p class="text-muted">No categories available</p>
-                  </div>
-                @endif
-              </div>
+                    @endforeach
+                  @endif
+                </div>
 
-              <!-- View All Button -->
-              <div class="text-center">
-                <a href="{{ route('buyer.dashboard') }}" class="view-all-btn">
-                  <span>🛍️</span>
-                  View All Categories
-                  <span>→</span>
-                </a>
+                <!-- View All Button -->
+                <div class="mega-view-all">
+                  <a href="{{ route('buyer.dashboard') }}" class="mega-view-all-btn">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    View All Categories
+                    <i class="bi bi-arrow-right"></i>
+                  </a>
+                </div>
               </div>
             </div>
           </li>
@@ -1075,7 +1831,9 @@ li a{
           <!-- Cart -->
           @auth
             <li class="nav-item">
-              <a class="nav-link" href="{{ route('cart.index') }}">Cart</a>
+              <a class="nav-link d-flex align-items-center" href="{{ route('cart.index') }}">
+                🛒 <span class="ms-1 d-none d-md-inline">Cart</span>
+              </a>
             </li>
             
             <!-- Notification Bell -->
@@ -1087,33 +1845,165 @@ li a{
           <!-- User Dropdown -->
           @auth
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                👋 Hello, {{ Auth::user()->name }}
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
+                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @php
+                  $gender = Auth::user()->sex ?? 'other';
+                  $greeting = match($gender) {
+                    'male' => '👨 Mr.',
+                    'female' => '👩 Ms.',
+                    default => '👋'
+                  };
+                @endphp
+                {{ $greeting }} <span class="ms-1">{{ Str::limit(Auth::user()->name, 12) }}</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
-                <li><a class="dropdown-item" href="#">My Orders</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
+              <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px;">
+                <li><a class="dropdown-item" href="{{ route('profile.show') }}">
+                  <i class="bi bi-person me-2"></i>Profile
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                  <i class="bi bi-box-seam me-2"></i>My Orders
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                  <i class="bi bi-heart me-2"></i>Wishlist
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li>
                   <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="dropdown-item">Logout</button>
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </button>
                   </form>
                 </li>
               </ul>
             </li>
           @else
             <li class="nav-item">
-              <a href="{{ route('login') }}" class="nav-link">Login</a>
+              <a href="{{ route('login') }}" class="nav-link d-flex align-items-center">
+                🔐 <span class="ms-1">Login</span>
+              </a>
             </li>
           @endauth
         </ul>
       </div>
+
+      <!-- Mobile Search Bar -->
+      <div class="collapse w-100 mt-2 d-lg-none" id="mobileSearch">
+        <form action="{{ route('products.index') }}" method="GET" class="search-form">
+          <input type="text" name="q" placeholder="🔍 Search for products..." class="form-control"
+            value="{{ request('q') }}" />
+          <button class="btn" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+      </div>
     </div>
   </nav>
+
+  <!-- Static Scrollable Shop Menu -->
+  <div class="static-shop-menu" id="staticShopMenu">
+    <div class="container">
+      <!-- Gender Filter Tabs -->
+      <div class="gender-tabs-static">
+        <button class="gender-tab-static active" data-gender="all">🛍️ All Categories</button>
+        <button class="gender-tab-static" data-gender="men">👨 Men's Collection</button>
+        <button class="gender-tab-static" data-gender="women">👩 Women's Collection</button>
+        <button class="gender-tab-static" data-gender="kids">👶 Kids Zone</button>
+      </div>
+
+      <!-- Scrollable Categories -->
+      <div class="categories-scroll-container">
+        <div class="categories-scroll" id="categoriesScrollGrid">
+          @if(!empty($categories) && $categories->count())
+            @foreach($categories as $category)
+              <div class="category-card-static" data-gender="{{ $category->gender ?? 'all' }}">
+                <div class="category-card-header">
+                  <div class="category-emoji">
+                    @switch($category->name)
+                      @case('Electronics')
+                        📱
+                        @break
+                      @case('Fashion')
+                        👕
+                        @break
+                      @case('Home & Kitchen')
+                        🏠
+                        @break
+                      @case('Books')
+                        📚
+                        @break
+                      @case('Sports')
+                        ⚽
+                        @break
+                      @case('Beauty')
+                        💄
+                        @break
+                      @case('Toys')
+                        🧸
+                        @break
+                      @case('Automotive')
+                        🚗
+                        @break
+                      @case('Health')
+                        🏥
+                        @break
+                      @case('Garden')
+                        🌱
+                        @break
+                      @case('Jewelry')
+                        💍
+                        @break
+                      @case('Music')
+                        🎵
+                        @break
+                      @case('Pet Supplies')
+                        🐕
+                        @break
+                      @case('Office')
+                        🖥️
+                        @break
+                      @case('Travel')
+                        ✈️
+                        @break
+                      @case('Art & Crafts')
+                        🎨
+                        @break
+                      @default
+                        🏷️
+                    @endswitch
+                  </div>
+                  <h6>{{ $category->name }}</h6>
+                  <span class="subcategory-count">{{ $category->subcategories ? $category->subcategories->count() : 0 }}</span>
+                </div>
+                
+                @if($category->subcategories && $category->subcategories->count())
+                  <div class="subcategory-list-static">
+                    @foreach($category->subcategories->take(6) as $subcategory)
+                      <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="subcategory-link-static">
+                        {{ $subcategory->name }}
+                      </a>
+                    @endforeach
+                    @if($category->subcategories->count() > 6)
+                      <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="subcategory-link-static more-link">
+                        +{{ $category->subcategories->count() - 6 }} more...
+                      </a>
+                    @endif
+                  </div>
+                @else
+                  <div class="subcategory-list-static">
+                    <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="subcategory-link-static">
+                      View All {{ $category->name }}
+                    </a>
+                  </div>
+                @endif
+              </div>
+            @endforeach
+          @endif
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
@@ -1122,7 +2012,7 @@ li a{
   <button type="button" class="btn btn-lg btn-warning shadow position-fixed floating-menu-btn"
     style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;animation:bounce 2s infinite;"
     data-bs-toggle="modal" data-bs-target="#categoryMenuModal">
-    🛍️
+    �
   </button>
 
   <style>
@@ -1155,13 +2045,13 @@ li a{
   <!-- Category Menu Modal -->
   <div class="modal fade" id="categoryMenuModal" tabindex="-1" aria-labelledby="categoryMenuModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-xl">
-        <div class="modal-header bg-indigo-50 rounded-top-xl">
-          <h5 class="modal-title text-indigo-700" id="categoryMenuModalLabel">🛍️ Browse Categories</h5>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius:20px;overflow:hidden;">
+        <div class="modal-header bg-gradient-to-r from-orange-50 to-yellow-50 rounded-top-xl border-0">
+          <h5 class="modal-title fw-bold" id="categoryMenuModalLabel" style="color:#8B4513;font-size:1.3rem;">� Browse Categories</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-0">
           @include('components.category-menu', ['categories' => $categories])
         </div>
       </div>
@@ -1956,13 +2846,13 @@ li a{
       }
     });
 
-    // Mega Menu Gender Filter Functionality
+    // Static Shop Menu Gender Filter Functionality
     document.addEventListener('DOMContentLoaded', function() {
-      const genderTabs = document.querySelectorAll('.gender-tab');
-      const categoryElements = document.querySelectorAll('.category-section');
+      const genderTabsStatic = document.querySelectorAll('.gender-tab-static');
+      const categoryCardsStatic = document.querySelectorAll('.category-card-static');
 
-      function filterCategories(selectedGender) {
-        categoryElements.forEach(function(category) {
+      function filterCategoriesStatic(selectedGender) {
+        categoryCardsStatic.forEach(function(category) {
           const categoryGender = category.getAttribute('data-gender');
           
           if (selectedGender === 'all' || categoryGender === selectedGender || categoryGender === 'all') {
@@ -1974,25 +2864,49 @@ li a{
         });
 
         // Update active tab
-        genderTabs.forEach(function(tab) {
+        genderTabsStatic.forEach(function(tab) {
           tab.classList.remove('active');
         });
-        document.querySelector(`[data-gender="${selectedGender}"]`).classList.add('active');
+        document.querySelector(`.gender-tab-static[data-gender="${selectedGender}"]`).classList.add('active');
       }
 
       // Add click events to gender tabs
-      genderTabs.forEach(function(tab) {
+      genderTabsStatic.forEach(function(tab) {
         tab.addEventListener('click', function(e) {
           e.preventDefault();
           const selectedGender = this.getAttribute('data-gender');
-          filterCategories(selectedGender);
+          filterCategoriesStatic(selectedGender);
         });
       });
 
+      // Add smooth scrolling for categories
+      const categoriesScroll = document.querySelector('.categories-scroll');
+      if (categoriesScroll) {
+        // Add scroll buttons
+        const scrollContainer = document.querySelector('.categories-scroll-container');
+        
+        const scrollLeftBtn = document.createElement('button');
+        scrollLeftBtn.innerHTML = '❮';
+        scrollLeftBtn.className = 'scroll-btn scroll-left';
+        scrollLeftBtn.addEventListener('click', () => {
+          categoriesScroll.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+        
+        const scrollRightBtn = document.createElement('button');
+        scrollRightBtn.innerHTML = '❯';
+        scrollRightBtn.className = 'scroll-btn scroll-right';
+        scrollRightBtn.addEventListener('click', () => {
+          categoriesScroll.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+        
+        scrollContainer.appendChild(scrollLeftBtn);
+        scrollContainer.appendChild(scrollRightBtn);
+      }
+
       // Add fadeIn animation keyframes to head
-      if (!document.querySelector('#megaMenuAnimations')) {
+      if (!document.querySelector('#staticMenuAnimations')) {
         const style = document.createElement('style');
-        style.id = 'megaMenuAnimations';
+        style.id = 'staticMenuAnimations';
         style.textContent = `
           @keyframes fadeInUp {
             from {
@@ -2005,12 +2919,107 @@ li a{
             }
           }
           
-          .category-section {
+          .category-card-static {
             animation: fadeInUp 0.3s ease;
           }
         `;
         document.head.appendChild(style);
       }
+    });
+
+    // Enhanced Mega Menu Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const navbar = document.getElementById('mainNavbar');
+      const megaMenuToggle = document.getElementById('shopMegaMenu');
+      const megaMenu = document.querySelector('.mega-menu-wrapper');
+      const genderTabs = document.querySelectorAll('.gender-tab');
+      const categoryCards = document.querySelectorAll('.mega-category-card');
+
+      // Navbar scroll effect
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+
+      // Mega menu hover functionality
+      let hoverTimeout;
+      
+      megaMenuToggle.addEventListener('mouseenter', function() {
+        clearTimeout(hoverTimeout);
+        megaMenu.classList.add('show');
+      });
+
+      megaMenuToggle.parentElement.addEventListener('mouseleave', function() {
+        hoverTimeout = setTimeout(() => {
+          megaMenu.classList.remove('show');
+        }, 300);
+      });
+
+      megaMenu.addEventListener('mouseenter', function() {
+        clearTimeout(hoverTimeout);
+      });
+
+      megaMenu.addEventListener('mouseleave', function() {
+        hoverTimeout = setTimeout(() => {
+          megaMenu.classList.remove('show');
+        }, 300);
+      });
+
+      // Gender filter functionality
+      function filterMegaCategories(selectedGender) {
+        categoryCards.forEach(function(card) {
+          const cardGender = card.getAttribute('data-gender');
+          
+          if (selectedGender === 'all' || cardGender === selectedGender || cardGender === 'all') {
+            card.style.display = 'block';
+            card.style.animation = 'fadeInUp 0.4s ease';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Update active tab
+        genderTabs.forEach(function(tab) {
+          tab.classList.remove('active');
+        });
+        document.querySelector(`.gender-tab[data-gender="${selectedGender}"]`).classList.add('active');
+      }
+
+      // Add click events to gender tabs
+      genderTabs.forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          const selectedGender = this.getAttribute('data-gender');
+          filterMegaCategories(selectedGender);
+        });
+      });
+
+      // Close mega menu on outside click
+      document.addEventListener('click', function(e) {
+        if (!megaMenuToggle.parentElement.contains(e.target)) {
+          megaMenu.classList.remove('show');
+        }
+      });
+
+      // Mobile mega menu handling
+      if (window.innerWidth <= 768) {
+        megaMenuToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          megaMenu.classList.toggle('show');
+        });
+      }
+
+      // Animate category cards on load
+      setTimeout(() => {
+        categoryCards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.animation = 'fadeInUp 0.4s ease forwards';
+          }, index * 100);
+        });
+      }, 300);
     });
   </script>
 </body>
