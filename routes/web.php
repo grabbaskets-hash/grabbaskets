@@ -14,6 +14,7 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 /*
@@ -23,13 +24,28 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    $categories = \App\Models\Category::with('subcategories')->get();
-    $products = \App\Models\Product::latest()->paginate(12);
-    $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
-    $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-    $blogProducts = \App\Models\Product::latest()->take(3)->get();
+    try {
+        $categories = \App\Models\Category::with('subcategories')->get();
+        $products = \App\Models\Product::latest()->paginate(12);
+        $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+        $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
+        $blogProducts = \App\Models\Product::latest()->take(3)->get();
 
-    return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        Log::error('Database error on homepage: ' . $e->getMessage());
+        
+        // Return a simple view with error message for debugging
+        return view('index', [
+            'categories' => collect([]),
+            'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12),
+            'trending' => collect([]),
+            'lookbookProduct' => null,
+            'blogProducts' => collect([]),
+            'database_error' => 'Database connection issue: ' . $e->getMessage()
+        ]);
+    }
 })->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
