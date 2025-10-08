@@ -85,6 +85,24 @@ Route::get('/', function () {
         }
     }
     
+    // Test database connection first
+    if (request()->has('dbtest')) {
+        try {
+            $categories = \App\Models\Category::count();
+            $products = \App\Models\Product::count();
+            return response()->json([
+                'status' => 'Database OK',
+                'categories' => $categories,
+                'products' => $products
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Database error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     try {
         $categories = \App\Models\Category::with('subcategories')->get();
         $products = \App\Models\Product::latest()->paginate(12);
