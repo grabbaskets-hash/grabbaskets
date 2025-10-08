@@ -1722,7 +1722,7 @@ li a{
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
                  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @php
-                  $gender = Auth::user()->sex ?? 'other';
+                  $gender = Auth::user()?->sex ?? 'other';
                   
                   // Fancy queen names for female users
                   $queenNames = [
@@ -1746,7 +1746,7 @@ li a{
                 @endphp
                 <span class="user-greeting-interactive">
                   {{ $greeting }} 
-                  <span class="ms-1 user-name-bounce">{{ Str::limit(Auth::user()->name, 12) }}</span>
+                  <span class="ms-1 user-name-bounce">{{ Str::limit(Auth::user()?->name ?? 'User', 12) }}</span>
                   <span class="greeting-emoji">{{ $gender === 'female' ? '👸' : ($gender === 'male' ? '🤴' : '🌟') }}</span>
                 </span>
               </a>
@@ -1760,7 +1760,7 @@ li a{
                 <li><a class="dropdown-item" href="#">
                   <i class="bi bi-heart me-2"></i>Wishlist
                 </a></li>
-                <li><a class="dropdown-item" href="#" onclick="playTamilGreeting('{{ Auth::user()->name }}'); return false;">
+                <li><a class="dropdown-item" href="#" onclick="playTamilGreeting('{{ Auth::user()?->name ?? 'User' }}'); return false;">
                   <i class="bi bi-volume-up me-2"></i>🇮🇳 Tamil Welcome
                 </a></li>
                 <li><hr class="dropdown-divider"></li>

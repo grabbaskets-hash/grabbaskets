@@ -267,7 +267,7 @@
 
       <!-- Right Side -->
       <div class="d-flex align-items-center gap-2">
-        <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
+        <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()?->name ?? 'User' }}</span>
 
         <div class="dropdown">
           <button class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button"
