@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 /*
@@ -23,8 +24,57 @@ use Illuminate\Http\Request;
 |--------------------------------------------------------------------------
 */
 
+// Health check route
+Route::get('/health', function () {
+    try {
+        $dbConnected = false;
+        $dbError = null;
+        
+        try {
+            DB::connection()->getPdo();
+            $dbConnected = true;
+        } catch (\Exception $e) {
+            $dbError = $e->getMessage();
+        }
+        
+        return response()->json([
+            'status' => 'OK',
+            'timestamp' => now(),
+            'app' => [
+                'env' => config('app.env'),
+                'debug' => config('app.debug'),
+                'url' => config('app.url'),
+            ],
+            'database' => [
+                'connected' => $dbConnected,
+                'connection' => config('database.default'),
+                'error' => $dbError
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'ERROR',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::get('/', function () {
     try {
+        // First test: Simple response without database
+        if (request()->has('test')) {
+            return response()->json([
+                'status' => 'OK',
+                'message' => 'Application is working',
+                'timestamp' => now(),
+                'config' => [
+                    'app_env' => config('app.env'),
+                    'app_url' => config('app.url'),
+                    'db_connection' => config('database.default')
+                ]
+            ]);
+        }
+
         $categories = \App\Models\Category::with('subcategories')->get();
         $products = \App\Models\Product::latest()->paginate(12);
         $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
@@ -35,6 +85,15 @@ Route::get('/', function () {
     } catch (\Exception $e) {
         // Log the error for debugging
         Log::error('Database error on homepage: ' . $e->getMessage());
+        
+        // If this is a simple test, return JSON
+        if (request()->has('test')) {
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
         
         // Return a simple view with error message for debugging
         return view('index', [
