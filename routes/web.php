@@ -60,18 +60,28 @@ Route::get('/health', function () {
 });
 
 Route::get('/', function () {
-    return response()->json([
-        'status' => 'Laravel is working!',
-        'timestamp' => now()->toString(),
-        'message' => 'Application successfully loaded',
-        'debug_info' => [
-            'php_version' => phpversion(),
-            'laravel_version' => app()->version(),
-            'environment' => app()->environment(),
-            'url' => config('app.url'),
-            'database' => config('database.default')
-        ]
-    ]);
+    try {
+        $categories = \App\Models\Category::with('subcategories')->get();
+        $products = \App\Models\Product::latest()->paginate(12);
+        $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+        $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
+        $blogProducts = \App\Models\Product::latest()->take(3)->get();
+
+        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        Log::error('Database error on homepage: ' . $e->getMessage());
+        
+        // Return a graceful fallback with empty data
+        return view('index', [
+            'categories' => collect([]),
+            'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12),
+            'trending' => collect([]),
+            'lookbookProduct' => null,
+            'blogProducts' => collect([]),
+            'database_error' => 'Unable to load products at this time. Please try again later.'
+        ]);
+    }
 })->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
