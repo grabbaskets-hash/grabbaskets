@@ -188,7 +188,7 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
             </div>
             <div class="btn-horizontal-group">
                 <button type="submit" class="btn btn-gradient">Update Product</button>
-                <a href="/seller/dashboard" class="btn btn-outline-pro">Dashboard</a>
+                <a href="{{ route('seller.dashboard') }}" class="btn btn-outline-pro">Back to Dashboard</a>
             </div>
         </form>
         </div>

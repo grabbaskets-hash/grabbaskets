@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -130,57 +131,222 @@ class SellerController extends Controller {
      */
     public function updateImagesByZip(Request $request)
     {
-        $request->validate([
-            'images_zip' => 'required|file|mimes:zip|max:51200', // 50MB max
+        // Log the start of upload attempt
+        Log::info('Bulk upload attempt started', [
+            'user_id' => Auth::id(),
+            'memory_limit' => ini_get('memory_limit'),
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'max_execution_time' => ini_get('max_execution_time')
         ]);
+        
+        // Increase time limit and memory for large uploads
+        set_time_limit(300); // 5 minutes
+        ini_set('memory_limit', '512M');
+        
+        try {
+            $request->validate([
+                'images_zip' => 'required|file|mimes:zip|max:51200', // 50MB max
+            ]);
 
-        $zipFile = $request->file('images_zip');
-        $zipPath = $zipFile->store('temp', 'local');
-        $fullZipPath = storage_path('app/' . $zipPath);
-        $zip = new \ZipArchive();
-        $updated = 0;
-        $errors = [];
-        if ($zip->open($fullZipPath) === TRUE) {
-            for ($i = 0; $i < $zip->numFiles; $i++) {
-                $filename = $zip->getNameIndex($i);
-                $basename = pathinfo($filename, PATHINFO_BASENAME);
-                $uniqueId = pathinfo($basename, PATHINFO_FILENAME);
-                $imageContent = $zip->getFromIndex($i);
-                if ($imageContent !== false) {
-                    $product = Product::where('unique_id', $uniqueId)
-                        ->where('seller_id', Auth::id())
-                        ->first();
-                    if ($product) {
-                        $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
-                        $uniqueName = Str::random(40) . '.' . $extension;
-                        $storagePath = 'products/' . $uniqueName;
-                        if (Storage::disk('public')->put($storagePath, $imageContent)) {
-                            // Delete old image if exists
-                            if ($product->image) {
-                                Storage::disk('public')->delete($product->image);
-                            }
-                            $product->image = $storagePath;
-                            $product->save();
-                            $updated++;
-                        } else {
-                            $errors[] = "Failed to save image for product $uniqueId";
+            $zipFile = $request->file('images_zip');
+            
+            // Enhanced file validation
+            if (!$zipFile || !$zipFile->isValid()) {
+                throw new \Exception('Invalid ZIP file uploaded');
+            }
+            
+            // Check file size before processing
+            $fileSize = $zipFile->getSize();
+            Log::info('Processing ZIP file', [
+                'filename' => $zipFile->getClientOriginalName(),
+                'size_mb' => round($fileSize / 1024 / 1024, 2),
+                'mime_type' => $zipFile->getMimeType()
+            ]);
+            
+            if ($fileSize > 50 * 1024 * 1024) { // 50MB
+                return redirect()->back()->with('error', 'ZIP file is too large. Maximum size is 50MB.');
+            }
+            
+            $zipPath = $zipFile->store('temp', 'local');
+            $fullZipPath = storage_path('app/' . $zipPath);
+            
+            // Verify ZIP file exists
+            if (!file_exists($fullZipPath)) {
+                Log::error('ZIP file not found after upload', ['path' => $fullZipPath]);
+                return redirect()->back()->with('error', 'Failed to upload ZIP file.');
+            }
+            
+            $zip = new \ZipArchive();
+            $updated = 0;
+            $errors = [];
+            $processed = 0;
+            
+            if ($zip->open($fullZipPath) === TRUE) {
+                $totalFiles = $zip->numFiles;
+                Log::info('ZIP opened successfully', ['total_files' => $totalFiles]);
+                
+                // Reduced limit to prevent 502 errors
+                $maxFiles = min($totalFiles, 30); // Process max 30 files at once to prevent timeout
+                
+                for ($i = 0; $i < $maxFiles; $i++) {
+                    $processed++;
+                    
+                    // Log progress every 5 files
+                    if ($processed % 5 == 0) {
+                        Log::info("Processing file $processed of $maxFiles", [
+                            'memory_usage_mb' => round(memory_get_usage(true) / 1024 / 1024, 2)
+                        ]);
+                    }
+                    
+                    // Clear memory periodically
+                    if ($processed % 10 == 0) {
+                        gc_collect_cycles();
+                    }
+                    
+                    // Check memory usage and stop if too high
+                    $memoryUsage = memory_get_usage(true);
+                    if ($memoryUsage > 300 * 1024 * 1024) { // 300MB threshold
+                        Log::warning('Memory usage too high, stopping processing', [
+                            'memory_mb' => round($memoryUsage / 1024 / 1024, 2)
+                        ]);
+                        $errors[] = "Processing stopped due to memory limits. Please use smaller ZIP files.";
+                        break;
+                    }
+                    
+                    $filename = $zip->getNameIndex($i);
+                    if (empty($filename) || strpos($filename, '__MACOSX') !== false || is_dir($filename)) {
+                        continue; // Skip system files and directories
+                    }
+                    
+                    $basename = pathinfo($filename, PATHINFO_BASENAME);
+                    $uniqueId = pathinfo($basename, PATHINFO_FILENAME);
+                    
+                    try {
+                        $imageContent = $zip->getFromIndex($i);
+                        
+                        if ($imageContent === false || empty($imageContent)) {
+                            $errors[] = "Could not extract: $basename";
+                            continue;
                         }
-                    } else {
-                        $errors[] = "No product found for unique_id: $uniqueId";
+                        
+                        // Check individual image size
+                        if (strlen($imageContent) > 5 * 1024 * 1024) { // 5MB per image
+                            $errors[] = "Image too large (>5MB): $basename";
+                            continue;
+                        }
+                        
+                        // Validate image content
+                        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                        $mimeType = $finfo->buffer($imageContent);
+                        
+                        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+                            $errors[] = "Invalid image type for $uniqueId: $mimeType";
+                            continue;
+                        }
+                        
+                        $product = Product::where('unique_id', $uniqueId)
+                            ->where('seller_id', Auth::id())
+                            ->first();
+                            
+                        if ($product) {
+                            $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
+                            $uniqueName = Str::random(40) . '.' . $extension;
+                            $storagePath = 'products/' . $uniqueName;
+                            
+                            if (Storage::disk('public')->put($storagePath, $imageContent)) {
+                                // Delete old image if exists
+                                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                                    Storage::disk('public')->delete($product->image);
+                                }
+                                $product->image = $storagePath;
+                                $product->save();
+                                $updated++;
+                                
+                                // Log successful update
+                                if ($updated % 5 == 0) {
+                                    Log::info("Successfully updated $updated products so far");
+                                }
+                            } else {
+                                $errors[] = "Failed to save image for product $uniqueId";
+                            }
+                        } else {
+                            $errors[] = "No product found for unique_id: $uniqueId";
+                        }
+                        
+                    } catch (\Exception $e) {
+                        $errors[] = "Error processing $basename: " . $e->getMessage();
+                        Log::error("Error processing individual file", [
+                            'filename' => $basename,
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
+                $zip->close();
+                
+                if ($totalFiles > $maxFiles) {
+                    $message = "Only processed first $maxFiles files out of $totalFiles. Please split your ZIP file into smaller batches to avoid server timeouts.";
+                    $errors[] = $message;
+                    Log::warning($message);
+                }
+            } else {
+                $error = 'Could not open ZIP file. Please ensure it is a valid ZIP file.';
+                $errors[] = $error;
+                Log::error('Failed to open ZIP file', ['path' => $fullZipPath]);
             }
-            $zip->close();
-        } else {
-            $errors[] = 'Could not open ZIP file.';
+            
+            // Clean up temp file
+            if (file_exists($fullZipPath)) {
+                Storage::delete($zipPath);
+            }
+            
+            // Log completion
+            Log::info('Bulk upload completed', [
+                'updated' => $updated,
+                'processed' => $processed,
+                'errors' => count($errors),
+                'final_memory_mb' => round(memory_get_usage(true) / 1024 / 1024, 2)
+            ]);
+            
+            $msg = "$updated product images updated successfully.";
+            if ($errors) {
+                $errorMsg = implode(' | ', array_slice($errors, 0, 3)); // Limit error display
+                if (count($errors) > 3) {
+                    $errorMsg .= ' | And ' . (count($errors) - 3) . ' more errors...';
+                }
+                $msg .= ' Errors: ' . $errorMsg;
+            }
+            
+            return redirect()->route('seller.dashboard')->with('bulk_upload_success', $msg);
+            
+        } catch (\Throwable $e) {
+            // Clean up temp file on error
+            if (isset($zipPath) && Storage::exists($zipPath)) {
+                Storage::delete($zipPath);
+            }
+            
+            // Enhanced error logging
+            Log::error('Bulk image upload failed', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'memory_mb' => round(memory_get_usage(true) / 1024 / 1024, 2)
+            ]);
+            
+            // Determine error type and provide helpful message
+            $errorMessage = 'Upload failed: ';
+            if (strpos($e->getMessage(), 'memory') !== false) {
+                $errorMessage .= 'Not enough memory. Try uploading smaller ZIP files (max 20-30 images).';
+            } elseif (strpos($e->getMessage(), 'time') !== false || strpos($e->getMessage(), 'timeout') !== false) {
+                $errorMessage .= 'Processing took too long. Try splitting into smaller batches.';
+            } elseif (strpos($e->getMessage(), 'zip') !== false) {
+                $errorMessage .= 'Invalid ZIP file. Please ensure it\'s a valid ZIP archive.';
+            } else {
+                $errorMessage .= $e->getMessage() . '. Check server logs for details.';
+            }
+            
+            return redirect()->back()->with('error', $errorMessage);
         }
-        // Clean up temp file
-        Storage::delete($zipPath);
-        $msg = "$updated product images updated.";
-        if ($errors) {
-            $msg .= ' Errors: ' . implode(' | ', $errors);
-        }
-        return redirect()->route('seller.dashboard')->with('bulk_upload_success', $msg);
     }
     public function addMultipleSubcategories()
     {
@@ -318,7 +484,7 @@ public function storeCategorySubcategory(Request $request)
     {
         // Ensure only owner can edit
         if ($product->seller_id !== Auth::id()) {
-            abort(403);
+            return redirect()->route('seller.dashboard')->with('error', 'Unauthorized access to product.');
         }
         $categories = Category::all();
         $subcategories = Subcategory::all();
@@ -328,7 +494,7 @@ public function storeCategorySubcategory(Request $request)
     public function updateProduct(Request $request, Product $product)
     {
         if ($product->seller_id !== Auth::id()) {
-            abort(403);
+            return redirect()->route('seller.dashboard')->with('error', 'Unauthorized access to product.');
         }
         $request->validate([
             'name' => 'required|string|max:255',
@@ -349,7 +515,7 @@ public function storeCategorySubcategory(Request $request)
             $data['image'] = $request->file('image')->store($folder, 'public');
         }
         $product->update($data);
-        return redirect()->route('seller.dashboard')->with('success', 'Product updated!');
+        return redirect()->route('seller.editProduct', $product)->with('success', 'Product updated successfully!');
     }
 
     // Seller profile pages
