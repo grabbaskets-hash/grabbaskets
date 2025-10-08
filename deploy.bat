@@ -2,11 +2,36 @@
 echo Starting deployment...
 
 echo Creating storage directories...
-if not exist "storage\framework\views" mkdir "storage\framework\views"
-if not exist "storage\framework\cache\data" mkdir "storage\framework\cache\data"
-if not exist "storage\framework\sessions" mkdir "storage\framework\sessions"
-if not exist "storage\logs" mkdir "storage\logs"
-if not exist "bootstrap\cache" mkdir "bootstrap\cache"
+if not exist "storage\framework\views" (
+    mkdir "storage\framework\views" >nul 2>&1
+    echo Created: storage\framework\views
+) else (
+    echo Exists: storage\framework\views
+)
+if not exist "storage\framework\cache\data" (
+    mkdir "storage\framework\cache\data" >nul 2>&1
+    echo Created: storage\framework\cache\data
+) else (
+    echo Exists: storage\framework\cache\data
+)
+if not exist "storage\framework\sessions" (
+    mkdir "storage\framework\sessions" >nul 2>&1
+    echo Created: storage\framework\sessions
+) else (
+    echo Exists: storage\framework\sessions
+)
+if not exist "storage\logs" (
+    mkdir "storage\logs" >nul 2>&1
+    echo Created: storage\logs
+) else (
+    echo Exists: storage\logs
+)
+if not exist "bootstrap\cache" (
+    mkdir "bootstrap\cache" >nul 2>&1
+    echo Created: bootstrap\cache
+) else (
+    echo Exists: bootstrap\cache
+)
 
 echo Clearing and caching configurations...
 php artisan config:clear

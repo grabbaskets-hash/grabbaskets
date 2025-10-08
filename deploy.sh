@@ -5,11 +5,11 @@ echo "Starting deployment..."
 
 # Create necessary directories
 echo "Creating storage directories..."
-mkdir -p storage/framework/views
-mkdir -p storage/framework/cache/data
-mkdir -p storage/framework/sessions
-mkdir -p storage/logs
-mkdir -p bootstrap/cache
+mkdir -p storage/framework/views 2>/dev/null || true
+mkdir -p storage/framework/cache/data 2>/dev/null || true
+mkdir -p storage/framework/sessions 2>/dev/null || true
+mkdir -p storage/logs 2>/dev/null || true
+mkdir -p bootstrap/cache 2>/dev/null || true
 
 # Set proper permissions (you may need to adjust these based on your server setup)
 echo "Setting permissions..."
