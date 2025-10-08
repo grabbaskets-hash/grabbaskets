@@ -1581,6 +1581,7 @@ li a{
                             {{ $category->subcategories ? $category->subcategories->count() : 0 }}
                           </span>
                         </div>
+                        <style>
     /* Unique 3D Card Effect for Categories */
     .unique-3d-card {
       box-shadow: 0 8px 32px #ff9900cc, 0 0 0 4px #fff;
@@ -1605,7 +1606,7 @@ li a{
       transform: rotateY(0deg) rotateX(0deg) scale(1.13);
       box-shadow: 0 16px 48px #ffb300cc,0 0 0 6px #fff;
     }
-                        
+                        </style>
                         @if($category->subcategories && $category->subcategories->count())
                           <div class="mega-subcategories">
                             @foreach($category->subcategories->take(6) as $subcategory)
