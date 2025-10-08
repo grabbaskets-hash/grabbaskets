@@ -1904,7 +1904,7 @@ li a{
     <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive -->
     <div class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;">
       <button class="fab-main" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        <span class="fab-icon" style="font-size:1.8rem;">�</span>
+        <span class="fab-icon" style="font-size:1.8rem;"></span>🛍️</span>
       </button>
       
       <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
@@ -2277,7 +2277,7 @@ li a{
           <div class="mb-3 fw-semibold">Quick Links</div>
           <div class="d-flex flex-column gap-2">
             <a href="/" class="footer-link">🏠 Home</a>
-            <a href="/products" class="footer-link">Shop</a>
+            <a href="/products" class="footer-link">🛍️Shop</a>
             <a href="/cart" class="footer-link">🛒 Cart</a>
             <a href="mailto:grabbaskets@gmail.com" class="footer-link">📞 Contact</a>
           </div>
