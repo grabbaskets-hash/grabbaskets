@@ -274,7 +274,7 @@
                             <td>{{ $p->delivery_charge ? '₹' . number_format($p->delivery_charge, 2) : 'Free' }}</td>
                             <td>{{ $p->created_at?->format('d M Y') }}</td>
                             <td>
-                                <a href="{{ route('seller.editProduct', $p->id) }}"
+                                <a href="{{ route('seller.editProduct', $p) }}"
                                     class="btn btn-sm btn-outline-primary">Edit</a>
                             </td>
                         </tr>
