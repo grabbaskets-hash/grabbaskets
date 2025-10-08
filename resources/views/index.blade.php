@@ -2278,7 +2278,7 @@ li a{
           <div class="mb-3 fw-semibold">Quick Links</div>
           <div class="d-flex flex-column gap-2">
             <a href="/" class="footer-link">🏠 Home</a>
-            <a href="/products" class="footer-link">� Shop</a>
+            <a href="/products" class="footer-link">Shop</a>
             <a href="/cart" class="footer-link">🛒 Cart</a>
             <a href="mailto:grabbaskets@gmail.com" class="footer-link">📞 Contact</a>
           </div>
