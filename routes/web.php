@@ -85,6 +85,26 @@ Route::get('/', function () {
         }
     }
     
+    // Test with ultra-simple template
+    if (request()->has('test')) {
+        try {
+            $categories = \App\Models\Category::with('subcategories')->get();
+            $products = \App\Models\Product::latest()->paginate(12);
+            $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+            $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
+            $blogProducts = \App\Models\Product::latest()->take(3)->get();
+
+            return view('index-test', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Test template failed',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
+    }
+    
     // Test database connection first
     if (request()->has('dbtest')) {
         try {
