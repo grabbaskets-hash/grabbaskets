@@ -60,6 +60,11 @@ Route::get('/health', function () {
 });
 
 Route::get('/', function () {
+    // Simple test first - return basic HTML
+    if (request()->has('simple')) {
+        return '<h1>Simple Test Working</h1><p>Time: ' . now() . '</p>';
+    }
+    
     try {
         $categories = \App\Models\Category::with('subcategories')->get();
         $products = \App\Models\Product::latest()->paginate(12);
@@ -71,6 +76,17 @@ Route::get('/', function () {
     } catch (\Exception $e) {
         // Log the error for debugging
         Log::error('Database error on homepage: ' . $e->getMessage());
+        
+        // For debugging, show the actual error
+        if (config('app.debug')) {
+            return response()->json([
+                'error' => 'Index page error',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
         
         // Return a graceful fallback with empty data
         return view('index', [
