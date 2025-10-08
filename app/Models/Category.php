@@ -11,6 +11,7 @@ class Category extends Model
         'unique_id',
         'image',
         'gender',
+        'emoji',
     ];
     // Each category has many subcategories
     public function subcategories()
