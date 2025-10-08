@@ -112,113 +112,6 @@
       background: rgba(255, 255, 255, 0.9);
       border-radius: 25px;
       box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
-      border: 2px solid rgba(139, 69, 19, 0.1);
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .search-form:focus-within {
-      transform: scale(1.02);
-      box-shadow: 0 6px 25px rgba(139, 69, 19, 0.2);
-      border-color: rgba(139, 69, 19, 0.3);
-    }
-
-    .search-form .form-control {
-      border: none;
-      background: transparent;
-      padding: 12px 20px;
-      font-size: 14px;
-      color: #8B4513;
-    }
-
-    .search-form .form-control:focus {
-      box-shadow: none;
-      background: transparent;
-    }
-
-    .search-form .btn {
-      background: linear-gradient(45deg, #8B4513, #A0522D);
-      border: none;
-      color: white;
-      padding: 12px 24px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .search-form .btn:hover {
-      background: linear-gradient(45deg, #A0522D, #8B4513);
-      transform: scale(1.05);
-    }
-
-    /* Advanced Mega Menu Styling */
-    .mega-menu-wrapper {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 95vw;
-      max-width: 1400px;
-      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(139, 69, 19, 0.15);
-      border: 1px solid rgba(139, 69, 19, 0.1);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateX(-50%) translateY(-20px);
-      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      z-index: 1040;
-      overflow: hidden;
-    }
-
-    .mega-menu-wrapper.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .mega-menu-wrapper::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 20px;
-      height: 20px;
-      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-      border: 1px solid rgba(139, 69, 19, 0.1);
-      border-bottom: none;
-      border-right: none;
-      transform: translateX(-50%) rotate(45deg);
-    }
-
-    .mega-menu-content {
-      padding: 30px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .mega-menu-header {
-      text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid rgba(139, 69, 19, 0.1);
-    }
-
-    .mega-menu-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(45deg, #8B4513, #D2691E);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-    }
-
-    .mega-menu-subtitle {
-      color: #8B4513;
-      font-size: 14px;
-      opacity: 0.8;
     }
 
     /* Gender Filter Tabs */
@@ -1529,102 +1422,27 @@ li a{
             <!-- Mega Menu -->
             <div class="mega-menu-wrapper dropdown-menu" aria-labelledby="shopMegaMenu">
               <div class="mega-menu-content">
-                <!-- Header -->
-                <div class="mega-menu-header">
-                  <h3 class="mega-menu-title">🛍️ Shop by Categories</h3>
-                  <p class="mega-menu-subtitle">Discover amazing products in every category</p>
-                </div>
-
-                <!-- Gender Filter Tabs -->
-                <div class="gender-filter-tabs">
-                  <button class="gender-tab active" data-gender="all">🌟 All Categories</button>
-                  <button class="gender-tab" data-gender="men">👨 Men's Collection</button>
-                  <button class="gender-tab" data-gender="women">👩 Women's Collection</button>
-                  <button class="gender-tab" data-gender="kids">👶 Kids Zone</button>
-                </div>
-
-                <!-- Categories Grid -->
-                <div class="mega-categories-grid" id="megaCategoriesGrid">
+                <!-- Amazon-like Mega Menu: Emoji for category, 3x3 subcategory grid -->
+                <div class="mega-categories-list" id="megaCategoriesList" style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;">
                   @if(!empty($categories) && $categories->count())
                     @foreach($categories as $category)
-                      @if(strtolower($category->name) !== 'furniture' && strtolower($category->name) !== 'mobillio')
-                      <div class="mega-category-card unique-3d-card" data-gender="{{ $category->gender ?? 'all' }}">
-                        <div class="mega-category-header">
-                          <div class="mega-category-emoji" style="box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff; background: #fff;">
-                            @php
-                              $modelImages = [
-                                'ELECTRONICS' => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80',
-                                'MEN\'S FASHION' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
-                                'WOMEN\'S FASHION' => 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=80&q=80',
-                                'HOME & KITCHEN' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
-                                'BEAUTY & PERSONAL CARE' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
-                                'SPORTS & FITNESS' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80',
-                                'BOOKS & EDUCATION' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=80&q=80',
-                                'KIDS & TOYS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
-                                'AUTOMOTIVE' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
-                                'HEALTH & WELLNESS' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80',
-                                'JEWELRY & ACCESSORIES' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
-                                'GROCERY & FOOD' => 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80',
-                                'GARDEN & OUTDOOR' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
-                                'PET SUPPLIES' => 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=80&q=80',
-                                'BABY PRODUCTS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
-                              ];
-                              $catKey = strtoupper($category->name);
-                              $img = $category->image ?? ($modelImages[$catKey] ?? 'https://via.placeholder.com/80');
-                            @endphp
-                            <div class="category-3d-img" style="width:60px;height:60px;perspective:400px;display:flex;align-items:center;justify-content:center;">
-                              <img src="{{ $img }}" alt="{{ $category->name }}" style="width:60px;height:60px;object-fit:cover;border-radius:14px;box-shadow:0 8px 32px #ff9900cc,0 0 0 4px #fff;transform:rotateY(-18deg) rotateX(12deg) scale(1.08);transition:transform 0.4s cubic-bezier(.25,1.7,.45,.87);">
+                      <div class="mega-category-card" style="display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:10px;box-shadow:0 1px 4px 0 rgba(139,69,19,0.05);padding:10px 14px;min-height:40px;transition:box-shadow 0.2s;">
+                        <div class="mega-category-emoji" style="font-size:1.08rem;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;border-radius:50%;box-shadow:0 1px 2px #e5e5e5;flex-shrink:0;">{{ $category->emoji }}</div>
+                        <div style="flex:1;">
+                          <div class="mega-category-title mb-1" style="font-size:0.89rem;font-weight:600;color:#232f3e;">{{ $category->name }}</div>
+                          @if($category->subcategories && $category->subcategories->count())
+                            <div class="mega-subcategories" style="display:flex;flex-wrap:wrap;gap:4px 8px;">
+                              @foreach($category->subcategories->take(8) as $subcategory)
+                                <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="mega-subcategory-link" style="font-size:0.81rem;padding:1px 7px;border-radius:5px;color:#654321;background:rgba(139,69,19,0.04);transition:background 0.2s;">{{ $subcategory->name }}</a>
+                              @endforeach
+                              @if($category->subcategories->count() > 8)
+                                <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="mega-subcategory-link" style="font-weight:600;color:#8B4513;">+{{ $category->subcategories->count() - 8 }} more</a>
+                              @endif
                             </div>
-                          </div>
-                          <h6 class="mega-category-title">{{ $category->name }}</h6>
-                          <span class="mega-category-count">
-                            {{ $category->subcategories ? $category->subcategories->count() : 0 }}
-                          </span>
+                          @else
+                            <span class="text-muted small" style="font-size:0.78rem;">No subcategories</span>
+                          @endif
                         </div>
-                        <style>
-    /* Unique 3D Card Effect for Categories */
-    .unique-3d-card {
-      box-shadow: 0 8px 32px #ff9900cc, 0 0 0 4px #fff;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(.25,1.7,.45,.87), box-shadow 0.3s;
-      background: linear-gradient(135deg, #fffbe6 0%, #f5f5dc 100%);
-      border: 2px solid #ffe066;
-      position: relative;
-    }
-    .unique-3d-card:hover {
-      transform: rotateY(12deg) rotateX(6deg) scale(1.04);
-      box-shadow: 0 16px 48px #ffb300cc, 0 0 0 6px #fff;
-      z-index: 2;
-    }
-    .category-3d-img img {
-      box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff;
-      border-radius: 14px;
-      background: #fff;
-      transition: transform 0.4s cubic-bezier(.25,1.7,.45,.87);
-    }
-    .unique-3d-card:hover .category-3d-img img {
-      transform: rotateY(0deg) rotateX(0deg) scale(1.13);
-      box-shadow: 0 16px 48px #ffb300cc,0 0 0 6px #fff;
-    }
-                        </style>
-                        @if($category->subcategories && $category->subcategories->count())
-                          <div class="mega-subcategories">
-                            @foreach($category->subcategories->take(6) as $subcategory)
-                              <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" 
-                                 class="mega-subcategory-link">
-                                {{ $subcategory->name }}
-                              </a>
-                            @endforeach
-                            @if($category->subcategories->count() > 6)
-                              <a href="{{ route('buyer.productsByCategory', $category->id) }}" 
-                                 class="mega-subcategory-link" style="font-weight: 600; color: #8B4513;">
-                                +{{ $category->subcategories->count() - 6 }} more
-                              </a>
-                            @endif
-                          </div>
-                        @else
-                          <p class="text-muted small">No subcategories available</p>
-                        @endif
                       </div>
                     @endforeach
                   @endif
@@ -1793,8 +1611,8 @@ li a{
               </a> --}}
             </div>
 
-            <img src="{{ asset('images/banners/banner3.png') }}" alt="Diwali Grand Sale Offers" class="img-fluid"
-              style="max-height: 380px; border-radius: 16px;">
+            <!-- image removed -->
+              <!-- removed stray style attribute -->
           </div>
         </div>
 
@@ -1823,11 +1641,8 @@ li a{
                     </button>
                   </form>
                 </div>
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="carousel-img" {{--
-                  style="height:220px;width:520px;object-fit:contain;border-radius:24px;
-                                  box-shadow:0 16px 48px #232f3e44,0 0 0 8px #ff9900cc;
-                                  transform:perspective(900px) rotateY(-12deg) scale(1.08) rotateX(6deg);
-                                  transition:transform 0.4s,box-shadow 0.4s;" --}}>
+                <!-- image removed -->
+                  <!-- removed leftover commented style attribute -->
               </div>
             </div>
           </div>
@@ -1893,301 +1708,41 @@ li a{
     </div>
   </section>
 
-  <!-- Categories Section -->
-  {{-- <section class="categories-section">
-    <div class="container">
-      <h2 class="text-center mb-4"
-        style="font-size:2.2rem;font-weight:800;letter-spacing:1px;text-shadow:0 2px 12px #232f3e22;">Shop by Category
-      </h2>
-      @php
-      $user = Auth::user();
-      $filteredCategories = $categories;
-      if ($user && isset($user->sex)) {
-      $sex = strtolower($user->sex);
-      $filteredCategories = $categories->filter(function($cat) use ($sex) {
-      $name = strtolower($cat->name);
-      if ($sex === 'female') {
-      return str_contains($name, 'women') || str_contains($name, 'beauty') || str_contains($name, 'fashion');
-      } elseif ($sex === 'male') {
-      return str_contains($name, 'men') || str_contains($name, 'electronics') || str_contains($name, 'sports');
-      }
-      return true;
-      });
-      }
-      @endphp
-      @foreach($filteredCategories as $category)
-      <div class="mb-5">
-        <div class="d-flex align-items-center gap-3 mb-3">
-          @php
-          $modelImages = [
-          'FASHION & CLOTHING' =>
-          'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-          'ELECTRONICS' =>
-          'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
-          'HOME' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80',
-          'BEAUTY' => 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
-          'SPORTS' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
-          'KIDS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=400&q=80',
-          'FOOD' => 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
-          'BOOKS' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80',
-          'JEWELLERY' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
-          'GROCERY' => 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80',
-          'TOYS' => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
-          'FURNITURE' => 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=400&q=80',
-          'MOBILE' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80',
-          'LAPTOPS' => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80',
-          'SHOES' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80',
-          'WATCHES' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
-          'BAGS' => 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80',
-          'ACCESSORIES' =>
-          'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-          'HEALTH' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
-          'AUTOMOTIVE' =>
-          'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80',
-          ];
-          $catKey = strtoupper($category->name);
-          $img = $category->image ?? ($modelImages[$catKey] ?? 'https://via.placeholder.com/80');
-          @endphp
-          <img src="{{ $img }}" alt="{{ $category->name }}" class="rounded shadow"
-            style="height:70px;width:70px;object-fit:cover;box-shadow:0 8px 32px #ff9900cc,0 0 0 4px #fff;">
-          <h4 class="mb-0" style="font-weight:800;letter-spacing:1px;">{{ $category->name }}</h4>
-          <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="btn btn-outline-primary ms-auto">View
-            All</a>
-        </div>
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
-          @php
-          $catProducts = $products->where('category_id', $category->id);
-          if ($user && isset($user->sex)) {
-          $sex = strtolower($user->sex);
-          $catProducts = $catProducts->filter(function($prod) use ($sex) {
-          $cat = strtolower(optional($prod->category)->name ?? '');
-          if ($sex === 'female') {
-          return str_contains($cat, 'women') || str_contains($cat, 'beauty') || str_contains($cat, 'fashion');
-          } elseif ($sex === 'male') {
-          return str_contains($cat, 'men') || str_contains($cat, 'electronics') || str_contains($cat, 'sports');
-          }
-          return true;
-          });
-          }
-          @endphp
-          @forelse($catProducts->take(5) as $product)
-          <div class="col">
-            <div class="card product-card h-100">
-              <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                class="card-img-top" alt="{{ $product->name }}">
-              <div class="card-body d-flex flex-column">
-                <h6 class="card-title">{{ $product->name }}</h6>
-                @if($product->discount > 0)
-                  <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                  <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-                  <small class="text-danger">({{ $product->discount }}% off)</small>
-                @else
-                  <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
-                @endif
-                @auth
-                <form method="POST" action="{{ route('cart.add') }}" class="mt-2 d-flex align-items-center">
-                  @csrf
-                  <input type="hidden" name="product_id" value="{{ $product->id }}">
-                  <input type="number" name="quantity" min="1" value="1" class="form-control me-2" style="width:70px;"
-                    required>
-                  <button type="submit" class="btn btn-primary flex-grow-1">Add</button>
-                </form>
-                @else
-                <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">Login</a>
-                @endauth
-              </div>
-            </div>
-          </div>
-          @empty
-          <div class="col">
-            <div class="text-muted">No products in this category.</div>
-          </div>
-          @endforelse
-        </div>
-      </div>
-      @endforeach
-    </div>
-  </section> --}}
-
-  <!-- 3D Shop by Categories -->
-  <section class="categories-3d">
-    <div class="categories-header">
-      <h2 class="section-title">🏛️ SHOP BY CATEGORIES 🏛️</h2>
-      <div class="title-glow"></div>
-      <p class="section-subtitle">✨ Explore our luxurious 3D collections ✨</p>
-    </div>
-    
-    <div class="categories-3d-grid">
-      <!-- Living Room Palace -->
-      <div class="category-cube" data-category="living">
-        <div class="cube-face front">
-          <div class="category-icon">🛋️</div>
-          <h3>Living Palace</h3>
-          <p>Royal comfort</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqvWFTS8vzDHCgJKy5LPZm0-jPaw3LZ6c4RA&s" alt="Furniture">
-          <div class="category-overlay">
-            <span>Premium Collection</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bedroom Kingdom -->
-      <div class="category-cube" data-category="bedroom">
-        <div class="cube-face front">
-          <div class="category-icon">🏰</div>
-          <h3>Bedroom Kingdom</h3>
-          <p>Dreamy comfort</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://www.estre.in/cdn/shop/files/1-min_1a7b23d8-e00c-4bca-86fe-9c65a55bcd1d.jpg?v=1743763633" alt="Chairs">
-          <div class="category-overlay">
-            <span>Luxury Dreams</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dining Empire -->
-      <div class="category-cube" data-category="dining">
-        <div class="cube-face front">
-          <div class="category-icon">🍽️</div>
-          <h3>Dining Empire</h3>
-          <p>Feast in style</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://thetimberguy.com/cdn/shop/products/Buy-Compact-Wooden-Dining-table-with-1-Bench-3-chairs-furniture-set-for-modern-Home-2_1200x.jpg?v=1640455849" alt="Tables">
-          <div class="category-overlay">
-            <span>Elegant Dining</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lighting Sanctuary -->
-      <div class="category-cube" data-category="lighting">
-        <div class="cube-face front">
-          <div class="category-icon">💡</div>
-          <h3>Light Sanctuary</h3>
-          <p>Illuminate beauty</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://plus.unsplash.com/premium_photo-1668005190411-1042cd38522e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bGFtcHxlbnwwfHwwfHx8MA%3D%3D" alt="Lamps">
-          <div class="category-overlay">
-            <span>Ambient Glow</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Garden Paradise -->
-      <div class="category-cube" data-category="garden">
-        <div class="cube-face front">
-          <div class="category-icon">🌿</div>
-          <h3>Garden Paradise</h3>
-          <p>Nature's beauty</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://www.thespruce.com/thmb/ZhNUOJ4Pt0Bj422Pu_uEzZXa_j0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/increase-humidity-for-houseplants-1902801-6-eadf73df8284421ca827c073d8a43fd2.jpg" alt="Plants">
-          <div class="category-overlay">
-            <span>Green Haven</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Decor Gallery -->
-      <div class="category-cube" data-category="decor">
-        <div class="cube-face front">
-          <div class="category-icon">🎨</div>
-          <h3>Decor Gallery</h3>
-          <p>Artistic flair</p>
-        </div>
-        <div class="cube-face back">
-          <img src="https://anilevents.in/wp-content/uploads/2021/03/20210204_100836-021-scaled.jpeg" alt="Decor">
-          <div class="category-overlay">
-            <span>Art Collection</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Floating Action Buttons -->
-    <div class="floating-actions">
-      <button class="fab-main" onclick="showCategoryMenu()">
-        <span class="fab-icon">🔮</span>
-        <span class="fab-text">Explore Magic</span>
+    <!-- Floating Category Menu -->
+    <div class="floating-actions" style="position:fixed;bottom:18px;right:18px;z-index:1200;">
+      <button class="fab-main" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:10px 12px;box-shadow:0 4px 16px rgba(139,69,19,0.12);font-size:1.5rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;width:48px;height:48px;">
+        <span class="fab-icon" style="font-size:1.7rem;">🛍️</span>
       </button>
-    </div>
-  </section>
-      <!-- Existing items -->
-      <div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqvWFTS8vzDHCgJKy5LPZm0-jPaw3LZ6c4RA&s"
-          alt="Desk">
-        <p>Desks</p>
-      </div>
-      <div><img src="https://www.estre.in/cdn/shop/files/1-min_1a7b23d8-e00c-4bca-86fe-9c65a55bcd1d.jpg?v=1743763633"
-          alt="Chair">
-        <p>Chairs</p>
-      </div>
-      <div><img
-          src="https://thetimberguy.com/cdn/shop/products/Buy-Compact-Wooden-Dining-table-with-1-Bench-3-chairs-furniture-set-for-modern-Home-2_1200x.jpg?v=1640455849"
-          alt="Table">
-        <p>Tables</p>
-      </div>
-      <div><img
-          src="https://plus.unsplash.com/premium_photo-1668005190411-1042cd38522e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bGFtcHxlbnwwfHwwfHx8MA%3D%3D"
-          alt="Lamp">
-        <p>Lamps</p>
-      </div>
-      <div><img
-          src="https://www.thespruce.com/thmb/ZhNUOJ4Pt0Bj422Pu_uEzZXa_j0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/increase-humidity-for-houseplants-1902801-6-eadf73df8284421ca827c073d8a43fd2.jpg"
-          alt="Plant">
-        <p>Plants</p>
-      </div>
-      <div><img src="https://anilevents.in/wp-content/uploads/2021/03/20210204_100836-021-scaled.jpeg" alt="Decor">
-        <p>Decoration</p>
-      </div>
-
-      <!-- NEW ITEMS -->
-      <div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcaeNOjysBGQ83oQDf7FSVu90w6AMZhtkbwg&s"
-          alt="Bookshelf">
-        <p>Bookshelves</p>
-      </div>
-      {{-- <div><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/area-rug-living-room.jpg?v=1620356820"
-          alt="Rug">
-        <p>Rugs</p>
-      </div> --}}
-      <div><img
-          src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEhMPEA8PDw8QFRUQDw8PDRUQDQ0PFRIWFhURFRUYHSggGBomHRYVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQFysdHR0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tKy0tLS0tLS0tLTctKy0tLSsrLS0tLS0tLS0tK//AABEIAOQA3QMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAADAQIEBgcFAAj/xABPEAABAwEDBgkIBQgIBwEAAAABAAIDEQQhMQUHEkFRcQYTIjJhgZGhsVJyc7KzwdHwFCMkNKIlM2N0gpK04UJDU2KjpMLDRGSDhJOU0jX/xAAYAQADAQEAAAAAAAAAAAAAAAAAAQIDBP/EACERAQEAAQMFAQEBAAAAAAAAAAABAgMRMRIhMkFRE2Ei/9oADAMBAAIRAxEAPwDYTIhukQOMSaaAKXphehlyYXoAhchl6YXJhcgHOchuclLTsScUdqAGXJhKPxI1nvSiNuzu+KAjYr3FnYpWkOjtTHSgfyCADxJ+Ql4gDHvK86b5qhOmSAtAP5BNc4bO0qLJP0qNNbWsBc5wa1oq5zjRrRtJNwCA6DpQP5BCdP8ANVW7dwvsUVdK0xXYhj9N2NOa2pK4lrzjWMNrHxsrq00BGWGnlVdQU7+hG59NXp1o3IL7SFl9qzmPNRHZQPJc+avWWhu+6q41o4d26StHRRC65kdSOt1UupU062J1pCG+2BuJDd5p4rELTwjtkhJNplGkakRvMbRqoA3AdC52hcBqFbtQJpUgdQ7Ap6lTSrfprexjdOR7GMGLnuDWjZeUeGdrwHNcHNcKtc0gtcNoIxWYnINsttnhDrUwgNjdHC+MMjjAj0RymgkuodY1lXrgrkg2SzR2cv03N0nOcAQ3Sc4uIaDqvVM7NncYVIYEGJqkNCojgEhT6JpQHQEqXTUUFFaUAXSKXRTWp4QHtEbPevEpShuQHi9MMir/AAg4W2Wywun02zhj+K0IJGPfxt/JN92F6odvzuPIHEWMA05RmkqAdgDcR03bkt1TG3hrDpihmQrDspZyMoykaDo7O1pBpGzSJON5dWouw6Vwrfl62zkOltUzy3Cj9BoJ1gNoAl1RU06+gMo5WggbpTzMiaL6veG3VphvI7VXsoZwcnRCotHHHU2Fpc43V10A2XlYe9laVv1CprQY07ymtZ7kupX5NUyjnThAH0eCV76iompG3RureCdVRvCZHnCL7NNIWthnBIs8Y0ng8kUc4mgNCTswwWZMFfDsVxyNEW5MtDqXP4wg9FGsp2tKnqp3CRybTwxyi92l9JczCjWNaG1DaYU147+qnFtNqklNZZJJSKkGSRz6E0rSu2g7Ejhf2eKZKKU60t19MjzRcOpOGHUV54u7Eow6kKIB7kkY9/iliSR4nrQHiL+xGQnc4IpSpxrnBl2lBC4a44/UCs8AVU4GurZoOhjR2XHwVthWkcmXKQxHagMR2q0n0TSE8JCEAZjehGaExgRWhAOATqLwCcgGkIT21uOBuO5GKY4IDIuG3AexWCxyyxCR8rpYwx8rgTE0uvY0NAFKVxqVmIC27PE6lhaPKtEY/BIfcsVaL1lle7p0p/kNo93vSxBOjC9Dh1lS0kIfivNb7koXibid6A9HcO0rXMoZEjs+QNMvcJTBC8spyQ6aZjnA3f3ysuyTYTaJoLMMZpI4d2m9ra9633O3YWRZLmDKgARClbgG2iEAKpxazz5xj52dimT6kQ4odo1KZyu8UsuCXV1JJsF44dSD9khSR4lLDrSRc4o+l8OPOCIUM4opRTjVOA/3WHcfXcrfCqVm/P2SPfJ7RyusK0xcufNSWKQxR41IYrQIF4pQvFAHYjNQmIrUA8JUgTkwRNcn0SOCQZ1nmP2KL9ZZ7CdY0xbLnp+5w/rLfYTLGma1jny69LxIzApIcDvKVmBTY+b1pLOahuPJ3+8pxNxSEc0bu4VTSvmZvJvH5UhcRVtnbJaHXXXN0G/ikaf2Vq+ec/kuf/pD/MwqpZhbFostdq8pzLO09DRpu9dnYrJnekJyXaOgw/xMXwRL22ZZd9SPnc4oU+pFOKHOlOW14LNgvahuXpkpwG5HoeyR60yHnH51p7NaZDzj860fS+HnFFQyiFJUaXm9d9lb0PkH4yfervBgqLm8P2Yekf4hXmDBa4uTU8qlxqSxRY1LjVoFC8QlaEpQD2IrUJqjyW8BzmtjllcwgOEbBRpLQ4DScQMCDjrQHQCeCuU3KEh/4dzPSzwt9R7k4WubWLM3/uHydwjCW4dUJHLl5Hyg+WW0QvDK2d7GhzAQHh8TX1IJPlUXVIRuGbZ7D9ks/wCsf7MnxWNt1rY89x+zWYfpz7J3xWODWss+XXpeMNbgU1nN7UowKa3m9vikp53N3p7RV24Jvkjpr71JydZXTSNibz5nsiZ5z3Bo73Ioj6CzZZOMGTLMTSs4daDq/OOJbvOjoIOdk/ku0edB/ERq7ZPsTWsYymiyJrY4m4ANa0AHfcqZnhgLMmWjYXQ0/wDYjT6ezml3z3/r551oc2IRdaHNiFM5dN4LIvHAJZF44BBmt1ocPOPzrRW60KDnH51p/U30KUQpjk8pVbR83n3Uekk8Qr1Z8AqLm8P2bdI/3K82fBa4uPU8qlsUyJQ2KZErQOAvEJWpSgEC4duko+UfpW/w8S7jVWcsOpJLTHTbS6v9RHfTWlSvCTIwRtEhcKmnJptwvU+JhuJpeKqq5cndoOfE0yBgFG30JqHU3ABx3kAKTwOyzLaHSRyEPbGA5jywxvaHOI0HNOJuxG5GO+WPUzu2OXS73B773b/SQ/w7FYSFXuD33u3+ki9gxWIpRtWYZ8T9RZRtmf3R/wA1j41rX8+f5qyD9JKfwN+KyDas8+XXpeMD1FMB5I6/Ep2opoHJaNtPFIU/WOgfyV1zSZN47KMJPNs7X2l13kjRb16b2nqVLAqT2LbcwWSqR2m1kXyOEDNmjGA53aXgfso23pZXbG1rUdCBfVUXPZ/+XL58Pt41edGl4oqDnom0smS9D4R/jM+C0t7bOfDyj54Q5sRvREObEb1lHVeDpF44BekXjgEGRmtCg5x+daI3WhQc4/OtOe030OU9MKeUltEzcn7O7old6jD71e7PgqDm3+7yend7KNX2zYLXFyanlU2NTIlCjUyFWzSWpSvNSlANaqtl1hMktHFpL2gOFKj6hl4qCFaWqq5ffSSTplaP8vGjbdOXjT32yCywsbI5z3SNawOcyrnvN1SBtJrcu3Y4WsjY1vkgUrU3Cl+0rN+HWUpHCIigDX1bcOS6guBph0K5cHrQ42eJznFxLAanG8Vp3o2rOZR0eD33u3+ki9g1WIqv8Hh9rt/nw+wYrEQpjesrz6n6uxj+/OfwxLI9q1rPtzbFvn8Ilku1ZZ8uvS8YBqKVo5vQPcmnByf7hRAOZdfvK+pc32SfodgssBFH8VxkoOIllPGPB3F1OpfOvArJP0y3WWzUq2SVpkGoxMq+T8LXDrX1S8+Hcqw+s9a9pDbS66gWfZ5R+TJPSw+0CvkioWeh9MmP6ZoR+In3IrLDyj5/Q5cRv96Ihzc5u8eKiOq8HPXjgEj0pwCARutBg5zvnWjN1oUPOPzrTnsr6HTimpxSW0HNx93k9O72UavllwVCzcH7PJ6d3so1fLKblpi5NTyqcxS4VCYpsK0ZpbE5IxOQA2BQLTkd73ueHQFryHaM1lMpa4May46Y1NGpdCNSWJBxTwdDqaQsxpePsTDQ7RpVXSgyc5oA4xlBcALPG0AdimNRAjYIlhya2J8soc5z5y1z60ABa0NFABdcAppShIUbBk+fc3WIenPslk+1ann1lGnY2f0g2Z5GxrnRgd7T2LLNqxy5dml4xHIucnn3+Ca0Y7wn6+gX+/4IONXzD5JrJPbXC6ICzxH++/lSdwZ+8tnElT1e9VXN1ko2PJ8ETm6Mjhx0oPO4yTlEHcC1v7KsfGUFR3J4ubUu+Q5A1rO89zvydT/mIuu56vEk23vuVAz0P/J7em0R+pIlU4eUYYhzc5u8eKIhy85u9KOu8PPTjgmvTjgEAjNaFDzj860VmtDi5x+dac9i+hk8pieUlL5m5P1Mvpf9tiv1lwWf5uT9XL6Ueo1X+y4LTFyanlU6NTYFBYpsC0ZprE5NYnFADjKkMKgsejtmG0ICa0orVFhlDsCDTGhwR2uVEKF4pAUpSojH8+kDRLZJRXTeyVhv5OixzC27bV7u5ZhRaln2PLsXmT+tEssK58/J3aXhDeLp4rs8CcnttFvs0DxpMfKC4eU1jS8g9HJpuXCjcaG/A+5WvNlamRZRs8j2k/nWsoaaMhieAenWP2uhLY7e1sfQ5cACNW6/sTYqGpBrhqPTtTLBbI7QTdR45Wyow1p0j2AkvNwLagkUurQdlVcmzhCldWuJAvuvVBzySE2COrdEfSGU6fq5LlpHHXAtbTSvbQVOiTQOKz3PnLWxQ/rLfYyqavTn+ow5Dk5zd6Ihyc5u9KOu8FclOA3Jrk44DcgPM1oUXOd860VmtBi5zt3vTnsr6HTymJ5UqXjNyfq5vSD1AtBspuWeZuz9XN6QeoFoNjNy1xcur5VOYptnUFinWdaMk5icUxiegOS6WidWoQ3PRQ+oSAdmn0JBsIIPiPBTxb1yLXqKixzXoC52eXSFUaq42R7RUU2LqhyYZJn1P1tj9HN68ay8rTM+bvr7IP0Up/xG/BZmVhly7NLwiOzA7z4BT8kWriZopf7KVjz5rXAkdlVAbgevwCIzEj51oqo+mIeLhdptcWkilaVFCOlOkkrGTGGycth5RN/JfUm+i4nBS2T2ixWaZpD6xhjqkXvjrG66m1pXaa60CJx4tpfpMoOTQto6vuRjb7cWU27G2jKgDWsYXbXkCjLjUgV30VEzvk/RIr6g2hpH/gluorpEDUF1kbUX1bt6ACqfnin07HDyCwi0tuIp/USp2q0vKMfQpecN6KEKXnDr8FMdd4K5KcBuSOSnVuQHm60CHnu3e8I7NaDDz3bvgnPacvQ6eUxP1JLi65vfzcvpB6gWgWM3LPc355EvpB6gWgWM3K8XLq+Se0qdZyuY6SmzrNAuVa+EwhcAKEvDm6LiBxUzKHlHyaOBrhSl96q5zHlkuzCnEri5Ly5FNc1xJoCCaFzx5Ya28N6SAunxw2jtVS7hynNrrUgAAXd6iaafxiA62T7CyUEvFRgL+9czK+T4Yea6TS2OLSO4BdzIh+rrtJ8VWOEktZnX4U9VKnB8l2nRdTarEyZUWGahXcs2ULk5SUHPc+tosvoX+1WcEq9Z3p9O0Wfohd7Qqhk3LHLl2afhAmYHrT2Hlbx8Pihxm7t8UoN7eke5Bz02vM7lhosckDy6sMzi0AV5EjQ7b5WmtFgtTH4O7WkL574C2otlewOI02h1xI5pp/q7lqlilcAKPeNzyrxvZz6s/wBLqaeU3sPwWb58T9ks45N9o1dEMnxVts2mR+cf218VRM8ocLNBpPLhx91aXfVPTyk2LT8oyUIEvPb1+CMECXnt6/BZx05cHOTjq3Jjk92A3JB5mtBh57t3wRY9aHDzzu+Cc9lfQyfqTU7UkuLhwCPIl88eqr/Yjcs74DO5MvnN9VaFk43K45tTlHynaZQCIozI480FztKSmNABgsvyxK9072tBa7F7G0qyl+7uG5bKZGjWAaUxAu2Lo5Ugjka15a11dF4OiDXWL1Nwt9sbN1KyBaJJGsmfPaJa3gvZM1gJOFAQ1wvxocVco7TUAkHqBcO34psDWtZota1rTXktaA2/G4JlaUFcBTG9aYzYOwcsQbW/u/yQZcs2c4gHfGfeFTHWnYHH9kppnPkuPUjc9lsHCSzwgnRcGNqTotwGJICr+V7SJJHPaatJJB6NS5dpDpGuYGlukC2pIuBxwRXYU6kt9z2EjcpDJqKIwJXOTGylZyZdKaE/oj7QqpFysHD2as7G+TEO97vgq0SovLfC7YljNw6/FITzTsp4psRuG4pHc3t8U9j37O5wfn0LTEa3Elh6dIEDvotgybJVoWHRy6Ja/wAkh3YarZMhz1aKYYjcUsU6v1bbA+5UjPQfs1n9OfZOVvsD1TM87vs9m9M72RWmXDLT8oydqBLz29fgjtQJOeOvwWUdOXBXJ7tW5Denu1bkCPR60yLnnd8E+LWmRc87vgj6PgyeMExPGCSos/As0EnnDwV+yWGEOEreMY4U0Q8sLTUGoI3d6z7gebn+cPVV0jtGhG9/kNLt9ASntuxyu1rrWmOxvDSx9qs1AaGzyR6L60oTWOh6qYoFqniDA0ZSnOgObLFV79jateABquCHkiHRcWg8mGOKzt6C1uk7uczsVjsgbS9rTXGrQahPbL6z3x+KbHlTRNfpkhF9GvdGWXnGmiT3qSzL5OH1nS2J/uFE3N7ZhoyxOaHOhcYi4gEl0c0rDqxoGV3hW59lBR0ZfT68fir2WaOTCVnW4VXSZkzSFRIP3ajxVIFsAwYBvXjlJwvF24ImX8O4f1LjyzK+Bk4iaA58jHNLidEs0aX3Y1PYuzJQFVDJ1oOiYtI6LnueG6tIqa23zD+mDTa0fBTM9r3Vlp7zsswA+QmSUXFblabW2MjcQfFPdlY05UZ/ZdXuor68UfnkpfDpwNqoP6MbAd+k8+8KvuK6nCW0GWd0ojkayjWgvjc2oaL3XjbVcWV92KFcQSI4bl4G47ymxm8bvglYCagAkk3ACpN2xMxo3XDsWp8CrTpwxmteTok66tOifBZ1kvIs0t1AwbXXnsC0bgnk42dnFlxfeXVI0aV1AfOKn2WV3i62F96p+eb8xZvSv9mrfk2hKqueeL7LZ36mz6J6NKJ3/wAq7wzw8oyZijvPLG4qRGornfWdSiOjK9oc5Edq3ITkU+5BQkWvcmRc87kSLWhxc/tR9P4OnjBMTxgpXFi4Jm5/nD1Qrc41Zo+W5jN4Lxpd1VUOC3Nd53+kKyWl7qNDTyuU5vnaBY38UjVeLDU5WHI18fGf2rnS12tc7kH9wNXdsuC5kEYY1rG3NaA1o2ACgXTsmCuMVa4PO4nKtss1KNlBtTMcZBDpdAvDz00V0cqVlhvE5ZsE2q0RS2ZxrQVaHOA7Xt7FdHFUTGZS+/Qgnd08UQO1FsuTrRL/AFEjPOFP5ra3WKPYhmys8kJfnFfpWUWXIFpaQTEbiDdRHGSZa3xkbNIUuWoCMbO5NMY2KLoy+1TWvxnLclP2NHWjMyM8+T2q9vsYOoHeEI5NG7cs7oZfV/tFIk4PvOvsUV3Bck6q9LFf3ZP39SC6wSbfgp/LKK/aM4l4BMJrQAnWDf3ocfAQNNaPPTWvuWkfRZQf6JHevaBGISuOX9EziiWbg1oGolmb3Ls2WyPbdxrjvDfgrII66l76ONg7EpMvouUvpCsLnsNSQ7qoe4qvZybXabRB9Fhsjntc5r3zaTaN0TUNY2ta7TTDbW63cQNncg2iEU1q+rKRMmO7CLbY5YADLG+MG4FwoCdldtxXJYHF2lonR20NKb1vstnBxw6WghQLXkyKRpY9sbmnFrmXGl4UzVk9NMsbkxUuRQVq7ODlmHNgs/VGK965Z4C2cEmsxrgNNtG9gr2p/ricwsZ+zWgxHldqvVs4Dg/mZdAUoRI0vJO0EEdF3QubaeA07BWOVkp8kt4vsNTXuTmeP0XG9lfqiBdB/Bm2Nv4gnzXtJ8VHlyfOznQTN6eKdTtAojeKjs8Fea/zv9IVjso07TGylQ0Bx82pf60UfaFVsgSaAdVrud5PQF3+D9uZ9Ile4uGg0RtBaTztFxuGB5Ix2rTGxhqS7rwwLqWWMgLh2W2xkjlt6zTxVgszqiov3Xq4xqsZwIyxtjtQu+jWyJ7z+icSH+DfkK2PxXL4V2cS2SeN1KFhJrsaQ46xqB1o1gtvGxRS/wBrGyTcXMBI71RLC4JpavLysg3KO55qvLyQFiNaIpC8vIBhKQry8gGuaKb0B7RVKvIoBkFxO/p8VyspWl8buS64hpoQCKmTQPcvLymyHKDYsqSOMbXaJ0yATShvFbr10g7SaHHEgE7Ei8sMmmKLK1RnxheXlz5N4jTRhRHJF5ZtI84HyndoPio0kzhsO8fBKvIq4fGagn5wSOedqReSMwurjTsUXg4wObM4i91omr+y/QHc0Ly8tcOGWfMdoQDp7U5l2HbrXl5OEfNO8sc0vcWlpaQXEggihFComRMoyNhayuloPljBfe4tZPI0VOs0AXl5V1WY9qjplvD/2Q=="
-          alt="Curtains">
-        <p>Curtains</p>
-      </div>
-      <div><img
-          src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFRUXFx0YGBgWFxgXFRcVFxoYFxUXGBcYHSggGBolGxgYITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGhAQGy0mICUtLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLf/AABEIARMAtwMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAADAAIEBQYBB//EAEUQAAEDAgMDCAcGBAQHAQEAAAEAAhEDIQQSMQVBUQYiYXFygZGxEzIzobLB0SNCUmLh8BSCksIkNHPSFUNTY5Oi8YMW/8QAGQEAAwEBAQAAAAAAAAAAAAAAAQIDAAQF/8QAKhEAAgIBAwIGAQUBAAAAAAAAAAECEQMSITETUQQiQWFxgTIzQ6GxwfD/2gAMAwEAAhEDEQA/APScQPs3dQ+IIW2h/hanZd/aj4ofZu6h8QQ9q/5ar2HeQShRjOSLpoCOLu6+gstbQFlj+RTpw8SSWlwPRw7outhh9EY8GlySAd6dT4LjVwv8/wD4nAd9EU30V5Ke551suMfKxhhooZp+KkuTTCDCDyd6Y6kYRUnO470phgpJ4aegJ2VdYZWCBLJ1XHNgaXlGeeCa6oRcrGBseQqzb+3Bhw3mFxeYABAvYC/W4d0qdi8WxjS5xa2N7rDqXnfKHawfUa94a0gWg/dMEHnAXJ071zZ82jZcnRgxanb4Njszawrta4gMJF25piDEg7xMeKt6bgAvL+SlcNxAuXOcIkxZokgA7xp4Alel4UGADwT4Z642JmholRImT3JFcYy5KfCsRBpJxSQGJGI9m7q+YQtoj/DVew7yCNiR9m7q+iHjv8vV7LvJYVGB5FezIBOt/wAIOUTHdE9K2uG0WL5ENIpEkCCTGk210+a2WFOiMeAy5H48HJbWR0b+IRaTLX8NRPQlXEg9F/CCnt+ZTeoDjz4LjW8Uqr4E/uEMPuFmYKWLrYI60F1QorHXjolYwx53qPmIM8ApThYhR6DQSehYwV7nRu06dENtt+spVxFhvUDaW1KdBmeoT0Aak8AhJqKthjFydIsJA1Tn1WtaXkwACZO4C5VPg9tU60ejcQJE5gQRaYg93ipGO2jSptBe8RpxmRwGvcpymquxlB3VGO2vt92Ka6mGWBdlIkkuu2mdwAAMmeBG6DQbRouc+oHuBJpNcHNaAMzRlIIk3ylwgXJA4qdtrEMOJHozkpMptPNBEy577NEbnDuKhUqZNRzm1G5PWFR+8EjLYiBBIF+kb7+dLzOz0I+VbE/C1GUWtp5fteaWDUBzogg/gIN+iDuW02JtDM0F4yvs1wJiHxJABWE5zHteG+kDKZaC4ls5XZiTItJeY4gdwNjMWMQ+nL4pNu6dMwdcZtwgaqsMjjv/AB/pOeNS2/k9NbV53RCICVW7OqtyNANsttZi0a38U/E7TpUyA+o1pJAud506l26klucel3sWAKSDTrAiySICwxPsndn6IeO/y9Xsu8kXEeyd2D5BDxg/w9Xsu8kRUYTkkyKUAyMzj1Tb5Fa3DDRZbkuyKfj81qsJohDgMuQ1X1T3b+kIweCLH96IDzDXHoTmjmkW1PhuVBTtUaQkxgXLndoNUQWCJgVRtkmnnT0eSJUEhRmjKWpQhi6QSbKMHEH6qVCi1WGbrGEXk34KFtXZ7K1OHNDtS3NpmggTG66sKQuoHKTFvpUjUZkgEZs06G0Nj7xMAa6qeVrS7Hx3qVGFwL/QOqsIBAqPEzMhri0T0mAO9VFGvJzZy4wQI0adTfcBaw4ajVSH4N9SHHMAc1SoYiDMuhoJ1uYUvZuzfSPzOEU2c0NnV1rHiAN+8rg0ylSO+4q2yFScHOcwAvkS50OLhmBLZItGnhClYjCvNP7WzWw5seqAZ506ESCJmQYEK+FJrScrQ2YmAATFhpwChbR2aKoO5xETc82QSMum6esBNLBJLZiRzRb3RV4Paj3sc217MDfWYIs6Y1nj4JYiQwhzcrmgOGUgmDq8XiIBsDM26FebL2e2nOXeZM7zopowjJLg0Bx1dvO6/EdGi0sM2rsCzQT4M/hNoDMahfLWNbEEwTzWElhghxJDvFD2u7+IqtcxhGbmucd4EfdOgEjplxtAQdq7OfTqsEBtJ5Jyt1gG4BvBhzT3gblzBYgsqEgOqNa7KS1sDW2Vu8TaY33U48VLiyr7rmj0DYuHyU2tFgBA6AkibPqZmgxFkl6C4PPfJosT7F3YPkmYr2FTsn4Sn4n2L+w74Uyt7Cp2T8JTiIw3Jl3MEHefO61WF0CyPJqmGtMCJcSd0nif3wWvweiEOAz5C1rNPUuNNzA3k+MLuKacsDVOosEkfPoCcAYaJjjuT320TWogGONx4eSZXIkdCOwSFGcwj9+SDMPDk2rcW9y6GGNF2k3ihQQYbpr36rP8tQRhXuAnIWvjWzXD99y072Kk5SYGrWp5KdX0X4pbmDgdx+m9JlXldD4nUlZlKYecK+pJaJmXDMfRE3BHHLZD5OYova+C0sDuYd5BJcc3j5p7sHiKDjREOY5vNl0sO4tykSPHeNN3eTlEMpugC9R+lhzTlsBYCQYA3QuWLbmvg6ppKD+Swe1Fp6JlUozG2VznOU2QjU2pCmiSB+9ywDM7fxLnVWNIaGsc8AzJdmawC264/cKXiMSWkAMlpZrFgS7Lc/zNKq+UQP8AFsytkhs3Jg3JFuIzu7iE1lXE1nwBzWkiBAaSDYHqI1/KOmeS3TXuddLZ+xuNleoki7OpENEpLtVnIzRYn2L+w74UOr7B/ZPwlExHsX9h3woZ9g/s/wBpTk0YXk8bd581rMFoslydPNPWfNazBaIQGnyTskpFi6wX7l3NvVBAOYTG/fw6Eyf31FGZTGoQRSgxKzMPFSB1rlU6Hh81yAIHSnVGgi6WzDc0R7/qnU6nFRq5BGvcOG7RCDkfQJYMfKa4xqo1CsNYj5TfRSXNtZLQSh5QNvSjXOR3ESfIKm2VS+zB/M743LnKzEupYqi8SW5LgXEgncdbFc2TXDqUDVrnA8AcxdHSYIXIneR/f+HU4tY19f6HxCfhau5NF9U2myDZWIk8AJlX992q4xvDVOLY/SVgFHtBw9IxxF2hxnjDW2n96q42Bhg2k0dAB7hf3z4ql2viqZqMp5hPODhIEAimSSd1pv0K65NOJpNnh4dCjia1NfP9l8i8q+v6L1jYSTmFJdRzlpifYv7DvhKGPYO7P9rkTE+xf2HfCUIexd1f2uREMByWmHSfvujxMLX4EWCyHJptndon3rXYLQJcY0+SxBuFzIN3HzSpp5VRAXobR4cUOk06k7+9F9Hzs2siPenELMwN7dOtcfx1ie9OJsmtNkgSJUblvxTCyxRcQLXMg6BMot0TIw+k5sQQPqf2E8VMo/cIjmh0aCOCq8bjxSY9zrNaC7+m/jKWTpWNFW6M+6q7E16vpWBjqY9GMpzAONy9ptxbwUDYsikBOaZObiSZJ8VHwO0w2k57i6ajjBaLy8w0CZvB6Yi6l4CnlY0F0kb+MFccGnJd6Oqd6X8ljHH/AOrhcmU64Nj4/veuPOtlcgSqD51R3Sq5lWEV2MACwCm2jgfSYkSeaWxAMTEWIGogjVX3JnERmpEGWGCdxuR5AHvCosdjQzEUXH1SHab4y7uifeOCn4TGtbizl9SqA4HdnAgjvAnuK54NRl9tHRJNx+kbIBdQ6VSUl2HKWuK9i/sO+EoVP2Lur+1yJifYv7DvhKHS9k7qHwlEQwHJx2vWfr81rsFoFjeTR9brPmQtlgvVCTHwUycli3VdqJrHXTqpVmTExdK5SXS7VZGA1gmU22ARanBMYwwlaCRsTQJvaIUZtTcNFNxY5uqrWkT1o2Yl0GEic08PnqqDlgS5go3Afq4cGOYTHTdaaj6oVJypwJewPYSX0w4hv3XNcOe09JAsdxUMybg0iuFpTTZhsC5lNpfDSQ4gE6BjbNAPHz71OwOLzUxOo1GltxjgoVDDOFJ9PKCDvcYAaSLui8Cbi0wbhDw16hALGhoy5nmM8HUZTpN/Du4o5Kmmux2Sx3F33LanWgor8WA0uMAfrFvFVz6VVrH1XVKYY38JJcdwANovvKhUq7yHRTLjuLjEQCczSTzhIGut1SeeS2SJwwp7tl0K071IbhyVnNk7UENa1hdzi2ZmHXJBnx10V7Vxb2iQGNO4vfAnjG/uKos1q6Elhp1ZA2xVpl9Fgh3oy7NBH38hBnu9xTcQ4UniDY5S0b2nMNP5ZH8ygM5riSdDLi1oLXXERlEgTAEcBwUjENdiatMtaRTbAk2LnXJgG8C2sbuK5VLV82dOnT8UehYKtLQehJNwNLK0DoSXonAaSv7F/Yd5FMo+yd1DyKfW9k/su8nJmG9keofCU5M8+5MD1u0fMrW4Y6LJ8lgeed2c/r++ha3C6BJHgaXJPaiEJjBon5VYQ5TKRIlJoTVjDn6WhNAtdKEkDAa4BGpHUoTsOAR195U4pMCUY4ZBgC0dyBim3COJzHgAPEkplbDkyZ3WB0QMU+1dkNxDHMnKSLOjS87upDwXJLD02hppted5IuTxKuBScNIlOIqRIjv3/RLojdtD65VSZjOVfJ55Y4UWNLC29znF5IA3tsDqTO6Fl6Yax1NnMzbpktvFnQRItxXrjqZcDJg20uNASIKp9tcnWVnMdJaWyeaBed5PFc2Tw/rEvjz+kjAYTDFwPo8z8xDRMANyOBLo4HTdMnUaaPZHJRpGevL3nUknXohabA7MbTblAsNFYMYITwwJciTzt8GR2hyYl7MkBgmZJLgeDZFh3yNytsFsWnTaIaOtW9RokJ0KkccY8ISWSUuWAbRXFJhJUEsm4g8x9/uu8ihYY/Ynsj4Si4p32b+y7yKj0D9ieyPhKIpguTTxlf2z5la3B6LG8nGHnR+Mk+K2OD0SQHmWNNye1yjl909xViYSUzMkSouKxrWAlxHeQBPSdAknNRVsaMXJ0iS+qGiSQBxNk2niGuEtII4gyFl6m1TUqQ4hu9pnmhoEk5gL6E9x0ug0T6IMyvl+UAMBbL2iwPOcOdqSBMeAPGvGpyqtjqfhWo87mvIldhVuB2iHjgdCOB3p/wDxWkCQagBGo6engulzjzZzqEuKLKOC6oTNqUT/AMxq6NqUTpVZ4hDqQ7h6cuxMLVxxAURu06Mkekb4j97l12Ppf9Rvit1I9zdOXYkNGq6WqKNo0r89vj0LtDH03khr2kjUA34hFTi+GBwa9A7mpEJEpEphRmW88D+iTj0J+XVDMkQPegE7KSHiDA6UkQk3Es5j+y7yKBQP2B7I+FykYl0sf2XeRUbDewPZHwlERGG5KzzzuznrWtwpt3LIclXDI7tHzWsw2iSI8uSSjAoYCeU7EItLaTHiWnjM2ygal06cViuU1X02Ia0GGQDa2bMAZ/pyjjY8VfbX2VzX+jOUFri5t+c4Q5ozE8wWNh+LoVDjqRDGvawGGNh1wcsyzo0MHoaBa5XDkc27mtl/1ndjUK8r5O4XCufULGH/AJJpgaNaHgiSRqbk/wD1QMXgqja4bVID6YDczLZogtdOswQb6SrrYtI0g6qQQym0scct3SZa5vd0/ND2k7LhzUeM94a9xAdVe9oyvABFmAerN+iIXNCa13X0Xknpqxgc70znCSSxrjAm5kQAOJBPeltuo4vpNp1MmcviMsuIg5ec0xbN1KrobSeBVJ/5rW0xlIlraeUiCZiANY1f0SJGzMA8Yik6q7NUyEmTIB5skWEEhxVdLbSfAjkkm0WmGwZcPb1JFi1zaWZp6eZ79CpLNmO/6z/6Wf7VLqYYGDo4aOGo6OkdBSbXIIa8QdA4eq49HA9B966OlBco5+rN8MEzZJF/TPP8rI8k52zP+67+lqPUxjRvl0xlF3E8A356cSmGk596mn4BpH5z97q069VunjfCB1JrllcMO4uBZUc5g9YlrQHcA03LrxJECNDKHsWqP4irH4vKyvZsez9FntmWxNWPxed0kYqOVJdijm5Y3Zr2PRw6VCaSpLF1o5GEDl0uXGhItRMBxRskmYqYSWMWuIPMf2XeRUXB+xPZHwuRajDkfP4XceBQcGfsT2R8LkRDz3k++m0mQQSTMPAvPWtZh3MFw2/aB+ayWxxfvWvwbbBTiVkGOI6D/V+q5/ExuP8AV+qLlVbyhxDWUKkkAljg2+UkkRzenqRk6VgitTortv7VaWcyoQQHDKwgl+jT4R4SqehQZ6AOqOFMEhzcxdL59oCLl4IuCBqB0ptCoylRpgUw6q4zSYeN5qOv6u6LA5eAJUzCbOv6Ss70tU6l12t4Bo0AH7jRecoyzSvhHe5xwquTjto5sP6Cm55BdJqCmcpgAW3hLGVC9lOnEMaA28W1LnX3nKwD+ZWLly28A9dwnfhFWzJLxe+6MzyjrGm2lFH0hNNxd6LOWio3Kxxlou0S1s/eLTpvu9lVC6q3OWl4pEnKIF3NGncUHGYQNc0h5bTcbkgvyvb6ocAQ5wbJIbMc6dU3D4qnTx+IkmRTptjV7nwCQGtF3HUgcUuL80n6FMm8G16moAUd2JcbUoJGrz6g4gW5zt1rC8kEQWMpvqXqAsbupg3P+o4fCLcSdFILogDQcBYfRdzVo406KfZ2Cq0qjqj8rgRlhmoEg5oIvpEDo6hdU6gIkXCEXJhYZlpg7x913XwPT5pVHSqQzlqdsknRx/L/AHNWX2Sft6uYk886Ddu0V/iMWAx0yDzRB1u9onpHSFm9nNBr1DH3ypN3l+iiVY/s2VKsODvAo7aw4O8D9FEo0WwLBSWUW8AuiznCjEDg73pOxA4O8CueibwCRpDgFjEfE4kfn8ElzEURwSWMW7z9k7sH4SgYf2DuyPhKLU9i7sH4ShUj9g/s/wBpViaMBsgX71psfjHUqNNzIkvy3GogfNZjZJv3q+26fsKP+r8goLgq+QlHadR4lrvBncdVl2sFWu8V3uJBcXZmkQxsu5pIsANNO+VZU8W6nhszBLpAE6XdBJjgJPcqavTqNpPzuJqV3MpB0kmCQ5516GDvIXJ4l6qidfhlpuRP2Qw1HOxLhGe1Nv4KTbNA8PADiVZFMpMDWhrbAAADoFgikyuyEFGNI5JScnbGSutanQuhqYUHUoZ2VGby0lu6HNBcL7rSO9VbaYdhalSoWfZUyWG+Zr5EgMaCecQAXF154K+wvNc08CPCRKz9PDipnwj5vVlgkBmcaF4a0uqNnVrjFhvhcPiY1NM7PDu4tBMDQxBa13o4BAN6kGDe4iyk/wAPX4HuqI+w9pCqw6ZmOLHhvq5m2lv5TuVlmVVii1ZN5pJ0ynYzEbx4PRC2v+F3/kH+5Ts11IpNR6Efc3Xl7FNVpVszS6m7KDdxe1wE2mMxP7CrNl1S2tUsPXOoPyC1mM9Rw4wP/YLK4I/bVO2VOMFHJS7Dubljt9zV0cS6N3g/6KZh6zyQOb4O+YUXCGwU7Dm4611I5mDoViXvBvDiB1aI+OxORrCGglxIuoVA89/aKJtg82j2ihexq3I1babiLNZ7/okhUvVb1DySRMaGqfsX9g/CUIH/AA7+z/aUSr7F/Yd8LkB7ow1Q/l/tKsSRg9la96vOUB/w9H/W+QVDsnXvV7yg/wAvR/1fkFBcFXyVOJrtbhCHfesAHZSTM6i8WvG5QMOS4YWdPS1DqTcMaRd11Z0sD6Wk2AC5uaATAJJ3kCRp71VtxAd6M82WVy12WSBnABJJ6QehcmW+rFs68ddOSRfBOampzV3nEODk9rUmIkrGHUmSR+96p8HXrNOMfhwXVMzoJc1rBqZJNwdTwMCVaOrlgdU3MaX97RLR3mB3rPbMZTpBtauSXPktpBrXOrNc3mw0guLTF3CAN83XF4p3JI6/DLytsmclGtGHa5ji7OS97iILqhPPMbr8OCtnOKpuTGEqUqOWpAOYkNBkMaYhs+J71dNMroh+KOef5M6jMMJoCSYUbiILSOr3EFZjCH7ap2ytFiXQ0dJA8ys1gXfaPP5z5qH7v0XX6f2a/BGyn0DcKswLrKxom4V0RYCgee/tHzTtsm1HtHyQsOee/tFO2ybUe0fJD0D6kZnqjqHkkuN9UdQSWMaCrai/sO+FyBiD/hqnZ/tKNjcQ006gBnmO4fhKj4s/4ar2D8JXQ0RRhdk/NaHamR1Kk17nAB+Y5W5jYADoH6LP7GoyA7d1haCmyRBjxChEpLkh7TxlMUHNoBweYAzNEXcATbfBKohgYa+mXl1SA7KAIa5kkyW80HKbDXXSVq20B0eIWe27h3mtTZSEFvOkeqHHfA1Iyi5nSIXN4mD/ACOrw01+JYYarmYHcRfr3+9FAVXRrNY6zgWOvbcdCRxbNgd8aq1a7eFbFlU4+5HLjcJewWmV0rlNR9o7QbRBkZn3IYLm0kl0aCxtrbcLqkpqKtiRi5OkRdv1jDKDfXqEEgahgu3xguj8reKpeVFH0TMJVDWsqCqaYDbVHsieaGEtLDYz+aIFwZjjVbQxVYveytlmcoJBDxFnCPXGUkXbO4AAj5L1XVA91VznvzWc45iARmME6CXTA4rgi3kyamdrrHCi7Y6AehSKZ6VBz626lJoMK7LOMsG7p6lytxCQbZdAsiArse6ze0Phcs/gHMD3DM0Q42J6bLQbSbzW9sT/AEu/RZbBMBc42u4+aj+4/gv+2vk2uCrMj12eP6qdTrs/G3xH1VLgaI4BWLaDeAVkQZzDPBe8i4zfVG2i9h9GHPAyyYuTew0XGMA0geCT2Tw8QsEBVxlACA/3FcQ8RQEbvEJLGVGixBBY4HeCLdPN+aZiGg0HNgw45NbiWm/SqfZmKquJD6gdzdAzLeWwraqfsf8A9B8JXTs+CHDMHyffFpNraN3b/VWoZT/MfBn+1YvY9TzK2WGfIUoblJBCXD77v/X/AGqJiKWYySSYyzzZLT90wLjoUlxQaiZxT5FTaKCls8fxL3P9m3nulwBqWAA9+QDd3qxw2D+0DKdWwBLrS3m5Sco11MBFd71XbUqEVaYbzXZSCQSDPE2FwQ4R+Vebnw6H5Xu2d+LK5c+iCUS99N73VwxrcwOUBuaLNAPFwdu/CeCjUcM2i2tVLszxmZTfLS4lxewkA2PNhxgacU6thg1lNg3NzHpLjUvHGPmq+tQGu9bDh1q2w5MunZIr8Zi61XLTfUcWl4JFgCQdTAE96uthUQBUjTNH/ow/NUr6EuaNIcD4Gf0Wi2A3mVB/3T7msEe5XcUp7Ebbx7kk01LoSm+jlSIhURFhA7ROJQ2u0T1jEPaL/U7Y7ua4rKYJ/Pdf7x4cepafbDua2Nc1uvK5Y/ZroJ6z5lRX6j+C37a+TZ4E9J930U9pPE+76KpwNRWDXK5IktqFcdVKCx6TnLAB4isYSQcSbJLBDV8UWtPow0Hi6Y8AmM2jWFMtcGuMg2BbBAPEniPBSn0LfX9IQKtDm3jubJ966fQlSMdgdm1qYvVYYn7hnjucrzC4uq0Xyf0umOnnap7KBF3kEzusAN1iTfpQ6VN9cww5KY9aoLk8W093QXbt0nSSXYd1ywFbbry/I3Jb1iQYb0etd3lv3ImI2s4b2/0u/wBysBsGiBEOgaDMhHYVKwh0DQZtE+4vlK07bERllx1sMo7iTPeO4p1GiH1QWPaQ2Ii4DQ3LFjcmC6xU48n6B+7700cmaAmAROsOIMdYMrky4HJ3e5048qiqoHyixDaZYS5rg0CmWCC7Mczs2+LjQ/i8czi9tknmNB11aZ14CAO5ab/+Pwv4PefqiM5NYcaMCGPDo3TNPLq2aMQ3a5acz2mNwaxxJdIjeelEobfyg5W1xJJ0e0EnqW3pbCpDSFIp7Do8D4ppY9TtgjkpUYmlylfHq19L81xE9B4I1TlFU3Nr99MkLbN2LS6fFOZsOkPxf1FDoruzdX2MQ3lE8bq3dTKc7lQ+NK//AIyfktw7Y9IgesOpx96b/wAHpD8R63HyQ6Puw9b2MIeUDiRmZXcBe9J2ukqswtWsHGKdpMZgQdeC9OdsynwPiVFqbLpHVpPejHGou0CWTUqMxg9o1hqxg/rPkpY21W09G33q9/4RR/D7yuDZNP8ADHeU+5PYpsLtPEOnmU7EjV3X81120cV+Clfpf9FJ2dSHo5GhJcL/AHSZb7oRXUgSJMROnclcmPpRWVcdifvNpgfzH5risThxuv3riDmwqKJ7tsNjQn3ef0QTtTg3XpgdyqXvaN4nol30XHVrWk+Df1VdTE0ok1q4cCHNkdqx74Wl2JgjAe/mNA5oJsLWO4RwVPyf2c0n0lYCBdoMn+Yk6dXetRSxbB96ekyY6FSC9WTnL0Q55YLQ431aCRPTGgXG1mCxAka6a9y7U2i3TKY6gPNR8zNw8GmPGLqhMO7GMmAw6bmgW4pDENiYIHTCjuc1ogBg9x8JTCANfcY8jdBoJM/jKfEHun9E9uKp7iD1BQQ1kbz1kfMLraQ0t1SJQCT/AOKbxjwB/QoVWtJs7TWD+l0ClhxE6dNvouspyfWN93TpuQMFBceHUd3dxQi7pJjdDQJ9yKx4nSZ/egXbdHdv6OlbYwwEmbfrxRmz+EJjKx/CB1X96OazotYdWnXP7utsYb6J0Wae8/VPbROjjb5qDX9KXSHwB+UEfFqnVszmwKkHfFp42my1mJjqDRbMFHdRueAuIsgtaTq/Q2uD16/uyeImM3jA06kAhg4xqT0TG7jK5Wq1ZEH3x5Ap1KrcAGffqize8D3IpIFkKpTcTdod1n9F1ThmmJ7xdJbSg2YRuEYd3vP1Q8Dhml9xMX1MWBNxv0SSSDsvaNMBou7Sbucb95Umk27ddJ1Oq6kqMmBpsBLp3WCl+hHnvPSuJIGGtF46Y6Yjin1W2CSSzADojXWxO88VLpjmg9aSS0eDMa1xj98U+mJufPpSSRZhpMEd/wBU15gGI8BwSSShQ7Pb9AjU3WJ368L24daSSJgwpCW23fRL0TZ0SSWAEe0ACw1jQcEKqY0jwHFJJYxzDVC7WDbgER7BqupLBI4YL2/cBJJJAKP/2Q=="
-          alt="Mirror">
-        <p>Mirrors</p>
-      </div>
-      <div><img
-          src="data:image/jpeg;base64,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"
-          alt="Coffee Table">
-        <p>Coffee Tables</p>
-      </div>
-      <div><img
-          src="https://paperplanedesign.in/cdn/shop/files/lord-buddha-wall-art-painting-for-bedroom-and-office-wall-decoration-951053.jpg?v=1715591479&width=1080"
-          alt="Wall Art">
-        <p>Wall Art</p>
+      
+      <!-- Floating Menu Popup -->
+      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:60px;right:0;width:420px;max-height:500px;background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(139,69,19,0.15);padding:20px;overflow-y:auto;">
+        <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h6 style="margin:0;font-weight:700;color:#232f3e;">Shop by Categories</h6>
+          <button onclick="toggleFloatingMenu()" style="background:none;border:none;font-size:1.2rem;color:#666;cursor:pointer;">✕</button>
+        </div>
+        
+        <div class="floating-categories-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          @if(!empty($categories) && $categories->count())
+            @foreach($categories->take(20) as $category)
+              <div class="floating-category-card" data-category-id="{{ $category->id }}" data-category-name="{{ $category->name }}" style="display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:12px;background:#f8f9fa;transition:background 0.2s;cursor:pointer;">
+                <div class="floating-category-emoji" style="font-size:1.1rem;margin-bottom:4px;">{{ $category->emoji }}</div>
+                <div class="floating-category-name" style="font-size:0.75rem;font-weight:600;color:#232f3e;text-align:center;line-height:1.1;">{{ Str::limit($category->name, 15) }}</div>
+              </div>
+            @endforeach
+          @endif
+        </div>
+        
+        <!-- Subcategory Display Area -->
+        <div id="subcategoryArea" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;">
+          <div id="subcategoryHeader" style="font-weight:600;color:#232f3e;margin-bottom:8px;"></div>
+          <div id="subcategoryList" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+        </div>
       </div>
     </div>
   </section>
-
-  <!-- About -->
-  <section class="about">
-    <h2>MOBILLIO FURNITURE</h2>
-    <p>Mobillio Store Inc. are unique resellers of modern furniture, designer-made, handcrafted items, since 1997. Our
-      legacy guarantees exceptional product quality, unique design and special prices for all of our product line up.
-    </p>
-    <a href="{{ route('buyer.dashboard') }}"><button>Explore</button></a>
-  </section>
-
+  
   <!-- Products Section -->
-  {{-- <section class="products-section">
+  <section class="products-section">
     <div class="container">
       @php
       $items = ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) ? collect($products->items()) :
@@ -2493,80 +2048,98 @@ li a{
 
 
 
-  <section class="container my-5">
-    <div class="text-center mb-4">
-      <h2 class="text-uppercase text-primary small fw-semibold">OUR BLOG</h2>
-      <p class="text-primary small">Read the latest news and product related articles</p>
-    </div>
+  <!-- Chatbot Widget -->
 
-    <div class="row g-4 justify-content-center">
-                    @foreach($categories as $category)
-                      @if(strtolower($category->name) !== 'furniture' && strtolower($category->name) !== 'mobillio')
-                        <div class="mega-category-card unique-3d-card" data-gender="{{ $category->gender ?? 'all' }}">
-                          <div class="mega-category-header">
-                            <div class="mega-category-emoji" style="box-shadow: 0 8px 32px #ff9900cc,0 0 0 4px #fff; background: #fff;">
-                              @php
-                                $modelImages = [
-                                  'ELECTRONICS' => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80',
-                                  'MEN\'S FASHION' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
-                                  'WOMEN\'S FASHION' => 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=80&q=80',
-                                  'HOME & KITCHEN' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
-                                  'BEAUTY & PERSONAL CARE' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80',
-                                  'SPORTS & FITNESS' => 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80',
-                                  'BOOKS & EDUCATION' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=80&q=80',
-                                  'KIDS & TOYS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
-                                  'AUTOMOTIVE' => 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=80&q=80',
-                                  'HEALTH & WELLNESS' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80',
-                                  'JEWELRY & ACCESSORIES' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
-                                  'GROCERY & FOOD' => 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80',
-                                  'GARDEN & OUTDOOR' => 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80',
-                                  'PET SUPPLIES' => 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=80&q=80',
-                                  'BABY PRODUCTS' => 'https://images.unsplash.com/photo-1503457574465-0ec62fae31a0?auto=format&fit=crop&w=80&q=80',
-                                ];
-                                $catKey = strtoupper($category->name);
-                                $img = $category->image ?? ($modelImages[$catKey] ?? 'https://via.placeholder.com/80');
-                              @endphp
-                              <div class="category-3d-img" style="width:60px;height:60px;perspective:400px;display:flex;align-items:center;justify-content:center;">
-                                <img src="{{ $img }}" alt="{{ $category->name }}" style="width:60px;height:60px;object-fit:cover;border-radius:14px;box-shadow:0 8px 32px #ff9900cc,0 0 0 4px #fff;transform:rotateY(-18deg) rotateX(12deg) scale(1.08);transition:transform 0.4s cubic-bezier(.25,1.7,.45,.87);">
-                              </div>
-                            </div>
-                            <h6 class="mega-category-title">{{ $category->name }}</h6>
-                            <span class="mega-category-count">
-                              {{ $category->subcategories ? $category->subcategories->count() : 0 }}
-                            </span>
-                          </div>
-                          @if($category->subcategories && $category->subcategories->count())
-                            <div class="mega-subcategories">
-                              @foreach($category->subcategories->take(6) as $subcategory)
-                                <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" 
-                                   class="mega-subcategory-link">
-                                  {{ $subcategory->name }}
-                                </a>
-                              @endforeach
-                              @if($category->subcategories->count() > 6)
-                                <a href="{{ route('buyer.productsByCategory', $category->id) }}" 
-                                   class="mega-subcategory-link" style="font-weight: 600; color: #8B4513;">
-                                  +{{ $category->subcategories->count() - 6 }} more
-                                </a>
-                              @endif
-                            </div>
-                          @else
-                            <p class="text-muted small">No subcategories available</p>
-                          @endif
-                        </div>
-                      @endif
-                    @endforeach
-            <a href="#" class="text-light"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="text-light"><i class="bi bi-twitter"></i></a>
-            <a href="#" class="text-light"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="text-light"><i class="bi bi-youtube"></i></a>
+  <x-chatbot-widget />
+
+
+
+  <!-- Premium Footer -->
+  <footer class="mt-5" style="background:linear-gradient(135deg,#232f3e 60%,#8B4513 100%);color:#fff;padding:48px 0 24px 0;border-radius:24px 24px 0 0;box-shadow:0 -2px 16px rgba(35,47,62,0.12);">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+          <div class="fw-bold fs-3 mb-2" style="letter-spacing:1px;">grabbasket</div>
+          <div class="mb-2">Premium Shopping Experience</div>
+          <div class="d-flex gap-3 justify-content-center justify-content-md-start">
+            <a href="#" class="text-warning"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="#" class="text-warning"><i class="bi bi-twitter fs-4"></i></a>
+            <a href="#" class="text-warning"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="#" class="text-warning"><i class="bi bi-youtube fs-4"></i></a>
           </div>
         </div>
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+          <div class="mb-2 fw-semibold">Quick Links</div>
+          <div class="d-flex flex-column gap-2">
+            <a href="/" class="text-white-50 text-decoration-none">Home</a>
+            <a href="/shop" class="text-white-50 text-decoration-none">Shop</a>
+            <a href="/cart" class="text-white-50 text-decoration-none">Cart</a>
+            <a href="/contact" class="text-white-50 text-decoration-none">Contact</a>
+          </div>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+          <div class="mb-2 fw-semibold">Contact Us</div>
+          <div class="text-white-50">grabbasket</div>
+          <div class="text-white-50">+91 98765 43210</div>
+          <div class="text-white-50">Chennai, India</div>
+        </div>
       </div>
+      <hr class="my-4" style="border-color:rgba(255,255,255,0.1);">
+      <div class="text-center text-white-50">&copy; {{ date('Y') }} grabbasket. All rights reserved.</div>
     </div>
   </footer>
-  <!-- Chatbot Widget -->
-  <x-chatbot-widget />
+
+  <!-- Voice Controller (Premium Welcome) -->
+  <script>
+    function playLoginWelcomeMessage() {
+      if ('speechSynthesis' in window) {
+  const userName = "{{ auth()->check() ? auth()->user()->name : 'Guest' }}";
+  const gender = "{{ auth()->check() ? (auth()->user()->gender ?? 'other') : 'other' }}";
+        let welcomeMessage = '';
+        if (gender === 'female') {
+          welcomeMessage = `Welcome back, beautiful ${userName}! Ready to discover amazing products just for you?`;
+        } else if (gender === 'male') {
+          welcomeMessage = `Welcome back, ${userName}! Let's find some great deals and products today!`;
+        } else {
+          welcomeMessage = `Welcome back to GrabBasket, ${userName}! Enjoy your premium shopping experience!`;
+        }
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(welcomeMessage);
+        utterance.rate = 0.85;
+        utterance.pitch = gender === 'female' ? 1.2 : 0.9;
+        utterance.volume = 0.8;
+        const voices = speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice => voice.lang.includes('en') && (gender === 'female' ? voice.name.toLowerCase().includes('female') : true)) || voices.find(voice => voice.lang.includes('en'));
+        if (preferredVoice) utterance.voice = preferredVoice;
+        showEnhancedVoiceNotification(welcomeMessage, gender);
+        utterance.onend = function() { };
+        utterance.onerror = function(event) { console.error('Speech error:', event.error); };
+        speechSynthesis.speak(utterance);
+      }
+    }
+    function showEnhancedVoiceNotification(message, gender) {
+      const notification = document.createElement('div');
+      const bgGradient = gender === 'female' ? 'linear-gradient(135deg,#F43397,#ff6b9d)' : gender === 'male' ? 'linear-gradient(135deg,#1CA9C9,#20cfcf)' : 'linear-gradient(135deg,#28a745,#20c997)';
+      notification.innerHTML = `<div class="enhanced-voice-notification" style="position:fixed;top:20px;right:20px;z-index:9999;background:${bgGradient};color:white;padding:20px 25px;border-radius:20px;box-shadow:0 12px 35px rgba(0,0,0,0.3);font-weight:600;max-width:350px;animation:slideInEnhanced 0.8s cubic-bezier(0.175,0.885,0.32,1.275);border:3px solid rgba(255,255,255,0.3);"><div style="display:flex;align-items:center;gap:15px;"><div style="font-size:2rem;animation:voiceIconPulse 1s ease-in-out infinite;">${gender==='female'?'👸':gender==='male'?'🤴':'🎤'}</div><div><div style="font-size:1rem;margin-bottom:8px;opacity:0.9;">🔊 Personal Welcome Message</div><div style="font-size:0.85rem;opacity:0.8;line-height:1.3;">${message}</div></div></div></div>`;
+      document.body.appendChild(notification);
+      setTimeout(()=>{notification.style.animation='slideOutEnhanced 0.8s ease-in forwards';setTimeout(()=>notification.remove(),800);},6000);
+    }
+    function initializeVoiceWelcome() {
+  const justLoggedIn = "{{ session('just_logged_in') ? 'true' : 'false' }}" === 'true';
+  const isAuthenticated = "{{ auth()->check() ? 'true' : 'false' }}" === 'true';
+      if (justLoggedIn || isAuthenticated) {
+        setTimeout(() => { playLoginWelcomeMessage(); }, 2000);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', initializeVoiceWelcome);
+  </script>
+
+  <style>
+    .enhanced-voice-notification { font-family:inherit; }
+    @keyframes slideInEnhanced { from { opacity:0;transform:translateX(100%) scale(0.8);} to { opacity:1;transform:translateX(0) scale(1);} }
+    @keyframes slideOutEnhanced { from { opacity:1;transform:translateX(0) scale(1);} to { opacity:0;transform:translateX(100%) scale(0.8);} }
+    @keyframes voiceIconPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
+  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -2808,6 +2381,73 @@ li a{
         });
       }
 
+    });
+  </script>
+
+  <!-- Floating Menu JavaScript -->
+  <script>
+    function toggleFloatingMenu() {
+      const menu = document.getElementById('floatingMenu');
+      const subcategoryArea = document.getElementById('subcategoryArea');
+      if (menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = 'block';
+        subcategoryArea.style.display = 'none';
+      } else {
+        menu.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add click events to floating category cards
+      const floatingCategoryCards = document.querySelectorAll('.floating-category-card');
+      floatingCategoryCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const categoryId = this.getAttribute('data-category-id');
+          const categoryName = this.getAttribute('data-category-name');
+          showCategorySubcategories(categoryId, categoryName);
+        });
+      });
+    });
+
+    function showCategorySubcategories(categoryId, categoryName) {
+      // Show subcategory area
+      const subcategoryArea = document.getElementById('subcategoryArea');
+      const subcategoryHeader = document.getElementById('subcategoryHeader');
+      const subcategoryList = document.getElementById('subcategoryList');
+      
+      subcategoryHeader.textContent = categoryName + ' Subcategories';
+      subcategoryArea.style.display = 'block';
+      
+      // Clear previous subcategories
+      subcategoryList.innerHTML = '';
+      
+      // Find category data
+      const categories = {!! json_encode($categories ?? []) !!};
+      const category = categories.find(cat => cat.id == categoryId);
+      
+      if (category && category.subcategories && category.subcategories.length > 0) {
+        category.subcategories.slice(0, 12).forEach(subcategory => {
+          const link = document.createElement('a');
+          link.href = `/buyer/subcategory/${subcategory.id}/products`;
+          link.textContent = subcategory.name;
+          link.style.cssText = 'font-size:0.8rem;padding:4px 8px;border-radius:6px;color:#654321;background:rgba(139,69,19,0.04);text-decoration:none;transition:background 0.2s;';
+          link.addEventListener('mouseenter', () => link.style.background = 'rgba(139,69,19,0.08)');
+          link.addEventListener('mouseleave', () => link.style.background = 'rgba(139,69,19,0.04)');
+          subcategoryList.appendChild(link);
+        });
+      } else {
+        subcategoryList.innerHTML = '<span style="color:#666;font-size:0.8rem;">No subcategories available</span>';
+      }
+    }
+
+    // Close floating menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const floatingMenu = document.getElementById('floatingMenu');
+      const fabButton = document.querySelector('.fab-main');
+      
+      if (floatingMenu && !floatingMenu.contains(event.target) && !fabButton.contains(event.target)) {
+        floatingMenu.style.display = 'none';
+      }
     });
   </script>
 

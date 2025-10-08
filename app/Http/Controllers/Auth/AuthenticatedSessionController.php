@@ -52,18 +52,21 @@ class AuthenticatedSessionController extends Controller
         if ($role === 'seller') {
             return redirect()->route('seller.dashboard')->with([
                 'success' => $greeting,
-                'tamil_greeting' => true
+                'tamil_greeting' => true,
+                'login_success' => true
             ]);
         }
         if ($role === 'buyer') {
             return redirect()->route('home')->with([
                 'success' => $greeting,
-                'tamil_greeting' => true
+                'tamil_greeting' => true,
+                'login_success' => true
             ]);
         }
         return redirect()->intended(route('dashboard', absolute: false))->with([
             'success' => $greeting,
-            'tamil_greeting' => true
+            'tamil_greeting' => true,
+            'login_success' => true
         ]);
 
         

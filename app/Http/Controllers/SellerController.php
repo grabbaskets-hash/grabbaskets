@@ -5,12 +5,17 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
 use App\Models\Order;
+use App\Imports\ProductsImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class SellerController extends Controller {
+    // ...existing code...
 
     // Bulk product upload: CSV + images
     public function bulkProductUpload(Request $request)
@@ -119,6 +124,63 @@ class SellerController extends Controller {
             ->latest()
             ->get();
         return view('seller.dashboard', compact('products'));
+    }
+    /**
+     * Update product images by uploading a ZIP file where each image filename is the product unique_id
+     */
+    public function updateImagesByZip(Request $request)
+    {
+        $request->validate([
+            'images_zip' => 'required|file|mimes:zip|max:51200', // 50MB max
+        ]);
+
+        $zipFile = $request->file('images_zip');
+        $zipPath = $zipFile->store('temp', 'local');
+        $fullZipPath = storage_path('app/' . $zipPath);
+        $zip = new \ZipArchive();
+        $updated = 0;
+        $errors = [];
+        if ($zip->open($fullZipPath) === TRUE) {
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $filename = $zip->getNameIndex($i);
+                $basename = pathinfo($filename, PATHINFO_BASENAME);
+                $uniqueId = pathinfo($basename, PATHINFO_FILENAME);
+                $imageContent = $zip->getFromIndex($i);
+                if ($imageContent !== false) {
+                    $product = Product::where('unique_id', $uniqueId)
+                        ->where('seller_id', Auth::id())
+                        ->first();
+                    if ($product) {
+                        $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
+                        $uniqueName = Str::random(40) . '.' . $extension;
+                        $storagePath = 'products/' . $uniqueName;
+                        if (Storage::disk('public')->put($storagePath, $imageContent)) {
+                            // Delete old image if exists
+                            if ($product->image) {
+                                Storage::disk('public')->delete($product->image);
+                            }
+                            $product->image = $storagePath;
+                            $product->save();
+                            $updated++;
+                        } else {
+                            $errors[] = "Failed to save image for product $uniqueId";
+                        }
+                    } else {
+                        $errors[] = "No product found for unique_id: $uniqueId";
+                    }
+                }
+            }
+            $zip->close();
+        } else {
+            $errors[] = 'Could not open ZIP file.';
+        }
+        // Clean up temp file
+        Storage::delete($zipPath);
+        $msg = "$updated product images updated.";
+        if ($errors) {
+            $msg .= ' Errors: ' . implode(' | ', $errors);
+        }
+        return redirect()->route('seller.dashboard')->with('bulk_upload_success', $msg);
     }
     public function addMultipleSubcategories()
     {
@@ -324,5 +386,144 @@ public function storeCategorySubcategory(Request $request)
             ->latest()
             ->paginate(15);
         return view('seller.transactions', compact('orders'));
+    }
+
+    /**
+     * Show the bulk upload Excel form
+     */
+    public function showBulkUploadForm()
+    {
+        $categories = Category::all();
+        $subcategories = Subcategory::with('category')->get();
+        return view('seller.bulk-upload-excel', compact('categories', 'subcategories'));
+    }
+
+    /**
+     * Process bulk upload from Excel with images
+     */
+    public function processBulkUpload(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls,csv|max:10240', // 10MB max
+            'images_zip' => 'nullable|mimes:zip|max:51200', // 50MB max for zip
+        ]);
+
+        try {
+            $zipPath = null;
+            
+            // Handle images zip file
+            if ($request->hasFile('images_zip')) {
+                $zipFile = $request->file('images_zip');
+                $zipPath = $zipFile->store('temp/bulk-uploads', 'local');
+            }
+
+            // Process Excel file
+            $import = new ProductsImport($zipPath);
+            Excel::import($import, $request->file('excel_file'));
+
+            // Clean up temporary zip file
+            if ($zipPath && Storage::disk('local')->exists($zipPath)) {
+                Storage::disk('local')->delete($zipPath);
+            }
+
+            $successCount = $import->getSuccessCount();
+            $errors = $import->getErrors();
+
+            $message = "Successfully imported {$successCount} products.";
+            
+            if (!empty($errors)) {
+                $message .= " However, there were some errors: " . implode(', ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= "... and " . (count($errors) - 5) . " more errors.";
+                }
+                return redirect()->route('seller.bulkUploadForm')
+                    ->with('warning', $message)
+                    ->with('errors', $errors);
+            }
+
+            return redirect()->route('seller.dashboard')->with('success', $message);
+
+        } catch (\Exception $e) {
+            // Clean up on error
+            if (isset($zipPath) && $zipPath && Storage::disk('local')->exists($zipPath)) {
+                Storage::disk('local')->delete($zipPath);
+            }
+            
+            return redirect()->route('seller.bulkUploadForm')
+                ->with('error', 'Error processing upload: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download sample Excel template
+     */
+    public function downloadSampleExcel()
+    {
+        // Create sample data with proper column headers
+        $sampleData = [
+            [
+                'name' => 'Sample Product 1',
+                'unique_id' => 'PROD-001',
+                'category_id' => 1,
+                'category_name' => 'Electronics',
+                'subcategory_id' => 1,
+                'subcategory_name' => 'Mobile Phones',
+                'image' => 'sample-product-1.jpg',
+                'description' => 'This is a sample product description. Describe your product features here.',
+                'price' => 999.99,
+                'discount' => 10,
+                'delivery_charge' => 50,
+                'gift_option' => true,
+                'stock' => 100
+            ],
+            [
+                'name' => 'Sample Product 2',
+                'unique_id' => 'PROD-002',
+                'category_id' => 2,
+                'category_name' => 'Fashion',
+                'subcategory_id' => 5,
+                'subcategory_name' => 'Men Clothing',
+                'image' => 'sample-product-2.jpg',
+                'description' => 'Another sample product with different category.',
+                'price' => 499.99,
+                'discount' => 15,
+                'delivery_charge' => 0,
+                'gift_option' => false,
+                'stock' => 50
+            ]
+        ];
+
+        // Create the export class
+        $export = new class($sampleData) implements FromArray, WithHeadings {
+            protected $data;
+            
+            public function __construct($data) {
+                $this->data = $data;
+            }
+            
+            public function array(): array {
+                return $this->data;
+            }
+            
+            public function headings(): array {
+                return [
+                    'NAME',
+                    'UNIQUE-ID', 
+                    'CATEGORY ID',
+                    'CATEGORY NAME',
+                    'SUBCATEGORY ID',
+                    'SUBCATEGORY-NAME',
+                    'IMAGE',
+                    'DESCRIPTION',
+                    'PRICE',
+                    'DISCOUNT',
+                    'DELIVERY-CHARGE',
+                    'GIFT-OPTION',
+                    'STOCK'
+                ];
+            }
+        };
+
+        return Excel::download($export, 'bulk-products-sample.xlsx');
     }
 }

@@ -80,7 +80,8 @@ class RegisteredUserController extends Controller
             $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
             return redirect()->route('seller.dashboard')->with([
                 'success' => $greeting,
-                'tamil_greeting' => true
+                'tamil_greeting' => true,
+                'login_success' => true
             ]);
         } else {
             $buyer = \App\Models\Buyer::create([
@@ -116,7 +117,8 @@ class RegisteredUserController extends Controller
             $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
             return redirect()->route('home')->with([
                 'success' => $greeting,
-                'tamil_greeting' => true
+                'tamil_greeting' => true,
+                'login_success' => true
             ]);
         }
     }

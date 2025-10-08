@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'grabbasket') }}</title>
+    <title>{{ config('app.name', 'grabbaskets') }}</title>
     <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbasket.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -36,25 +36,26 @@
         /* Product Cards */
         .product-card {
             background: #fff;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             display: flex;
-            gap: 15px;
+            gap: 4px;
+            min-height: 80px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) scale(0.97);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
         .product-img {
-            width: 150px;
-            height: 150px;
+            width: 10px;
+            height: 10px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 6px;
         }
 
         .price {
@@ -174,8 +175,8 @@
     <!-- Right Side: Hello + Buttons -->
     <div class="d-flex align-items-center gap-2">
 
-      <!-- Hello User -->
-      <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
+    <!-- Hello User -->
+    <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ optional(Auth::user())->name ?? 'Guest' }}</span>
 
       <!-- My Account Dropdown -->
       <div class="dropdown">
@@ -187,7 +188,6 @@
           <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
           <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
           <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-          <li><a class="dropdown-item" href="{{ route('seller.dashboard') }}"><i class="bi bi-briefcase"></i> Seller</a></li>
           <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
           <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
         </ul>

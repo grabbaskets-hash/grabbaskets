@@ -85,45 +85,8 @@ Route::get('/', function () {
         }
     }
     
-    // Test with ultra-simple template
-    if (request()->has('test')) {
-        try {
-            $categories = \App\Models\Category::with('subcategories')->get();
-            $products = \App\Models\Product::latest()->paginate(12);
-            $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
-            $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-            $blogProducts = \App\Models\Product::latest()->take(3)->get();
-
-            return view('index-test', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Test template failed',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ], 500);
-        }
-    }
-    
-    // Test database connection first
-    if (request()->has('dbtest')) {
-        try {
-            $categories = \App\Models\Category::count();
-            $products = \App\Models\Product::count();
-            return response()->json([
-                'status' => 'Database OK',
-                'categories' => $categories,
-                'products' => $products
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Database error',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-    
     try {
+        // Force fresh data by adding a timestamp parameter that changes the cache key
         $categories = \App\Models\Category::with('subcategories')->get();
         $products = \App\Models\Product::latest()->paginate(12);
         $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
@@ -190,6 +153,11 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     // Bulk uploads
     Route::post('/seller/bulk-image-upload', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
     Route::post('/seller/bulk-product-upload', [SellerController::class, 'bulkProductUpload'])->name('seller.bulkProductUpload');
+    
+    // Excel Bulk Upload Routes
+    Route::get('/seller/bulk-upload-excel', [SellerController::class, 'showBulkUploadForm'])->name('seller.bulkUploadForm');
+    Route::post('/seller/bulk-upload-excel', [SellerController::class, 'processBulkUpload'])->name('seller.processBulkUpload');
+    Route::get('/seller/download-sample-excel', [SellerController::class, 'downloadSampleExcel'])->name('seller.downloadSampleExcel');
 
     // Seller: Dashboard & Profile
     Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
@@ -456,5 +424,37 @@ Route::post('/admin/sms/order-reminders', function (Request $request) {
     }
     return app(\App\Http\Controllers\SmsController::class)->sendOrderReminders($request);
 })->name('admin.sms.reminders');
+
+// Admin Category Emoji Management Routes
+Route::prefix('admin/category-emojis')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\CategoryEmojiController::class, 'index'])->name('admin.category-emojis.index');
+    Route::put('/{category}', [App\Http\Controllers\Admin\CategoryEmojiController::class, 'update'])->name('admin.category-emojis.update');
+    Route::post('/bulk-update', [App\Http\Controllers\Admin\CategoryEmojiController::class, 'bulkUpdate'])->name('admin.category-emojis.bulk-update');
+    Route::post('/suggestions', [App\Http\Controllers\Admin\CategoryEmojiController::class, 'getSuggestions'])->name('admin.category-emojis.suggestions');
+});
+
+// Debug route to check emojis
+Route::get('/debug/emojis', function () {
+    $categories = App\Models\Category::select('id', 'name', 'emoji')->get();
+    $output = '<h1>Category Emojis</h1><ul>';
+    foreach ($categories as $cat) {
+        $output .= '<li>' . $cat->id . ': ' . $cat->name . ' = ' . ($cat->emoji ?: 'NULL') . '</li>';
+    }
+    $output .= '</ul>';
+    return $output;
+});
+
+// Test route to update an emoji manually
+Route::get('/debug/test-emoji-update/{id}/{emoji}', function ($id, $emoji) {
+    $category = App\Models\Category::find($id);
+    if ($category) {
+        $category->emoji = $emoji;
+        $category->save();
+        return "Updated category {$category->name} with emoji: {$emoji}";
+    }
+    return "Category not found";
+});
+
+Route::post('seller/update-images-zip', [App\Http\Controllers\SellerController::class, 'updateImagesByZip'])->name('seller.updateImagesByZip');
 
 require __DIR__ . '/auth.php';

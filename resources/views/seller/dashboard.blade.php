@@ -118,7 +118,7 @@
             z-index: 1101;
         }
 
-        .nav-pills{
+        .nav-pills {
             position: relative;
             bottom: 50px;
         }
@@ -141,6 +141,11 @@
             <li>
                 <a class="nav-link" href="{{ route('seller.createProduct') }}">
                     <i class="bi bi-plus-circle"></i> Add Product
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" href="{{ route('seller.bulkUploadForm') }}">
+                    <i class="bi bi-cloud-upload"></i> Bulk Upload Excel
                 </a>
             </li>
             <li>
@@ -184,7 +189,7 @@
             @csrf
         </form>
     </div>
-    
+
     <!-- Content -->
     <div class="content">
         <!-- Dashboard Header -->
@@ -233,52 +238,79 @@
         <div class="orders-table p-3">
             <h4 class="mb-3"><i class="bi bi-clock-history"></i> Your Products</h4>
             @if(isset($products) && $products->count())
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Category</th>
-                                <th>Subcategory</th>
-                                <th>Price</th>
-                                <th>Discount</th>
-                                <th>Delivery</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($products as $p)
-                                <tr>
-                                    <td>
-                                        @if($p->image)
-                                            <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
-                                                <img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                                            </a>
-                                        @else
-                                            <span class="text-muted small">No Image</span>
-                                        @endif
-                                    </td>
-                                    <td><a href="{{ route('product.details', $p->id) }}" class="text-decoration-none text-dark">{{ $p->name }}</a></td>
-                                    <td>{{ optional($p->category)->name ?? '-' }}</td>
-                                    <td>{{ optional($p->subcategory)->name ?? '-' }}</td>
-                                    <td>₹{{ number_format($p->price, 2) }}</td>
-                                    <td>{{ $p->discount ? $p->discount . '%' : '-' }}</td>
-                                    <td>{{ $p->delivery_charge ? '₹' . number_format($p->delivery_charge, 2) : 'Free' }}</td>
-                                    <td>{{ $p->created_at?->format('d M Y') }}</td>
-                                    <td>
-                                        <a href="{{ route('seller.editProduct', $p->id) }}"
-                                            class="btn btn-sm btn-outline-primary">Edit</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Subcategory</th>
+                            <th>Price</th>
+                            <th>Discount</th>
+                            <th>Delivery</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($products as $p)
+                        <tr>
+                            <td>
+                                @if($p->image)
+                                <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
+                                    <img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                </a>
+                                @else
+                                <span class="text-muted small">No Image</span>
+                                @endif
+                            </td>
+                            <td><a href="{{ route('product.details', $p->id) }}" class="text-decoration-none text-dark">{{ $p->name }}</a>
+                            </td>
+                            <td>{{ optional($p->category)->name ?? '-' }}</td>
+                            <td>{{ optional($p->subcategory)->name ?? '-' }}</td>
+                            <td>₹{{ number_format($p->price, 2) }}</td>
+                            <td>{{ $p->discount ? $p->discount . '%' : '-' }}</td>
+                            <td>{{ $p->delivery_charge ? '₹' . number_format($p->delivery_charge, 2) : 'Free' }}</td>
+                            <td>{{ $p->created_at?->format('d M Y') }}</td>
+                            <td>
+                                <a href="{{ route('seller.editProduct', $p->id) }}"
+                                    class="btn btn-sm btn-outline-primary">Edit</a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
             @else
-                <p class="mb-0">You haven't added any products yet.</p>
+            <p class="mb-0">You haven't added any products yet.</p>
             @endif
+        </div>
+
+        <!-- Update Product Images by ZIP -->
+        <div class="container mt-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-images me-2"></i>Update Product Images by ZIP
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('seller.updateImagesByZip') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="images_zip" class="form-label fw-bold">Upload ZIP File (image filenames must match
+                                product unique IDs)</label>
+                            <input type="file" class="form-control" id="images_zip" name="images_zip" accept=".zip"
+                                required>
+                            <div class="form-text">Each image filename (without extension) must match a product's unique
+                                ID. Example: <code>PROD-123.jpg</code> will update the image for product with unique ID
+                                <code>PROD-123</code>.</div>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-upload me-1"></i>Upload & Update Images
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -296,28 +328,28 @@
             if ('speechSynthesis' in window) {
                 // Tamil greeting message
                 const tamilMessage = `வணக்கம் ${userName}! கிராப்பாஸ்கெட்டுக்கு தங்களை அன்புடன் வரவேற்கிறோம்!`;
-                
+
                 const utterance = new SpeechSynthesisUtterance(tamilMessage);
-                
+
                 // Try to find Tamil voice
                 const voices = speechSynthesis.getVoices();
-                const tamilVoice = voices.find(voice => 
-                    voice.lang.includes('ta') || 
-                    voice.lang.includes('hi') || 
+                const tamilVoice = voices.find(voice =>
+                    voice.lang.includes('ta') ||
+                    voice.lang.includes('hi') ||
                     voice.name.toLowerCase().includes('tamil')
                 );
-                
+
                 if (tamilVoice) {
                     utterance.voice = tamilVoice;
                 } else {
                     // Fallback to any available voice
                     utterance.voice = voices[0] || null;
                 }
-                
+
                 utterance.rate = 0.8;
                 utterance.pitch = 1.1;
                 utterance.volume = 0.7;
-                
+
                 // Add visual feedback with enhanced Tamil styling
                 const notification = document.createElement('div');
                 notification.innerHTML = `
@@ -346,15 +378,15 @@
                       </div>
                     </div>
                 `;
-                
+
                 document.body.appendChild(notification);
-                
+
                 // Remove notification after 5 seconds with fade out
                 setTimeout(() => {
                     notification.style.animation = 'tamilFadeOut 0.5s ease-in forwards';
                     setTimeout(() => notification.remove(), 500);
                 }, 5000);
-                
+
                 // Play the speech
                 speechSynthesis.speak(utterance);
             }
@@ -417,7 +449,7 @@
         });
     </script>
     @endif
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

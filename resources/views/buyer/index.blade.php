@@ -116,8 +116,6 @@
                         </li>
                         <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i>
                                 Shop</a></li>
-                        <li><a class="dropdown-item" href="{{ route('seller.dashboard') }}"><i
-                                    class="bi bi-briefcase"></i> Seller</a></li>
                         <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i>
                                 Wishlist</a></li>
                         <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i>
