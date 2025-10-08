@@ -2079,9 +2079,9 @@ li a{
         </div>
         <div class="col-md-4 text-center text-md-end">
           <div class="mb-2 fw-semibold">Contact Us</div>
-          <div class="text-white-50">grabbasket</div>
-          <div class="text-white-50">+91 98765 43210</div>
-          <div class="text-white-50">Chennai, India</div>
+          <div class="text-white-50">grabbaskets@gmail.com</div>
+          <div class="text-white-50">+91 83005 04230</div>
+          <div class="text-white-50">Theni, Tamil Nadu, India</div>
         </div>
       </div>
       <hr class="my-4" style="border-color:rgba(255,255,255,0.1);">
