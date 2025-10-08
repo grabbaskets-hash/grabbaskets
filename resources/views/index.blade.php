@@ -1561,14 +1561,7 @@ li a{
   @endif
   --}}
   <!-- Modern Enhanced Navbar -->
-  <!-- Language Tab -->
-  <div class="d-flex justify-content-end align-items-center p-2" style="background: linear-gradient(90deg, #f5f5dc 0%, #faebd7 100%); border-bottom: 1px solid #e5e5e5;">
-    <div class="btn-group" role="group" aria-label="Language switcher" style="box-shadow: 0 2px 8px rgba(139,69,19,0.07); border-radius: 8px; overflow: hidden;">
-      <button class="btn btn-sm btn-outline-primary language-btn" data-lang="en" style="font-weight:600; background: #fff;">🇬🇧 English</button>
-      <button class="btn btn-sm btn-outline-success language-btn" data-lang="ta" style="font-weight:600; background: #fff;">🇮🇳 தமிழ்</button>
-      <button class="btn btn-sm btn-outline-warning language-btn" data-lang="te" style="font-weight:600; background: #fff;">🇮🇳 తెలుగు</button>
-    </div>
-  </div>
+
   <nav class="navbar navbar-expand-lg" id="mainNavbar">
     <div class="container">
       <!-- Logo -->
@@ -1909,34 +1902,43 @@ li a{
     </div>
   </section>
 
-    <!-- Floating Category Menu -->
-    <div class="floating-actions" style="position:fixed;bottom:18px;right:18px;z-index:1200;">
-      <button class="fab-main" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:10px 12px;box-shadow:0 4px 16px rgba(139,69,19,0.12);font-size:1.5rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;width:48px;height:48px;">
-        <span class="fab-icon" style="font-size:1.7rem;">🛍️</span>
+    <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive -->
+    <div class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;">
+      <button class="fab-main" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <span class="fab-icon" style="font-size:1.8rem;">�</span>
       </button>
       
-      <!-- Floating Menu Popup -->
-      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:60px;right:0;width:420px;max-height:500px;background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(139,69,19,0.15);padding:20px;overflow-y:auto;">
-        <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h6 style="margin:0;font-weight:700;color:#232f3e;">Shop by Categories</h6>
-          <button onclick="toggleFloatingMenu()" style="background:none;border:none;font-size:1.2rem;color:#666;cursor:pointer;">✕</button>
+      <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
+      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);">
+        <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h6 style="margin:0;font-weight:700;color:#232f3e;font-size:1.1rem;">😊 Browse by Categories 🛍️</h6>
+          <button onclick="toggleFloatingMenu()" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.2)'" onmouseout="this.style.background='rgba(139,69,19,0.1)'">✕</button>
         </div>
         
-        <div class="floating-categories-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <!-- Enhanced Responsive Categories Grid -->
+        <div class="floating-categories-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:12px;max-width:100%;">
           @if(!empty($categories) && $categories->count())
             @foreach($categories->take(20) as $category)
-              <div class="floating-category-card" data-category-id="{{ $category->id }}" data-category-name="{{ $category->name }}" style="display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:12px;background:#f8f9fa;transition:background 0.2s;cursor:pointer;">
-                <div class="floating-category-emoji" style="font-size:1.1rem;margin-bottom:4px;">{{ $category->emoji }}</div>
-                <div class="floating-category-name" style="font-size:0.75rem;font-weight:600;color:#232f3e;text-align:center;line-height:1.1;">{{ Str::limit($category->name, 15) }}</div>
+              <div class="floating-category-card" data-category-id="{{ $category->id }}" data-category-name="{{ $category->name }}" style="display:flex;flex-direction:column;align-items:center;padding:12px 8px;border-radius:16px;background:linear-gradient(135deg,#f8f9fa,#fff);border:1px solid rgba(139,69,19,0.1);transition:all 0.3s;cursor:pointer;text-align:center;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 16px rgba(139,69,19,0.15)';this.style.background='linear-gradient(135deg,#fff,#f8f9fa)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.background='linear-gradient(135deg,#f8f9fa,#fff)'">
+                <div class="floating-category-emoji" style="font-size:1.4rem;margin-bottom:6px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">{!! $category->emoji !!}</div>
+                <div class="floating-category-name" style="font-size:0.8rem;font-weight:600;color:#232f3e;line-height:1.2;word-break:break-word;">{{ Str::limit($category->name, 12) }}</div>
               </div>
             @endforeach
+          @else
+            <div style="grid-column:1/-1;text-align:center;padding:20px;color:#666;">
+              <div style="font-size:2rem;margin-bottom:8px;">😅</div>
+              <p style="margin:0;font-size:0.9rem;">No categories available</p>
+            </div>
           @endif
         </div>
         
-        <!-- Subcategory Display Area -->
-        <div id="subcategoryArea" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;">
-          <div id="subcategoryHeader" style="font-weight:600;color:#232f3e;margin-bottom:8px;"></div>
-          <div id="subcategoryList" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+        <!-- Enhanced Subcategory Display Area -->
+        <div id="subcategoryArea" style="display:none;margin-top:20px;padding-top:20px;border-top:2px solid rgba(139,69,19,0.1);">
+          <div id="subcategoryHeader" style="font-weight:700;color:#8B4513;margin-bottom:12px;font-size:1rem;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:1.2rem;">📂</span>
+            <span></span>
+          </div>
+          <div id="subcategoryList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
       </div>
     </div>
@@ -2395,26 +2397,7 @@ li a{
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Language tab switching
-    document.addEventListener('DOMContentLoaded', function() {
-      const langBtns = document.querySelectorAll('.language-btn');
-      const langKey = 'grabbasket_lang';
-      // Set active button from localStorage
-      const savedLang = localStorage.getItem(langKey) || 'en';
-      langBtns.forEach(btn => {
-        if (btn.dataset.lang === savedLang) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-        btn.addEventListener('click', function() {
-          localStorage.setItem(langKey, this.dataset.lang);
-          langBtns.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          // Optionally, reload or trigger translation here
-        });
-      });
-    });
+
   </script>
   <script>
     function scrollShelf(key, dir) {
