@@ -2266,10 +2266,10 @@ li a{
           <div class="fw-bold fs-3 mb-2" style="letter-spacing:1px;">grabbaskets</div>
           <div class="mb-3 text-white-50">Premium Shopping Experience</div>
           <div class="d-flex gap-3 justify-content-center justify-content-md-start">
-            <a href="#" class="text-warning footer-social-link"><i class="bi bi-facebook fs-4"></i></a>
-            <a href="#" class="text-warning footer-social-link"><i class="bi bi-twitter fs-4"></i></a>
-            <a href="#" class="text-warning footer-social-link"><i class="bi bi-instagram fs-4"></i></a>
-            <a href="#" class="text-warning footer-social-link"><i class="bi bi-youtube fs-4"></i></a>
+            <a href="https://facebook.com/grabbaskets" target="_blank" class="text-warning footer-social-link"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="https://twitter.com/grabbaskets" target="_blank" class="text-warning footer-social-link"><i class="bi bi-twitter fs-4"></i></a>
+            <a href="https://instagram.com/grabbaskets" target="_blank" class="text-warning footer-social-link"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="https://youtube.com/@grabbaskets" target="_blank" class="text-warning footer-social-link"><i class="bi bi-youtube fs-4"></i></a>
           </div>
         </div>
         
@@ -2278,9 +2278,9 @@ li a{
           <div class="mb-3 fw-semibold">Quick Links</div>
           <div class="d-flex flex-column gap-2">
             <a href="/" class="footer-link">🏠 Home</a>
-            <a href="/shop" class="footer-link">🛍️ Shop</a>
+            <a href="/products" class="footer-link">� Shop</a>
             <a href="/cart" class="footer-link">🛒 Cart</a>
-            <a href="/contact" class="footer-link">📞 Contact</a>
+            <a href="mailto:grabbaskets@gmail.com" class="footer-link">📞 Contact</a>
           </div>
         </div>
         
@@ -2334,9 +2334,9 @@ li a{
         </div>
         <div class="col-md-6 text-center text-md-end">
           <div class="d-flex gap-3 justify-content-center justify-content-md-end flex-wrap">
-            <a href="/privacy" class="footer-link-small">Privacy Policy</a>
-            <a href="/terms" class="footer-link-small">Terms & Conditions</a>
-            <a href="/support" class="footer-link-small">Support</a>
+            <a href="mailto:grabbaskets@gmail.com?subject=Privacy Policy Inquiry" class="footer-link-small">Privacy Policy</a>
+            <a href="mailto:grabbaskets@gmail.com?subject=Terms and Conditions Inquiry" class="footer-link-small">Terms & Conditions</a>
+            <a href="mailto:grabbaskets@gmail.com?subject=Support Request" class="footer-link-small">Support</a>
           </div>
         </div>
       </div>
