@@ -65,6 +65,26 @@ Route::get('/', function () {
         return '<h1>Simple Test Working</h1><p>Time: ' . now() . '</p>';
     }
     
+    // Test with minimal template
+    if (request()->has('minimal')) {
+        try {
+            $categories = \App\Models\Category::with('subcategories')->get();
+            $products = \App\Models\Product::latest()->paginate(12);
+            $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+            $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
+            $blogProducts = \App\Models\Product::latest()->take(3)->get();
+
+            return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Minimal template test failed',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
+    }
+    
     try {
         $categories = \App\Models\Category::with('subcategories')->get();
         $products = \App\Models\Product::latest()->paginate(12);
