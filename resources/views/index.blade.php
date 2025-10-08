@@ -573,37 +573,18 @@
       transform: scale(1.05);
     }
 
-    .user-name-bounce {
-      animation: gentle-bounce 2s ease-in-out infinite;
-    }
-
     .greeting-emoji {
       font-size: 1.2em;
-      animation: rotate-sparkle 3s ease-in-out infinite;
       transition: all 0.3s ease;
     }
 
     .user-greeting-interactive:hover .greeting-emoji {
-      animation: excited-bounce 0.6s ease-in-out;
-      transform: scale(1.3);
+      transform: scale(1.1);
     }
 
     @keyframes gentle-bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-2px); }
-    }
-
-    @keyframes rotate-sparkle {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(10deg); }
-      75% { transform: rotate(-10deg); }
-    }
-
-    @keyframes excited-bounce {
-      0%, 100% { transform: scale(1.3) translateY(0); }
-      25% { transform: scale(1.4) translateY(-4px); }
-      50% { transform: scale(1.5) translateY(-2px); }
-      75% { transform: scale(1.4) translateY(-4px); }
     }
 
     /* Enhanced Mega Menu Interactivity */
@@ -612,19 +593,8 @@
       overflow: hidden;
     }
 
-    .mega-subcategory-link::after {
-      content: '✨';
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%) scale(0);
-      transition: all 0.3s ease;
-      opacity: 0;
-    }
-
-    .mega-subcategory-link:hover::after {
-      transform: translateY(-50%) scale(1);
-      opacity: 1;
+    .mega-subcategory-link:hover {
+      background-color: rgba(255, 153, 0, 0.1);
     }
 
     .mega-category-emoji {
@@ -633,15 +603,9 @@
     }
 
     .mega-category-emoji:hover {
-      animation: emoji-dance 0.8s ease-in-out;
+      transform: scale(1.1);
     }
 
-    @keyframes emoji-dance {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      25% { transform: rotate(10deg) scale(1.1); }
-      50% { transform: rotate(-10deg) scale(1.2); }
-      75% { transform: rotate(5deg) scale(1.1); }
-    }
     .hero-section {
       background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 25%, #f5deb3 50%, #daa520 75%, #8B4513 100%);
       color: #2c1810;
@@ -659,12 +623,6 @@
       height: 100%;
       background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><circle cx="20" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="40" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="60" cy="10" r="1" fill="rgba(139,69,19,0.1)"/><circle cx="80" cy="10" r="1" fill="rgba(139,69,19,0.1)"/></svg>') repeat;
       opacity: 0.3;
-      animation: float 20s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
     }
 
     .hero-section h1 {
@@ -1453,31 +1411,6 @@ li a{
       z-index: 1;
     }
 
-    /* ✨ Floating Sparkles Animation */
-    .diwali-theme-banner::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 2px, transparent 3px) 0 0 / 40px 40px;
-      animation: sparkleMove 12s linear infinite;
-      opacity: 0.4;
-      z-index: 2;
-    }
-
-    /* Sparkle Animation */
-    @keyframes sparkleMove {
-      from {
-        background-position: 0 0;
-      }
-
-      to {
-        background-position: 200px 200px;
-      }
-    }
-
     /* 🔥 Text Glow */
     .text-glow {
       text-shadow: 0 0 10px #ffd700, 0 0 20px #ffae42, 0 0 40px #ffa500;
@@ -1766,8 +1699,8 @@ li a{
                 <li><a class="dropdown-item" href="#">
                   <i class="bi bi-heart me-2"></i>Wishlist
                 </a></li>
-                <li><a class="dropdown-item" href="#" onclick="playTamilGreeting('{{ Auth::user()?->name ?? 'User' }}'); return false;">
-                  <i class="bi bi-volume-up me-2"></i>🇮🇳 Tamil Welcome
+                <li><a class="dropdown-item" href="#" onclick="alert('Tamil Welcome: வணக்கம்!'); return false;">
+                  <i class="bi bi-volume-up me-2"></i>Tamil Welcome
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
@@ -1803,39 +1736,12 @@ li a{
     </div>
   </nav>
 
-  <!-- Floating Menu Button -->
-  <button type="button" class="btn btn-lg btn-warning shadow position-fixed floating-menu-btn"
-    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;animation:bounce 2s infinite;"
+  <!-- Simple Menu Button -->
+  <button type="button" class="btn btn-lg btn-warning shadow position-fixed"
+    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;"
     data-bs-toggle="modal" data-bs-target="#categoryMenuModal">
-    �
+    <i class="bi bi-grid-3x3-gap"></i>
   </button>
-
-  <style>
-    .floating-menu-btn {
-      transition: all 0.3s ease;
-      background: linear-gradient(45deg, #ffc107, #ffb300) !important;
-      border: 3px solid #fff;
-      box-shadow: 0 4px 20px rgba(255, 193, 7, 0.4);
-    }
-    
-    .floating-menu-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(255, 193, 7, 0.6);
-      background: linear-gradient(45deg, #ffb300, #ffc107) !important;
-    }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-5px);
-      }
-      60% {
-        transform: translateY(-3px);
-      }
-    }
-  </style>
 
   <!-- Category Menu Modal -->
   <div class="modal fade" id="categoryMenuModal" tabindex="-1" aria-labelledby="categoryMenuModalLabel"
@@ -2891,162 +2797,16 @@ li a{
 
       // Add sparkle effect on user greeting hover
       const userGreeting = document.querySelector('.user-greeting-interactive');
+      // Simple hover effect for user greeting
       if (userGreeting) {
         userGreeting.addEventListener('mouseenter', function() {
-          // Create sparkle effect
-          for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-              createSparkle(this);
-            }, i * 200);
-          }
+          this.style.transform = 'scale(1.05)';
+        });
+        userGreeting.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
         });
       }
 
-      function createSparkle(element) {
-        const sparkle = document.createElement('span');
-        sparkle.innerHTML = '✨';
-        sparkle.style.position = 'absolute';
-        sparkle.style.pointerEvents = 'none';
-        sparkle.style.zIndex = '1000';
-        sparkle.style.fontSize = '12px';
-        sparkle.style.animation = 'sparkle-fly 1s ease-out forwards';
-        
-        const rect = element.getBoundingClientRect();
-        sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
-        sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
-        
-        document.body.appendChild(sparkle);
-        
-        setTimeout(() => {
-          sparkle.remove();
-        }, 1000);
-      }
-
-      // Add sparkle animation CSS
-      if (!document.querySelector('#sparkleAnimations')) {
-        const style = document.createElement('style');
-        style.id = 'sparkleAnimations';
-        style.textContent = `
-          @keyframes sparkle-fly {
-            0% {
-              opacity: 1;
-              transform: translateY(0) scale(1);
-            }
-            100% {
-              opacity: 0;
-              transform: translateY(-30px) scale(0.5);
-            }
-          }
-        `;
-        document.head.appendChild(style);
-      }
-
-      // Tamil Voice Greeting Function
-      function playTamilGreeting(userName) {
-        if ('speechSynthesis' in window) {
-          // Tamil greeting message
-          const tamilMessage = `வணக்கம் ${userName}! கிராப்பாஸ்கெட்டுக்கு தங்களை அன்புடன் வரவேற்கிறோம்!`;
-          
-          const utterance = new SpeechSynthesisUtterance(tamilMessage);
-          
-          // Try to find Tamil voice
-          const voices = speechSynthesis.getVoices();
-          const tamilVoice = voices.find(voice => 
-            voice.lang.includes('ta') || 
-            voice.lang.includes('hi') || 
-            voice.name.toLowerCase().includes('tamil')
-          );
-          
-          if (tamilVoice) {
-            utterance.voice = tamilVoice;
-          } else {
-            // Fallback to any available voice
-            utterance.voice = voices[0] || null;
-          }
-          
-          utterance.rate = 0.8;
-          utterance.pitch = 1.1;
-          utterance.volume = 0.7;
-          
-          // Add visual feedback with enhanced Tamil styling
-          const notification = document.createElement('div');
-          notification.innerHTML = `
-            <div class="alert alert-success d-flex align-items-center tamil-greeting-notification" style="
-              position: fixed; 
-              top: 20px; 
-              right: 20px; 
-              z-index: 9999; 
-              border-radius: 15px; 
-              box-shadow: 0 8px 32px rgba(0,123,255,0.3);
-              background: linear-gradient(135deg, #28a745, #20c997);
-              border: 2px solid #ffd700;
-              min-width: 300px;
-              animation: tamilSlideIn 0.8s ease-out;
-            ">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-volume-up-fill me-2" style="font-size: 1.5rem; color: #ffd700;"></i>
-                <div>
-                  <div style="color: white; font-weight: bold; font-size: 1.1rem;">
-                    🔊 வணக்கம் ${userName}! 🎉
-                  </div>
-                  <div style="color: #f8f9fa; font-size: 0.9rem; margin-top: 2px;">
-                    கிராப்பாஸ்கெட்டுக்கு வரவேற்கிறோம்!
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          
-          document.body.appendChild(notification);
-          
-          // Remove notification after 5 seconds with fade out
-          setTimeout(() => {
-            notification.style.animation = 'tamilFadeOut 0.5s ease-in forwards';
-            setTimeout(() => notification.remove(), 500);
-          }, 5000);
-          
-          // Play the speech
-          speechSynthesis.speak(utterance);
-        }
-      }
-
-      // Add Tamil greeting animations CSS
-      if (!document.querySelector('#tamilAnimations')) {
-        const style = document.createElement('style');
-        style.id = 'tamilAnimations';
-        style.textContent = `
-          @keyframes tamilSlideIn {
-            0% {
-              opacity: 0;
-              transform: translateX(100%) scale(0.8);
-            }
-            50% {
-              transform: translateX(-10px) scale(1.05);
-            }
-            100% {
-              opacity: 1;
-              transform: translateX(0) scale(1);
-            }
-          }
-          
-          @keyframes tamilFadeOut {
-            0% {
-              opacity: 1;
-              transform: scale(1);
-            }
-            100% {
-              opacity: 0;
-              transform: scale(0.9) translateX(50px);
-            }
-          }
-          
-          .tamil-greeting-notification:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s ease;
-          }
-        `;
-        document.head.appendChild(style);
-      }
     });
   </script>
 
