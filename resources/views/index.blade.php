@@ -9,6 +9,12 @@
   <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbaskets.jpg') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  @if(isset($database_error))
+  <script>
+    console.error('Database Error: {{ $database_error }}');
+  </script>
+  @endif
   <!-- Dark mode toggle removed -->
   <style>
     body {
