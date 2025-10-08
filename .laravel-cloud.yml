@@ -1,0 +1,27 @@
+name: grabbaskets-ecommerce
+environments:
+  production:
+    domain: grabbaskets.com
+    deploy:
+      - name: Deploy Application
+        run: |
+          composer install --no-dev --optimize-autoloader
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan migrate --force
+    services:
+      - type: database
+        engine: mysql
+        version: '8.0'
+      - type: cache
+        engine: redis
+        version: '7.0'
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: https://grabbaskets.com
+      DB_CONNECTION: mysql
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
