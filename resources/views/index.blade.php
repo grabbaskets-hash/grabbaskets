@@ -502,7 +502,7 @@
     .hero-section {
       background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 25%, #f5deb3 50%, #daa520 75%, #8B4513 100%);
       color: #2c1810;
-      padding: 60px 0 80px 0;
+      padding: 40px 0 60px 0;
       position: relative;
       overflow: hidden;
     }
@@ -519,15 +519,38 @@
     }
 
     .hero-section h1 {
-      font-size: 2.8rem;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 700;
       text-shadow: 0 2px 16px rgba(35, 47, 62, 0.18);
+      line-height: 1.2;
     }
 
     .hero-section p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      margin-bottom: 20px;
       opacity: 0.95;
+      line-height: 1.4;
+    }
+
+    /* Enhanced carousel and banner responsive design */
+    .carousel-item {
+      min-height: 300px;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    @media (min-width: 768px) {
+      .carousel-item {
+        min-height: 400px;
+      }
+      .hero-section {
+        padding: 60px 0 80px 0;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .carousel-item {
+        min-height: 450px;
+      }
     }
 
     .search-bar {
@@ -1094,14 +1117,70 @@
     }
 
     .carousel-img {
-      width: 20%;
-      /* full width of carousel item */
-      max-height: 250px;
-      /* adjust as per design */
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      /* crop nicely, keeps ratio */
+      border-radius: 10px;
+    }
+
+    /* Enhanced Carousel Indicators */
+    .carousel-indicators {
+      bottom: 20px;
+    }
+
+    .carousel-indicators [data-bs-target] {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.5);
+      border: 2px solid rgba(255,255,255,0.8);
+      transition: all 0.3s ease;
+    }
+
+    .carousel-indicators .active {
+      background-color: #ff9900;
+      border-color: #ff9900;
+      transform: scale(1.2);
+    }
+
+    /* Enhanced Carousel Controls */
+    .carousel-control-prev,
+    .carousel-control-next {
+      width: 5%;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+      opacity: 1;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-size: 20px 20px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    @media (max-width: 768px) {
+      .carousel-control-prev,
+      .carousel-control-next {
+        width: 8%;
+      }
+      
+      .carousel-indicators {
+        bottom: 10px;
+      }
+      
+      .carousel-indicators [data-bs-target] {
+        width: 10px;
+        height: 10px;
+      }
+    }
+
+    /* Additional carousel image enhancements */
+    .carousel-img:hover {
       object-position: center;
-      /* crop from center */
       border-radius: 24px;
       box-shadow: 0 16px 48px #232f3e44, 0 0 0 8px #ff9900cc;
       transform: perspective(900px) rotateY(-12deg) scale(1.08) rotateX(6deg);
@@ -1282,16 +1361,20 @@ li a{
       border: 1px solid rgba(139, 69, 19, 0.1);
     }
 
-    /* 🌟 Diwali Theme Banner */
+    /* 🌟 Diwali Theme Banner - Enhanced Mobile & Desktop Responsive */
     .diwali-theme-banner {
       background-image: url("/images/diwali-bg1.jpg");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      border-radius: 20px;
-      min-height: 400px;
+      border-radius: 15px;
+      min-height: 300px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
     /* Overlay for better contrast */
@@ -1299,20 +1382,25 @@ li a{
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 15px;
       z-index: 1;
     }
 
-    /* 🔥 Text Glow */
+    /* 🔥 Enhanced Text Glow for better readability */
     .text-glow {
-      text-shadow: 0 0 10px #ffd700, 0 0 20px #ffae42, 0 0 40px #ffa500;
+      text-shadow: 
+        0 0 5px #ffd700, 
+        0 0 10px #ffae42, 
+        0 0 20px #ffa500,
+        2px 2px 4px rgba(0,0,0,0.3);
     }
 
     /* Ensure content stays above all effects */
-    .diwali-theme-banner>* {
+    .diwali-theme-banner > * {
       position: relative;
       z-index: 5;
+      text-align: center;
     }
 
     /* 🪔 Optional: Floating Diya Glow (light orbs) */
@@ -1321,20 +1409,60 @@ li a{
       pointer-events: none;
     }
 
-    /* Responsive layout */
-    @media (max-width: 768px) {
+    /* Enhanced Responsive layout */
+    @media (max-width: 576px) {
       .diwali-theme-banner {
-        flex-direction: column;
-        text-align: center;
-        padding: 2rem;
-      }
-
-      .diwali-theme-banner img {
-        max-height: 250px;
+        min-height: 250px;
+        padding: 15px;
+        border-radius: 10px;
       }
 
       .diwali-theme-banner h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem !important;
+        margin-bottom: 10px;
+      }
+
+      .diwali-theme-banner p {
+        font-size: 0.9rem !important;
+        margin-bottom: 15px;
+      }
+
+      .diwali-theme-banner .btn {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+      }
+    }
+
+    @media (min-width: 577px) and (max-width: 768px) {
+      .diwali-theme-banner {
+        min-height: 320px;
+        padding: 25px;
+      }
+
+      .diwali-theme-banner h1 {
+        font-size: 2rem !important;
+      }
+
+      .diwali-theme-banner p {
+        font-size: 1rem !important;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .diwali-theme-banner {
+        min-height: 400px;
+        padding: 40px;
+        border-radius: 20px;
+      }
+
+      .diwali-theme-banner .d-flex {
+        text-align: left !important;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .diwali-theme-banner {
+        min-height: 450px;
       }
     }
 
@@ -1342,7 +1470,7 @@ li a{
 
 
 
-    /* 🪔 Second Diwali Banner Theme */
+    /* 🪔 Second Diwali Banner Theme - Enhanced Mobile Responsive */
     .diwali-theme-banner-2 {
       background-image: url("/images/diwali-bg2.jpg");
       background-size: cover;
@@ -1362,6 +1490,65 @@ li a{
       animation: sparkleMove 14s linear infinite;
       opacity: 0.5;
       z-index: 2;
+    }
+
+    /* Enhanced Product Banner Responsive Design */
+    .product-banner-content {
+      min-height: 300px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .product-banner-content {
+        min-height: 350px;
+        padding: 40px;
+        text-align: left;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .product-banner-content {
+        min-height: 400px;
+        padding: 60px;
+      }
+    }
+
+    /* Mobile-first button styling */
+    .banner-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    @media (min-width: 576px) {
+      .banner-buttons {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .banner-buttons {
+        justify-content: flex-start;
+      }
+    }
+
+    .banner-buttons .btn {
+      min-width: 120px;
+      font-weight: 600;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .banner-buttons .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
   </style>
 </head>
@@ -1577,80 +1764,85 @@ li a{
       </div>
     </div>
   </div>
-  <!-- Hero Section with Carousel -->
+  <!-- Hero Section with Enhanced Responsive Carousel -->
   <section class="hero-section">
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
       <div class="carousel-inner">
-        {{-- 🎆 Diwali Banner (first slide) --}}
+        {{-- 🎆 Diwali Banner (first slide) - Enhanced Mobile Layout --}}
         <div class="carousel-item active">
-          <div class="d-flex align-items-center justify-content-between p-5 diwali-theme-banner">
-            {{-- <img src="{{ asset('images/banners/diwali-banner.png') }}" alt="Shop Lights and Gifts"
-              class="carousel-img" style="max-height: 380px;"> --}}
-
-            <div class="text-end text-light ms-4">
-              <h1 class="fw-bold display-5 text-glow">🪔 Lights, Gifts & More</h1>
-              <p class="fs-4">Celebrate Diwali with joy, color, and style — only on Grabbasket.</p>
-              {{-- <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg fw-semibold shadow-lg">Shop
-                Gifts</a> --}}
-            </div>
-          </div>
-        </div>
-        <!-- 🪔 Diwali Exclusive Offers Banner -->
-        <div class="carousel-item">
-          <div class="d-flex align-items-center justify-content-between p-5 diwali-theme-banner diwali-theme-banner-2">
-
-            <div class="text-light me-4">
-              <h1 class="fw-bold display-5 text-glow">💫 Grabbasket Diwali Festival</h1>
-              <p class="fs-4 mb-3">
-                Light up your home with grand offers this festive season! </p>
-              <p class="fs-5 text-warning mb-4">
-                ✨ Limited Time Offers | 🕓 Hurry! Ends this weekend.
-              </p>
-              {{-- <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg fw-semibold shadow-lg">
-                Shop Now & Save Big
-              </a> --}}
-            </div>
-
-            <!-- image removed -->
-              <!-- removed stray style attribute -->
-          </div>
-        </div>
-
-
-
-        {{-- 🛍️ Product Banners --}}
-        @foreach($products as $index => $product)
-          <div class="carousel-item {{ $index === 0 ? '' : '' }}">
-            <div class="py-5"
-              style="background: linear-gradient(90deg,#232f3e,#ff9900);">
-              <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div class="text-white">
-                  <h2 class="h1 fw-bold mb-2">
-                    🔥 {{ $product->discount ?? 30 }}% OFF – {{ $product->category?->name ?? 'Uncategorized' }}
-                  </h2>
-                  <p class="mb-2">⭐ {{ $product->rating ?? 4.8 }}/5 from {{ $product->reviews_count ?? 500 }}+ happy
-                    buyers</p>
-                  <p class="mb-3 text-warning fw-bold">⚡ Hurry! Only {{ $product->stock ?? 10 }} left in stock</p>
-                  <a href="{{ route('product.details', $product->id) }}" class="btn btn-light text-dark me-2"
-                    style="margin-left: 70px">Shop Now</a>
-                  <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <button type="submit" class="btn btn-warning" style="background:#ff9900;color:#232f3e;">
-                      Grab Now
-                    </button>
-                  </form>
+          <div class="diwali-theme-banner">
+            <div class="container">
+              <div class="row align-items-center justify-content-center">
+                <div class="col-12 col-lg-8 text-center text-lg-end">
+                  <h1 class="fw-bold text-glow text-light mb-3">🪔 Lights, Gifts & More</h1>
+                  <p class="fs-5 text-light mb-4">Celebrate Diwali with joy, color, and style — only on GrabBaskets.</p>
+                  <div class="banner-buttons">
+                    <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg shadow-lg">
+                      <i class="bi bi-gift-fill me-2"></i>Shop Gifts
+                    </a>
+                  </div>
                 </div>
-                <!-- image removed -->
-                  <!-- removed leftover commented style attribute -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 🪔 Diwali Exclusive Offers Banner - Enhanced Mobile Layout -->
+        <div class="carousel-item">
+          <div class="diwali-theme-banner diwali-theme-banner-2">
+            <div class="container">
+              <div class="row align-items-center justify-content-center">
+                <div class="col-12 col-lg-8 text-center text-lg-start">
+                  <h1 class="fw-bold text-glow text-light mb-3">💫 GrabBaskets Diwali Festival</h1>
+                  <p class="fs-5 text-light mb-3">Light up your home with grand offers this festive season!</p>
+                  <p class="fs-6 text-warning mb-4">✨ Limited Time Offers | 🕓 Hurry! Ends this weekend.</p>
+                  <div class="banner-buttons">
+                    <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg shadow-lg">
+                      <i class="bi bi-lightning-charge-fill me-2"></i>Shop Now & Save Big
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- 🛍️ Product Banners - Enhanced Responsive Design --}}
+        @foreach($products as $index => $product)
+          <div class="carousel-item">
+            <div class="product-banner-content" style="background: linear-gradient(90deg,#232f3e,#ff9900);">
+              <div class="container">
+                <div class="row align-items-center">
+                  <div class="col-12 col-lg-8">
+                    <div class="text-white">
+                      <h2 class="h2 fw-bold mb-3 text-glow">
+                        🔥 {{ $product->discount ?? 30 }}% OFF – {{ $product->category?->name ?? 'Uncategorized' }}
+                      </h2>
+                      <p class="mb-2 fs-6">⭐ {{ $product->rating ?? 4.8 }}/5 from {{ $product->reviews_count ?? 500 }}+ happy buyers</p>
+                      <p class="mb-4 text-warning fw-bold fs-6">⚡ Hurry! Only {{ $product->stock ?? 10 }} left in stock</p>
+                      
+                      <div class="banner-buttons">
+                        <a href="{{ route('product.details', $product->id) }}" class="btn btn-light text-dark">
+                          <i class="bi bi-eye-fill me-2"></i>Shop Now
+                        </a>
+                        <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
+                          @csrf
+                          <input type="hidden" name="product_id" value="{{ $product->id }}">
+                          <button type="submit" class="btn btn-warning" style="background:#ff9900;color:#232f3e;">
+                            <i class="bi bi-cart-plus-fill me-2"></i>Grab Now
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         @endforeach
       </div>
 
-
-      <!-- Controls -->
+      <!-- Enhanced Carousel Controls -->
       <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
@@ -1659,6 +1851,15 @@ li a{
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
+      
+      <!-- Carousel Indicators for better mobile navigation -->
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        @foreach($products as $index => $product)
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index + 2 }}" aria-label="Slide {{ $index + 3 }}"></button>
+        @endforeach
+      </div>
     </div>
   </section>
 
@@ -2057,35 +2258,86 @@ li a{
   <!-- Premium Footer -->
   <footer class="mt-5" style="background:linear-gradient(135deg,#232f3e 60%,#8B4513 100%);color:#fff;padding:48px 0 24px 0;border-radius:24px 24px 0 0;box-shadow:0 -2px 16px rgba(35,47,62,0.12);">
     <div class="container">
-      <div class="row g-4 align-items-center">
-        <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-          <div class="fw-bold fs-3 mb-2" style="letter-spacing:1px;">grabbasket</div>
-          <div class="mb-2">Premium Shopping Experience</div>
+      <div class="row g-4 align-items-start">
+        <!-- Brand Section -->
+        <div class="col-lg-4 col-md-6 text-center text-md-start mb-4 mb-md-0">
+          <div class="fw-bold fs-3 mb-2" style="letter-spacing:1px;">grabbaskets</div>
+          <div class="mb-3 text-white-50">Premium Shopping Experience</div>
           <div class="d-flex gap-3 justify-content-center justify-content-md-start">
-            <a href="#" class="text-warning"><i class="bi bi-facebook fs-4"></i></a>
-            <a href="#" class="text-warning"><i class="bi bi-twitter fs-4"></i></a>
-            <a href="#" class="text-warning"><i class="bi bi-instagram fs-4"></i></a>
-            <a href="#" class="text-warning"><i class="bi bi-youtube fs-4"></i></a>
+            <a href="#" class="text-warning footer-social-link"><i class="bi bi-facebook fs-4"></i></a>
+            <a href="#" class="text-warning footer-social-link"><i class="bi bi-twitter fs-4"></i></a>
+            <a href="#" class="text-warning footer-social-link"><i class="bi bi-instagram fs-4"></i></a>
+            <a href="#" class="text-warning footer-social-link"><i class="bi bi-youtube fs-4"></i></a>
           </div>
         </div>
-        <div class="col-md-4 text-center mb-3 mb-md-0">
-          <div class="mb-2 fw-semibold">Quick Links</div>
+        
+        <!-- Quick Links Section -->
+        <div class="col-lg-4 col-md-6 text-center mb-4 mb-lg-0">
+          <div class="mb-3 fw-semibold">Quick Links</div>
           <div class="d-flex flex-column gap-2">
-            <a href="/" class="text-white-50 text-decoration-none">Home</a>
-            <a href="/shop" class="text-white-50 text-decoration-none">Shop</a>
-            <a href="/cart" class="text-white-50 text-decoration-none">Cart</a>
-            <a href="/contact" class="text-white-50 text-decoration-none">Contact</a>
+            <a href="/" class="footer-link">🏠 Home</a>
+            <a href="/shop" class="footer-link">🛍️ Shop</a>
+            <a href="/cart" class="footer-link">🛒 Cart</a>
+            <a href="/contact" class="footer-link">📞 Contact</a>
           </div>
         </div>
-        <div class="col-md-4 text-center text-md-end">
-          <div class="mb-2 fw-semibold">Contact Us</div>
-          <div class="text-white-50">grabbaskets@gmail.com</div>
-          <div class="text-white-50">+91 83005 04230</div>
-          <div class="text-white-50">Theni, Tamil Nadu, India</div>
+        
+        <!-- Contact Section -->
+        <div class="col-lg-4 col-md-12 text-center text-lg-end">
+          <div class="mb-3 fw-semibold">Contact Us</div>
+          <div class="contact-info">
+            <!-- Email -->
+            <div class="contact-item mb-2">
+              <a href="mailto:grabbaskets@gmail.com" class="contact-link">
+                <i class="bi bi-envelope-fill me-2"></i>
+                <span class="d-none d-sm-inline">grabbaskets@gmail.com</span>
+                <span class="d-inline d-sm-none">Email Us</span>
+              </a>
+            </div>
+            
+            <!-- Phone -->
+            <div class="contact-item mb-2">
+              <a href="tel:+918300504230" class="contact-link">
+                <i class="bi bi-telephone-fill me-2"></i>
+                <span>+91 83005 04230</span>
+              </a>
+            </div>
+            
+            <!-- WhatsApp -->
+            <div class="contact-item mb-2">
+              <a href="https://wa.me/918300504230" target="_blank" class="contact-link">
+                <i class="bi bi-whatsapp me-2"></i>
+                <span class="d-none d-sm-inline">WhatsApp Us</span>
+                <span class="d-inline d-sm-none">WhatsApp</span>
+              </a>
+            </div>
+            
+            <!-- Location -->
+            <div class="contact-item">
+              <a href="https://maps.google.com/?q=Theni,Tamil Nadu,India" target="_blank" class="contact-link">
+                <i class="bi bi-geo-alt-fill me-2"></i>
+                <span>Theni, Tamil Nadu, India</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+      
       <hr class="my-4" style="border-color:rgba(255,255,255,0.1);">
-      <div class="text-center text-white-50">&copy; {{ date('Y') }} grabbasket. All rights reserved.</div>
+      
+      <!-- Copyright Section -->
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+          <div class="text-white-50">&copy; {{ date('Y') }} GrabBaskets. All rights reserved.</div>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <div class="d-flex gap-3 justify-content-center justify-content-md-end flex-wrap">
+            <a href="/privacy" class="footer-link-small">Privacy Policy</a>
+            <a href="/terms" class="footer-link-small">Terms & Conditions</a>
+            <a href="/support" class="footer-link-small">Support</a>
+          </div>
+        </div>
+      </div>
     </div>
   </footer>
 
