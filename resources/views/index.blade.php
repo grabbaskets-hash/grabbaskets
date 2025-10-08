@@ -1558,8 +1558,7 @@ li a{
   <div class="alert alert-success text-center mt-3 mb-0" role="alert">
     {{ session('success') }}
   </div>
-  @endif
-  --}}
+  @endif --}}
   <!-- Modern Enhanced Navbar -->
 
   <nav class="navbar navbar-expand-lg" id="mainNavbar">
@@ -2131,7 +2130,7 @@ li a{
         </div>
       </div>
     </div>
-  </section> --}}
+  {{-- </section> --}}
 
   <section class="trending my-5" style="margin-left:20px ">
     <h2 class="mb-3 " style="margin-left: 40%">🔥 Trending Items</h2>
@@ -2225,7 +2224,7 @@ li a{
         </div>
       </div>
     </div>
-  </section> --}}
+  {{-- </section> --}}
 
   <section class="container my-5">
     <div class="row align-items-center" style="margin-left: 20%">
