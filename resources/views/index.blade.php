@@ -3079,6 +3079,10 @@ li a{
         <div class="robot-leg right-leg"></div>
       </div>
       <span class="chat-pulse"></span>
+    </div>
+  </div>
+
+  <style>
     /* Robot walking animation */
     .robot-anim {
       position: relative;
@@ -3134,6 +3138,8 @@ li a{
       z-index: 10000;
       transition: none;
     }
+  </style>
+
   <script>
     // Make chatbot toggle draggable
     document.addEventListener('DOMContentLoaded', function() {
