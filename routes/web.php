@@ -60,51 +60,18 @@ Route::get('/health', function () {
 });
 
 Route::get('/', function () {
-    try {
-        // First test: Simple response without database
-        if (request()->has('test')) {
-            return response()->json([
-                'status' => 'OK',
-                'message' => 'Application is working',
-                'timestamp' => now(),
-                'config' => [
-                    'app_env' => config('app.env'),
-                    'app_url' => config('app.url'),
-                    'db_connection' => config('database.default')
-                ]
-            ]);
-        }
-
-        $categories = \App\Models\Category::with('subcategories')->get();
-        $products = \App\Models\Product::latest()->paginate(12);
-        $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
-        $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-        $blogProducts = \App\Models\Product::latest()->take(3)->get();
-
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        Log::error('Database error on homepage: ' . $e->getMessage());
-        
-        // If this is a simple test, return JSON
-        if (request()->has('test')) {
-            return response()->json([
-                'status' => 'ERROR',
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-        
-        // Return a simple view with error message for debugging
-        return view('index', [
-            'categories' => collect([]),
-            'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12),
-            'trending' => collect([]),
-            'lookbookProduct' => null,
-            'blogProducts' => collect([]),
-            'database_error' => 'Database connection issue: ' . $e->getMessage()
-        ]);
-    }
+    return response()->json([
+        'status' => 'Laravel is working!',
+        'timestamp' => now()->toString(),
+        'message' => 'Application successfully loaded',
+        'debug_info' => [
+            'php_version' => phpversion(),
+            'laravel_version' => app()->version(),
+            'environment' => app()->environment(),
+            'url' => config('app.url'),
+            'database' => config('database.default')
+        ]
+    ]);
 })->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
