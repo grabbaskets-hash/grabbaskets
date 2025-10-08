@@ -100,7 +100,7 @@
             <div class="d-flex align-items-center gap-2">
 
                 <!-- Hello User -->
-                <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
+                <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()?->name ?? 'User' }}</span>
 
                 <!-- My Account Dropdown -->
                 <div class="dropdown">
@@ -162,28 +162,28 @@
                 <div class="col-md-3">
                     <div class="p-3">
                         <i class="bi bi-bag-check display-6 text-primary"></i>
-                        <h5 class="mt-2">{{ Auth::user()->buyerOrders()->count() }}</h5>
+                        <h5 class="mt-2">{{ Auth::user()?->buyerOrders()->count() ?? 0 }}</h5>
                         <small class="text-muted">Total Orders</small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-3">
                         <i class="bi bi-heart-fill display-6 text-danger"></i>
-                        <h5 class="mt-2">{{ Auth::user()->wishlists()->count() }}</h5>
+                        <h5 class="mt-2">{{ Auth::user()?->wishlists()->count() ?? 0 }}</h5>
                         <small class="text-muted">Wishlist Items</small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-3">
                         <i class="bi bi-cart-fill display-6 text-success"></i>
-                        <h5 class="mt-2">{{ Auth::user()->cartItems()->count() }}</h5>
+                        <h5 class="mt-2">{{ Auth::user()?->cartItems()->count() ?? 0 }}</h5>
                         <small class="text-muted">Cart Items</small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-3">
                         <i class="bi bi-bell-fill display-6 text-warning"></i>
-                        <h5 class="mt-2">{{ Auth::user()->notifications()->whereNull('read_at')->count() }}</h5>
+                        <h5 class="mt-2">{{ Auth::user()?->notifications()->whereNull('read_at')->count() ?? 0 }}</h5>
                         <small class="text-muted">Unread Notifications</small>
                     </div>
                 </div>
