@@ -56,6 +56,37 @@
                     </div>
                 </div>
                 
+                <!-- Products by Category Showcase -->
+                @if(isset($categoryProducts) && !empty($categoryProducts))
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h3>Products by Category</h3>
+                        @foreach($categoryProducts as $categoryName => $products)
+                            @if($products->count() > 0)
+                            <div class="mb-4">
+                                <h5 class="text-primary">{{ $categoryName }} ({{ $products->count() }} products)</h5>
+                                <div class="row">
+                                    @foreach($products as $product)
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card h-100">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title small">{{ \Illuminate\Support\Str::limit($product->name, 30) }}</h6>
+                                                <p class="card-text small text-muted">₹{{ number_format($product->price, 2) }}</p>
+                                                @if($product->discount > 0)
+                                                    <span class="badge bg-success">{{ $product->discount }}% OFF</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                
                 <hr class="my-4">
                 <div class="d-flex justify-content-center gap-3">
                     <a href="/health" class="btn btn-outline-info">Health Check</a>

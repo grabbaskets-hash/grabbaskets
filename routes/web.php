@@ -35,12 +35,23 @@ Route::get('/', function () {
     if (request()->has('minimal')) {
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
-            $products = \App\Models\Product::latest()->paginate(12);
-            $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+            
+            // Get sample products from ALL categories for better showcase
+            $categoryProducts = [];
+            foreach ($categories as $category) {
+                $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            }
+            
+            // Get mixed products for main display
+            $products = \App\Models\Product::inRandomOrder()->paginate(12);
+            $trending = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for better showcase
             $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-            $blogProducts = \App\Models\Product::latest()->take(3)->get();
+            $blogProducts = \App\Models\Product::inRandomOrder()->take(6)->get(); // Increased for variety
 
-            return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+            return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Minimal template test failed',
@@ -54,12 +65,23 @@ Route::get('/', function () {
     try {
         // Force fresh data by adding a timestamp parameter that changes the cache key
         $categories = \App\Models\Category::with('subcategories')->get();
-        $products = \App\Models\Product::latest()->paginate(12);
-        $trending = \App\Models\Product::inRandomOrder()->take(5)->get();
+        
+        // Get sample products from ALL categories for better showcase
+        $categoryProducts = [];
+        foreach ($categories as $category) {
+            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+        }
+        
+        // Get mixed products for main display
+        $products = \App\Models\Product::inRandomOrder()->paginate(12);
+        $trending = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for better showcase
         $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-        $blogProducts = \App\Models\Product::latest()->take(3)->get();
+        $blogProducts = \App\Models\Product::inRandomOrder()->take(6)->get(); // Increased for variety
 
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts'));
+        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
     } catch (\Exception $e) {
         // Log the error for debugging
         Log::error('Database error on homepage: ' . $e->getMessage());
