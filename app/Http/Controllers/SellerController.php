@@ -472,33 +472,13 @@ public function storeCategorySubcategory(Request $request)
                 // Store in products folder for consistency
                 $folder = "products";
                 
-                // Try R2 first, fallback to local storage
-                $uploadSuccess = false;
-                
+                // Simplified upload for cloud compatibility
                 try {
-                    // Attempt R2 upload
-                    $imagePath = $image->storeAs($folder, $filename, 'r2');
-                    $uploadSuccess = true;
-                    Log::info('Image uploaded to R2 storage', ['path' => $imagePath]);
+                    $imagePath = $image->storeAs($folder, $filename, 'public');
+                    Log::info('Image uploaded to public storage', ['path' => $imagePath]);
                 } catch (Exception $e) {
-                    Log::warning('R2 upload failed, falling back to local storage: ' . $e->getMessage());
-                    
-                    try {
-                        // Fallback to local storage
-                        $imagePath = $image->storeAs($folder, $filename, 'public');
-                        $uploadSuccess = true;
-                        Log::info('Image uploaded to local storage', ['path' => $imagePath]);
-                    } catch (Exception $localE) {
-                        Log::error('Both R2 and local storage failed', [
-                            'r2_error' => $e->getMessage(),
-                            'local_error' => $localE->getMessage()
-                        ]);
-                        return redirect()->back()->withInput()->with('error', 'Failed to upload image. Please try again.');
-                    }
-                }
-                
-                if (!$uploadSuccess) {
-                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+                    Log::error('Image upload failed', ['error' => $e->getMessage()]);
+                    return redirect()->back()->withInput()->with('error', 'Failed to upload image. Please try again.');
                 }
                 
             } catch (Exception $e) {
@@ -557,22 +537,13 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
         if ($request->hasFile('image')) {
-            // Delete old image if it exists (check both local and R2)
+            // Delete old image if it exists (safer cloud-compatible approach)
             if ($product->image) {
                 try {
-                    if (Storage::disk('public')->exists($product->image)) {
-                        Storage::disk('public')->delete($product->image);
-                    }
+                    // Try to delete from public storage (most likely location in cloud)
+                    Storage::disk('public')->delete($product->image);
                 } catch (Exception $e) {
-                    Log::warning('Failed to delete local image: ' . $e->getMessage());
-                }
-                
-                try {
-                    if (Storage::disk('r2')->exists($product->image)) {
-                        Storage::disk('r2')->delete($product->image);
-                    }
-                } catch (Exception $e) {
-                    Log::warning('Failed to delete R2 image: ' . $e->getMessage());
+                    Log::warning('Failed to delete image: ' . $e->getMessage());
                 }
             }
             
@@ -581,30 +552,18 @@ public function storeCategorySubcategory(Request $request)
             $subcategoryId = $request->subcategory_id;
             $folder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
             
-            // Try R2 first, fallback to local storage
+            // Simplified upload approach for cloud compatibility
             $imagePath = null;
             $uploadSuccess = false;
             
             try {
-                // Attempt R2 upload
-                $imagePath = $request->file('image')->store($folder, 'r2');
+                // Primary approach: use public storage (works in both local and cloud)
+                $imagePath = $request->file('image')->store($folder, 'public');
                 $uploadSuccess = true;
-                Log::info('Image uploaded to R2 storage', ['path' => $imagePath]);
+                Log::info('Image uploaded to public storage', ['path' => $imagePath]);
             } catch (Exception $e) {
-                Log::warning('R2 upload failed, falling back to local storage: ' . $e->getMessage());
-                
-                try {
-                    // Fallback to local storage
-                    $imagePath = $request->file('image')->store($folder, 'public');
-                    $uploadSuccess = true;
-                    Log::info('Image uploaded to local storage', ['path' => $imagePath]);
-                } catch (Exception $localE) {
-                    Log::error('Both R2 and local storage failed', [
-                        'r2_error' => $e->getMessage(),
-                        'local_error' => $localE->getMessage()
-                    ]);
-                    return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
-                }
+                Log::error('Image upload failed', ['error' => $e->getMessage()]);
+                return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
             }
             
             if ($uploadSuccess && $imagePath) {
