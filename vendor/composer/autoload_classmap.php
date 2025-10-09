@@ -6,7 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\AddMoreTheniProducts' => $baseDir . '/app/Console/Commands/AddMoreTheniProducts.php',
     'App\\Console\\Commands\\CheckInfobipDelivery' => $baseDir . '/app/Console/Commands/CheckInfobipDelivery.php',
+    'App\\Console\\Commands\\CreateTheniSelvakummarProducts' => $baseDir . '/app/Console/Commands/CreateTheniSelvakummarProducts.php',
     'App\\Console\\Commands\\DebugEmailIssue' => $baseDir . '/app/Console/Commands/DebugEmailIssue.php',
     'App\\Console\\Commands\\DebugSmsService' => $baseDir . '/app/Console/Commands/DebugSmsService.php',
     'App\\Console\\Commands\\DiagnoseProduction' => $baseDir . '/app/Console/Commands/DiagnoseProduction.php',
