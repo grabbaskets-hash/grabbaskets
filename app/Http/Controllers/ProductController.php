@@ -12,9 +12,10 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            return view('buyer.product-details-test', ['product' => $product, 'seller' => null, 'reviews' => collect(), 'otherProducts' => collect()]);
+            $imageUrl = $product->image_url;  // This might be causing the issue
+            return "Product found: " . $product->name . " | Image URL: " . $imageUrl;
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return "Error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine();
         }
     }
     public function addReview(Request $request, $id)
