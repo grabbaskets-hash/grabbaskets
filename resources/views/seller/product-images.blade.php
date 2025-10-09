@@ -34,8 +34,8 @@
         <div class="col">
             <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
                 <div class="card h-100 shadow-hover" style="transition: transform 0.2s; cursor: pointer;">
-                    @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
+                    @if($product->image || $product->image_data)
+                    <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
                     @else
                     <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;">
                         <span class="text-muted">No Image</span>

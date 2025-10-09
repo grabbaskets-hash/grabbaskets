@@ -318,7 +318,7 @@
     <div class="row g-4 product-section">
       <!-- Image -->
       <div class="col-lg-6 text-center">
-        @if($product->image)
+        @if($product->image || $product->image_data)
           <img src="{{ $product->image_url }}" class="product-image img-fluid" alt="{{ $product->name }}" 
                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
           <div style="display: none; padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
@@ -487,7 +487,7 @@
       @forelse($otherProducts as $op)
         <div class="col-6 col-md-3">
           <a href="{{ route('product.details', $op->id) }}" class="card h-100 text-decoration-none text-dark">
-            @if($op->image)
+            @if($op->image || $op->image_data)
               <img src="{{ $op->image_url }}" class="card-img-top" alt="{{ $op->name }}" 
                    style="height: 200px; object-fit: cover;"
                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
