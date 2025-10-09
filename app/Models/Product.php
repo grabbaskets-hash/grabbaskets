@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User; // 👈 Add this import
 
 class Product extends Model
@@ -85,13 +86,30 @@ class Product extends Model
             
             // Check if it's already a direct image path (SRM images in images/ folder)
             if (strpos($imagePath, 'images/') === 0) {
-                // Remove the duplicate 'images/' prefix and create relative path
+                // Remove the duplicate 'images/' prefix
                 $cleanPath = str_replace('images/', '', $imagePath);
-                // Use relative path for local access
+
+                // For cloud deployment, first try to serve from the configured storage disk
+                if (app()->environment('production')) {
+                    // If the file exists on the default disk, return that URL
+                    if (Storage::exists('images/' . $cleanPath)) {
+                        return Storage::url('images/' . $cleanPath);
+                    }
+
+                    // Otherwise fall back to the app url + /images path (useful for static deploys)
+                    return rtrim(config('app.url'), '/') . '/images/' . $cleanPath;
+                }
+
+                // For local development, use relative path
                 return '/images/' . $cleanPath;
             }
             
             // For all other cases, use storage path
+            if (app()->environment('production')) {
+                // Use cloud storage URL for production
+                return Storage::url($imagePath);
+            }
+            
             return '/storage/' . $imagePath;
         }
         
