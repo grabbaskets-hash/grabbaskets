@@ -2,6 +2,7 @@
 
 @extends('layouts.app')
 
+@section('content')
 <style>
 body {
     background: linear-gradient(135deg, #e0f7fa, #80deea);
@@ -111,52 +112,17 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
            Edit your product details and keep your inventory up to date.</p>
         
         @if($product->image)
-            @php
-                // Check multiple possible image paths
-                $imagePath = $product->image;
-                $fullStoragePath = public_path('storage/' . $imagePath);
-                $imageExists = file_exists($fullStoragePath);
-                
-                // If the image doesn't exist in the expected location, try alternative paths
-                if (!$imageExists) {
-                    // Try without storage prefix (for old images that might include full path)
-                    $alternativePath = str_replace('storage/', '', $imagePath);
-                    $fullAlternativePath = public_path('storage/' . $alternativePath);
-                    if (file_exists($fullAlternativePath)) {
-                        $imagePath = $alternativePath;
-                        $imageExists = true;
-                    }
-                    
-                    // Try images folder (for very old images)
-                    if (!$imageExists) {
-                        $oldImagePath = public_path('images/' . basename($imagePath));
-                        if (file_exists($oldImagePath)) {
-                            $imagePath = 'images/' . basename($imagePath);
-                            $imageExists = true;
-                        }
-                    }
-                }
-            @endphp
-            
-            @if($imageExists)
-                <div class="mt-4">
-                    <img src="{{ asset('storage/' . $imagePath) }}" 
-                         alt="{{ $product->name }}" 
-                         style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div style="display: none; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem; margin-top: 10px;">
-                        <i class="fas fa-image" style="font-size: 2rem; opacity: 0.5;"></i>
-                        <div class="text-white small mt-2">Image not found</div>
-                    </div>
-                    <div class="text-white small mt-2">Current Product Image</div>
-                </div>
-            @else
-                <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
+            <div class="mt-4">
+                <img src="{{ asset('storage/' . $product->image) }}" 
+                     alt="{{ $product->name }}" 
+                     style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display: none; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem; margin-top: 10px;">
                     <i class="fas fa-image" style="font-size: 2rem; opacity: 0.5;"></i>
-                    <div class="text-white small mt-2">No image uploaded</div>
-                    <div class="text-white small" style="opacity: 0.7;">Path: {{ $product->image }}</div>
+                    <div class="text-white small mt-2">Image not found</div>
                 </div>
-            @endif
+                <div class="text-white small mt-2">Current Product Image</div>
+            </div>
         @else
             <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
                 <i class="fas fa-upload" style="font-size: 2rem; opacity: 0.5;"></i>

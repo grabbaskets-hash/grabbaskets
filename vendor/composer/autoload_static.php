@@ -546,7 +546,9 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\AddMoreTheniProducts' => __DIR__ . '/../..' . '/app/Console/Commands/AddMoreTheniProducts.php',
         'App\\Console\\Commands\\CheckInfobipDelivery' => __DIR__ . '/../..' . '/app/Console/Commands/CheckInfobipDelivery.php',
+        'App\\Console\\Commands\\CreateTheniSelvakummarProducts' => __DIR__ . '/../..' . '/app/Console/Commands/CreateTheniSelvakummarProducts.php',
         'App\\Console\\Commands\\DebugEmailIssue' => __DIR__ . '/../..' . '/app/Console/Commands/DebugEmailIssue.php',
         'App\\Console\\Commands\\DebugSmsService' => __DIR__ . '/../..' . '/app/Console/Commands/DebugSmsService.php',
         'App\\Console\\Commands\\DiagnoseProduction' => __DIR__ . '/../..' . '/app/Console/Commands/DiagnoseProduction.php',
