@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use App\Models\User; // 👈 Add this import
 
 class Product extends Model
@@ -14,6 +15,9 @@ class Product extends Model
         'subcategory_id',
         'seller_id',
         'image',
+        'image_data',
+        'image_mime_type',
+        'image_size',
         'description',
         'price',
         'discount',
@@ -67,23 +71,70 @@ class Product extends Model
         return 0;
     }
 
-    // Get the correct image URL (simplified for cloud compatibility)
+    // Get the correct image URL (supporting both file storage and database storage)
     public function getImageUrlAttribute()
     {
-        if (!$this->image) {
-            return 'https://via.placeholder.com/200?text=No+Image';
+        // Priority 1: Database stored image
+        if ($this->image_data && $this->image_mime_type) {
+            return "data:{$this->image_mime_type};base64,{$this->image_data}";
+        }
+        
+        // Priority 2: File system image
+        if ($this->image) {
+            $imagePath = $this->image;
+            
+            // Check if it's already a direct image path (SRM images in images/ folder)
+            if (strpos($imagePath, 'images/') === 0) {
+                // Remove the duplicate 'images/' prefix and use asset() for public/images/
+                $cleanPath = str_replace('images/', '', $imagePath);
+                return asset('images/' . $cleanPath);
+            }
+            
+            // For all other cases, use storage path
+            return asset('storage/' . $imagePath);
+        }
+        
+        // Priority 3: Fallback placeholder
+        return 'https://via.placeholder.com/200?text=No+Image';
+    }
+
+    // Store image in database
+    public function storeImageInDatabase($imageFile)
+    {
+        if (!$imageFile || !$imageFile->isValid()) {
+            return false;
         }
 
-        $imagePath = $this->image;
-        
-        // Check if it's already a direct image path (SRM images in images/ folder)
-        if (strpos($imagePath, 'images/') === 0) {
-            // Remove the duplicate 'images/' prefix and use asset() for public/images/
-            $cleanPath = str_replace('images/', '', $imagePath);
-            return asset('images/' . $cleanPath);
+        try {
+            $imageData = base64_encode(file_get_contents($imageFile->getPathname()));
+            $mimeType = $imageFile->getMimeType();
+            $size = $imageFile->getSize();
+
+            $this->update([
+                'image_data' => $imageData,
+                'image_mime_type' => $mimeType,
+                'image_size' => $size,
+                'image' => null // Clear file path since we're using database storage
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to store image in database: ' . $e->getMessage());
+            return false;
         }
+    }
+
+    // Get image size in human readable format
+    public function getImageSizeFormattedAttribute()
+    {
+        if (!$this->image_size) return null;
         
-        // For all other cases, use storage path
-        return asset('storage/' . $imagePath);
+        if ($this->image_size < 1024) {
+            return $this->image_size . ' B';
+        } elseif ($this->image_size < 1048576) {
+            return round($this->image_size / 1024, 2) . ' KB';
+        } else {
+            return round($this->image_size / 1048576, 2) . ' MB';
+        }
     }
 }
