@@ -519,3 +519,23 @@ Route::get('/debug-bulk-system', function() {
         ], 500);
     }
 });
+
+// Public test route for simple upload (no auth required)
+Route::get('/test-simple-upload', function() {
+    try {
+        return response()->json([
+            'status' => 'Simple upload system working',
+            'routes_available' => [
+                'simple_upload_form' => url('/seller/simple-upload'),
+                'login_first' => url('/login'),
+                'dashboard' => url('/seller/dashboard')
+            ],
+            'note' => 'You need to login first to access seller routes'
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'ERROR',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
