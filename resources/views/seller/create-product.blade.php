@@ -125,6 +125,18 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
 /* Error */
 .text-danger { font-size: 0.85rem; margin-top: 3px; }
 
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Required field indicator */
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
 /* Responsive */
 @media(max-width: 768px) {
     .container-card { flex-direction: column; }
@@ -148,6 +160,22 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
     <div class="right-box">
         <h2 class="mb-4">Add New Product</h2>
 
+        <!-- Information Banner -->
+        <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(90deg, #e7f3ff, #f0f9ff); border-radius: 0.8rem;">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill text-primary me-3 mt-1"></i>
+                <div>
+                    <h6 class="mb-2 text-primary">📝 Product Upload Guidelines</h6>
+                    <ul class="mb-0 small text-dark" style="padding-left: 1rem;">
+                        <li><strong>Images:</strong> Upload high-quality images (400x400px+, max 2MB, JPEG/PNG)</li>
+                        <li><strong>Required:</strong> All fields marked with * must be completed</li>
+                        <li><strong>Categories:</strong> Select category first, then matching subcategory</li>
+                        <li><strong>Success:</strong> You'll see a confirmation message after successful upload</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         @if(session('success'))
             <div class="alert alert-success text-dark">{{ session('success') }}</div>
         @endif
@@ -160,13 +188,13 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
             <div class="row g-3">
 
                 <div class="col-md-6">
-                    <label for="name">Product Name</label>
+                    <label for="name" class="required">Product Name</label>
                     <input type="text" id="name" name="name" class="form-control" required value="{{ old('name') }}">
                     @error('name') <div class="text-danger">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
-                    <label for="category_id">Category</label>
+                    <label for="category_id" class="required">Category</label>
                     <select id="category_id" name="category_id" class="form-select" required>
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
@@ -179,7 +207,7 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 </div>
 
                 <div class="col-md-6">
-                    <label for="subcategory_id">Subcategory</label>
+                    <label for="subcategory_id" class="required">Subcategory</label>
                     <select id="subcategory_id" name="subcategory_id" class="form-select" required>
                         <option value="">Select Subcategory</option>
                         @foreach($subcategories as $subcategory)
@@ -193,7 +221,7 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 </div>
 
                 <div class="col-md-6">
-                    <label for="price">Price</label>
+                    <label for="price" class="required">Price</label>
                     <input type="number" step="0.01" id="price" name="price" class="form-control" required value="{{ old('price') }}">
                     @error('price') <div class="text-danger">{{ $message }}</div> @enderror
                 </div>
@@ -211,7 +239,7 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 </div>
 
                 <div class="col-md-6">
-                    <label for="gift_option">Gift Option Available?</label>
+                    <label for="gift_option" class="required">Gift Option Available?</label>
                     <select id="gift_option" name="gift_option" class="form-select" required>
                         <option value="">Select</option>
                         <option value="yes" {{ old('gift_option') == 'yes' ? 'selected' : '' }}>Yes</option>
@@ -221,23 +249,35 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 </div>
 
                 <div class="col-12">
-                    <label for="description">Description</label>
+                    <label for="description" class="required">Description</label>
                     <textarea id="description" name="description" class="form-control" required>{{ old('description') }}</textarea>
                     @error('description') <div class="text-danger">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
-                    <label for="stock">Number of Stock Held</label>
+                    <label for="stock" class="required">Number of Stock Held</label>
                     <input type="number" id="stock" name="stock" class="form-control" min="0" required value="{{ old('stock') }}">
                     @error('stock') <div class="text-danger">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
                     <label for="image">Product Image</label>
-                    <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    <input type="file" id="image" name="image" class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif" onchange="previewImage(this)">
                     @error('image') <div class="text-danger">{{ $message }}</div> @enderror
+                    <div class="mt-1">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            Max size: 2MB | Formats: JPEG, PNG, JPG, GIF | Recommended: 400x400px or larger
+                        </small>
+                    </div>
                     <div id="imagePreview" class="mt-2" style="display: none;">
                         <img id="preview" src="" alt="Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
+                        <div class="mt-1">
+                            <small class="text-success"><i class="bi bi-check-circle"></i> Image ready for upload</small>
+                        </div>
+                    </div>
+                    <div id="uploadError" class="mt-1" style="display: none;">
+                        <small class="text-danger"><i class="bi bi-exclamation-triangle"></i> <span id="errorMessage"></span></small>
                     </div>
                 </div>
 
@@ -245,7 +285,13 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
 
             <!-- Horizontal Buttons -->
             <div class="btn-horizontal-group">
-                <button type="submit" class="btn btn-gradient">Add Product</button>
+                <button type="submit" id="submitBtn" class="btn btn-gradient">
+                    <span id="submitText">Add Product</span>
+                    <span id="submitSpinner" style="display: none;">
+                        <i class="spinner-border spinner-border-sm me-2" role="status"></i>
+                        Adding Product...
+                    </span>
+                </button>
                 <a href="/seller/dashboard" class="btn btn-outline-pro">Dashboard</a>
             </div>
 
@@ -285,8 +331,34 @@ document.addEventListener('DOMContentLoaded', function () {
 function previewImage(input) {
     const preview = document.getElementById('preview');
     const previewContainer = document.getElementById('imagePreview');
+    const errorContainer = document.getElementById('uploadError');
+    const errorMessage = document.getElementById('errorMessage');
+    
+    // Hide error message
+    errorContainer.style.display = 'none';
     
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file size (2MB = 2097152 bytes)
+        if (file.size > 2097152) {
+            errorMessage.textContent = 'File size must be less than 2MB. Please choose a smaller image.';
+            errorContainer.style.display = 'block';
+            previewContainer.style.display = 'none';
+            input.value = ''; // Clear the file input
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            errorMessage.textContent = 'Please select a valid image file (JPEG, PNG, JPG, or GIF).';
+            errorContainer.style.display = 'block';
+            previewContainer.style.display = 'none';
+            input.value = ''; // Clear the file input
+            return;
+        }
+        
         const reader = new FileReader();
         
         reader.onload = function(e) {
@@ -294,11 +366,53 @@ function previewImage(input) {
             previewContainer.style.display = 'block';
         }
         
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
     } else {
         previewContainer.style.display = 'none';
     }
 }
+
+// Form submission handling
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+    
+    form.addEventListener('submit', function(e) {
+        // Show loading state
+        submitBtn.disabled = true;
+        submitText.style.display = 'none';
+        submitSpinner.style.display = 'inline';
+        
+        // Validate form before submission
+        const requiredFields = ['name', 'category_id', 'subcategory_id', 'description', 'price', 'gift_option', 'stock'];
+        let isValid = true;
+        
+        requiredFields.forEach(function(fieldName) {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (!field || !field.value.trim()) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            submitBtn.disabled = false;
+            submitText.style.display = 'inline';
+            submitSpinner.style.display = 'none';
+            alert('Please fill in all required fields before submitting.');
+            return;
+        }
+        
+        // Re-enable button after 5 seconds in case of server issues
+        setTimeout(function() {
+            submitBtn.disabled = false;
+            submitText.style.display = 'inline';
+            submitSpinner.style.display = 'none';
+        }, 5000);
+    });
+});
 </script>
 
 </body>
