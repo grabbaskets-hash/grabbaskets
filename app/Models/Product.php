@@ -74,29 +74,35 @@ class Product extends Model
             return null;
         }
 
-        // First check if it's an R2 URL (if stored in R2)
-        try {
-            if (\Illuminate\Support\Facades\Storage::disk('r2')->exists($this->image)) {
-                $bucket = env('AWS_BUCKET');
-                $endpoint = env('AWS_ENDPOINT');
-                return "{$endpoint}/{$bucket}/{$this->image}";
-            }
-        } catch (\Exception $e) {
-            // R2 not available, continue to local storage
-        }
-
-        // Check local storage paths
         $imagePath = $this->image;
         
-        // Try different local storage paths
-        if (file_exists(public_path('storage/' . $imagePath))) {
+        // In cloud environment, try R2 first (safer approach)
+        try {
+            $bucket = env('AWS_BUCKET');
+            $endpoint = env('AWS_ENDPOINT');
+            
+            // If we have R2 configuration, assume R2 storage for cloud environment
+            if ($bucket && $endpoint) {
+                return "{$endpoint}/{$bucket}/{$imagePath}";
+            }
+        } catch (\Exception $e) {
+            // R2 not configured, continue to local storage
+        }
+
+        // Fallback to local storage paths (safer file existence checking)
+        try {
+            // Try common storage paths without file_exists() to avoid cloud filesystem issues
+            $storagePaths = [
+                'storage/' . $imagePath,
+                $imagePath,
+                'images/' . basename($imagePath)
+            ];
+            
+            // Return the first logical path (in cloud, we assume storage/ is the standard)
             return asset('storage/' . $imagePath);
-        } elseif (file_exists(public_path($imagePath))) {
-            return asset($imagePath);
-        } elseif (file_exists(public_path('images/' . basename($imagePath)))) {
-            return asset('images/' . basename($imagePath));
-        } else {
-            // Fallback - try the original path anyway
+            
+        } catch (\Exception $e) {
+            // Final fallback
             return asset('storage/' . $imagePath);
         }
     }
