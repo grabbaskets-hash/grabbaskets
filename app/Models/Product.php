@@ -85,13 +85,14 @@ class Product extends Model
             
             // Check if it's already a direct image path (SRM images in images/ folder)
             if (strpos($imagePath, 'images/') === 0) {
-                // Remove the duplicate 'images/' prefix and use asset() for public/images/
+                // Remove the duplicate 'images/' prefix and create relative path
                 $cleanPath = str_replace('images/', '', $imagePath);
-                return asset('images/' . $cleanPath);
+                // Use relative path for local access
+                return '/images/' . $cleanPath;
             }
             
             // For all other cases, use storage path
-            return asset('storage/' . $imagePath);
+            return '/storage/' . $imagePath;
         }
         
         // Priority 3: Fallback placeholder
