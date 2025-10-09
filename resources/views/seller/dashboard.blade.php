@@ -149,6 +149,11 @@
                 </a>
             </li>
             <li>
+                <a class="nav-link" href="{{ route('seller.bulkImageReupload') }}">
+                    <i class="bi bi-images"></i> Bulk Image Re-upload
+                </a>
+            </li>
+            <li>
                 <a class="nav-link" href="{{ route('seller.createCategorySubcategory') }}">
                     <i class="bi bi-plus-square"></i> Add Category
                 </a>
