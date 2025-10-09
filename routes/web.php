@@ -154,8 +154,30 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
     Route::post('/seller/bulk-image-upload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
 
-    // Bulk uploads
-    Route::post('/seller/bulk-image-upload', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
+    // Debug route for testing
+    Route::get('/test-bulk-upload-debug', function() {
+        try {
+            return response()->json([
+                'status' => 'OK',
+                'ziparchive_available' => class_exists('ZipArchive'),
+                'authenticated' => Auth::check(),
+                'user_id' => Auth::id(),
+                'seller_products' => Auth::check() ? \App\Models\Product::where('seller_id', Auth::id())->count() : 0,
+                'categories_available' => \App\Models\Category::count(),
+                'storage_configured' => config('filesystems.default'),
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version()
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => $e->getMessage()
+            ]);
+        }
+    });
+
+    // Legacy bulk uploads (keep for compatibility)
+    Route::post('/seller/bulk-image-upload-legacy', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
     Route::post('/seller/bulk-product-upload', [SellerController::class, 'bulkProductUpload'])->name('seller.bulkProductUpload');
     
     // Excel Bulk Upload Routes
