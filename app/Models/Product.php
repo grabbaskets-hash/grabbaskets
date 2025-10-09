@@ -72,15 +72,20 @@ class Product extends Model
         return 0;
     }
 
-    // Get the correct image URL (supporting both file storage and database storage)
+    // Get the correct image URL (supporting GitHub, file storage and database storage)
     public function getImageUrlAttribute()
     {
-        // Priority 1: Database stored image
+        // Priority 1: GitHub hosted image (full URL)
+        if ($this->image && str_starts_with($this->image, 'https://raw.githubusercontent.com')) {
+            return $this->image;
+        }
+        
+        // Priority 2: Database stored image
         if ($this->image_data && $this->image_mime_type) {
             return "data:{$this->image_mime_type};base64,{$this->image_data}";
         }
         
-        // Priority 2: File system image
+        // Priority 3: File system image
         if ($this->image) {
             $imagePath = $this->image;
             

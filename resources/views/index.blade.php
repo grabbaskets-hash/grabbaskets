@@ -2661,7 +2661,7 @@ li a{
       subcategoryList.innerHTML = '';
       
       // Find category data
-      const categories = {!! json_encode($categories ?? []) !!};
+      const categories = <?php echo json_encode($categories ?? []); ?>;
       const category = categories.find(cat => cat.id == categoryId);
       
       if (category && category.subcategories && category.subcategories.length > 0) {
