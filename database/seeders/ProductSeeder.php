@@ -2,8 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents                'image' => 'https://via.placeholder.com/400x400/1a1a1a/ffffff?text=iPhone+15+Pro+Max',
+            ],
+            [
+                'name' => 'Samsung Galaxy S24 Ultra 512GB Titanium Black',
+                'unique_id' => 'SG1',
+                'description' => 'Premium Android smartphone with S Pen, 200MP camera, AI features, and 6.8-inch Dynamic AMOLED display.',
+                'price' => 134999.00,
+                'stock' => 30,
+                'category_id' => $electronics->id,
+                'subcategory_id' => $mobileSubcat->id,
+                'seller_id' => $sellerId,
+                'gift_option' => 'yes',
+                'delivery_charge' => 0,
+                'discount' => 8,
+                'image' => 'https://via.placeholder.com/400x400/2c3e50/ffffff?text=Samsung+Galaxy+S24+Ultra',te\Database\Seeder;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Subcategory;
@@ -94,7 +107,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 5,
-                'image' => 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=400&fit=crop',
+                'image' => 'https://via.placeholder.com/400x400/1a1a1a/ffffff?text=iPhone+15+Pro+Max',
             ],
             [
                 'name' => 'Samsung Galaxy S24 Ultra 512GB Titanium Black',
@@ -108,7 +121,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 8,
-                'image' => 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=400&fit=crop',
+                'image' => 'https://via.placeholder.com/400x400/2c3e50/ffffff?text=Samsung+Galaxy+S24+Ultra',
             ],
             [
                 'name' => 'OnePlus 12 16GB RAM 512GB Silky Black',
@@ -136,7 +149,21 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 15,
-                'image' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+                                'image' => 'https://picsum.photos/400/400?random=1',
+            ],
+            [
+                'name' => 'Xiaomi 14 Ultra 512GB Black',
+                'unique_id' => 'XM1',
+                'description' => 'Professional photography smartphone with Leica optics, Snapdragon 8 Gen 3, and 6.73-inch LTPO AMOLED display.',
+                'price' => 89999.00,
+                'stock' => 35,
+                'category_id' => $electronics->id,
+                'subcategory_id' => $mobileSubcat->id,
+                'seller_id' => $sellerId,
+                'gift_option' => 'yes',
+                'delivery_charge' => 0,
+                'discount' => 10,
+                'image' => 'https://picsum.photos/400/400?random=2',
             ],
             
             // Laptops (Amazon bestsellers)
