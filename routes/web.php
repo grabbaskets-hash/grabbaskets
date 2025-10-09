@@ -175,6 +175,9 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
             ]);
         }
     });
+    
+    // Test route for debugging
+    Route::get('/test-bulk-simple', [App\Http\Controllers\TestBulkController::class, 'showBulkTest'])->name('test.bulk');
 
     // Legacy bulk uploads (keep for compatibility)
     Route::post('/seller/bulk-image-upload-legacy', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');

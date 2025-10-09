@@ -790,20 +790,24 @@ public function storeCategorySubcategory(Request $request)
     // Bulk Image Re-upload Methods
     public function showBulkImageReupload()
     {
-        $categories = Category::all();
-        
-        // Get products belonging to current seller that need images
-        $productsNeedingImages = Product::where('seller_id', Auth::id())
-            ->where(function($query) {
-                $query->whereNull('image')
-                      ->orWhere('image', '')
-                      ->orWhere('description', 'LIKE', '%⚠️ Image needs to be re-uploaded%');
-            })
-            ->whereNull('image_data') // Not using database storage
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $categories = Category::all();
+            
+            // Simplified query to avoid potential issues
+            $productsNeedingImages = Product::where('seller_id', Auth::id())
+                ->where(function($query) {
+                    $query->whereNull('image')
+                          ->orWhere('image', '');
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-        return view('seller.bulk-image-reupload', compact('categories', 'productsNeedingImages'));
+            return view('seller.bulk-image-reupload', compact('categories', 'productsNeedingImages'));
+            
+        } catch (\Exception $e) {
+            Log::error('Bulk image reupload page error: ' . $e->getMessage());
+            return redirect()->route('seller.dashboard')->with('error', 'Unable to load bulk upload page: ' . $e->getMessage());
+        }
     }
 
     public function processBulkImageReupload(Request $request)
