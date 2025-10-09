@@ -6,13 +6,15 @@ use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
     public function show($id)
     {
         try {
-            $product = Product::findOrFail($id);
-            return "Product found: " . $product->name . " | Image: " . $product->image;
+            // Test basic database connection
+            $count = DB::table('products')->count();
+            return "Database connection OK. Total products: " . $count . " | Looking for ID: " . $id;
         } catch (\Exception $e) {
             return "Error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine();
         }
