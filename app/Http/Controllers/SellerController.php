@@ -802,7 +802,7 @@ public function storeCategorySubcategory(Request $request)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            return view('seller.bulk-image-reupload', compact('categories', 'productsNeedingImages'));
+            return view('seller.bulk-image-reupload-simple', compact('categories', 'productsNeedingImages'));
             
         } catch (\Exception $e) {
             Log::error('Bulk image reupload page error: ' . $e->getMessage());
