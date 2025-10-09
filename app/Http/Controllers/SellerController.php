@@ -785,4 +785,223 @@ public function storeCategorySubcategory(Request $request)
 
         return Excel::download($export, 'bulk-products-sample.xlsx');
     }
+
+    // Bulk Image Re-upload Methods
+    public function showBulkImageReupload()
+    {
+        $categories = Category::all();
+        
+        // Get products belonging to current seller that need images
+        $productsNeedingImages = Product::where('seller_id', Auth::id())
+            ->where(function($query) {
+                $query->whereNull('image')
+                      ->orWhere('image', '')
+                      ->orWhere('description', 'LIKE', '%⚠️ Image needs to be re-uploaded%');
+            })
+            ->whereNull('image_data') // Not using database storage
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('seller.bulk-image-reupload', compact('categories', 'productsNeedingImages'));
+    }
+
+    public function processBulkImageReupload(Request $request)
+    {
+        $request->validate([
+            'zip_file' => 'required|file|mimes:zip|max:102400', // 100MB
+            'category_id' => 'nullable|exists:categories,id',
+            'matching_method' => 'required|in:name,unique_id,both'
+        ]);
+
+        try {
+            $zipFile = $request->file('zip_file');
+            $matchingMethod = $request->matching_method;
+            $categoryId = $request->category_id;
+            
+            // Create temporary directory for extraction
+            $tempDir = storage_path('app/temp/bulk_images_' . time());
+            mkdir($tempDir, 0755, true);
+            
+            // Extract zip file
+            $zip = new \ZipArchive;
+            if ($zip->open($zipFile->getPathname()) !== TRUE) {
+                throw new \Exception('Unable to open zip file');
+            }
+            
+            $zip->extractTo($tempDir);
+            $zip->close();
+            
+            // Get seller's products that need images
+            $query = Product::where('seller_id', Auth::id())
+                ->where(function($q) {
+                    $q->whereNull('image')
+                      ->orWhere('image', '')
+                      ->orWhere('description', 'LIKE', '%⚠️ Image needs to be re-uploaded%');
+                })
+                ->whereNull('image_data');
+                
+            if ($categoryId) {
+                $query->where('category_id', $categoryId);
+            }
+            
+            $productsNeedingImages = $query->get();
+            
+            // Find image files in extracted directory
+            $imageFiles = $this->findImageFiles($tempDir);
+            
+            // Match images to products
+            $matches = $this->matchImagesToProducts($imageFiles, $productsNeedingImages, $matchingMethod);
+            
+            // Process matches and upload to cloud storage
+            $uploadedCount = 0;
+            $errors = [];
+            
+            foreach ($matches['matched'] as $productId => $imagePath) {
+                try {
+                    $product = Product::find($productId);
+                    if ($product && $product->seller_id === Auth::id()) {
+                        
+                        // Generate unique filename for cloud storage
+                        $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+                        $cloudFileName = $product->unique_id . '_' . time() . '.' . $extension;
+                        $cloudPath = 'products/' . $cloudFileName;
+                        
+                        // Upload to cloud storage
+                        $imageContent = file_get_contents($imagePath);
+                        $uploaded = Storage::put($cloudPath, $imageContent, 'public');
+                        
+                        if ($uploaded) {
+                            // Update product
+                            $product->update([
+                                'image' => $cloudPath,
+                                'description' => str_replace("\n\n⚠️ Image needs to be re-uploaded by seller.", '', $product->description)
+                            ]);
+                            $uploadedCount++;
+                            
+                            Log::info('Bulk image uploaded', [
+                                'product_id' => $product->id,
+                                'cloud_path' => $cloudPath,
+                                'original_file' => basename($imagePath)
+                            ]);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Failed to upload image for product {$productId}: " . $e->getMessage();
+                }
+            }
+            
+            // Clean up temporary directory
+            $this->deleteDirectory($tempDir);
+            
+            // Prepare response message
+            $message = "Successfully uploaded {$uploadedCount} images.";
+            
+            if (count($matches['unmatched']) > 0) {
+                $message .= " " . count($matches['unmatched']) . " images could not be matched to products.";
+            }
+            
+            if (!empty($errors)) {
+                $message .= " " . count($errors) . " errors occurred during upload.";
+                Log::warning('Bulk image upload errors', $errors);
+            }
+            
+            return redirect()->route('seller.bulkImageReupload')->with('success', $message);
+            
+        } catch (\Exception $e) {
+            Log::error('Bulk image upload failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage());
+        }
+    }
+
+    private function findImageFiles($directory)
+    {
+        $imageFiles = [];
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory)
+        );
+        
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $extension = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+                if (in_array($extension, $allowedExtensions)) {
+                    $imageFiles[] = $file->getPathname();
+                }
+            }
+        }
+        
+        return $imageFiles;
+    }
+
+    private function matchImagesToProducts($imageFiles, $products, $matchingMethod)
+    {
+        $matched = [];
+        $unmatched = [];
+        
+        foreach ($imageFiles as $imagePath) {
+            $fileName = pathinfo($imagePath, PATHINFO_FILENAME);
+            $bestMatch = null;
+            $bestScore = 0;
+            
+            foreach ($products as $product) {
+                $score = 0;
+                
+                if ($matchingMethod === 'name' || $matchingMethod === 'both') {
+                    // Match by product name
+                    $nameScore = $this->calculateSimilarity($fileName, $product->name);
+                    $score = max($score, $nameScore);
+                }
+                
+                if ($matchingMethod === 'unique_id' || $matchingMethod === 'both') {
+                    // Match by unique ID
+                    if (stripos($fileName, $product->unique_id) !== false) {
+                        $score = max($score, 0.9); // High score for ID match
+                    }
+                }
+                
+                if ($score > $bestScore && $score > 0.6) { // Minimum 60% similarity
+                    $bestScore = $score;
+                    $bestMatch = $product;
+                }
+            }
+            
+            if ($bestMatch) {
+                $matched[$bestMatch->id] = $imagePath;
+            } else {
+                $unmatched[] = [
+                    'filename' => basename($imagePath),
+                    'path' => $imagePath
+                ];
+            }
+        }
+        
+        return [
+            'matched' => $matched,
+            'unmatched' => $unmatched
+        ];
+    }
+
+    private function calculateSimilarity($str1, $str2)
+    {
+        // Normalize strings
+        $str1 = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str1));
+        $str2 = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str2));
+        
+        // Calculate similarity
+        similar_text($str1, $str2, $percent);
+        return $percent / 100;
+    }
+
+    private function deleteDirectory($dir)
+    {
+        if (!is_dir($dir)) return;
+        
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
 }

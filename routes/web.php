@@ -150,6 +150,10 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::put('/seller/product/{product}', [SellerController::class, 'updateProduct'])->name('seller.updateProduct');
     Route::get('/seller/product-images', [SellerController::class, 'productImages'])->name('seller.productImages');
 
+    // Bulk Image Re-upload
+    Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
+    Route::post('/seller/bulk-image-reupload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
+
     // Bulk uploads
     Route::post('/seller/bulk-image-upload', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
     Route::post('/seller/bulk-product-upload', [SellerController::class, 'bulkProductUpload'])->name('seller.bulkProductUpload');
