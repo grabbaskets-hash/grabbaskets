@@ -78,7 +78,9 @@ class Product extends Model
         
         // Check if it's already a direct image path (SRM images in images/ folder)
         if (strpos($imagePath, 'images/') === 0) {
-            return asset($imagePath);
+            // Remove the duplicate 'images/' prefix and use asset() for public/images/
+            $cleanPath = str_replace('images/', '', $imagePath);
+            return asset('images/' . $cleanPath);
         }
         
         // In cloud environment, try R2 first (safer approach)
