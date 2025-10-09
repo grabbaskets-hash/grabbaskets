@@ -460,4 +460,7 @@ Route::post('seller/update-images-zip', [App\Http\Controllers\SellerController::
 // Include test routes
 require __DIR__ . '/test.php';
 
+// Include debug routes
+require __DIR__ . '/debug.php';
+
 require __DIR__ . '/auth.php';
