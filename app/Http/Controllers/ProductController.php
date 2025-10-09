@@ -11,13 +11,13 @@ class ProductController extends Controller
 {
     public function show($id)
     {
-        try {
-            // Test basic database connection
-            $count = DB::table('products')->count();
-            return "Database connection OK. Total products: " . $count . " | Looking for ID: " . $id;
-        } catch (\Exception $e) {
-            return "Error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine();
-        }
+        $product = Product::with(['category','subcategory'])->findOrFail($id);
+        $seller = Seller::where('id', $product->seller_id)->first();
+        $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
+        $otherProducts = Product::where('seller_id', $product->seller_id)
+            ->where('id', '!=', $product->id)
+            ->latest()->take(8)->get();
+        return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
     }
     public function addReview(Request $request, $id)
     {
