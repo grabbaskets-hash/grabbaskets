@@ -72,11 +72,11 @@ class Product extends Model
         return 0;
     }
 
-    // Get the correct image URL (supporting GitHub, file storage and database storage)
+    // Get the correct image URL (supporting direct URLs, file storage and database storage)
     public function getImageUrlAttribute()
     {
-        // Priority 1: GitHub hosted image (full URL)
-        if ($this->image && str_starts_with($this->image, 'https://raw.githubusercontent.com')) {
+        // Priority 1: Direct external image URL (https://)
+        if ($this->image && (str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'http://'))) {
             return $this->image;
         }
         
@@ -129,7 +129,7 @@ class Product extends Model
             return '/storage/' . $imagePath;
         }
         
-        // Priority 3: Fallback placeholder
+        // Priority 4: Fallback placeholder
         return 'https://via.placeholder.com/200?text=No+Image';
     }
 
