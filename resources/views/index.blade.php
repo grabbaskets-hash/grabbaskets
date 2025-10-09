@@ -2139,43 +2139,62 @@ li a{
   <!-- Products by Category Showcase -->
   <section class="py-5 bg-light">
     <div class="container">
-      <h2 class="text-center mb-5">🛍️ Shop by Category</h2>
+      <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold mb-3">🛍️ Shop by Category</h2>
+        <p class="lead text-muted">Discover our curated collection of premium products across all categories</p>
+      </div>
       @if(isset($categoryProducts) && !empty($categoryProducts))
         @foreach($categoryProducts as $categoryName => $products)
           @if($products->count() > 0)
           <div class="mb-5">
-            <h3 class="mb-3 text-primary">{{ $categoryName }}</h3>
+            <div class="d-flex align-items-center mb-4">
+              <h3 class="h4 fw-bold text-primary mb-0">{{ $categoryName }}</h3>
+              <span class="badge bg-primary ms-3">{{ $products->count() }} Products</span>
+            </div>
             <div class="row g-3">
               @foreach($products as $product)
-              <div class="col-lg-4 col-md-6">
+              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                 <div class="card product-card h-100 shadow-sm">
                   <img src="{{ $product->image_url }}" 
                        class="card-img-top" 
                        alt="{{ $product->name }}"
-                       style="height: 200px; object-fit: cover;"
-                       onerror="this.src='https://via.placeholder.com/300x200?text={{ urlencode($categoryName) }}'">
+                       style="height: 250px; object-fit: cover;"
+                       onerror="this.src='https://via.placeholder.com/300x250?text={{ urlencode($categoryName) }}'">
                   <div class="card-body d-flex flex-column">
-                    <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 50) }}</h6>
-                    <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($product->description, 80) }}</p>
+                    <h6 class="card-title fw-bold">{{ \Illuminate\Support\Str::limit($product->name, 60) }}</h6>
+                    <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($product->description, 100) }}</p>
                     <div class="mt-auto">
                       @if($product->discount > 0)
-                        <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                        <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-                        <small class="text-danger">({{ $product->discount }}% off)</small>
+                        <div class="price-section mb-2">
+                          <span class="fw-bold text-success fs-6">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                          <small class="text-muted text-decoration-line-through ms-2">₹{{ number_format($product->price, 2) }}</small>
+                          <small class="badge bg-danger ms-2">{{ $product->discount }}% OFF</small>
+                        </div>
                       @else
-                        <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                        <div class="price-section mb-2">
+                          <span class="fw-bold text-success fs-6">₹{{ number_format($product->price, 2) }}</span>
+                        </div>
                       @endif
-                      <div class="mt-2">
+                      @if($product->stock > 0)
+                        <small class="text-success d-block mb-2"><i class="bi bi-check-circle"></i> In Stock ({{ $product->stock }} available)</small>
+                      @else
+                        <small class="text-danger d-block mb-2"><i class="bi bi-x-circle"></i> Out of Stock</small>
+                      @endif
+                      <div class="d-grid gap-2">
                         <a href="{{ route('product.details', $product->id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
                         @auth
-                        <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
-                          @csrf
-                          <input type="hidden" name="product_id" value="{{ $product->id }}">
-                          <input type="hidden" name="quantity" value="1">
-                          <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
-                        </form>
+                          @if($product->stock > 0)
+                          <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                          </form>
+                          @else
+                          <button class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
+                          @endif
                         @else
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login to Buy</a>
+                          <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login to Buy</a>
                         @endauth
                       </div>
                     </div>
@@ -2191,50 +2210,65 @@ li a{
     </div>
   </section>
 
-  <section class="trending my-5" style="margin-left:20px ">
-    <h2 class="mb-3 " style="margin-left: 40%">🔥 Trending Items</h2>
-    <div class="grid">
-      @foreach($products as $product)
-        <div class="item card shadow-sm p-3 text-center position-relative" style="min-width:250px;">
-          <!-- Share Button -->
-          <div class="position-absolute top-0 end-0 m-2">
-            <div class="dropdown">
-              <button class="btn btn-sm btn-outline-secondary rounded-circle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-share"></i>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success"></i> WhatsApp</a></li>
-                <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary"></i> Facebook</a></li>
-                <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info"></i> Twitter</a></li>
-                <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg"></i> Copy Link</a></li>
-              </ul>
+  <section class="trending my-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3">🔥 Trending Items</h2>
+        <p class="lead text-muted">Most popular products loved by our customers</p>
+      </div>
+      <div class="row g-4">
+        @foreach($trending as $product)
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+            <div class="item card shadow-sm h-100 position-relative">
+              <!-- Share Button -->
+              <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary rounded-circle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-share"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success"></i> WhatsApp</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary"></i> Facebook</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault;"><i class="bi bi-twitter text-info"></i> Twitter</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg"></i> Copy Link</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <a href="{{ route('product.details', $product->id) }}" style="text-decoration: none" class="text-dark">
+                <div class="image-box p-3">
+                  <img src="{{ $product->image_url }}"
+                    alt="{{ $product->name }}"
+                    class="img-fluid rounded"
+                    style="height: 200px; width: 100%; object-fit: cover;"
+                    onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                </div>
+
+                <div class="card-body text-center">
+                  <h6 class="card-title fw-bold">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+
+                  <div class="stars mb-2">
+                    @php $stars = rand(3, 5); @endphp
+                    <span class="text-warning">
+                      {!! str_repeat('★', $stars) !!}{!! str_repeat('☆', 5 - $stars) !!}
+                    </span>
+                  </div>
+
+                  @if($product->discount > 0)
+                    <div class="price-section">
+                      <p class="price fw-bold text-success mb-1">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</p>
+                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                      <small class="badge bg-danger ms-1">{{ $product->discount }}% OFF</small>
+                    </div>
+                  @else
+                    <p class="price fw-bold text-success">₹{{ number_format($product->price, 2) }}</p>
+                  @endif
+                </div>
+              </a>
             </div>
           </div>
-
-          <a href="{{ route('product.details', $product->id) }}" style="text-decoration: none">
-            <div class="image-box">
-              <img src="{{ $product->image_url }}"
-                alt="{{ $product->name }}"
-                onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
-            </div>
-
-            <h6 class="mt-2">{{ \Illuminate\Support\Str::limit($product->name, 30) }}</h6>
-
-            <div class="stars">
-              @php $stars = rand(3, 5); @endphp
-              {!! str_repeat('★', $stars) !!}{!! str_repeat('☆', 5 - $stars) !!}
-            </div>
-
-            @if($product->discount > 0)
-              <p class="price fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</p>
-              <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-              <small class="text-danger">({{ $product->discount }}% off)</small>
-            @else
-              <p class="price fw-bold text-success">₹{{ number_format($product->price, 2) }}</p>
-            @endif
-          </a>
-        </div>
-      @endforeach
+        @endforeach
+      </div>
     </div>
   </section>
 
