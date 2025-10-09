@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Exception;
+use ZipArchive;
 
 class SellerController extends Controller {
     // ...existing code...
