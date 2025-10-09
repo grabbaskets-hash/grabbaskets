@@ -460,7 +460,7 @@ public function storeCategorySubcategory(Request $request)
         return $this->storeProductWithDatabaseImage($request);
     }
 
-    // New method for database image storage
+    // New method for cloud-compatible image storage
     private function storeProductWithDatabaseImage(Request $request)
     {
         $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
@@ -482,20 +482,43 @@ public function storeCategorySubcategory(Request $request)
         
         $imageStored = false;
         
-        // Handle image upload to database
+        // Handle image upload - try cloud storage first, then database fallback
         if ($request->hasFile('image')) {
             try {
                 $image = $request->file('image');
-                $imageStored = $product->storeImageInDatabase($image);
                 
-                if ($imageStored) {
-                    Log::info('Image stored in database', [
-                        'product_id' => $product->id,
-                        'size' => $image->getSize(),
-                        'mime_type' => $image->getMimeType()
-                    ]);
-                } else {
-                    Log::error('Failed to store image in database', ['product_id' => $product->id]);
+                // Try cloud storage first for production
+                if (app()->environment('production')) {
+                    $imageName = $unique_id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                    $cloudPath = 'products/' . $imageName;
+                    
+                    // Upload to cloud storage
+                    $uploaded = Storage::put($cloudPath, file_get_contents($image->getPathname()), 'public');
+                    
+                    if ($uploaded) {
+                        $product->update(['image' => $cloudPath]);
+                        $imageStored = true;
+                        Log::info('Image stored in cloud storage', [
+                            'product_id' => $product->id,
+                            'cloud_path' => $cloudPath,
+                            'size' => $image->getSize()
+                        ]);
+                    }
+                }
+                
+                // Fallback to database storage if cloud failed or not in production
+                if (!$imageStored) {
+                    $imageStored = $product->storeImageInDatabase($image);
+                    
+                    if ($imageStored) {
+                        Log::info('Image stored in database (fallback)', [
+                            'product_id' => $product->id,
+                            'size' => $image->getSize(),
+                            'mime_type' => $image->getMimeType()
+                        ]);
+                    } else {
+                        Log::error('Failed to store image in database', ['product_id' => $product->id]);
+                    }
                 }
                 
             } catch (Exception $e) {
@@ -506,7 +529,7 @@ public function storeCategorySubcategory(Request $request)
         
         $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
         if ($imageStored) {
-            $successMessage .= " Image stored in database.";
+            $successMessage .= " Image uploaded to " . (app()->environment('production') ? "cloud storage" : "database") . ".";
         }
         
         return redirect()->route('seller.dashboard')->with('success', $successMessage);
@@ -539,38 +562,49 @@ public function storeCategorySubcategory(Request $request)
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
+        
+        // Handle image update with cloud-compatible approach
         if ($request->hasFile('image')) {
-            // Delete old image if it exists (safer cloud-compatible approach)
-            if ($product->image) {
-                try {
-                    // Try to delete from public storage (most likely location in cloud)
-                    Storage::disk('public')->delete($product->image);
-                } catch (Exception $e) {
-                    Log::warning('Failed to delete image: ' . $e->getMessage());
-                }
-            }
-            
-            $sellerId = Auth::id();
-            $categoryId = $request->category_id;
-            $subcategoryId = $request->subcategory_id;
-            $folder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
-            
-            // Simplified upload approach for cloud compatibility
-            $imagePath = null;
-            $uploadSuccess = false;
-            
             try {
-                // Primary approach: use public storage (works in both local and cloud)
-                $imagePath = $request->file('image')->store($folder, 'public');
-                $uploadSuccess = true;
-                Log::info('Image uploaded to public storage', ['path' => $imagePath]);
+                $image = $request->file('image');
+                $imageStored = false;
+                
+                // Try cloud storage first for production
+                if (app()->environment('production')) {
+                    $imageName = $product->unique_id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                    $cloudPath = 'products/' . $imageName;
+                    
+                    // Upload to cloud storage
+                    $uploaded = Storage::put($cloudPath, file_get_contents($image->getPathname()), 'public');
+                    
+                    if ($uploaded) {
+                        $data['image'] = $cloudPath;
+                        $imageStored = true;
+                        Log::info('Product image updated in cloud storage', [
+                            'product_id' => $product->id,
+                            'cloud_path' => $cloudPath
+                        ]);
+                    }
+                }
+                
+                // Fallback to database storage if cloud failed or not in production
+                if (!$imageStored) {
+                    $imageStored = $product->storeImageInDatabase($image);
+                    
+                    if ($imageStored) {
+                        // Clear the file path since we're using database storage
+                        $data['image'] = null;
+                        Log::info('Product image updated in database (fallback)', ['product_id' => $product->id]);
+                    }
+                }
+                
+                if (!$imageStored) {
+                    return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
+                }
+                
             } catch (Exception $e) {
-                Log::error('Image upload failed', ['error' => $e->getMessage()]);
+                Log::error('Image update failed: ' . $e->getMessage());
                 return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
-            }
-            
-            if ($uploadSuccess && $imagePath) {
-                $data['image'] = $imagePath;
             }
         }
         $product->update($data);

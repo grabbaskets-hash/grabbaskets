@@ -104,6 +104,17 @@ class Product extends Model
                 return '/images/' . $cleanPath;
             }
             
+            // Check if it's a cloud storage path (products/ folder for new uploads)
+            if (strpos($imagePath, 'products/') === 0) {
+                // For production, use Storage::url() to get cloud URL
+                if (app()->environment('production')) {
+                    return Storage::url($imagePath);
+                }
+                
+                // For local development, fallback to storage path
+                return '/storage/' . $imagePath;
+            }
+            
             // For all other cases, use storage path
             if (app()->environment('production')) {
                 // Use cloud storage URL for production
