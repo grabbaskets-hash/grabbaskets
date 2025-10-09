@@ -1966,8 +1966,9 @@ li a{
             <div class="shelf-item">
               <div class="card product-card h-100 border-danger">
                 <img
-                  src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                  class="card-img-top" alt="{{ $product->name }}">
+                  src="{{ $product->image_url }}"
+                  class="card-img-top" alt="{{ $product->name }}"
+                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-danger">Flash Sale! {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2010,8 +2011,9 @@ li a{
             <div class="shelf-item">
               <div class="card product-card h-100">
                 <img
-                  src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                  class="card-img-top" alt="{{ $product->name }}">
+                  src="{{ $product->image_url }}"
+                  class="card-img-top" alt="{{ $product->name }}"
+                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-muted">Up to {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2052,8 +2054,9 @@ li a{
             <div class="shelf-item">
               <div class="card product-card h-100">
                 <img
-                  src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                  class="card-img-top" alt="{{ $product->name }}">
+                  src="{{ $product->image_url }}"
+                  class="card-img-top" alt="{{ $product->name }}"
+                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                 <div class="card-body d-flex flex-column">
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
                   <div class="mt-auto">
@@ -2094,8 +2097,9 @@ li a{
             <div class="shelf-item">
               <div class="card product-card h-100">
                 <img
-                  src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                  class="card-img-top" alt="{{ $product->name }}">
+                  src="{{ $product->image_url }}"
+                  class="card-img-top" alt="{{ $product->name }}"
+                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-success">Free Delivery</div>
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2154,8 +2158,9 @@ li a{
 
           <a href="{{ route('product.details', $product->id) }}" style="text-decoration: none">
             <div class="image-box">
-              <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/200' }}"
-                alt="{{ $product->name }}">
+              <img src="{{ $product->image_url }}"
+                alt="{{ $product->name }}"
+                onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
             </div>
 
             <h6 class="mt-2">{{ \Illuminate\Support\Str::limit($product->name, 30) }}</h6>

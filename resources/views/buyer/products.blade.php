@@ -275,9 +275,12 @@
                                 <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                                     <div class="flex-shrink-0 w-100 h-50 rounded-lg overflow-hidden border">
                                         @if ($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover">
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover"
+                                                 onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                                         @else
-                                            <div class="w-100 h-100 bg-gray-200"></div>
+                                            <div class="w-100 h-100 bg-gray-200 d-flex align-items-center justify-content-center">
+                                                <span class="text-muted">No Image</span>
+                                            </div>
                                         @endif
                                     </div>
                                     <div class="flex-grow-1 ms-2">
@@ -360,10 +363,13 @@
                             <!-- Product Image -->
                             <div class="flex-shrink-0 w-32 h-50 rounded-lg overflow-hidden border">
                                 @if ($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="w-full h-full object-cover">
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                        class="w-full h-full object-cover"
+                                        onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                                 @else
-                                    <div class="w-full h-full bg-gray-200"></div>
+                                    <div class="w-full h-full bg-gray-200 d-flex align-items-center justify-content-center">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
                                 @endif
                             </div>
 
