@@ -76,6 +76,11 @@ class Product extends Model
 
         $imagePath = $this->image;
         
+        // Check if it's already a direct image path (SRM images in images/ folder)
+        if (strpos($imagePath, 'images/') === 0) {
+            return asset($imagePath);
+        }
+        
         // In cloud environment, try R2 first (safer approach)
         try {
             $bucket = env('AWS_BUCKET');
