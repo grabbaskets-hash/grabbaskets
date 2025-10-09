@@ -2,7 +2,6 @@
 
 @extends('layouts.app')
 
-@section('content')
 <style>
 body {
     background: linear-gradient(135deg, #e0f7fa, #80deea);
