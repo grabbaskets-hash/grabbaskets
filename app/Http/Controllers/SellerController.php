@@ -123,6 +123,11 @@ class SellerController extends Controller {
     }
     public function dashboard()
     {
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login to access seller dashboard.');
+        }
+
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', Auth::id())
             ->latest()
