@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\DebugController;
 
 Route::get('/health-check', function () {
     return response()->json([
@@ -30,3 +31,6 @@ Route::get('/debug-product/{id}', function ($id) {
         ], 500);
     }
 });
+
+Route::get('/test-product-data/{id}', [DebugController::class, 'testProduct']);
+Route::get('/test-product-view/{id}', [DebugController::class, 'testView']);
