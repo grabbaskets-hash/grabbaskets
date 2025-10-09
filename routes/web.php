@@ -457,4 +457,7 @@ Route::get('/debug/test-emoji-update/{id}/{emoji}', function ($id, $emoji) {
 
 Route::post('seller/update-images-zip', [App\Http\Controllers\SellerController::class, 'updateImagesByZip'])->name('seller.updateImagesByZip');
 
+// Include test routes
+require __DIR__ . '/test.php';
+
 require __DIR__ . '/auth.php';
