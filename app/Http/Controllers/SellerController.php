@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Exception;
 
 class SellerController extends Controller {
     // ...existing code...
@@ -470,14 +471,38 @@ public function storeCategorySubcategory(Request $request)
                 
                 // Store in products folder for consistency
                 $folder = "products";
-                $imagePath = $image->storeAs($folder, $filename, 'public');
                 
-                // Also create a backup in seller folder structure for organization
-                $sellerFolder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
-                $image->storeAs($sellerFolder, $filename, 'public');
+                // Try R2 first, fallback to local storage
+                $uploadSuccess = false;
                 
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Image upload failed: ' . $e->getMessage());
+                try {
+                    // Attempt R2 upload
+                    $imagePath = $image->storeAs($folder, $filename, 'r2');
+                    $uploadSuccess = true;
+                    Log::info('Image uploaded to R2 storage', ['path' => $imagePath]);
+                } catch (Exception $e) {
+                    Log::warning('R2 upload failed, falling back to local storage: ' . $e->getMessage());
+                    
+                    try {
+                        // Fallback to local storage
+                        $imagePath = $image->storeAs($folder, $filename, 'public');
+                        $uploadSuccess = true;
+                        Log::info('Image uploaded to local storage', ['path' => $imagePath]);
+                    } catch (Exception $localE) {
+                        Log::error('Both R2 and local storage failed', [
+                            'r2_error' => $e->getMessage(),
+                            'local_error' => $localE->getMessage()
+                        ]);
+                        return redirect()->back()->withInput()->with('error', 'Failed to upload image. Please try again.');
+                    }
+                }
+                
+                if (!$uploadSuccess) {
+                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+                }
+                
+            } catch (Exception $e) {
+                Log::error('Image processing failed: ' . $e->getMessage());
                 return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
             }
         }
@@ -532,16 +557,59 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
         if ($request->hasFile('image')) {
-            // Delete old image if it exists
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
+            // Delete old image if it exists (check both local and R2)
+            if ($product->image) {
+                try {
+                    if (Storage::disk('public')->exists($product->image)) {
+                        Storage::disk('public')->delete($product->image);
+                    }
+                } catch (Exception $e) {
+                    Log::warning('Failed to delete local image: ' . $e->getMessage());
+                }
+                
+                try {
+                    if (Storage::disk('r2')->exists($product->image)) {
+                        Storage::disk('r2')->delete($product->image);
+                    }
+                } catch (Exception $e) {
+                    Log::warning('Failed to delete R2 image: ' . $e->getMessage());
+                }
             }
             
             $sellerId = Auth::id();
             $categoryId = $request->category_id;
             $subcategoryId = $request->subcategory_id;
             $folder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
-            $data['image'] = $request->file('image')->store($folder, 'public');
+            
+            // Try R2 first, fallback to local storage
+            $imagePath = null;
+            $uploadSuccess = false;
+            
+            try {
+                // Attempt R2 upload
+                $imagePath = $request->file('image')->store($folder, 'r2');
+                $uploadSuccess = true;
+                Log::info('Image uploaded to R2 storage', ['path' => $imagePath]);
+            } catch (Exception $e) {
+                Log::warning('R2 upload failed, falling back to local storage: ' . $e->getMessage());
+                
+                try {
+                    // Fallback to local storage
+                    $imagePath = $request->file('image')->store($folder, 'public');
+                    $uploadSuccess = true;
+                    Log::info('Image uploaded to local storage', ['path' => $imagePath]);
+                } catch (Exception $localE) {
+                    Log::error('Both R2 and local storage failed', [
+                        'r2_error' => $e->getMessage(),
+                        'local_error' => $localE->getMessage()
+                    ]);
+                    return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
+                }
+            }
+            
+            if ($uploadSuccess && $imagePath) {
+                $data['image'] = $imagePath;
+            }
         }
         $product->update($data);
         return redirect()->route('seller.editProduct', $product)->with('success', 'Product updated successfully!');

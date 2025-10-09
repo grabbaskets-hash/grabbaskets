@@ -133,24 +133,7 @@
         
         @if($product->image)
             <div class="mt-4">
-                @php
-                    $imagePath = $product->image;
-                    $imageUrl = null;
-                    
-                    // Try different image paths
-                    if (file_exists(public_path('storage/' . $imagePath))) {
-                        $imageUrl = asset('storage/' . $imagePath);
-                    } elseif (file_exists(public_path($imagePath))) {
-                        $imageUrl = asset($imagePath);
-                    } elseif (file_exists(public_path('images/' . basename($imagePath)))) {
-                        $imageUrl = asset('images/' . basename($imagePath));
-                    } else {
-                        // Fallback - try the original path anyway
-                        $imageUrl = asset('storage/' . $imagePath);
-                    }
-                @endphp
-                
-                <img src="{{ $imageUrl }}" 
+                <img src="{{ $product->image_url }}" 
                      alt="{{ $product->name }}" 
                      style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
