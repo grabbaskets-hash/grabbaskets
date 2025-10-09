@@ -1968,7 +1968,7 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-danger">Flash Sale! {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2013,7 +2013,7 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-muted">Up to {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2056,7 +2056,7 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
                 <div class="card-body d-flex flex-column">
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
                   <div class="mt-auto">
@@ -2099,7 +2099,7 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-success">Free Delivery</div>
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2159,7 +2159,7 @@ li a{
                        class="card-img-top" 
                        alt="{{ $product->name }}"
                        style="height: 250px; object-fit: cover;"
-                       onerror="this.src='https://via.placeholder.com/300x250?text={{ urlencode($categoryName) }}'">
+                       onerror="this.src='https://picsum.photos/300/250?grayscale&text={{ urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName)) }}'">>
                   <div class="card-body d-flex flex-column">
                     <h6 class="card-title fw-bold">{{ \Illuminate\Support\Str::limit($product->name, 60) }}</h6>
                     <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($product->description, 100) }}</p>
@@ -2241,7 +2241,7 @@ li a{
                     alt="{{ $product->name }}"
                     class="img-fluid rounded"
                     style="height: 200px; width: 100%; object-fit: cover;"
-                    onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                    onerror="this.src='https://picsum.photos/200/200?grayscale'">>
                 </div>
 
                 <div class="card-body text-center">
@@ -2460,8 +2460,19 @@ li a{
         if (preferredVoice) utterance.voice = preferredVoice;
         showEnhancedVoiceNotification(welcomeMessage, gender);
         utterance.onend = function() { };
-        utterance.onerror = function(event) { console.error('Speech error:', event.error); };
-        speechSynthesis.speak(utterance);
+        utterance.onerror = function(event) { 
+          // Silently handle speech errors to avoid console spam
+          if (event.error !== 'not-allowed') {
+            console.log('Speech synthesis not available:', event.error); 
+          }
+        };
+        
+        // Only attempt speech if it's allowed
+        try {
+          speechSynthesis.speak(utterance);
+        } catch (error) {
+          console.log('Speech synthesis not supported or not allowed');
+        }
       }
     }
     function showEnhancedVoiceNotification(message, gender) {
@@ -2554,6 +2565,19 @@ li a{
 
     // Handle logout forms
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Bootstrap carousel properly
+      if (typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
+        const carouselElement = document.getElementById('heroCarousel');
+        if (carouselElement) {
+          new bootstrap.Carousel(carouselElement, {
+            keyboard: true,
+            pause: 'hover',
+            wrap: true,
+            interval: 5000
+          });
+        }
+      }
+
       const logoutForms = document.querySelectorAll('form[action*="logout"]');
       logoutForms.forEach(function(form) {
         form.addEventListener('submit', function(e) {
