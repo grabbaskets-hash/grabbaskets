@@ -110,10 +110,58 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
         <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Grabbasket Logo">
         <p>Welcome to <strong>Grabbasket</strong>!<br>
            Edit your product details and keep your inventory up to date.</p>
-        @if($product->image && file_exists(public_path('storage/'.$product->image)))
-            <div class="mt-4">
-                <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;">
-                <div class="text-white small mt-2">Current Product Image</div>
+        
+        @if($product->image)
+            @php
+                // Check multiple possible image paths
+                $imagePath = $product->image;
+                $fullStoragePath = public_path('storage/' . $imagePath);
+                $imageExists = file_exists($fullStoragePath);
+                
+                // If the image doesn't exist in the expected location, try alternative paths
+                if (!$imageExists) {
+                    // Try without storage prefix (for old images that might include full path)
+                    $alternativePath = str_replace('storage/', '', $imagePath);
+                    $fullAlternativePath = public_path('storage/' . $alternativePath);
+                    if (file_exists($fullAlternativePath)) {
+                        $imagePath = $alternativePath;
+                        $imageExists = true;
+                    }
+                    
+                    // Try images folder (for very old images)
+                    if (!$imageExists) {
+                        $oldImagePath = public_path('images/' . basename($imagePath));
+                        if (file_exists($oldImagePath)) {
+                            $imagePath = 'images/' . basename($imagePath);
+                            $imageExists = true;
+                        }
+                    }
+                }
+            @endphp
+            
+            @if($imageExists)
+                <div class="mt-4">
+                    <img src="{{ asset('storage/' . $imagePath) }}" 
+                         alt="{{ $product->name }}" 
+                         style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div style="display: none; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem; margin-top: 10px;">
+                        <i class="fas fa-image" style="font-size: 2rem; opacity: 0.5;"></i>
+                        <div class="text-white small mt-2">Image not found</div>
+                    </div>
+                    <div class="text-white small mt-2">Current Product Image</div>
+                </div>
+            @else
+                <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
+                    <i class="fas fa-image" style="font-size: 2rem; opacity: 0.5;"></i>
+                    <div class="text-white small mt-2">No image uploaded</div>
+                    <div class="text-white small" style="opacity: 0.7;">Path: {{ $product->image }}</div>
+                </div>
+            @endif
+        @else
+            <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
+                <i class="fas fa-upload" style="font-size: 2rem; opacity: 0.5;"></i>
+                <div class="text-white small mt-2">Upload an image for this product</div>
             </div>
         @endif
     </div>
@@ -182,8 +230,15 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 </div>
                 <div class="col-md-6">
                     <label for="image">Product Image</label>
-                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
                     @error('image') <div class="text-danger">{{ $message }}</div> @enderror
+                    <small class="text-muted">Choose a new image to replace the current one. Max size: 2MB</small>
+                    
+                    <!-- Image Preview -->
+                    <div id="imagePreview" style="display: none; margin-top: 10px;">
+                        <img id="previewImg" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
+                        <div><small class="text-muted">New image preview</small></div>
+                    </div>
                 </div>
             </div>
             <div class="btn-horizontal-group">
@@ -197,6 +252,7 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
 document.addEventListener('DOMContentLoaded', function () {
     const categorySelect = document.getElementById('category_id');
     const subcategorySelect = document.getElementById('subcategory_id');
+    
     function filterSubcategories(catId) {
         let hasAny = false;
         for (let i = 0; i < subcategorySelect.options.length; i++) {
@@ -211,36 +267,31 @@ document.addEventListener('DOMContentLoaded', function () {
             subcategorySelect.selectedIndex = 0;
         }
     }
+    
     categorySelect.addEventListener('change', function () {
         filterSubcategories(this.value);
     });
+    
     filterSubcategories(categorySelect.value);
 });
-</script>
-        </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const categorySelect = document.getElementById('category_id');
-    const subcategorySelect = document.getElementById('subcategory_id');
-    function filterSubcategories(catId) {
-        let hasAny = false;
-        for (let i = 0; i < subcategorySelect.options.length; i++) {
-            const opt = subcategorySelect.options[i];
-            const match = String(opt.dataset.categoryId) === String(catId);
-            opt.hidden = !match;
-            opt.disabled = !match;
-            if (match) hasAny = true;
-        }
-        subcategorySelect.disabled = !catId || !hasAny;
-        if (!catId || !subcategorySelect.selectedOptions[0] || subcategorySelect.selectedOptions[0].disabled) {
-            subcategorySelect.selectedIndex = 0;
-        }
+
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
     }
-    categorySelect.addEventListener('change', function () {
-        filterSubcategories(this.value);
-    });
-    filterSubcategories(categorySelect.value);
-});
+}
 </script>
 @endsection
