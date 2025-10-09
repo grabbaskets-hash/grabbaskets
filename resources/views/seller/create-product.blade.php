@@ -167,7 +167,8 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                 <div>
                     <h6 class="mb-2 text-primary">📝 Product Upload Guidelines</h6>
                     <ul class="mb-0 small text-dark" style="padding-left: 1rem;">
-                        <li><strong>Images:</strong> Upload high-quality images (400x400px+, max 2MB, JPEG/PNG)</li>
+                        <li><strong>Images:</strong> Stored securely in database (cloud-safe, no file system issues)</li>
+                        <li><strong>Size/Format:</strong> Max 2MB, JPEG/PNG/JPG/GIF, 400x400px+ recommended</li>
                         <li><strong>Required:</strong> All fields marked with * must be completed</li>
                         <li><strong>Categories:</strong> Select category first, then matching subcategory</li>
                         <li><strong>Success:</strong> You'll see a confirmation message after successful upload</li>
@@ -267,13 +268,13 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
                     <div class="mt-1">
                         <small class="text-muted">
                             <i class="bi bi-info-circle"></i> 
-                            Max size: 2MB | Formats: JPEG, PNG, JPG, GIF | Recommended: 400x400px or larger
+                            Max size: 2MB | Formats: JPEG, PNG, JPG, GIF | <strong>Stored in database (cloud-safe)</strong>
                         </small>
                     </div>
                     <div id="imagePreview" class="mt-2" style="display: none;">
                         <img id="preview" src="" alt="Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
                         <div class="mt-1">
-                            <small class="text-success"><i class="bi bi-check-circle"></i> Image ready for upload</small>
+                            <small class="text-success"><i class="bi bi-check-circle"></i> Image ready for database storage</small>
                         </div>
                     </div>
                     <div id="uploadError" class="mt-1" style="display: none;">

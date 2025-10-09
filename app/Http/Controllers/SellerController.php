@@ -455,44 +455,23 @@ public function storeCategorySubcategory(Request $request)
             'gift_option' => 'required|in:yes,no',
             'stock' => 'required|integer|min:0',
         ]);
-        $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
-        $imagePath = null;
         
-        if ($request->hasFile('image')) {
-            try {
-                $image = $request->file('image');
-                $sellerId = Auth::id();
-                $categoryId = $request->category_id;
-                $subcategoryId = $request->subcategory_id;
-                
-                // Create unique filename
-                $extension = $image->getClientOriginalExtension();
-                $filename = $unique_id . '_' . time() . '.' . $extension;
-                
-                // Store in products folder for consistency
-                $folder = "products";
-                
-                // Simplified upload for cloud compatibility
-                try {
-                    $imagePath = $image->storeAs($folder, $filename, 'public');
-                    Log::info('Image uploaded to public storage', ['path' => $imagePath]);
-                } catch (Exception $e) {
-                    Log::error('Image upload failed', ['error' => $e->getMessage()]);
-                    return redirect()->back()->withInput()->with('error', 'Failed to upload image. Please try again.');
-                }
-                
-            } catch (Exception $e) {
-                Log::error('Image processing failed: ' . $e->getMessage());
-                return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
-            }
-        }
+        // Use database storage method
+        return $this->storeProductWithDatabaseImage($request);
+    }
+
+    // New method for database image storage
+    private function storeProductWithDatabaseImage(Request $request)
+    {
+        $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
+        
+        // Create the product first
         $product = Product::create([
             'name' => $request->name,
             'unique_id' => $unique_id,
             'category_id' => $request->category_id,
             'subcategory_id' => $request->subcategory_id,
             'seller_id' => Auth::id(),
-            'image' => $imagePath,
             'description' => $request->description,
             'price' => $request->price,
             'discount' => $request->discount ?? 0,
@@ -501,9 +480,33 @@ public function storeCategorySubcategory(Request $request)
             'stock' => $request->stock,
         ]);
         
+        $imageStored = false;
+        
+        // Handle image upload to database
+        if ($request->hasFile('image')) {
+            try {
+                $image = $request->file('image');
+                $imageStored = $product->storeImageInDatabase($image);
+                
+                if ($imageStored) {
+                    Log::info('Image stored in database', [
+                        'product_id' => $product->id,
+                        'size' => $image->getSize(),
+                        'mime_type' => $image->getMimeType()
+                    ]);
+                } else {
+                    Log::error('Failed to store image in database', ['product_id' => $product->id]);
+                }
+                
+            } catch (Exception $e) {
+                Log::error('Image processing failed: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+            }
+        }
+        
         $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
-        if ($imagePath) {
-            $successMessage .= " Image uploaded and saved.";
+        if ($imageStored) {
+            $successMessage .= " Image stored in database.";
         }
         
         return redirect()->route('seller.dashboard')->with('success', $successMessage);
