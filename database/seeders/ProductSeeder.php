@@ -94,7 +94,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 5,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Samsung Galaxy S24 Ultra',
@@ -108,7 +108,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 8,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'OnePlus 12',
@@ -122,7 +122,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 199,
                 'discount' => 12,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',
             ],
             
             // Laptops
@@ -138,7 +138,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 10,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Dell XPS 13',
@@ -152,7 +152,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 499,
                 'discount' => 15,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop',
             ],
 
             // Audio
@@ -168,7 +168,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 20,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'AirPods Pro 2nd Gen',
@@ -182,7 +182,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 8,
-                'image' => 'products/default-electronics.jpg',
+                'image' => 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&h=400&fit=crop',
             ],
         ];
 
@@ -243,7 +243,7 @@ class ProductSeeder extends Seeder
             'gift_option' => 'yes',
             'delivery_charge' => 99,
             'discount' => 25,
-            'image' => 'products/default-fashion.jpg',
+            'image' => 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop',
         ],
         [
             'name' => 'Ralph Lauren Polo Shirt',
@@ -257,7 +257,7 @@ class ProductSeeder extends Seeder
             'gift_option' => 'yes',
             'delivery_charge' => 99,
             'discount' => 15,
-            'image' => 'products/default-fashion.jpg',
+            'image' => 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
         ],
 
         // Women's Fashion (Dresses)
@@ -273,7 +273,7 @@ class ProductSeeder extends Seeder
             'gift_option' => 'yes',
             'delivery_charge' => 99,
             'discount' => 30,
-            'image' => 'products/default-fashion.jpg',
+            'image' => 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=400&fit=crop',
         ],
 
         // Men's Fashion (Shoes)
@@ -289,7 +289,7 @@ class ProductSeeder extends Seeder
             'gift_option' => 'no',
             'delivery_charge' => 199,
             'discount' => 18,
-            'image' => 'products/default-fashion.jpg',
+            'image' => 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=400&fit=crop',
         ],
         [
             'name' => 'Adidas Ultraboost 22',
@@ -303,7 +303,7 @@ class ProductSeeder extends Seeder
             'gift_option' => 'yes',
             'delivery_charge' => 199,
             'discount' => 22,
-            'image' => 'products/default-fashion.jpg',
+            'image' => 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop',
         ],
     ];
 
@@ -339,7 +339,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 12,
-                'image' => 'products/default-home.jpg',
+                'image' => 'https://images.unsplash.com/photo-1558618644-fbd671c999fb?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'KitchenAid Stand Mixer',
@@ -353,7 +353,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 299,
                 'discount' => 8,
-                'image' => 'products/default-home.jpg',
+                'image' => 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Decorative Wall Mirror',
@@ -367,7 +367,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 199,
                 'discount' => 25,
-                'image' => 'products/default-home.jpg',
+                'image' => 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop',
             ],
         ];
 
@@ -403,7 +403,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 49,
                 'discount' => 0,
-                'image' => 'products/default-beauty.jpg',
+                'image' => 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'MAC Ruby Woo Lipstick',
@@ -417,7 +417,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 99,
                 'discount' => 10,
-                'image' => 'products/default-beauty.jpg',
+                'image' => 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400&h=400&fit=crop',
             ],
         ];
 
@@ -453,7 +453,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'no',
                 'delivery_charge' => 499,
                 'discount' => 15,
-                'image' => 'products/default-sports.jpg',
+                'image' => 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Nike Dri-FIT T-Shirt',
@@ -467,7 +467,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 99,
                 'discount' => 20,
-                'image' => 'products/default-sports.jpg',
+                'image' => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
             ],
         ];
 
@@ -503,7 +503,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 0,
-                'image' => 'products/default-books.jpg',
+                'image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Atomic Habits',
@@ -517,7 +517,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 5,
-                'image' => 'products/default-books.jpg',
+                'image' => 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'The Alchemist',
@@ -531,7 +531,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 0,
                 'discount' => 10,
-                'image' => 'products/default-books.jpg',
+                'image' => 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
             ],
         ];
 
@@ -587,7 +587,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'yes',
                 'delivery_charge' => 149,
                 'discount' => 12,
-                'image' => 'products/default-toys.jpg',
+                'image' => 'https://images.unsplash.com/photo-1558060370-d532d3d86191?w=400&h=400&fit=crop',
             ],
             [
                 'name' => 'Multivitamin Tablets',
@@ -601,7 +601,7 @@ class ProductSeeder extends Seeder
                 'gift_option' => 'no',
                 'delivery_charge' => 99,
                 'discount' => 5,
-                'image' => 'products/default-health.jpg',
+                'image' => 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
             ],
         ];
 
