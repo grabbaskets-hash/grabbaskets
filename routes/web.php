@@ -101,6 +101,12 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Test route without middleware
+Route::get('/test-seller-dashboard', function () {
+    $controller = new App\Http\Controllers\SellerController();
+    return $controller->dashboard();
+});
+
 // Verified user routes (buyer + seller)
 Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     // Seller: Category & Subcategory
