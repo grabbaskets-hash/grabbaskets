@@ -66,4 +66,38 @@ class Product extends Model
         }
         return 0;
     }
+
+    // Get the correct image URL (handles both local and R2 storage)
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // First check if it's an R2 URL (if stored in R2)
+        try {
+            if (\Illuminate\Support\Facades\Storage::disk('r2')->exists($this->image)) {
+                $bucket = env('AWS_BUCKET');
+                $endpoint = env('AWS_ENDPOINT');
+                return "{$endpoint}/{$bucket}/{$this->image}";
+            }
+        } catch (\Exception $e) {
+            // R2 not available, continue to local storage
+        }
+
+        // Check local storage paths
+        $imagePath = $this->image;
+        
+        // Try different local storage paths
+        if (file_exists(public_path('storage/' . $imagePath))) {
+            return asset('storage/' . $imagePath);
+        } elseif (file_exists(public_path($imagePath))) {
+            return asset($imagePath);
+        } elseif (file_exists(public_path('images/' . basename($imagePath)))) {
+            return asset('images/' . basename($imagePath));
+        } else {
+            // Fallback - try the original path anyway
+            return asset('storage/' . $imagePath);
+        }
+    }
 }
