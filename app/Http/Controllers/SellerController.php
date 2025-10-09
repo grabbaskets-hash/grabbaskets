@@ -456,14 +456,32 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
         $imagePath = null;
+        
         if ($request->hasFile('image')) {
-            $sellerId = Auth::id();
-            $categoryId = $request->category_id;
-            $subcategoryId = $request->subcategory_id;
-            $folder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
-            $imagePath = $request->file('image')->store($folder, 'public');
+            try {
+                $image = $request->file('image');
+                $sellerId = Auth::id();
+                $categoryId = $request->category_id;
+                $subcategoryId = $request->subcategory_id;
+                
+                // Create unique filename
+                $extension = $image->getClientOriginalExtension();
+                $filename = $unique_id . '_' . time() . '.' . $extension;
+                
+                // Store in products folder for consistency
+                $folder = "products";
+                $imagePath = $image->storeAs($folder, $filename, 'public');
+                
+                // Also create a backup in seller folder structure for organization
+                $sellerFolder = "seller/{$sellerId}/{$categoryId}/{$subcategoryId}";
+                $image->storeAs($sellerFolder, $filename, 'public');
+                
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Image upload failed: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+            }
         }
-        Product::create([
+        $product = Product::create([
             'name' => $request->name,
             'unique_id' => $unique_id,
             'category_id' => $request->category_id,
@@ -477,7 +495,13 @@ public function storeCategorySubcategory(Request $request)
             'gift_option' => $request->gift_option,
             'stock' => $request->stock,
         ]);
-        return redirect()->route('seller.dashboard')->with('success', 'Product added!');
+        
+        $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
+        if ($imagePath) {
+            $successMessage .= " Image uploaded and saved.";
+        }
+        
+        return redirect()->route('seller.dashboard')->with('success', $successMessage);
     }
 
     public function editProduct(Product $product)

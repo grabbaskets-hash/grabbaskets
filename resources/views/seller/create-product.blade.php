@@ -234,8 +234,11 @@ label { font-weight: 600; color: #374151; margin-bottom: 5px; }
 
                 <div class="col-md-6">
                     <label for="image">Product Image</label>
-                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
                     @error('image') <div class="text-danger">{{ $message }}</div> @enderror
+                    <div id="imagePreview" class="mt-2" style="display: none;">
+                        <img id="preview" src="" alt="Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
+                    </div>
                 </div>
 
             </div>
@@ -278,6 +281,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
   filterSubcategories(categorySelect.value);
 });
+
+function previewImage(input) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
 </script>
 
 </body>
