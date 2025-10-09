@@ -149,11 +149,6 @@
                 </a>
             </li>
             <li>
-                <a class="nav-link" href="{{ route('seller.simpleUpload') }}">
-                    <i class="bi bi-upload"></i> Simple Image Upload
-                </a>
-            </li>
-            <li>
                 <a class="nav-link" href="{{ route('seller.bulkImageReupload') }}">
                     <i class="bi bi-images"></i> Bulk Image Re-upload
                 </a>

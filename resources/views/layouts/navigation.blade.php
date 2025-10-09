@@ -54,7 +54,9 @@
                             $emoji = '🧑';
                         }
                     @endphp
-                    <span class="hidden md:inline user-greeting-interactive">Hello, {{ $user->name ?? 'User' }} <span class="greeting-emoji">{{ $emoji }}</span></span>
+                    @if($user)
+                        <span class="hidden md:inline user-greeting-interactive">Hello, {{ $user->name ?? 'User' }} <span class="greeting-emoji">{{ $emoji }}</span></span>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="px-3 py-2 bg-white/10 rounded hover:bg-white/20">Logout</button>
