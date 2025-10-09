@@ -24,40 +24,6 @@ use Illuminate\Http\Request;
 |--------------------------------------------------------------------------
 */
 
-// Health check route
-Route::get('/health', function () {
-    try {
-        $dbConnected = false;
-        $dbError = null;
-        
-        try {
-            DB::connection()->getPdo();
-            $dbConnected = true;
-        } catch (\Exception $e) {
-            $dbError = $e->getMessage();
-        }
-        
-        return response()->json([
-            'status' => 'OK',
-            'timestamp' => now(),
-            'app' => [
-                'env' => config('app.env'),
-                'debug' => config('app.debug'),
-                'url' => config('app.url'),
-            ],
-            'database' => [
-                'connected' => $dbConnected,
-                'connection' => config('database.default'),
-                'error' => $dbError
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'ERROR',
-            'message' => $e->getMessage()
-        ], 500);
-    }
-});
 
 Route::get('/', function () {
     // Simple test first - return basic HTML
@@ -148,40 +114,6 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::post('/seller/product/store', [SellerController::class, 'storeProduct'])->name('seller.storeProduct');
     Route::get('/seller/product/{product}/edit', [SellerController::class, 'editProduct'])->name('seller.editProduct');
     Route::put('/seller/product/{product}', [SellerController::class, 'updateProduct'])->name('seller.updateProduct');
-    Route::get('/seller/product-images', [SellerController::class, 'productImages'])->name('seller.productImages');
-
-    // Bulk Image Re-upload
-    Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
-    Route::post('/seller/bulk-image-upload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
-
-    // Simple Image Upload
-    Route::get('/seller/simple-upload', [SellerController::class, 'showSimpleUpload'])->name('seller.simpleUpload');
-    Route::post('/seller/simple-upload', [SellerController::class, 'processSimpleUpload'])->name('seller.processSimpleUpload');
-
-    // Debug route for testing
-    Route::get('/test-bulk-upload-debug', function() {
-        try {
-            return response()->json([
-                'status' => 'OK',
-                'ziparchive_available' => class_exists('ZipArchive'),
-                'authenticated' => Auth::check(),
-                'user_id' => Auth::id(),
-                'seller_products' => Auth::check() ? \App\Models\Product::where('seller_id', Auth::id())->count() : 0,
-                'categories_available' => \App\Models\Category::count(),
-                'storage_configured' => config('filesystems.default'),
-                'php_version' => PHP_VERSION,
-                'laravel_version' => app()->version()
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'ERROR',
-                'message' => $e->getMessage()
-            ]);
-        }
-    });
-    
-    // Test route for debugging
-    Route::get('/test-bulk-simple', [App\Http\Controllers\TestBulkController::class, 'showBulkTest'])->name('test.bulk');
 
     // Legacy bulk uploads (keep for compatibility)
     Route::post('/seller/bulk-image-upload-legacy', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
