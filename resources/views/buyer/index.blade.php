@@ -214,7 +214,7 @@
                             <span class="discount-badge">{{ $product->discount }}% OFF</span>
                         @endif
 
-                        @if($product->image)
+                        @if($product->image || $product->image_data)
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
                                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                         @else

@@ -2245,7 +2245,7 @@ li a{
         </div>
         <div class="col-md-6 text-center">
           <img
-            src="{{ $lookbookProduct->image ? asset('storage/' . $lookbookProduct->image) : 'https://via.placeholder.com/450' }}"
+            src="{{ ($lookbookProduct->image || $lookbookProduct->image_data) ? $lookbookProduct->image_url : 'https://via.placeholder.com/450' }}"
             alt="{{ $lookbookProduct->name }}" class="img-fluid rounded"
             style="max-height:450px; object-fit:contain; min-height:400px">
         </div>

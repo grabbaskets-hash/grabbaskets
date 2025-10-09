@@ -274,7 +274,7 @@
                                 </form>
                                 <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                                     <div class="flex-shrink-0 w-100 h-50 rounded-lg overflow-hidden border">
-                                        @if ($product->image)
+                                        @if ($product->image || $product->image_data)
                                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover"
                                                  onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                                         @else
@@ -362,7 +362,7 @@
                         <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                             <!-- Product Image -->
                             <div class="flex-shrink-0 w-32 h-50 rounded-lg overflow-hidden border">
-                                @if ($product->image)
+                                @if ($product->image || $product->image_data)
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                                         class="w-full h-full object-cover"
                                         onerror="this.src='https://via.placeholder.com/200?text=No+Image'">

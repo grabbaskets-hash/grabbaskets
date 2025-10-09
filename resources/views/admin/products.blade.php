@@ -222,9 +222,9 @@
                                 <tr>
                                     <td class="fw-bold">{{ $product->id }}</td>
                                     <td>
-                                        @if($product->image)
+                                        @if($product->image || $product->image_data)
                                             <a href="{{ route('product.details', $product->id) }}">
-                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                                                     width="50" class="rounded" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
                                             </a>
                                         @else

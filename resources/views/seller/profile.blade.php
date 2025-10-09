@@ -256,8 +256,8 @@
                   <div class="col-md-6 col-lg-4">
                     <div class="card product-card h-100 shadow-sm">
                       <div class="card-body text-center">
-                        @if($p->image)
-                          <img src="{{ asset('storage/' . $p->image) }}" class="rounded mb-3 border shadow-sm"
+                        @if($p->image || $p->image_data)
+                          <img src="{{ $p->image_url }}" class="rounded mb-3 border shadow-sm"
                             style="width:120px; height:120px; object-fit:cover;" alt="{{ $p->name }}">
                         @else
                           <div class="text-muted fs-1">🖼</div>

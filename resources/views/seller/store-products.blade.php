@@ -157,8 +157,8 @@
                 @foreach($products as $p)
                     <div class="col-sm-6 col-lg-4">
                         <div class="card product-card h-100">
-                            @if($p->image)
-                                <img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" class="card-img-top product-img">
+                            @if($p->image || $p->image_data)
+                                <img src="{{ $p->image_url }}" alt="{{ $p->name }}" class="card-img-top product-img">
                             @endif
                             <div class="card-body">
                                 <h5 class="product-title">{{ $p->name }}</h5>

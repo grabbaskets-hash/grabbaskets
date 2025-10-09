@@ -257,9 +257,9 @@
                         @foreach($products as $p)
                         <tr>
                             <td>
-                                @if($p->image)
+                                @if($p->image || $p->image_data)
                                 <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
-                                    <img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                    <img src="{{ $p->image_url }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                                 </a>
                                 @else
                                 <span class="text-muted small">No Image</span>
