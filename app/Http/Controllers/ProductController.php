@@ -12,7 +12,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            return view('buyer.product-details', ['product' => $product, 'seller' => null, 'reviews' => collect(), 'otherProducts' => collect()]);
+            return view('buyer.product-details-test', ['product' => $product, 'seller' => null, 'reviews' => collect(), 'otherProducts' => collect()]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
