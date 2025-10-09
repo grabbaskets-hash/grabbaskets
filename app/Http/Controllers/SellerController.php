@@ -508,6 +508,11 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
         if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            
             $sellerId = Auth::id();
             $categoryId = $request->category_id;
             $subcategoryId = $request->subcategory_id;
