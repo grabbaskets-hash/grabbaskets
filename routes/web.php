@@ -36,16 +36,14 @@ Route::get('/', function () {
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
             
-            // Get sample products from ALL categories for better showcase
-            $categoryProducts = [];
-            foreach ($categories as $category) {
-                $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            }
-            
-            // Get mixed products for main display
+        // Get sample products from ALL categories for better showcase
+        $categoryProducts = [];
+        foreach ($categories as $category) {
+            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->inRandomOrder()
+                ->take(6) // Increased to show more realistic products
+                ->get();
+        }            // Get mixed products for main display
             $products = \App\Models\Product::inRandomOrder()->paginate(12);
             $trending = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for better showcase
             $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
@@ -71,15 +69,15 @@ Route::get('/', function () {
         foreach ($categories as $category) {
             $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
                 ->inRandomOrder()
-                ->take(3)
+                ->take(6) // Increased to show more realistic products
                 ->get();
         }
         
         // Get mixed products for main display
-        $products = \App\Models\Product::inRandomOrder()->paginate(12);
-        $trending = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for better showcase
+        $products = \App\Models\Product::inRandomOrder()->paginate(15); // Increased for more variety
+        $trending = \App\Models\Product::inRandomOrder()->take(12)->get(); // Increased for better showcase
         $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-        $blogProducts = \App\Models\Product::inRandomOrder()->take(6)->get(); // Increased for variety
+        $blogProducts = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for variety
 
         return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
     } catch (\Exception $e) {
