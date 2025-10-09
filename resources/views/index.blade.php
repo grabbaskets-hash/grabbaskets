@@ -2136,6 +2136,61 @@ li a{
     </div>
   {{-- </section> --}}
 
+  <!-- Products by Category Showcase -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-5">🛍️ Shop by Category</h2>
+      @if(isset($categoryProducts) && !empty($categoryProducts))
+        @foreach($categoryProducts as $categoryName => $products)
+          @if($products->count() > 0)
+          <div class="mb-5">
+            <h3 class="mb-3 text-primary">{{ $categoryName }}</h3>
+            <div class="row g-3">
+              @foreach($products as $product)
+              <div class="col-lg-4 col-md-6">
+                <div class="card product-card h-100 shadow-sm">
+                  <img src="{{ $product->image_url }}" 
+                       class="card-img-top" 
+                       alt="{{ $product->name }}"
+                       style="height: 200px; object-fit: cover;"
+                       onerror="this.src='https://via.placeholder.com/300x200?text={{ urlencode($categoryName) }}'">
+                  <div class="card-body d-flex flex-column">
+                    <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 50) }}</h6>
+                    <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($product->description, 80) }}</p>
+                    <div class="mt-auto">
+                      @if($product->discount > 0)
+                        <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                        <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                        <small class="text-danger">({{ $product->discount }}% off)</small>
+                      @else
+                        <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                      @endif
+                      <div class="mt-2">
+                        <a href="{{ route('product.details', $product->id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        @auth
+                        <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
+                          @csrf
+                          <input type="hidden" name="product_id" value="{{ $product->id }}">
+                          <input type="hidden" name="quantity" value="1">
+                          <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+                        </form>
+                        @else
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login to Buy</a>
+                        @endauth
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              @endforeach
+            </div>
+          </div>
+          @endif
+        @endforeach
+      @endif
+    </div>
+  </section>
+
   <section class="trending my-5" style="margin-left:20px ">
     <h2 class="mb-3 " style="margin-left: 40%">🔥 Trending Items</h2>
     <div class="grid">
