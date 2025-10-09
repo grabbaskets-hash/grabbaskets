@@ -5,17 +5,49 @@ use App\Models\Review;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 class ProductController extends Controller
 {
     public function show($id)
     {
-        $product = Product::with(['category','subcategory'])->findOrFail($id);
-        $seller = Seller::where('id', $product->seller_id)->first();
-        $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
-        $otherProducts = Product::where('seller_id', $product->seller_id)
-            ->where('id', '!=', $product->id)
-            ->latest()->take(8)->get();
-        return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
+        try {
+            // Add debug info
+            Log::info("ProductController::show called with ID: " . $id);
+            
+            $product = Product::with(['category','subcategory'])->findOrFail($id);
+            Log::info("Product found: " . $product->name);
+            
+            $seller = Seller::where('id', $product->seller_id)->first();
+            Log::info("Seller found: " . ($seller ? $seller->name : 'none'));
+            
+            $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
+            Log::info("Reviews found: " . $reviews->count());
+            
+            $otherProducts = Product::where('seller_id', $product->seller_id)
+                ->where('id', '!=', $product->id)
+                ->latest()->take(8)->get();
+            Log::info("Other products found: " . $otherProducts->count());
+            
+            // Test image URL generation
+            $imageUrl = $product->image_url;
+            Log::info("Image URL generated: " . $imageUrl);
+            
+            Log::info("About to render view...");
+            return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
+            
+        } catch (\Exception $e) {
+            Log::error("Error in ProductController::show: " . $e->getMessage());
+            Log::error("File: " . $e->getFile() . " Line: " . $e->getLine());
+            Log::error("Trace: " . $e->getTraceAsString());
+            
+            // Return JSON error for debugging instead of 500 page
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ], 500);
+        }
     }
     public function addReview(Request $request, $id)
     {
