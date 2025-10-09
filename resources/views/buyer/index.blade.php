@@ -215,7 +215,8 @@
                         @endif
 
                         @if($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-img">
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
+                                 onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                         @else
                             <div class="product-img d-flex align-items-center justify-content-center bg-light">
                                 <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>

@@ -318,7 +318,19 @@
     <div class="row g-4 product-section">
       <!-- Image -->
       <div class="col-lg-6 text-center">
-        <img src="{{ asset('storage/' . $product->image) }}" class="product-image img-fluid" alt="{{ $product->name }}">
+        @if($product->image)
+          <img src="{{ $product->image_url }}" class="product-image img-fluid" alt="{{ $product->name }}" 
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div style="display: none; padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
+            <i class="bi bi-image" style="font-size: 3rem;"></i>
+            <p class="mt-2 mb-0">Image not available</p>
+          </div>
+        @else
+          <div style="padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
+            <i class="bi bi-image" style="font-size: 3rem;"></i>
+            <p class="mt-2 mb-0">No image available</p>
+          </div>
+        @endif
       </div>
 
       <!-- Details -->
@@ -475,7 +487,18 @@
       @forelse($otherProducts as $op)
         <div class="col-6 col-md-3">
           <a href="{{ route('product.details', $op->id) }}" class="card h-100 text-decoration-none text-dark">
-            <img src="{{ asset('storage/' . $op->image) }}" class="card-img-top" alt="{{ $op->name }}">
+            @if($op->image)
+              <img src="{{ $op->image_url }}" class="card-img-top" alt="{{ $op->name }}" 
+                   style="height: 200px; object-fit: cover;"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display: none; height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                <i class="bi bi-image" style="font-size: 2rem;"></i>
+              </div>
+            @else
+              <div style="height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                <i class="bi bi-image" style="font-size: 2rem;"></i>
+              </div>
+            @endif
             <div class="card-body text-center">
               <h6>{{ $op->name }}</h6>
               @if($op->discount > 0)
