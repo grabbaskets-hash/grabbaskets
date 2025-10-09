@@ -152,7 +152,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
 
     // Bulk Image Re-upload
     Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
-    Route::post('/seller/bulk-image-reupload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
+    Route::post('/seller/bulk-image-upload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
 
     // Bulk uploads
     Route::post('/seller/bulk-image-upload', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
