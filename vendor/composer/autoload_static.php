@@ -605,6 +605,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Console\\Commands\\TestDirectEmail' => __DIR__ . '/../..' . '/app/Console/Commands/TestDirectEmail.php',
         'App\\Console\\Commands\\TestEmailWithLog' => __DIR__ . '/../..' . '/app/Console/Commands/TestEmailWithLog.php',
         'App\\Console\\Commands\\TestInfobipDirectApi' => __DIR__ . '/../..' . '/app/Console/Commands/TestInfobipDirectApi.php',
+        'App\\Console\\Commands\\TestProductImageGitHubUpload' => __DIR__ . '/../..' . '/app/Console/Commands/TestProductImageGitHubUpload.php',
         'App\\Console\\Commands\\TestPromotionalEmail' => __DIR__ . '/../..' . '/app/Console/Commands/TestPromotionalEmail.php',
         'App\\Console\\Commands\\TestSmsNotifications' => __DIR__ . '/../..' . '/app/Console/Commands/TestSmsNotifications.php',
         'App\\Console\\Commands\\TestSmsWithDemoMode' => __DIR__ . '/../..' . '/app/Console/Commands/TestSmsWithDemoMode.php',

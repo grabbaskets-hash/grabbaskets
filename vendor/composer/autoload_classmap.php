@@ -45,6 +45,7 @@ return array(
     'App\\Console\\Commands\\TestDirectEmail' => $baseDir . '/app/Console/Commands/TestDirectEmail.php',
     'App\\Console\\Commands\\TestEmailWithLog' => $baseDir . '/app/Console/Commands/TestEmailWithLog.php',
     'App\\Console\\Commands\\TestInfobipDirectApi' => $baseDir . '/app/Console/Commands/TestInfobipDirectApi.php',
+    'App\\Console\\Commands\\TestProductImageGitHubUpload' => $baseDir . '/app/Console/Commands/TestProductImageGitHubUpload.php',
     'App\\Console\\Commands\\TestPromotionalEmail' => $baseDir . '/app/Console/Commands/TestPromotionalEmail.php',
     'App\\Console\\Commands\\TestSmsNotifications' => $baseDir . '/app/Console/Commands/TestSmsNotifications.php',
     'App\\Console\\Commands\\TestSmsWithDemoMode' => $baseDir . '/app/Console/Commands/TestSmsWithDemoMode.php',

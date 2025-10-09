@@ -16,8 +16,8 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get or create a seller user
-        $seller = User::first();
+        // Get or create the default seller
+        $seller = User::where('email', 'seller@example.com')->first();
         if (!$seller) {
             $seller = User::create([
                 'name' => 'Default Seller',
@@ -34,31 +34,46 @@ class ProductSeeder extends Seeder
         }
         $sellerId = $seller->id;
 
-        // Electronics Products
+        // Get or create the demo seller
+        $demoSeller = User::where('email', 'demo-seller@example.com')->first();
+        if (!$demoSeller) {
+            $demoSeller = User::create([
+                'name' => 'Demo Seller',
+                'email' => 'demo-seller@example.com',
+                'phone' => '9000000000',
+                'billing_address' => 'Demo Address',
+                'state' => 'Demo State',
+                'city' => 'Demo City',
+                'pincode' => '999999',
+                'role' => 'seller',
+                'sex' => 'male',
+                'password' => bcrypt('password'),
+            ]);
+        }
+        $demoSellerId = $demoSeller->id;
+
+        // Seed products for default seller
         $this->createElectronicsProducts($sellerId);
-        
-        // Fashion Products
         $this->createFashionProducts($sellerId);
-        
-        // Home & Kitchen Products
         $this->createHomeKitchenProducts($sellerId);
-        
-        // Beauty Products
         $this->createBeautyProducts($sellerId);
-        
-        // Sports Products
         $this->createSportsProducts($sellerId);
-        
-        // Books Products
         $this->createBooksProducts($sellerId);
-        
-        // Other Categories
         $this->createOtherProducts($sellerId);
 
-        $this->command->info('Products created successfully!');
+        // Seed demo products for demo seller (with DEMO- prefix for unique_id)
+        $this->createElectronicsProducts($demoSellerId, 'DEMO-');
+        $this->createFashionProducts($demoSellerId, 'DEMO-');
+        $this->createHomeKitchenProducts($demoSellerId, 'DEMO-');
+        $this->createBeautyProducts($demoSellerId, 'DEMO-');
+        $this->createSportsProducts($demoSellerId, 'DEMO-');
+        $this->createBooksProducts($demoSellerId, 'DEMO-');
+        $this->createOtherProducts($demoSellerId, 'DEMO-');
+
+        $this->command->info('Products created successfully for default and demo sellers!');
     }
 
-    private function createElectronicsProducts($sellerId)
+    private function createElectronicsProducts($sellerId, $uniquePrefix = '')
     {
         $electronics = Category::where('name', 'ELECTRONICS')->first();
         $mobileSubcat = Subcategory::where('name', 'Mobile Phones')->first();
@@ -172,125 +187,140 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
             Product::firstOrCreate(
-                ['unique_id' => $product['unique_id']],
-                $product
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
             );
         }
     }
 
-    private function createFashionProducts($sellerId)
+    private function createFashionProducts($sellerId, $uniquePrefix = '')
     {
 
-        $fashion = Category::where('name', 'FASHION & CLOTHING')->first();
-        $menSubcat = Subcategory::where('name', "Men's Clothing")->first();
-        $womenSubcat = Subcategory::where('name', "Women's Clothing")->first();
-        $footwearSubcat = Subcategory::where('name', 'Footwear')->first();
+        $mensFashion = Category::where('name', "MEN'S FASHION")->first();
+        $womensFashion = Category::where('name', "WOMEN'S FASHION")->first();
+        $menSubcat = Subcategory::where('name', "Men's Shirts")->first();
+        $womenSubcat = Subcategory::where('name', "Women's Dresses")->first();
+        $footwearSubcat = Subcategory::where('name', "Men's Shoes")->first();
 
-        if (!$fashion) {
-            echo "[ERROR] Category 'FASHION & CLOTHING' not found. Please check CategorySeeder.\n";
+        if (!$mensFashion) {
+            echo "[ERROR] Category 'MEN'S FASHION' not found. Please check CategorySeeder.\n";
+            return;
+        }
+        if (!$womensFashion) {
+            echo "[ERROR] Category 'WOMEN'S FASHION' not found. Please check CategorySeeder.\n";
             return;
         }
         if (!$menSubcat) {
-            echo "[ERROR] Subcategory 'Men's Clothing' not found. Please check SubcategorySeeder.\n";
+            echo "[ERROR] Subcategory 'Men's Shirts' not found. Please check SubcategorySeeder.\n";
             return;
         }
         if (!$womenSubcat) {
-            echo "[ERROR] Subcategory 'Women's Clothing' not found. Please check SubcategorySeeder.\n";
+            echo "[ERROR] Subcategory 'Women's Dresses' not found. Please check SubcategorySeeder.\n";
             return;
         }
         if (!$footwearSubcat) {
-            echo "[ERROR] Subcategory 'Footwear' not found. Please check SubcategorySeeder.\n";
+            echo "[ERROR] Subcategory 'Men's Shoes' not found. Please check SubcategorySeeder.\n";
             return;
         }
 
     $products = [
-            // Men's Clothing
-            [
-                'name' => 'Levi\'s 501 Original Jeans',
-                'unique_id' => 'LJ1',
-                'description' => 'Classic straight-leg jeans in premium denim',
-                'price' => 4999.00,
-                'stock' => 100,
-                'category_id' => $fashion->id,
-                'subcategory_id' => $menSubcat->id,
-                'seller_id' => $sellerId,
-                'gift_option' => 'yes',
-                'delivery_charge' => 99,
-                'discount' => 25,
-                'image' => 'products/default-fashion.jpg',
-            ],
-            [
-                'name' => 'Ralph Lauren Polo Shirt',
-                'unique_id' => 'RL1',
-                'description' => 'Classic cotton polo shirt with iconic logo',
-                'price' => 3499.00,
-                'stock' => 80,
-                'category_id' => $fashion->id,
-                'subcategory_id' => $menSubcat->id,
-                'seller_id' => $sellerId,
-                'gift_option' => 'yes',
-                'delivery_charge' => 99,
-                'discount' => 15,
-                'image' => 'products/default-fashion.jpg',
-            ],
+        // Men's Fashion (Shirts)
+        [
+            'name' => "Levi's 501 Original Jeans",
+            'unique_id' => 'LJ1',
+            'description' => 'Classic straight-leg jeans in premium denim',
+            'price' => 4999.00,
+            'stock' => 100,
+            'category_id' => $mensFashion->id,
+            'subcategory_id' => $menSubcat->id,
+            'seller_id' => $sellerId,
+            'gift_option' => 'yes',
+            'delivery_charge' => 99,
+            'discount' => 25,
+            'image' => 'products/default-fashion.jpg',
+        ],
+        [
+            'name' => 'Ralph Lauren Polo Shirt',
+            'unique_id' => 'RL1',
+            'description' => 'Classic cotton polo shirt with iconic logo',
+            'price' => 3499.00,
+            'stock' => 80,
+            'category_id' => $mensFashion->id,
+            'subcategory_id' => $menSubcat->id,
+            'seller_id' => $sellerId,
+            'gift_option' => 'yes',
+            'delivery_charge' => 99,
+            'discount' => 15,
+            'image' => 'products/default-fashion.jpg',
+        ],
 
-            // Women's Clothing
-            [
-                'name' => 'Zara Floral Dress',
-                'unique_id' => 'ZD1',
-                'description' => 'Elegant floral print dress perfect for any occasion',
-                'price' => 2999.00,
-                'stock' => 60,
-                'category_id' => $fashion->id,
-                'subcategory_id' => $womenSubcat->id,
-                'seller_id' => $sellerId,
-                'gift_option' => 'yes',
-                'delivery_charge' => 99,
-                'discount' => 30,
-                'image' => 'products/default-fashion.jpg',
-            ],
+        // Women's Fashion (Dresses)
+        [
+            'name' => 'Zara Floral Dress',
+            'unique_id' => 'ZD1',
+            'description' => 'Elegant floral print dress perfect for any occasion',
+            'price' => 2999.00,
+            'stock' => 60,
+            'category_id' => $womensFashion->id,
+            'subcategory_id' => $womenSubcat->id,
+            'seller_id' => $sellerId,
+            'gift_option' => 'yes',
+            'delivery_charge' => 99,
+            'discount' => 30,
+            'image' => 'products/default-fashion.jpg',
+        ],
 
-            // Footwear
-            [
-                'name' => 'Nike Air Jordan 1',
-                'unique_id' => 'NJ1',
-                'description' => 'Iconic basketball shoes with premium leather construction',
-                'price' => 12995.00,
-                'stock' => 45,
-                'category_id' => $fashion->id,
-                'subcategory_id' => $footwearSubcat->id,
-                'seller_id' => $sellerId,
-                'gift_option' => 'no',
-                'delivery_charge' => 199,
-                'discount' => 18,
-                'image' => 'products/default-fashion.jpg',
-            ],
-            [
-                'name' => 'Adidas Ultraboost 22',
-                'unique_id' => 'AU1',
-                'description' => 'Premium running shoes with responsive cushioning',
-                'price' => 16999.00,
-                'stock' => 35,
-                'category_id' => $fashion->id,
-                'subcategory_id' => $footwearSubcat->id,
-                'seller_id' => $sellerId,
-                'gift_option' => 'yes',
-                'delivery_charge' => 199,
-                'discount' => 22,
-                'image' => 'products/default-fashion.jpg',
-            ],
-        ];
+        // Men's Fashion (Shoes)
+        [
+            'name' => 'Nike Air Jordan 1',
+            'unique_id' => 'NJ1',
+            'description' => 'Iconic basketball shoes with premium leather construction',
+            'price' => 12995.00,
+            'stock' => 45,
+            'category_id' => $mensFashion->id,
+            'subcategory_id' => $footwearSubcat->id,
+            'seller_id' => $sellerId,
+            'gift_option' => 'no',
+            'delivery_charge' => 199,
+            'discount' => 18,
+            'image' => 'products/default-fashion.jpg',
+        ],
+        [
+            'name' => 'Adidas Ultraboost 22',
+            'unique_id' => 'AU1',
+            'description' => 'Premium running shoes with responsive cushioning',
+            'price' => 16999.00,
+            'stock' => 35,
+            'category_id' => $mensFashion->id,
+            'subcategory_id' => $footwearSubcat->id,
+            'seller_id' => $sellerId,
+            'gift_option' => 'yes',
+            'delivery_charge' => 199,
+            'discount' => 22,
+            'image' => 'products/default-fashion.jpg',
+        ],
+    ];
 
         foreach ($products as $product) {
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
             Product::firstOrCreate(
-                ['unique_id' => $product['unique_id']],
-                $product
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
             );
         }
     }
 
-    private function createHomeKitchenProducts($sellerId)
+    private function createHomeKitchenProducts($sellerId, $uniquePrefix = '')
     {
         $home = Category::where('name', 'HOME & KITCHEN')->first();
         $kitchenSubcat = Subcategory::where('name', 'Kitchen Appliances')->first();
@@ -342,14 +372,19 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
             Product::firstOrCreate(
-                ['unique_id' => $product['unique_id']],
-                $product
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
             );
         }
     }
 
-    private function createBeautyProducts($sellerId)
+    private function createBeautyProducts($sellerId, $uniquePrefix = '')
     {
         $beauty = Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
         $skincareSubcat = Subcategory::where('name', 'Skincare')->first();
@@ -387,14 +422,19 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
             Product::firstOrCreate(
-                ['unique_id' => $product['unique_id']],
-                $product
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
             );
         }
     }
 
-    private function createSportsProducts($sellerId)
+    private function createSportsProducts($sellerId, $uniquePrefix = '')
     {
         $sports = Category::where('name', 'SPORTS & FITNESS')->first();
         $exerciseSubcat = Subcategory::where('name', 'Exercise Equipment')->first();
@@ -432,14 +472,19 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
             Product::firstOrCreate(
-                ['unique_id' => $product['unique_id']],
-                $product
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
             );
         }
     }
 
-    private function createBooksProducts($sellerId)
+    private function createBooksProducts($sellerId, $uniquePrefix = '')
     {
         $books = Category::where('name', 'BOOKS & EDUCATION')->first();
         $fictionSubcat = Subcategory::where('name', 'Fiction')->first();
@@ -491,23 +536,44 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
-                Product::firstOrCreate(
-                    ['unique_id' => $product['unique_id']],
-                    $product
-                );
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
+            Product::firstOrCreate(
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
+            );
         }
     }
 
-    private function createOtherProducts($sellerId)
+    private function createOtherProducts($sellerId, $uniquePrefix = '')
     {
-        // Toys
-        $toys = Category::where('name', 'TOYS & GAMES')->first();
-        $educationalSubcat = Subcategory::where('name', 'Educational Toys')->first();
+    // Toys
+    $toys = Category::where('name', "KIDS & TOYS")->first();
+    $educationalSubcat = Subcategory::where('name', 'Educational Toys')->first();
         
-        // Health
-        $health = Category::where('name', 'HEALTH & WELLNESS')->first();
-        $vitaminsSubcat = Subcategory::where('name', 'Vitamins & Supplements')->first();
+    // Health
+    $health = Category::where('name', 'HEALTH & WELLNESS')->first();
+    $vitaminsSubcat = Subcategory::where('name', 'Vitamins & Supplements')->first();
 
+    if (!$toys) {
+        echo "[ERROR] Category 'KIDS & TOYS' not found. Please check CategorySeeder.\n";
+        return;
+    }
+    if (!$educationalSubcat) {
+        echo "[ERROR] Subcategory 'Educational Toys' not found. Please check SubcategorySeeder.\n";
+        return;
+    }
+    if (!$health) {
+        echo "[ERROR] Category 'HEALTH & WELLNESS' not found. Please check CategorySeeder.\n";
+        return;
+    }
+    if (!$vitaminsSubcat) {
+        echo "[ERROR] Subcategory 'Vitamins & Supplements' not found. Please check SubcategorySeeder.\n";
+        return;
+    }
     $products = [
             [
                 'name' => 'LEGO Creator 3-in-1 Set',
@@ -540,10 +606,15 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
-                Product::firstOrCreate(
-                    ['unique_id' => $product['unique_id']],
-                    $product
-                );
+            $productCopy = $product;
+            if ($uniquePrefix) {
+                $productCopy['unique_id'] = $uniquePrefix . $product['unique_id'];
+            }
+            $productCopy['seller_id'] = $sellerId;
+            Product::firstOrCreate(
+                ['unique_id' => $productCopy['unique_id']],
+                $productCopy
+            );
         }
     }
 }
