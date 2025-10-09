@@ -154,6 +154,10 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
     Route::post('/seller/bulk-image-upload', [SellerController::class, 'processBulkImageReupload'])->name('seller.processBulkImageReupload');
 
+    // Simple Image Upload
+    Route::get('/seller/simple-upload', [SellerController::class, 'showSimpleUpload'])->name('seller.simpleUpload');
+    Route::post('/seller/simple-upload', [SellerController::class, 'processSimpleUpload'])->name('seller.processSimpleUpload');
+
     // Debug route for testing
     Route::get('/test-bulk-upload-debug', function() {
         try {
