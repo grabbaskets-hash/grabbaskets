@@ -493,3 +493,25 @@ require __DIR__ . '/test.php';
 require __DIR__ . '/debug.php';
 
 require __DIR__ . '/auth.php';
+
+// Public debug routes (no authentication required)
+Route::get('/debug-bulk-system', function() {
+    try {
+        return response()->json([
+            'status' => 'OK',
+            'ziparchive_available' => class_exists('ZipArchive'),
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
+            'storage_driver' => config('filesystems.default'),
+            'categories_count' => \App\Models\Category::count(),
+            'products_count' => \App\Models\Product::count(),
+            'auth_middleware' => 'Route requires login to test seller features'
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'ERROR',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
