@@ -67,11 +67,11 @@ class Product extends Model
         return 0;
     }
 
-    // Get the correct image URL (handles both local and R2 storage)
+    // Get the correct image URL (simplified for cloud compatibility)
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
-            return null;
+            return 'https://via.placeholder.com/200?text=No+Image';
         }
 
         $imagePath = $this->image;
@@ -83,34 +83,7 @@ class Product extends Model
             return asset('images/' . $cleanPath);
         }
         
-        // In cloud environment, try R2 first (safer approach)
-        try {
-            $bucket = env('AWS_BUCKET');
-            $endpoint = env('AWS_ENDPOINT');
-            
-            // If we have R2 configuration, assume R2 storage for cloud environment
-            if ($bucket && $endpoint) {
-                return "{$endpoint}/{$bucket}/{$imagePath}";
-            }
-        } catch (\Exception $e) {
-            // R2 not configured, continue to local storage
-        }
-
-        // Fallback to local storage paths (safer file existence checking)
-        try {
-            // Try common storage paths without file_exists() to avoid cloud filesystem issues
-            $storagePaths = [
-                'storage/' . $imagePath,
-                $imagePath,
-                'images/' . basename($imagePath)
-            ];
-            
-            // Return the first logical path (in cloud, we assume storage/ is the standard)
-            return asset('storage/' . $imagePath);
-            
-        } catch (\Exception $e) {
-            // Final fallback
-            return asset('storage/' . $imagePath);
-        }
+        // For all other cases, use storage path
+        return asset('storage/' . $imagePath);
     }
 }
