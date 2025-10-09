@@ -12,8 +12,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            $imageUrl = $product->image_url;  // This might be causing the issue
-            return "Product found: " . $product->name . " | Image URL: " . $imageUrl;
+            return "Product found: " . $product->name . " | Image: " . $product->image;
         } catch (\Exception $e) {
             return "Error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine();
         }
