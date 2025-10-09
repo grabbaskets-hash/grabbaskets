@@ -33,7 +33,24 @@ class ProductController extends Controller
             Log::info("Image URL generated: " . $imageUrl);
             
             Log::info("About to render view...");
-            return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
+            
+            // Temporarily return JSON instead of view to test if view is the issue
+            return response()->json([
+                'success' => true,
+                'product' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image' => $product->image,
+                    'image_url' => $imageUrl,
+                ],
+                'seller' => $seller ? $seller->name : null,
+                'reviews_count' => $reviews->count(),
+                'other_products_count' => $otherProducts->count(),
+                'message' => 'Controller working fine - issue might be in the view'
+            ]);
+            
+            // Original view call (commented out for testing)
+            // return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
             
         } catch (\Exception $e) {
             Log::error("Error in ProductController::show: " . $e->getMessage());
