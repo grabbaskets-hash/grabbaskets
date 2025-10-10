@@ -16,6 +16,11 @@ class ProductController extends Controller
         $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
         $otherProducts = Product::where('seller_id', $product->seller_id)
             ->where('id', '!=', $product->id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
             ->latest()->take(8)->get();
         return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
     }

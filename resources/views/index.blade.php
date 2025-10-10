@@ -1550,6 +1550,109 @@ li a{
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
+
+    /* Zepto-like category strip below banner */
+    .zepto-cat-section {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(35, 47, 62, 0.08);
+      margin-top: -16px;
+      padding: 14px 8px 6px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .zepto-cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px 8px;
+    }
+
+    .zepto-cat-header h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #232f3e;
+      margin: 0;
+    }
+
+    .zepto-cat-track {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 86px;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 6px 36px 10px; /* leave room for nav buttons */
+      scroll-snap-type: x proximity;
+    }
+
+    .zepto-cat-track::-webkit-scrollbar { height: 8px; }
+    .zepto-cat-track::-webkit-scrollbar-thumb { background: rgba(35,47,62,0.18); border-radius: 8px; }
+
+    .zepto-cat-item { scroll-snap-align: start; text-align: center; }
+
+    .zepto-cat-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #232f3e;
+      gap: 6px;
+    }
+
+    .zepto-cat-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#fafafa,#fff);
+      border: 1px solid rgba(139,69,19,0.12);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 14px rgba(35,47,62,0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+
+    .zepto-cat-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .zepto-cat-emoji { font-size: 1.4rem; }
+
+    .zepto-cat-link:hover .zepto-cat-icon { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(35,47,62,0.16); }
+
+    .zepto-cat-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #2c3e50;
+      line-height: 1.1;
+      max-width: 80px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .zepto-cat-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      display: grid;
+      place-items: center;
+      background: #232f3e;
+      color: #ff9900;
+      box-shadow: 0 4px 12px rgba(35,47,62,0.25);
+      z-index: 3;
+    }
+    .zepto-cat-prev { left: 8px; }
+    .zepto-cat-next { right: 8px; }
+
+    @media (min-width: 768px) {
+      .zepto-cat-section { margin-top: -24px; padding: 18px 10px 8px; }
+      .zepto-cat-track { grid-auto-columns: 96px; gap: 12px; }
+      .zepto-cat-icon { width: 72px; height: 72px; }
+      .zepto-cat-name { font-size: 0.82rem; max-width: 92px; }
+    }
   </style>
 </head>
 
@@ -1855,6 +1958,47 @@ li a{
     </div>
   </section>
 
+  <!-- Zepto-like Category Strip (below banner) -->
+  <section class="py-2">
+    <div class="container">
+      <div class="zepto-cat-section" aria-label="Shop by category">
+        <div class="zepto-cat-header">
+          <h2>Shop by category</h2>
+          <a href="{{ route('buyer.dashboard') }}" class="text-decoration-none" style="font-weight:600;color:#8B4513;">View all</a>
+        </div>
+
+        <button class="zepto-cat-nav zepto-cat-prev d-none d-md-grid" type="button" onclick="scrollZeptoCats(-1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <div id="zeptoCatTrack" class="zepto-cat-track">
+          @if(!empty($categories) && $categories->count())
+            @foreach($categories->take(24) as $category)
+              <div class="zepto-cat-item">
+                <a class="zepto-cat-link" href="{{ route('buyer.productsByCategory', $category->id) }}" title="{{ $category->name }}">
+                  <span class="zepto-cat-icon">
+                    @php $cImg = $category->image_url ?? $category->image ?? null; @endphp
+                    @if(!empty($cImg))
+                      <img src="{{ $cImg }}" alt="{{ $category->name }}" onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.classList.remove('d-none');">
+                      <span class="zepto-cat-emoji d-none">{!! $category->emoji ?? '🛍️' !!}</span>
+                    @else
+                      <span class="zepto-cat-emoji">{!! $category->emoji ?? '🛍️' !!}</span>
+                    @endif
+                  </span>
+                  <span class="zepto-cat-name">{{ Str::limit($category->name, 12) }}</span>
+                </a>
+              </div>
+            @endforeach
+          @else
+            <div class="text-center text-muted" style="grid-column:1/-1;padding:10px 0;">No categories available</div>
+          @endif
+        </div>
+        <button class="zepto-cat-nav zepto-cat-next d-none d-md-grid" type="button" onclick="scrollZeptoCats(1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
 
 
   <!-- Promo Highlights -->
@@ -1943,6 +2087,15 @@ li a{
     </div>
   </section>
   
+  <script>
+    function scrollZeptoCats(dir) {
+      const track = document.getElementById('zeptoCatTrack');
+      if (!track) return;
+      const itemWidth = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width : 100;
+      track.scrollBy({ left: dir * (itemWidth * 3), behavior: 'smooth' });
+    }
+  </script>
+
   <!-- Products Section -->
   <section class="products-section">
     <div class="container">
@@ -1950,7 +2103,12 @@ li a{
       $items = ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) ? collect($products->items()) :
       collect($products);
       $flashSale = $items->where('is_flash_sale', true)->take(8);
-      $deals = $items->sortByDesc('discount')->take(12);
+      // Prefer global top deals so SRM-updated products appear here
+      try {
+        $deals = \App\Models\Product::orderByDesc('discount')->take(12)->get();
+      } catch (\Throwable $e) {
+        $deals = $items->sortByDesc('discount')->take(12);
+      }
       $trending = $items->take(12);
       $freeDelivery = $items->filter(fn($p) => (int)($p->delivery_charge ?? 0) === 0)->take(12);
       @endphp
@@ -1968,7 +2126,8 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
+                  data-fallback="{{ asset('images/no-image.png') }}"
+                  onerror="this.src=this.dataset.fallback">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-danger">Flash Sale! {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2013,7 +2172,8 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
+                  data-fallback="{{ asset('images/no-image.png') }}"
+                  onerror="this.src=this.dataset.fallback">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-muted">Up to {{ (int)($product->discount ?? 0) }}% off</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2056,7 +2216,8 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
+                  data-fallback="{{ asset('images/no-image.png') }}"
+                  onerror="this.src=this.dataset.fallback">
                 <div class="card-body d-flex flex-column">
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
                   <div class="mt-auto">
@@ -2099,7 +2260,8 @@ li a{
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
-                  onerror="this.src='https://picsum.photos/200/200?grayscale'">
+                  data-fallback="{{ asset('images/no-image.png') }}"
+                  onerror="this.src=this.dataset.fallback">
                 <div class="card-body d-flex flex-column">
                   <div class="small text-success">Free Delivery</div>
                   <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
@@ -2142,6 +2304,7 @@ li a{
       <div class="text-center mb-5">
         <h2 class="display-4 fw-bold mb-3">🛍️ Shop by Category</h2>
         <p class="lead text-muted">Discover our curated collection of premium products across all categories</p>
+      
       </div>
       @if(isset($categoryProducts) && !empty($categoryProducts))
         @foreach($categoryProducts as $categoryName => $products)
@@ -2155,11 +2318,15 @@ li a{
               @foreach($products as $product)
               <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                 <div class="card product-card h-100 shadow-sm">
+                  @php
+                    $fallbackUrl = 'https://picsum.photos/300/250?grayscale&text=' . urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName));
+                  @endphp
                   <img src="{{ $product->image_url }}" 
                        class="card-img-top" 
                        alt="{{ $product->name }}"
                        style="height: 250px; object-fit: cover;"
-                       onerror="this.src='https://picsum.photos/300/250?grayscale&text={{ urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName)) }}'">>
+                       data-fallback="{{ $fallbackUrl }}"
+                       onerror="this.src=this.dataset.fallback">
                   <div class="card-body d-flex flex-column">
                     <h6 class="card-title fw-bold">{{ \Illuminate\Support\Str::limit($product->name, 60) }}</h6>
                     <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($product->description, 100) }}</p>
@@ -2241,7 +2408,8 @@ li a{
                     alt="{{ $product->name }}"
                     class="img-fluid rounded"
                     style="height: 200px; width: 100%; object-fit: cover;"
-                    onerror="this.src='https://picsum.photos/200/200?grayscale'">>
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.src=this.dataset.fallback">
                 </div>
 
                 <div class="card-body text-center">
