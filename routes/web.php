@@ -36,18 +36,99 @@ Route::get('/', function () {
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
             
-        // Get sample products from ALL categories for better showcase
+        // Get sample products from ALL categories for better showcase - ONLY WITH GOOGLE IMAGES
         $categoryProducts = [];
         foreach ($categories as $category) {
             $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
                 ->inRandomOrder()
                 ->take(6) // Increased to show more realistic products
                 ->get();
-        }            // Get mixed products for main display
-            $products = \App\Models\Product::inRandomOrder()->paginate(12);
-            $trending = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for better showcase
-            $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-            $blogProducts = \App\Models\Product::inRandomOrder()->take(6)->get(); // Increased for variety
+        }
+        
+        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY RELEVANT IMAGES
+        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
+        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
+        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
+        
+        $mixedProducts = collect();
+        
+        // Get products from each category
+        if ($cookingCategory) {
+            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(6)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($cookingProducts);
+        }
+        
+        if ($beautyCategory) {
+            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($beautyProducts);
+        }
+        
+        if ($dentalCategory) {
+            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($dentalProducts);
+        }
+        
+        // Shuffle the mixed products and paginate
+        $shuffledProducts = $mixedProducts->shuffle();
+        $products = new \Illuminate\Pagination\LengthAwarePaginator(
+            $shuffledProducts->forPage(1, 12),
+            $shuffledProducts->count(),
+            12,
+            1,
+            ['path' => request()->url()]
+        );
+            $trending = \App\Models\Product::whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(8)
+                ->get(); // Increased for better showcase
+            $lookbookProduct = \App\Models\Product::whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->first();
+            $blogProducts = \App\Models\Product::whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(6)
+                ->get(); // Increased for variety
 
             return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
         } catch (\Exception $e) {
@@ -64,20 +145,99 @@ Route::get('/', function () {
         // Force fresh data by adding a timestamp parameter that changes the cache key
         $categories = \App\Models\Category::with('subcategories')->get();
         
-        // Get sample products from ALL categories for better showcase
+        // Get sample products from ALL categories for better showcase - ONLY WITH RELEVANT IMAGES
         $categoryProducts = [];
         foreach ($categories as $category) {
             $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
                 ->inRandomOrder()
                 ->take(6) // Increased to show more realistic products
                 ->get();
         }
         
-        // Get mixed products for main display
-        $products = \App\Models\Product::inRandomOrder()->paginate(15); // Increased for more variety
-        $trending = \App\Models\Product::inRandomOrder()->take(12)->get(); // Increased for better showcase
-        $lookbookProduct = \App\Models\Product::inRandomOrder()->first();
-        $blogProducts = \App\Models\Product::inRandomOrder()->take(8)->get(); // Increased for variety
+        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY RELEVANT IMAGES
+        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
+        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
+        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
+        
+        $mixedProducts = collect();
+        
+        // Get products from each category
+        if ($cookingCategory) {
+            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(8)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($cookingProducts);
+        }
+        
+        if ($beautyCategory) {
+            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(4)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($beautyProducts);
+        }
+        
+        if ($dentalCategory) {
+            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+            $mixedProducts = $mixedProducts->merge($dentalProducts);
+        }
+        
+        // Shuffle the mixed products and paginate
+        $shuffledProducts = $mixedProducts->shuffle();
+        $products = new \Illuminate\Pagination\LengthAwarePaginator(
+            $shuffledProducts->forPage(1, 15),
+            $shuffledProducts->count(),
+            15,
+            1,
+            ['path' => request()->url()]
+        );
+        $trending = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->take(12)
+            ->get(); // Increased for better showcase
+        $lookbookProduct = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->first();
+        $blogProducts = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->take(8)
+            ->get(); // Increased for variety
 
         return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
     } catch (\Exception $e) {

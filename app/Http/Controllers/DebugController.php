@@ -20,6 +20,8 @@ class DebugController extends Controller
             $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
             $otherProducts = Product::where('seller_id', $product->seller_id)
                 ->where('id', '!=', $product->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
                 ->latest()->take(8)->get();
             
             // Step 3: Test image URL generation
@@ -60,6 +62,8 @@ class DebugController extends Controller
             $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
             $otherProducts = Product::where('seller_id', $product->seller_id)
                 ->where('id', '!=', $product->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
                 ->latest()->take(8)->get();
             
             // Try to render the actual view
