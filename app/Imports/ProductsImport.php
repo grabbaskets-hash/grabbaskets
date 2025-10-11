@@ -146,12 +146,14 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             'category_id' => 'category_id',
             'categoryid' => 'category_id',
             'cat_id' => 'category_id',
+            'category' => 'category_name',
             'category_name' => 'category_name',
             'categoryname' => 'category_name',
             'cat_name' => 'category_name',
             'subcategory_id' => 'subcategory_id',
             'subcategoryid' => 'subcategory_id',
             'sub_id' => 'subcategory_id',
+            'subcategory' => 'subcategory_name',
             'subcategory_name' => 'subcategory_name',
             'subcategoryname' => 'subcategory_name',
             'sub_name' => 'subcategory_name',
@@ -558,6 +560,25 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             'discount' => 'nullable|numeric|min:0|max:100',
             'delivery_charge' => 'nullable|numeric|min:0',
         ];
+    }
+
+    public function prepareForValidation($data, $index)
+    {
+        // Normalize the column names before validation
+        $normalizedData = [];
+        foreach ($data as $key => $value) {
+            $normalizedKey = $this->normalizeColumnName($key);
+            
+            // Transform data as needed
+            if ($normalizedKey === 'discount' && !empty($value)) {
+                // Remove % sign and convert to number
+                $value = str_replace('%', '', $value);
+                $value = is_numeric($value) ? (float)$value : $value;
+            }
+            
+            $normalizedData[$normalizedKey] = $value;
+        }
+        return $normalizedData;
     }
 
     public function customValidationMessages()
