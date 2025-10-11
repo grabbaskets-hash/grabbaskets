@@ -14,11 +14,11 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Http\Request;
 
 // Admin: Update product seller
 Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
@@ -705,6 +705,58 @@ Route::get('/serve-image/{type}/{filename}', function ($type, $filename) {
         'Cache-Control' => 'public, max-age=86400', // Cache for 1 day
     ]);
 })->name('serve.image');
+
+// Debug: Inspect a product's image resolution details by id or name
+Route::get('/debug/product-image', function (Request $request) {
+    $query = \App\Models\Product::with(['productImages' => function($q){ $q->orderByDesc('is_primary')->orderBy('id'); }]);
+    if ($request->filled('id')) {
+        $query->where('id', $request->id);
+    } elseif ($request->filled('name')) {
+        $query->where('name', 'LIKE', '%' . $request->name . '%');
+    } else {
+        return response()->json(['error' => 'Provide id or name query param'], 400);
+    }
+
+    $product = $query->first();
+    if (!$product) {
+        return response()->json(['error' => 'Product not found'], 404);
+    }
+
+    $details = [
+        'id' => $product->id,
+        'name' => $product->name,
+        'legacy_image_field' => $product->image,
+        'computed_image_url' => $product->image_url,
+        'has_image_data' => (bool) ($product->image_data && $product->image_mime_type),
+        'product_images' => $product->productImages->map(function($img){
+            return [
+                'path' => $img->image_path,
+                'is_primary' => (bool) $img->is_primary,
+                'computed_url' => $img->image_url,
+            ];
+        }),
+        'exists_in_public_disk' => false,
+        'public_disk_path_tested' => null,
+        'r2_candidate_url' => null,
+    ];
+
+    // Check file existence on public disk for legacy path
+    if ($product->image && !str_starts_with($product->image, 'http')) {
+        $imagePath = ltrim($product->image, '/');
+        $details['public_disk_path_tested'] = $imagePath;
+        try {
+            $details['exists_in_public_disk'] = Storage::disk('public')->exists($imagePath);
+        } catch (\Throwable $e) {
+            $details['exists_in_public_disk'] = false;
+        }
+        $r2Base = config('filesystems.disks.r2.url');
+        if (!empty($r2Base)) {
+            $details['r2_candidate_url'] = rtrim($r2Base, '/') . '/' . $imagePath;
+        }
+    }
+
+    return response()->json($details);
+});
 
 // Public test route for simple upload (no auth required)
 Route::get('/test-simple-upload', function() {
