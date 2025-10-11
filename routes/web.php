@@ -28,9 +28,6 @@ use Illuminate\Support\Facades\Response;
 #use Illuminate\Support\Facades\Storage;
 // Universal image serving route for public and R2 disks
 use App\Http\Controllers\ImageServeController;
-Route::get('/serve-image/{disk}/{folder}/{filename}', [ImageServeController::class, 'serve'])
-    ->where(['disk' => 'public|r2', 'folder' => '[^/]+', 'filename' => '.+'])
-    ->name('serve.image');
 
 
 
