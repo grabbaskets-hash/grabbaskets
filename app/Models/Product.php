@@ -129,19 +129,32 @@ class Product extends Model
                 return '/' . $imagePath;
             }
 
-            // Case B: Stored uploads (public disk or R2). In production, always prefer R2 base URL.
+            // Case B: Stored uploads (public disk or R2)
             if (app()->environment('production')) {
+                // First try to use local storage path if it's accessible
+                try {
+                    // Check if file exists locally and use serve route as fallback
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        // Use serve route for reliable image serving
+                        $pathParts = explode('/', $imagePath, 2);
+                        if (count($pathParts) === 2) {
+                            return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
+                        }
+                        // Fallback to standard storage path
+                        return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
+                    }
+                } catch (\Throwable $e) {
+                    // Continue to R2 attempt
+                }
+                
+                // Fallback to R2 URL
                 $r2BaseUrl = config('filesystems.disks.r2.url');
                 if (!empty($r2BaseUrl)) {
                     return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
                 }
-                // Fallback: default disk URL (if configured)
-                try {
-                    return Storage::url($imagePath);
-                } catch (\Throwable $e) {
-                    // Last resort: app URL + storage path
-                    return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
-                }
+                
+                // Last resort: app URL + storage path
+                return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
             }
 
             // Local/dev: serve via storage symlink

@@ -1958,9 +1958,6 @@ li a{
     </div>
   </section>
 
-  {{-- Hide everything below the Shop by category strip as requested --}}
-  @if(false)
-
   <!-- Zepto-like Category Strip (below banner) -->
   <section class="py-2">
     <div class="container">
@@ -2518,10 +2515,6 @@ li a{
   <!-- Chatbot Widget -->
 
   <x-chatbot-widget />
-
-
-
-  @endif
 
   <!-- Premium Footer -->
   <footer class="mt-5" style="background:linear-gradient(135deg,#232f3e 60%,#8B4513 100%);color:#fff;padding:48px 0 24px 0;border-radius:24px 24px 0 0;box-shadow:0 -2px 16px rgba(35,47,62,0.12);">

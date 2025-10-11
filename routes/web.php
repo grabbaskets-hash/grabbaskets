@@ -16,6 +16,8 @@ use App\Http\Controllers\CourierTrackingController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 
 /*
@@ -36,10 +38,11 @@ Route::get('/', function () {
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
             
-        // Get sample products from ALL categories for better showcase - ONLY WITH GOOGLE IMAGES
+        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
         $categoryProducts = [];
         foreach ($categories as $category) {
             $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -50,7 +53,7 @@ Route::get('/', function () {
                 ->get();
         }
         
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY RELEVANT IMAGES
+        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
         $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
         $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
         $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
@@ -60,6 +63,7 @@ Route::get('/', function () {
         // Get products from each category
         if ($cookingCategory) {
             $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -73,6 +77,7 @@ Route::get('/', function () {
         
         if ($beautyCategory) {
             $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -86,6 +91,7 @@ Route::get('/', function () {
         
         if ($dentalCategory) {
             $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -106,7 +112,8 @@ Route::get('/', function () {
             1,
             ['path' => request()->url()]
         );
-            $trending = \App\Models\Product::whereNotNull('image')
+            $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+                ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
                 ->where('image', 'NOT LIKE', '%placeholder%')
@@ -114,14 +121,16 @@ Route::get('/', function () {
                 ->inRandomOrder()
                 ->take(8)
                 ->get(); // Increased for better showcase
-            $lookbookProduct = \App\Models\Product::whereNotNull('image')
+            $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+                ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
                 ->where('image', 'NOT LIKE', '%placeholder%')
                 ->where('image', 'NOT LIKE', '%via.placeholder%')
                 ->inRandomOrder()
                 ->first();
-            $blogProducts = \App\Models\Product::whereNotNull('image')
+            $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+                ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
                 ->where('image', 'NOT LIKE', '%placeholder%')
@@ -145,10 +154,11 @@ Route::get('/', function () {
         // Force fresh data by adding a timestamp parameter that changes the cache key
         $categories = \App\Models\Category::with('subcategories')->get();
         
-        // Get sample products from ALL categories for better showcase - ONLY WITH RELEVANT IMAGES
+        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
         $categoryProducts = [];
         foreach ($categories as $category) {
             $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -159,7 +169,7 @@ Route::get('/', function () {
                 ->get();
         }
         
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY RELEVANT IMAGES
+        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
         $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
         $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
         $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
@@ -169,6 +179,7 @@ Route::get('/', function () {
         // Get products from each category
         if ($cookingCategory) {
             $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -182,6 +193,7 @@ Route::get('/', function () {
         
         if ($beautyCategory) {
             $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -195,6 +207,7 @@ Route::get('/', function () {
         
         if ($dentalCategory) {
             $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
+                ->whereNotNull('seller_id') // Only legitimate seller/admin products
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -215,7 +228,8 @@ Route::get('/', function () {
             1,
             ['path' => request()->url()]
         );
-        $trending = \App\Models\Product::whereNotNull('image')
+        $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+            ->whereNotNull('image')
             ->where('image', '!=', '')
             ->where('image', 'NOT LIKE', '%unsplash%')
             ->where('image', 'NOT LIKE', '%placeholder%')
@@ -223,14 +237,16 @@ Route::get('/', function () {
             ->inRandomOrder()
             ->take(12)
             ->get(); // Increased for better showcase
-        $lookbookProduct = \App\Models\Product::whereNotNull('image')
+        $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+            ->whereNotNull('image')
             ->where('image', '!=', '')
             ->where('image', 'NOT LIKE', '%unsplash%')
             ->where('image', 'NOT LIKE', '%placeholder%')
             ->where('image', 'NOT LIKE', '%via.placeholder%')
             ->inRandomOrder()
             ->first();
-        $blogProducts = \App\Models\Product::whereNotNull('image')
+        $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
+            ->whereNotNull('image')
             ->where('image', '!=', '')
             ->where('image', 'NOT LIKE', '%unsplash%')
             ->where('image', 'NOT LIKE', '%placeholder%')
@@ -648,6 +664,39 @@ Route::get('/debug-bulk-system', function() {
         ], 500);
     }
 });
+
+// Image serving route as fallback for storage symlink issues
+Route::get('/serve-image/{type}/{filename}', function ($type, $filename) {
+    // Validate type (only allow 'products' for security)
+    if ($type !== 'products') {
+        abort(404);
+    }
+    
+    $path = $type . '/' . $filename;
+    
+    // Check if file exists
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+    
+    // Get file contents and mime type
+    $file = Storage::disk('public')->get($path);
+    $fullPath = Storage::disk('public')->path($path);
+    
+    // Detect mime type
+    $mimeType = 'image/jpeg'; // default
+    if (function_exists('mime_content_type')) {
+        $detectedType = mime_content_type($fullPath);
+        if ($detectedType) {
+            $mimeType = $detectedType;
+        }
+    }
+    
+    return Response::make($file, 200, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=86400', // Cache for 1 day
+    ]);
+})->name('serve.image');
 
 // Public test route for simple upload (no auth required)
 Route::get('/test-simple-upload', function() {
