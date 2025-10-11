@@ -246,7 +246,16 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                                 $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
                                 $uniqueName = Str::random(40) . '.' . $extension;
                                 $storagePath = 'products/' . $uniqueName;
-                                if (Storage::put($storagePath, $imageContent)) {
+                                $saved = false;
+                                try {
+                                    $saved = Storage::disk('r2')->put($storagePath, $imageContent);
+                                } catch (\Throwable $e) {
+                                    $saved = false;
+                                }
+                                if (!$saved) {
+                                    $saved = Storage::put($storagePath, $imageContent);
+                                }
+                                if ($saved) {
                                     $zip->close();
                                     return $storagePath;
                                 }

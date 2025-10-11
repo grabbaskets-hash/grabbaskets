@@ -63,8 +63,14 @@ class SellerController extends Controller {
             $uid = isset($data['unique_id']) ? strtolower($data['unique_id']) : null;
             if ($uid && isset($imageMap[$uid])) {
                 $img = $imageMap[$uid];
-                $folder = "seller/{$sellerId}/{$data['category_id']}/{$data['subcategory_id']}";
-                $path = $img->store($folder, 'public');
+                // Store under products/ to keep URL generation consistent
+                $folder = "products/seller/{$sellerId}/{$data['category_id']}/{$data['subcategory_id']}";
+                // Try cloud first, fallback to local/public
+                try {
+                    $path = $img->store($folder, 'r2');
+                } catch (\Throwable $e) {
+                    $path = $img->store($folder, 'public');
+                }
                 $product->image = $path;
                 $updatedImages++;
             }
@@ -97,7 +103,9 @@ class SellerController extends Controller {
             abort(403);
         }
         if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+            // Try delete from both disks, ignore errors
+            try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
+            try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
         }
         $product->delete();
         return redirect()->route('seller.dashboard')->with('success', 'Product deleted!');
@@ -261,10 +269,21 @@ class SellerController extends Controller {
                             $uniqueName = Str::random(40) . '.' . $extension;
                             $storagePath = 'products/' . $uniqueName;
                             
-                            if (Storage::disk('public')->put($storagePath, $imageContent)) {
-                                // Delete old image if exists
-                                if ($product->image && Storage::disk('public')->exists($product->image)) {
-                                    Storage::disk('public')->delete($product->image);
+                            // Try cloud first, fallback to local/public
+                            $saved = false;
+                            try {
+                                $saved = Storage::disk('r2')->put($storagePath, $imageContent);
+                            } catch (\Throwable $e) {
+                                $saved = false;
+                            }
+                            if (!$saved) {
+                                $saved = Storage::disk('public')->put($storagePath, $imageContent);
+                            }
+                            if ($saved) {
+                                // Delete old image if exists (try both disks)
+                                if ($product->image) {
+                                    try { if (Storage::disk('r2')->exists($product->image)) Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
+                                    try { if (Storage::disk('public')->exists($product->image)) Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
                                 }
                                 $product->image = $storagePath;
                                 $product->save();
@@ -487,25 +506,23 @@ public function storeCategorySubcategory(Request $request)
             'stock' => $request->stock,
         ]);
         if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $folder = 'products';
+            
+            // Prefer AWS (R2/S3) storage first
             try {
-                $image = $request->file('image');
-                $githubService = new GitHubImageService();
-                
-                // Try GitHub first
-                $uploadResult = $githubService->uploadImage($image);
-                
-                if ($uploadResult['success']) {
-                    $product->update(['image' => $uploadResult['url']]);
-                    Log::info('Image stored in GitHub successfully', [
-                        'product_id' => $product->id,
-                        'github_url' => $uploadResult['url'],
-                        'filename' => $uploadResult['filename'],
-                        'size' => $image->getSize()
-                    ]);
-                } else {
-                    // Fallback to local storage
-                    Log::warning('GitHub upload failed, falling back to local storage: ' . $uploadResult['error']);
-                    $folder = "products";
+                $path = $image->store($folder, 'r2');
+                $product->update(['image' => $path]);
+                Log::info('Image stored in AWS (r2) successfully', [
+                    'product_id' => $product->id,
+                    'path' => $path,
+                    'size' => $image->getSize()
+                ]);
+            } catch (\Throwable $cloudEx) {
+                Log::warning('Cloud upload failed, falling back to local/public storage', [
+                    'error' => $cloudEx->getMessage()
+                ]);
+                try {
                     $path = $image->store($folder, 'public');
                     $product->update(['image' => $path]);
                     Log::info('Image stored in local/public storage (fallback)', [
@@ -513,21 +530,11 @@ public function storeCategorySubcategory(Request $request)
                         'path' => $path,
                         'size' => $image->getSize()
                     ]);
-                }
-            } catch (Exception $e) {
-                // Fallback to local storage on any exception
-                Log::warning('Image processing exception, falling back to local storage: ' . $e->getMessage());
-                try {
-                    $folder = "products";
-                    $path = $image->store($folder, 'public');
-                    $product->update(['image' => $path]);
-                    Log::info('Image stored in local/public storage (exception fallback)', [
-                        'product_id' => $product->id,
-                        'path' => $path,
-                        'size' => $image->getSize()
+                } catch (\Throwable $localEx) {
+                    Log::error('Both cloud and local storage failed for image upload', [
+                        'cloud_error' => $cloudEx->getMessage(),
+                        'local_error' => $localEx->getMessage(),
                     ]);
-                } catch (Exception $localException) {
-                    Log::error('Both GitHub and local storage failed: ' . $localException->getMessage());
                     return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
                 }
             }
@@ -564,46 +571,33 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
         
-        // Handle image update with GitHub storage (with local fallback)
+        // Handle image update: prefer AWS (r2) storage first with local fallback
         if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $folder = 'products';
             try {
-                $image = $request->file('image');
-                $githubService = new GitHubImageService();
-                
-                // Try GitHub first
-                $uploadResult = $githubService->uploadImage($image);
-                
-                if ($uploadResult['success']) {
-                    $data['image'] = $uploadResult['url'];
-                    Log::info('Product image updated in GitHub successfully', [
-                        'product_id' => $product->id,
-                        'github_url' => $uploadResult['url'],
-                        'filename' => $uploadResult['filename']
-                    ]);
-                } else {
-                    // Fallback to local storage
-                    Log::warning('GitHub upload failed, falling back to local storage: ' . $uploadResult['error']);
-                    $folder = "products";
+                $path = $image->store($folder, 'r2');
+                $data['image'] = $path;
+                Log::info('Product image updated in AWS (r2) successfully', [
+                    'product_id' => $product->id,
+                    'path' => $path
+                ]);
+            } catch (\Throwable $cloudEx) {
+                Log::warning('Cloud upload failed during product update, falling back to local/public storage', [
+                    'error' => $cloudEx->getMessage()
+                ]);
+                try {
                     $path = $image->store($folder, 'public');
                     $data['image'] = $path;
                     Log::info('Product image updated in local/public storage (fallback)', [
                         'product_id' => $product->id,
                         'path' => $path
                     ]);
-                }
-            } catch (Exception $e) {
-                // Fallback to local storage on any exception
-                Log::warning('Image processing exception, falling back to local storage: ' . $e->getMessage());
-                try {
-                    $folder = "products";
-                    $path = $image->store($folder, 'public');
-                    $data['image'] = $path;
-                    Log::info('Product image updated in local/public storage (exception fallback)', [
-                        'product_id' => $product->id,
-                        'path' => $path
+                } catch (\Throwable $localEx) {
+                    Log::error('Both cloud and local storage failed during product update', [
+                        'cloud_error' => $cloudEx->getMessage(),
+                        'local_error' => $localEx->getMessage(),
                     ]);
-                } catch (Exception $localException) {
-                    Log::error('Both GitHub and local storage failed: ' . $localException->getMessage());
                     return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
                 }
             }
@@ -873,7 +867,16 @@ public function storeCategorySubcategory(Request $request)
                         
                         // Upload to cloud storage
                         $imageContent = file_get_contents($imagePath);
-                        $uploaded = Storage::put($cloudPath, $imageContent, 'public');
+                        // Try cloud first, fallback to local/public
+                        $uploaded = false;
+                        try {
+                            $uploaded = Storage::disk('r2')->put($cloudPath, $imageContent);
+                        } catch (\Throwable $e) {
+                            $uploaded = false;
+                        }
+                        if (!$uploaded) {
+                            $uploaded = Storage::disk('public')->put($cloudPath, $imageContent);
+                        }
                         
                         if ($uploaded) {
                             // Update product

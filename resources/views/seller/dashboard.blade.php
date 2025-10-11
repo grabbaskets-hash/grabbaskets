@@ -278,9 +278,13 @@
                             <td>{{ $p->discount ? $p->discount . '%' : '-' }}</td>
                             <td>{{ $p->delivery_charge ? '₹' . number_format($p->delivery_charge, 2) : 'Free' }}</td>
                             <td>{{ $p->created_at?->format('d M Y') }}</td>
-                            <td>
-                                <a href="{{ route('seller.editProduct', $p) }}"
-                                    class="btn btn-sm btn-outline-primary">Edit</a>
+                            <td class="d-flex gap-2">
+                                <a href="{{ route('seller.editProduct', $p) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form action="{{ route('seller.destroyProduct', $p) }}" method="POST" onsubmit="return confirm('Delete this product? This will remove its images too.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach
