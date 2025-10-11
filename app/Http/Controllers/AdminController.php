@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Category;
@@ -136,23 +137,33 @@ class AdminController extends Controller
 
     public function products(Request $request)
     {
-        $query = Product::with(['seller', 'category', 'subcategory']);
+        try {
+            $query = Product::with(['seller', 'category', 'subcategory']);
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->whereHas('category', function ($q) use ($request) {
+                    $q->where('name', $request->category);
+                });
+            }
+
+            $categories = Category::pluck('name')->toArray();
+            $products = $query->paginate(10)->appends($request->only(['search', 'category']));
+            $sellers = User::where('role', 'seller')->pluck('name', 'id');
+
+            return view('admin.products', compact('products', 'categories', 'sellers'));
+        } catch (\Throwable $e) {
+            Log::error('Admin products page failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Admin products error');
         }
-
-        if ($request->filled('category') && $request->category !== 'all') {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('name', $request->category);
-            });
-        }
-
-    $categories = Category::pluck('name')->toArray();
-    $products = $query->paginate(10)->appends($request->only(['search', 'category']));
-    $sellers = User::where('role', 'seller')->pluck('name', 'id');
-
-    return view('admin.products', compact('products', 'categories', 'sellers'));
     }
 
     // ✅ Enhanced users() with search, role, and status filters
