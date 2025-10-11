@@ -280,6 +280,7 @@
                             <td>{{ $p->created_at?->format('d M Y') }}</td>
                             <td class="d-flex gap-2">
                                 <a href="{{ route('seller.editProduct', $p) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{{ route('seller.productGallery', $p) }}" class="btn btn-sm btn-outline-info">Gallery</a>
                                 <form action="{{ route('seller.destroyProduct', $p) }}" method="POST" onsubmit="return confirm('Delete this product? This will remove its images too.');">
                                     @csrf
                                     @method('DELETE')

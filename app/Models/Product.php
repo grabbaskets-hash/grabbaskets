@@ -48,6 +48,16 @@ class Product extends Model
         return $this->hasMany(Wishlist::class);
     }
 
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class)->ordered();
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(ProductImage::class)->primary();
+    }
+
     public function isWishlistedBy($user)
     {
         if (!$user) return false;
@@ -75,17 +85,41 @@ class Product extends Model
     // Get the correct image URL (supporting direct URLs, file storage and database storage)
     public function getImageUrlAttribute()
     {
+        // Priority 1: Primary image from product_images table
+        $primaryImage = $this->primaryImage;
+        if ($primaryImage) {
+            return $primaryImage->image_url;
+        }
+
+        // Priority 2: First image from product_images table
+        $firstImage = $this->productImages()->first();
+        if ($firstImage) {
+            return $firstImage->image_url;
+        }
+
+        // Priority 3: Legacy single image field
+        if ($this->image) {
+            return $this->getLegacyImageUrl();
+        }
+
+        // Priority 4: Database stored image
+        if ($this->image_data && $this->image_mime_type) {
+            return "data:{$this->image_mime_type};base64,{$this->image_data}";
+        }
+        
+        // Priority 5: Fallback placeholder
+        return 'https://via.placeholder.com/200?text=No+Image';
+    }
+
+    // Helper method for legacy image URL generation
+    private function getLegacyImageUrl()
+    {
         // Priority 1: Direct external image URL (https://)
         if ($this->image && (str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'http://'))) {
             return $this->image;
         }
         
-        // Priority 2: Database stored image
-        if ($this->image_data && $this->image_mime_type) {
-            return "data:{$this->image_mime_type};base64,{$this->image_data}";
-        }
-        
-        // Priority 3: File system image
+        // Priority 2: File system image
         if ($this->image) {
             $imagePath = ltrim($this->image, '/');
 
@@ -113,8 +147,7 @@ class Product extends Model
             // Local/dev: serve via storage symlink
             return '/storage/' . $imagePath;
         }
-        
-        // Priority 4: Fallback placeholder
+
         return 'https://via.placeholder.com/200?text=No+Image';
     }
 
