@@ -1975,13 +1975,13 @@ li a{
             @foreach($categories->take(24) as $category)
               <div class="zepto-cat-item">
                 <a class="zepto-cat-link" href="{{ route('buyer.productsByCategory', $category->id) }}" title="{{ $category->name }}">
-                  <span class="zepto-cat-icon">
-                    @php $cImg = $category->image_url ?? $category->image ?? null; @endphp
+                  <span class="zepto-cat-icon position-relative" style="background: linear-gradient(135deg,#fffbe6,#ffe4b5); border: 2px solid #ff9900;">
+                    @php $cImg = $category->image_url ?? $category->image ?? null; $emoji = $category->emoji ?? '🛍️'; @endphp
                     @if(!empty($cImg))
-                      <img src="{{ $cImg }}" alt="{{ $category->name }}" onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.classList.remove('d-none');">
-                      <span class="zepto-cat-emoji d-none">{!! $category->emoji ?? '🛍️' !!}</span>
+                      <img src="{{ $cImg }}" alt="{{ $category->name }}" style="z-index:2;position:relative;" onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.classList.remove('d-none');">
+                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle d-none" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
                     @else
-                      <span class="zepto-cat-emoji">{!! $category->emoji ?? '🛍️' !!}</span>
+                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
                     @endif
                   </span>
                   <span class="zepto-cat-name">{{ Str::limit($category->name, 12) }}</span>
@@ -2115,35 +2115,41 @@ li a{
 
       @if($flashSale->count())
       <div class="mb-4">
-        <h2 class="mb-3" style="color:#ff0033;"><i class="bi bi-lightning-charge-fill"></i> Flash Sale</h2>
-        <div class="shelf" style="border:2px solid #ff0033;box-shadow:0 4px 24px rgba(255,0,51,0.08);">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('flash',-1)" style="background:#ff0033;color:#fff;"><i
-              class="bi bi-chevron-left"></i></button>
+        <div class="p-3 rounded-4 mb-3" style="background:linear-gradient(90deg,#ff0033 60%,#ff9900 100%);box-shadow:0 6px 32px #ff003344;display:flex;align-items:center;gap:16px;">
+          <span class="badge bg-warning text-dark fs-5 px-3 py-2" style="border-radius:16px 0 16px 0;font-weight:700;"><i class="bi bi-lightning-charge-fill"></i> FLASH SALE</span>
+          <span class="text-white fw-bold fs-5">Hurry! Limited time offers</span>
+          <span class="ms-auto d-none d-md-inline-block text-white-50" style="font-size:1.1rem;">🔥 Ends Soon</span>
+        </div>
+        <div class="shelf" style="border:2px solid #ff0033;box-shadow:0 4px 24px rgba(255,0,51,0.08);background:linear-gradient(90deg,#fff6f6 60%,#fffbe6 100%);">
+          <button class="nav-btn nav-prev" onclick="scrollShelf('flash',-1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-flash" class="shelf-track">
             @foreach($flashSale as $product)
             <div class="shelf-item">
-              <div class="card product-card h-100 border-danger">
+              <div class="card product-card h-100 border-0 shadow-sm position-relative" style="overflow:visible;">
+                @if($product->discount > 0)
+                  <span class="position-absolute top-0 start-0 badge bg-danger fs-6" style="z-index:2;border-radius:0 0 12px 0;">-{{ (int)($product->discount ?? 0) }}%</span>
+                @endif
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
                   data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback">
+                  onerror="this.src=this.dataset.fallback"
+                  style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff003322;">
                 <div class="card-body d-flex flex-column">
-                  <div class="small text-danger">Flash Sale! {{ (int)($product->discount ?? 0) }}% off</div>
+                  <div class="small text-danger fw-bold mb-1"><i class="bi bi-lightning-charge-fill"></i> Flash Sale!</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
-                      <span class="fw-bold text-danger">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                      <span class="fw-bold text-danger fs-5">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                      <small class="text-muted text-decoration-line-through ms-2">₹{{ number_format($product->price, 2) }}</small>
                     @else
-                      <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                      <span class="fw-bold fs-5">₹{{ number_format($product->price, 2) }}</span>
                     @endif
                     @auth
                     <form method="POST" action="{{ route('cart.add') }}" class="mt-2 d-flex align-items-center">
                       @csrf
                       <input type="hidden" name="product_id" value="{{ $product->id }}">
-                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2"
-                        style="width:70px;" required>
+                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2" style="width:70px;" required>
                       <button type="submit" class="btn btn-danger flex-grow-1">Add to Cart</button>
                     </form>
                     @else
@@ -2155,45 +2161,50 @@ li a{
             </div>
             @endforeach
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('flash',1)" style="background:#ff0033;color:#fff;"><i
-              class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" onclick="scrollShelf('flash',1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
       @endif
 
       <div class="mb-4">
-        <h2 class="mb-3">Deals of the Day</h2>
-        <div class="shelf">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('deals',-1)"><i class="bi bi-chevron-left"></i></button>
+        <div class="p-3 rounded-4 mb-3" style="background:linear-gradient(90deg,#ff9900 60%,#ff0033 100%);box-shadow:0 6px 32px #ff990044;display:flex;align-items:center;gap:16px;">
+          <span class="badge bg-danger text-white fs-5 px-3 py-2" style="border-radius:16px 0 16px 0;font-weight:700;"><i class="bi bi-stars"></i> DEALS OF THE DAY</span>
+          <span class="text-white fw-bold fs-5">Best prices, just for today!</span>
+        </div>
+        <div class="shelf" style="border:2px solid #ff9900;box-shadow:0 4px 24px #ff990022;background:linear-gradient(90deg,#fffbe6 60%,#fff6f6 100%);">
+          <button class="nav-btn nav-prev" onclick="scrollShelf('deals',-1)" style="background:#ff9900;color:#fff;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-deals" class="shelf-track">
             @foreach($deals as $product)
             <div class="shelf-item">
-              <div class="card product-card h-100">
+              <div class="card product-card h-100 border-0 shadow-sm position-relative" style="overflow:visible;">
+                @if($product->discount > 0)
+                  <span class="position-absolute top-0 start-0 badge bg-warning text-dark fs-6" style="z-index:2;border-radius:0 0 12px 0;">-{{ (int)($product->discount ?? 0) }}%</span>
+                @endif
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
                   data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback">
+                  onerror="this.src=this.dataset.fallback"
+                  style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff990022;">
                 <div class="card-body d-flex flex-column">
-                  <div class="small text-muted">Up to {{ (int)($product->discount ?? 0) }}% off</div>
+                  <div class="small text-warning fw-bold mb-1"><i class="bi bi-stars"></i> Deal of the Day</div>
                   <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
-                      <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                      <span class="fw-bold text-success fs-5">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                      <small class="text-muted text-decoration-line-through ms-2">₹{{ number_format($product->price, 2) }}</small>
                     @else
-                      <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                      <span class="fw-bold fs-5">₹{{ number_format($product->price, 2) }}</span>
                     @endif
                     @auth
                     <form method="POST" action="{{ route('cart.add') }}" class="mt-2 d-flex align-items-center">
                       @csrf
                       <input type="hidden" name="product_id" value="{{ $product->id }}">
-                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2"
-                        style="width:70px;" required>
-                      <button type="submit" class="btn btn-primary flex-grow-1">Add</button>
+                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2" style="width:70px;" required>
+                      <button type="submit" class="btn btn-warning flex-grow-1">Add</button>
                     </form>
                     @else
-                    <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">Login</a>
+                    <a href="{{ route('login') }}" class="btn btn-warning w-100 mt-2">Login</a>
                     @endauth
                   </div>
                 </div>
@@ -2201,7 +2212,7 @@ li a{
             </div>
             @endforeach
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('deals',1)"><i class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" onclick="scrollShelf('deals',1)" style="background:#ff9900;color:#fff;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
 

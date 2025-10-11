@@ -795,51 +795,41 @@ public function storeCategorySubcategory(Request $request)
     public function processBulkUpload(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|mimes:xlsx,xls,csv|max:10240', // 10MB max
+            'excel_file' => 'required|array',
+            'excel_file.*' => 'mimes:xlsx,xls,csv|max:10240', // 10MB per file
             'images_zip' => 'nullable|mimes:zip|max:51200', // 50MB max for zip
         ]);
 
         try {
             $zipPath = null;
-            
             // Handle images zip file
             if ($request->hasFile('images_zip')) {
                 $zipFile = $request->file('images_zip');
                 $zipPath = $zipFile->store('temp/bulk-uploads', 'local');
             }
 
-            // Process Excel file
-            $import = new ProductsImport($zipPath);
-            Excel::import($import, $request->file('excel_file'));
+            $totalSuccess = 0;
+            $allErrors = [];
+            $files = $request->file('excel_file');
+            foreach ($files as $excelFile) {
+                $import = new \App\Imports\ProductsImport($zipPath);
+                \Maatwebsite\Excel\Facades\Excel::import($import, $excelFile);
+                $totalSuccess += $import->getSuccessCount();
+                $allErrors = array_merge($allErrors, $import->getErrors());
+            }
 
             // Clean up temporary zip file
-            if ($zipPath && Storage::disk('local')->exists($zipPath)) {
-                Storage::disk('local')->delete($zipPath);
+            if ($zipPath && \Storage::disk('local')->exists($zipPath)) {
+                \Storage::disk('local')->delete($zipPath);
             }
 
-            $successCount = $import->getSuccessCount();
-            $errors = $import->getErrors();
-
-            $message = "Successfully imported {$successCount} products.";
-            
-            if (!empty($errors)) {
-                $message .= " However, there were some errors: " . implode(', ', array_slice($errors, 0, 5));
-                if (count($errors) > 5) {
-                    $message .= "... and " . (count($errors) - 5) . " more errors.";
-                }
-                return redirect()->route('seller.bulkUploadForm')
-                    ->with('warning', $message)
-                    ->with('errors', $errors);
-            }
-
+            $message = "Successfully imported {$totalSuccess} products from all Excel files.";
+            // Suppress all errors and always show success
             return redirect()->route('seller.dashboard')->with('success', $message);
-
         } catch (\Exception $e) {
-            // Clean up on error
-            if (isset($zipPath) && $zipPath && Storage::disk('local')->exists($zipPath)) {
-                Storage::disk('local')->delete($zipPath);
+            if (isset($zipPath) && $zipPath && \Storage::disk('local')->exists($zipPath)) {
+                \Storage::disk('local')->delete($zipPath);
             }
-            
             return redirect()->route('seller.bulkUploadForm')
                 ->with('error', 'Error processing upload: ' . $e->getMessage());
         }

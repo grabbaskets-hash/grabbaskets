@@ -348,7 +348,7 @@
                         </div>
                         <h5>Click to select Excel file</h5>
                         <p class="text-muted mb-0">Supported formats: .xlsx, .xls, .csv (Max: 10MB)</p>
-                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" class="d-none" required>
+                        <input type="file" id="excel_file" name="excel_file[]" accept=".xlsx,.xls,.csv" class="d-none" required multiple>
                     </div>
                     <div id="excel_file_info" class="mt-2"></div>
                 </div>
