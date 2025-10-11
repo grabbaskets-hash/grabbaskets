@@ -1,42 +1,3 @@
-@php
-    // Print all product fields and key accessors for debugging
-    if (isset($product) && $product) {
-        echo '<div style="color:blue;font-weight:bold;">[DEBUG] Product fields:</div>';
-        foreach ($product->getAttributes() as $key => $val) {
-            echo '<div style="color:blue;">' . htmlspecialchars($key) . ': ' . htmlspecialchars((string)$val) . '</div>';
-        }
-        // Try image_url accessor
-        try {
-            $imgUrl = $product->image_url;
-            echo '<div style="color:green;">[DEBUG] $product->image_url: ' . htmlspecialchars($imgUrl) . '</div>';
-        } catch (Throwable $e) {
-            echo '<div style="color:red;">[DEBUG] Exception in $product->image_url: ' . htmlspecialchars($e->getMessage()) . '</div>';
-        }
-        // Try getLegacyImageUrl()
-        try {
-            $legacyUrl = $product->getLegacyImageUrl();
-            echo '<div style="color:green;">[DEBUG] $product->getLegacyImageUrl(): ' . htmlspecialchars($legacyUrl) . '</div>';
-        } catch (Throwable $e) {
-            echo '<div style="color:red;">[DEBUG] Exception in $product->getLegacyImageUrl(): ' . htmlspecialchars($e->getMessage()) . '</div>';
-        }
-    }
-@endphp
-@php
-    // Debug output for null checks
-    if (!isset($product) || !$product) {
-        echo '<div style="color:red;font-weight:bold;">[DEBUG] $product is null or not set</div>';
-    }
-    if (!isset($categories) || !$categories) {
-        echo '<div style="color:red;font-weight:bold;">[DEBUG] $categories is null or not set</div>';
-    } else {
-        echo '<div style="color:green;">[DEBUG] $categories count: ' . (is_countable($categories) ? count($categories) : 'N/A') . '</div>';
-    }
-    if (!isset($subcategories) || !$subcategories) {
-        echo '<div style="color:red;font-weight:bold;">[DEBUG] $subcategories is null or not set</div>';
-    } else {
-        echo '<div style="color:green;">[DEBUG] $subcategories count: ' . (is_countable($subcategories) ? count($subcategories) : 'N/A') . '</div>';
-    }
-@endphp
 
 <!DOCTYPE html>
 <html lang="en">
@@ -164,40 +125,33 @@
 
 <body>
 <div class="container-card">
+    <div style="width:100%;background:linear-gradient(90deg,#3b82f6,#06b6d4);color:#fff;padding:18px 0 12px 0;text-align:center;font-size:1.6rem;font-weight:700;letter-spacing:1px;box-shadow:0 2px 8px rgba(59,130,246,0.08);margin-bottom:0.5rem;">
+        <i class="fas fa-pen-to-square me-2"></i> Edit Product
+    </div>
     <!-- Left Box -->
     <div class="left-box">
         <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Grabbasket Logo">
         <p>Welcome to <strong>Grabbasket</strong>!<br>
            Edit your product details and keep your inventory up to date.</p>
-        
-        @if($product->image)
-            <div class="mt-4">
-                <img src="{{ $product->image_url }}" 
-                     alt="{{ $product->name }}" 
-                     style="max-width: 100%; max-height: 220px; border-radius: 1rem; border: 2px solid #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.09); background:#fafafa;"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div style="display: none; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem; margin-top: 10px;">
-                    <i class="fas fa-image" style="font-size: 2rem; opacity: 0.5;"></i>
-                    <div class="text-white small mt-2">Image not found</div>
-                    <div class="text-white small">Path: {{ $product->image }}</div>
+        <div class="mt-4" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+            @if($product->image)
+                <div style="background:#fff;border-radius:1rem;padding:18px 12px 10px 12px;box-shadow:0 2px 12px rgba(59,130,246,0.10);width:210px;max-width:100%;margin-bottom:10px;">
+                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width:180px;max-height:180px;border-radius:0.7rem;border:2px solid #e0e7ef;box-shadow:0 2px 8px rgba(59,130,246,0.08);background:#fafafa;object-fit:contain;">
                 </div>
                 <div class="text-white small mt-2">Current Product Image</div>
-                <div class="text-white small mt-2">Debug: <span style="word-break:break-all">{{ $product->image }}</span></div>
-                @if($product->image)
-                    <div class="text-white small mt-1">Direct link: <a href="{{ $product->getLegacyImageUrl() }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
-                @endif
-            </div>
-        @else
-            <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
-                <i class="fas fa-upload" style="font-size: 2rem; opacity: 0.5;"></i>
-                <div class="text-white small mt-2">Upload an image for this product</div>
-            </div>
-        @endif
+                <div class="text-white small mt-1">Direct link: <a href="{{ $product->getLegacyImageUrl() }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
+            @else
+                <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
+                    <i class="fas fa-upload" style="font-size: 2rem; opacity: 0.5;"></i>
+                    <div class="text-white small mt-2">Upload an image for this product</div>
+                </div>
+            @endif
+        </div>
     </div>
 
     <!-- Right Box -->
     <div class="right-box">
-        <h2 class="mb-4">Edit Product</h2>
+    <h2 class="mb-4" style="font-weight:700;color:#3b82f6;letter-spacing:1px;">Edit Product Details</h2>
         
         @if(session('success'))
             <div class="alert alert-success text-dark">{{ session('success') }}</div>
@@ -209,7 +163,7 @@
         <form method="POST" action="{{ route('seller.updateProduct', $product) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <div class="row g-3">
+            <div class="row g-4">
 
                 <div class="col-md-6">
                     <label for="name">Product Name</label>
@@ -287,14 +241,21 @@
                 <div class="col-12">
                     <label for="image">Product Image</label>
                     <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
-                    @error('image') <div class="text-danger">{{ $message }}</div> @enderror
+                    @error('image') <div class="text-danger" style="font-weight:600;">{{ $message }}</div> @enderror
                     <small class="text-muted">Choose a new image to replace the current one. Max size: 2MB</small>
-                    
                     <!-- Image Preview -->
-                    <div id="imagePreview" style="display: none; margin-top: 10px;">
-                        <img id="previewImg" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
+                    <div id="imagePreview" style="display: none; margin-top: 10px; text-align:center;">
+                        <img id="previewImg" src="" alt="Preview" style="max-width: 170px; max-height: 170px; border-radius: 10px; border: 2px solid #3b82f6; box-shadow:0 2px 8px rgba(59,130,246,0.10);">
                         <div><small class="text-muted">New image preview</small></div>
                     </div>
+    /* Subtle hover effect for form fields */
+    input.form-control:hover, select.form-select:hover, textarea.form-control:hover {
+        border-color: #06b6d4;
+        box-shadow: 0 0 0 0.12rem rgba(6,182,212,0.13);
+    }
+    /* Section spacing for better readability */
+    .row.g-4 > [class^='col-'] { margin-bottom: 18px; }
+    .alert { font-size:1rem; font-weight:600; letter-spacing:0.2px; }
                 </div>
 
             </div>
