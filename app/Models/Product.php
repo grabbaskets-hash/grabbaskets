@@ -112,7 +112,7 @@ class Product extends Model
     }
 
     // Helper method for legacy image URL generation
-    private function getLegacyImageUrl()
+    public function getLegacyImageUrl()
     {
         // Priority 1: Direct external image URL (https:// or GitHub raw)
         if ($this->image && (str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'http://'))) {
