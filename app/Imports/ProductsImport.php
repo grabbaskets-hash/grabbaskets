@@ -546,6 +546,52 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             }
         }
 
+        // Fallback: Assign available images from storage sequentially for products without images
+        // This ensures bulk imports get images even without ZIP files or embedded images
+        if (!empty($candidates) || empty($row['image'])) {
+            try {
+                $availableImages = collect(Storage::disk('public')->files('products'))
+                    ->filter(function($file) {
+                        return preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $file);
+                    })
+                    ->shuffle() // Randomize to distribute images fairly
+                    ->take(100) // Limit to prevent memory issues
+                    ->toArray();
+
+                if (!empty($availableImages)) {
+                    // Try to find an unused image by checking existing products
+                    $usedImages = \App\Models\Product::whereNotNull('image')
+                        ->where('image', '!=', '')
+                        ->pluck('image')
+                        ->toArray();
+
+                    $unusedImages = array_diff($availableImages, $usedImages);
+                    
+                    if (!empty($unusedImages)) {
+                        $selectedImage = reset($unusedImages);
+                        Log::info('Assigning available image from storage during bulk import', [
+                            'image' => $selectedImage,
+                            'candidates' => $candidates
+                        ]);
+                        return $selectedImage;
+                    } else {
+                        // If all images are used, just pick one randomly
+                        $selectedImage = $availableImages[array_rand($availableImages)];
+                        Log::info('Reusing existing image from storage during bulk import', [
+                            'image' => $selectedImage,
+                            'candidates' => $candidates
+                        ]);
+                        return $selectedImage;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to assign fallback image from storage', [
+                    'error' => $e->getMessage(),
+                    'candidates' => $candidates
+                ]);
+            }
+        }
+
         return null;
     }
 

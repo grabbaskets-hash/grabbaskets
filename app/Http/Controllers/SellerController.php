@@ -66,14 +66,53 @@ class SellerController extends Controller {
                 $img = $imageMap[$uid];
                 // Store under products/ to keep URL generation consistent
                 $folder = "products/seller/{$sellerId}/{$data['category_id']}/{$data['subcategory_id']}";
-                // Try cloud first, fallback to local/public
+                
+                // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
+                $r2Path = null;
+                $publicPath = null;
+                $r2Success = false;
+                $publicSuccess = false;
+                
+                // Try AWS R2 first
                 try {
-                    $path = $img->store($folder, 'r2');
-                } catch (\Throwable $e) {
-                    $path = $img->store($folder, 'public');
+                    $r2Path = $img->store($folder, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('AWS R2 upload failed during bulk product upload', [
+                        'error' => $r2Ex->getMessage(),
+                        'unique_id' => $uid
+                    ]);
                 }
-                $product->image = $path;
-                $updatedImages++;
+                
+                // Then save to Git storage (public disk)
+                try {
+                    $publicPath = $img->store($folder, 'public');
+                    $publicSuccess = !empty($publicPath);
+                } catch (\Throwable $publicEx) {
+                    Log::warning('Git storage upload failed during bulk product upload', [
+                        'error' => $publicEx->getMessage(),
+                        'unique_id' => $uid
+                    ]);
+                }
+                
+                // Use whichever path was successful (prefer R2)
+                $finalPath = $r2Success ? $r2Path : $publicPath;
+                
+                if ($finalPath) {
+                    $product->image = $finalPath;
+                    $updatedImages++;
+                    
+                    Log::info('Bulk product image stored with dual storage redundancy', [
+                        'unique_id' => $uid,
+                        'path' => $finalPath,
+                        'r2_success' => $r2Success,
+                        'public_success' => $publicSuccess
+                    ]);
+                } else {
+                    Log::error('Both storages failed for bulk product upload image', [
+                        'unique_id' => $uid
+                    ]);
+                }
             }
             $product->save();
             $count++;
@@ -142,12 +181,51 @@ class SellerController extends Controller {
                 $mimeType = $image->getMimeType();
                 $fileSize = $image->getSize();
 
-                // Try cloud first, fallback to local/public
+                // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
+                $r2Path = null;
+                $publicPath = null;
+                $r2Success = false;
+                $publicSuccess = false;
+                $finalPath = null;
+
+                // Try AWS R2 first
                 try {
-                    $path = $image->store($folder, 'r2');
-                } catch (\Throwable $e) {
-                    $path = $image->store($folder, 'public');
+                    $r2Path = $image->store($folder, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('AWS R2 upload failed for product gallery image', [
+                        'error' => $r2Ex->getMessage(),
+                        'product_id' => $product->id,
+                        'original_name' => $originalName
+                    ]);
                 }
+
+                // Then save to Git storage (public disk)
+                try {
+                    $publicPath = $image->store($folder, 'public');
+                    $publicSuccess = !empty($publicPath);
+                } catch (\Throwable $publicEx) {
+                    Log::warning('Git storage (public) upload failed for product gallery image', [
+                        'error' => $publicEx->getMessage(),
+                        'product_id' => $product->id,
+                        'original_name' => $originalName
+                    ]);
+                }
+
+                // Use whichever path was successful (prefer R2)
+                $finalPath = $r2Success ? $r2Path : $publicPath;
+
+                if (!$finalPath) {
+                    throw new \Exception('Both AWS R2 and Git storage failed');
+                }
+
+                Log::info('Product gallery image stored with dual storage redundancy', [
+                    'product_id' => $product->id,
+                    'path' => $finalPath,
+                    'r2_success' => $r2Success,
+                    'public_success' => $publicSuccess,
+                    'original_name' => $originalName
+                ]);
 
                 // Get the next sort order
                 $nextSortOrder = ProductImage::where('product_id', $product->id)
@@ -156,7 +234,7 @@ class SellerController extends Controller {
                 // Create ProductImage record
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $path,
+                    'image_path' => $finalPath,
                     'original_name' => $originalName,
                     'mime_type' => $mimeType,
                     'file_size' => $fileSize,
@@ -621,59 +699,56 @@ public function storeCategorySubcategory(Request $request)
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $folder = 'products';
+            $imageUploaded = false;
+            $imagePath = null;
             
-            // Prefer AWS (R2/S3) storage first
+            // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
             try {
-                $path = $image->store($folder, 'r2');
-                $product->update(['image' => $path]);
+                // First try to save to AWS R2
+                $r2Path = $image->store($folder, 'r2');
+                $r2Success = !empty($r2Path);
                 
-                // Also create a ProductImage record for the new gallery system
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $path,
-                    'original_name' => $image->getClientOriginalName(),
-                    'mime_type' => $image->getMimeType(),
-                    'file_size' => $image->getSize(),
-                    'sort_order' => 1,
-                    'is_primary' => true, // First image is primary
-                ]);
+                // Then save to local/public Git storage (same path for consistency)
+                $publicPath = $image->store($folder, 'public');
+                $publicSuccess = !empty($publicPath);
                 
-                Log::info('Image stored in AWS (r2) successfully', [
-                    'product_id' => $product->id,
-                    'path' => $path,
-                    'size' => $image->getSize()
-                ]);
-            } catch (\Throwable $cloudEx) {
-                Log::warning('Cloud upload failed, falling back to local/public storage', [
-                    'error' => $cloudEx->getMessage()
-                ]);
-                try {
-                    $path = $image->store($folder, 'public');
-                    $product->update(['image' => $path]);
+                // Use whichever path was successful (prefer R2 for URL generation)
+                $imagePath = $r2Success ? $r2Path : $publicPath;
+                $imageUploaded = $r2Success || $publicSuccess;
+                
+                if ($imageUploaded) {
+                    $product->update(['image' => $imagePath]);
                     
                     // Also create a ProductImage record for the new gallery system
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image_path' => $path,
+                        'image_path' => $imagePath,
                         'original_name' => $image->getClientOriginalName(),
                         'mime_type' => $image->getMimeType(),
                         'file_size' => $image->getSize(),
                         'sort_order' => 1,
-                        'is_primary' => true,
+                        'is_primary' => true, // First image is primary
                     ]);
                     
-                    Log::info('Image stored in local/public storage (fallback)', [
+                    Log::info('Image stored with dual storage redundancy', [
                         'product_id' => $product->id,
-                        'path' => $path,
+                        'path' => $imagePath,
+                        'r2_success' => $r2Success,
+                        'public_success' => $publicSuccess,
                         'size' => $image->getSize()
                     ]);
-                } catch (\Throwable $localEx) {
-                    Log::error('Both cloud and local storage failed for image upload', [
-                        'cloud_error' => $cloudEx->getMessage(),
-                        'local_error' => $localEx->getMessage(),
+                } else {
+                    Log::error('Both AWS R2 and Git storage failed for image upload', [
+                        'product_id' => $product->id
                     ]);
-                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+                    return redirect()->back()->withInput()->with('error', 'Image upload failed to both storages. Please try again.');
                 }
+            } catch (\Throwable $ex) {
+                Log::error('Exception during dual storage image upload', [
+                    'error' => $ex->getMessage(),
+                    'product_id' => $product->id
+                ]);
+                return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
             }
         }
         $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
@@ -708,35 +783,66 @@ public function storeCategorySubcategory(Request $request)
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
         
-        // Handle image update: prefer AWS (r2) storage first with local fallback
+        // Handle image update: DUAL STORAGE for redundancy (AWS R2 + Git storage)
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $folder = 'products';
+            $imageUploaded = false;
+            $imagePath = null;
+            
             try {
-                $path = $image->store($folder, 'r2');
-                $data['image'] = $path;
-                Log::info('Product image updated in AWS (r2) successfully', [
-                    'product_id' => $product->id,
-                    'path' => $path
-                ]);
-            } catch (\Throwable $cloudEx) {
-                Log::warning('Cloud upload failed during product update, falling back to local/public storage', [
-                    'error' => $cloudEx->getMessage()
-                ]);
+                // Save to both AWS R2 and Git storage
+                $r2Path = null;
+                $publicPath = null;
+                $r2Success = false;
+                $publicSuccess = false;
+                
+                // Try AWS R2 first
                 try {
-                    $path = $image->store($folder, 'public');
-                    $data['image'] = $path;
-                    Log::info('Product image updated in local/public storage (fallback)', [
-                        'product_id' => $product->id,
-                        'path' => $path
+                    $r2Path = $image->store($folder, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('AWS R2 upload failed during product update', [
+                        'error' => $r2Ex->getMessage(),
+                        'product_id' => $product->id
                     ]);
-                } catch (\Throwable $localEx) {
-                    Log::error('Both cloud and local storage failed during product update', [
-                        'cloud_error' => $cloudEx->getMessage(),
-                        'local_error' => $localEx->getMessage(),
-                    ]);
-                    return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
                 }
+                
+                // Then save to Git storage (public disk)
+                try {
+                    $publicPath = $image->store($folder, 'public');
+                    $publicSuccess = !empty($publicPath);
+                } catch (\Throwable $publicEx) {
+                    Log::warning('Git storage (public) upload failed during product update', [
+                        'error' => $publicEx->getMessage(),
+                        'product_id' => $product->id
+                    ]);
+                }
+                
+                // Use whichever path was successful (prefer R2)
+                $imagePath = $r2Success ? $r2Path : $publicPath;
+                $imageUploaded = $r2Success || $publicSuccess;
+                
+                if ($imageUploaded) {
+                    $data['image'] = $imagePath;
+                    Log::info('Product image updated with dual storage redundancy', [
+                        'product_id' => $product->id,
+                        'path' => $imagePath,
+                        'r2_success' => $r2Success,
+                        'public_success' => $publicSuccess
+                    ]);
+                } else {
+                    Log::error('Both AWS R2 and Git storage failed during product update', [
+                        'product_id' => $product->id
+                    ]);
+                    return redirect()->back()->with('error', 'Failed to upload image to any storage. Please try again.');
+                }
+            } catch (\Throwable $ex) {
+                Log::error('Exception during dual storage image update', [
+                    'error' => $ex->getMessage(),
+                    'product_id' => $product->id
+                ]);
+                return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
             }
         }
         $product->update($data);
@@ -812,23 +918,24 @@ public function storeCategorySubcategory(Request $request)
             $allErrors = [];
             $files = $request->file('excel_file');
             foreach ($files as $excelFile) {
-                $import = new \App\Imports\ProductsImport($zipPath);
+                // Pass zip path and current seller id to ensure updates are scoped to the seller
+                $import = new \App\Imports\ProductsImport($zipPath, Auth::id());
                 \Maatwebsite\Excel\Facades\Excel::import($import, $excelFile);
                 $totalSuccess += $import->getSuccessCount();
                 $allErrors = array_merge($allErrors, $import->getErrors());
             }
 
             // Clean up temporary zip file
-            if ($zipPath && \Storage::disk('local')->exists($zipPath)) {
-                \Storage::disk('local')->delete($zipPath);
+            if ($zipPath && Storage::disk('local')->exists($zipPath)) {
+                Storage::disk('local')->delete($zipPath);
             }
 
             $message = "Successfully imported {$totalSuccess} products from all Excel files.";
             // Suppress all errors and always show success
             return redirect()->route('seller.dashboard')->with('success', $message);
         } catch (\Exception $e) {
-            if (isset($zipPath) && $zipPath && \Storage::disk('local')->exists($zipPath)) {
-                \Storage::disk('local')->delete($zipPath);
+            if (isset($zipPath) && $zipPath && Storage::disk('local')->exists($zipPath)) {
+                Storage::disk('local')->delete($zipPath);
             }
             return redirect()->route('seller.bulkUploadForm')
                 ->with('error', 'Error processing upload: ' . $e->getMessage());
