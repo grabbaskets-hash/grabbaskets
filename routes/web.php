@@ -858,3 +858,8 @@ Route::get('/test-deployment', function () {
     
     return response()->json($response, 200, [], JSON_PRETTY_PRINT);
 });
+
+// Test route for image display verification
+Route::get('/test-images', function () {
+    return view('test-images');
+})->name('test.images');
