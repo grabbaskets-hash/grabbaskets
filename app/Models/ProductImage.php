@@ -46,18 +46,31 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // Stored uploads - prefer R2 in production
+        // Stored uploads - prioritize local storage in production for reliability
         if (app()->environment('production')) {
+            // First try local storage if file exists there
+            try {
+                if (Storage::disk('public')->exists($imagePath)) {
+                    // Use serve route for reliable image serving
+                    $pathParts = explode('/', $imagePath, 2);
+                    if (count($pathParts) === 2) {
+                        return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
+                    }
+                    // Fallback to standard storage path
+                    return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
+                }
+            } catch (\Throwable $e) {
+                // Continue to R2 attempt
+            }
+            
+            // Fallback to R2 storage
             $r2BaseUrl = config('filesystems.disks.r2.url');
             if (!empty($r2BaseUrl)) {
                 return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
             }
-            // Fallback: default disk URL
-            try {
-                return Storage::url($imagePath);
-            } catch (\Throwable $e) {
-                return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
-            }
+            
+            // Last resort: app URL + storage path
+            return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
         }
 
         // Local/dev: serve via storage symlink
