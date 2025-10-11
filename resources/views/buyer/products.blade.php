@@ -274,13 +274,23 @@
                                 </form>
                                 <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                                     <div class="flex-shrink-0 w-100 h-50 rounded-lg overflow-hidden border">
+                                        @php
+                                            $categoryName = optional($product->category)->name ?? '';
+                                            $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
+                                            $unsplashQuery = $unsplashQuery ?: 'product colorful';
+                                        @endphp
                                         @if ($product->image || $product->image_data)
                                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover"
-                                                 onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                                                 onerror="
+                                                    if (!this.dataset.fallback) {
+                                                        this.dataset.fallback = '1';
+                                                        this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
+                                                    } else {
+                                                        this.src = 'https://source.unsplash.com/400x400/?product,shopping,retail,colorful';
+                                                    }
+                                                 ">
                                         @else
-                                            <div class="w-100 h-100 bg-gray-200 d-flex align-items-center justify-content-center">
-                                                <span class="text-muted">No Image</span>
-                                            </div>
+                                            <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover">
                                         @endif
                                     </div>
                                     <div class="flex-grow-1 ms-2">
@@ -362,14 +372,24 @@
                         <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                             <!-- Product Image -->
                             <div class="flex-shrink-0 w-32 h-50 rounded-lg overflow-hidden border">
+                                @php
+                                    $categoryName = optional($product->category)->name ?? '';
+                                    $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
+                                    $unsplashQuery = $unsplashQuery ?: 'product colorful';
+                                @endphp
                                 @if ($product->image || $product->image_data)
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                                         class="w-full h-full object-cover"
-                                        onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                                        onerror="
+                                            if (!this.dataset.fallback) {
+                                                this.dataset.fallback = '1';
+                                                this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
+                                            } else {
+                                                this.src = 'https://source.unsplash.com/400x400/?product,shopping,retail,colorful';
+                                            }
+                                        ">
                                 @else
-                                    <div class="w-full h-full bg-gray-200 d-flex align-items-center justify-content-center">
-                                        <span class="text-muted">No Image</span>
-                                    </div>
+                                    <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 @endif
                             </div>
 
