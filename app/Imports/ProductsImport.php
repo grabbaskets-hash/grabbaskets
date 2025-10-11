@@ -230,13 +230,23 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
 
     protected function handleImageUpload($row)
     {
-        if (empty($row['image'])) {
-            return null;
+        // Build candidate names to match: image column and unique_id
+        $candidates = [];
+        if (!empty($row['image'])) {
+            $imageName = trim($row['image']);
+            $candidates[] = strtolower($imageName);
+            $candidates[] = strtolower(pathinfo($imageName, PATHINFO_FILENAME));
+        }
+        if (!empty($row['unique_id'])) {
+            $uid = trim($row['unique_id']);
+            $candidates[] = strtolower($uid);
+            $candidates[] = strtolower(pathinfo($uid, PATHINFO_FILENAME));
         }
 
-        $imageName = trim($row['image']);
-        $imageNameLower = strtolower($imageName);
-        $imageBase = pathinfo($imageNameLower, PATHINFO_FILENAME);
+        // Nothing to match
+        if (empty($candidates)) {
+            return null;
+        }
 
         // If we have a zip file, extract the image
         if ($this->zipFile && Storage::exists($this->zipFile)) {
@@ -245,28 +255,27 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                 $zipPath = Storage::path($this->zipFile);
 
                 if ($zip->open($zipPath) === TRUE) {
-                    $found = false;
                     for ($i = 0; $i < $zip->numFiles; $i++) {
                         $filename = $zip->getNameIndex($i);
                         $basename = basename($filename);
                         $basenameLower = strtolower($basename);
-                        $base = pathinfo($basenameLower, PATHINFO_FILENAME);
+                        $base = strtolower(pathinfo($basenameLower, PATHINFO_FILENAME));
 
-                        // Case-insensitive match, and allow missing extension in Excel
-                        if ($basenameLower === $imageNameLower || $base === $imageBase) {
+                        // Match full filename or just base against candidates (case-insensitive)
+                        if (in_array($basenameLower, $candidates, true) || in_array($base, $candidates, true)) {
                             $imageContent = $zip->getFromIndex($i);
                             if ($imageContent !== false) {
                                 $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
                                 $uniqueName = Str::random(40) . '.' . $extension;
                                 $storagePath = 'products/' . $uniqueName;
-                                
+
                                 // Try AWS (R2) first, then fallback to local
                                 $saved = false;
                                 try {
                                     $saved = Storage::disk('r2')->put($storagePath, $imageContent);
                                     if ($saved) {
                                         Log::info('Image stored in AWS (r2) from bulk import', [
-                                            'image_name' => $imageName,
+                                            'matched' => $basename,
                                             'path' => $storagePath
                                         ]);
                                     }
@@ -276,29 +285,26 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                                     ]);
                                     $saved = false;
                                 }
-                                
+
                                 if (!$saved) {
                                     $saved = Storage::disk('public')->put($storagePath, $imageContent);
                                     if ($saved) {
                                         Log::info('Image stored in local storage from bulk import (fallback)', [
-                                            'image_name' => $imageName,
+                                            'matched' => $basename,
                                             'path' => $storagePath
                                         ]);
                                     }
                                 }
-                                
+
                                 if ($saved) {
                                     $zip->close();
                                     return $storagePath;
                                 }
                             }
-                            $found = true;
                         }
                     }
                     $zip->close();
-                    if (!$found) {
-                        Log::warning('Image not found in ZIP: ' . $imageName);
-                    }
+                    Log::warning('No image matched in ZIP for candidates', ['candidates' => $candidates]);
                 }
             } catch (\Exception $e) {
                 Log::error('Error extracting image from zip: ' . $e->getMessage());
