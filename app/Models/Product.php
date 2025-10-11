@@ -87,45 +87,30 @@ class Product extends Model
         
         // Priority 3: File system image
         if ($this->image) {
-            $imagePath = $this->image;
-            
-            // Check if it's already a direct image path (SRM images in images/ folder)
-            if (strpos($imagePath, 'images/') === 0) {
-                // Remove the duplicate 'images/' prefix
-                $cleanPath = str_replace('images/', '', $imagePath);
+            $imagePath = ltrim($this->image, '/');
 
-                // For cloud deployment, first try to serve from the configured storage disk
-                if (app()->environment('production')) {
-                    // If the file exists on the default disk, return that URL
-                    if (Storage::exists('images/' . $cleanPath)) {
-                        return Storage::url('images/' . $cleanPath);
-                    }
-
-                    // Otherwise fall back to the app url + /images path (useful for static deploys)
-                    return rtrim(config('app.url'), '/') . '/images/' . $cleanPath;
-                }
-
-                // For local development, use relative path
-                return '/images/' . $cleanPath;
+            // Case A: Static public images shipped with app (e.g., images/srm/...)
+            if (str_starts_with($imagePath, 'images/')) {
+                // Serve directly from public/images in both envs
+                return '/' . $imagePath;
             }
-            
-            // Check if it's a cloud storage path (products/ folder for new uploads)
-            if (strpos($imagePath, 'products/') === 0) {
-                // For production, use Storage::url() to get cloud URL
-                if (app()->environment('production')) {
-                    return Storage::url($imagePath);
-                }
-                
-                // For local development, fallback to storage path
-                return '/storage/' . $imagePath;
-            }
-            
-            // For all other cases, use storage path
+
+            // Case B: Stored uploads (public disk or R2). In production, always prefer R2 base URL.
             if (app()->environment('production')) {
-                // Use cloud storage URL for production
-                return Storage::url($imagePath);
+                $r2BaseUrl = config('filesystems.disks.r2.url');
+                if (!empty($r2BaseUrl)) {
+                    return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+                }
+                // Fallback: default disk URL (if configured)
+                try {
+                    return Storage::url($imagePath);
+                } catch (\Throwable $e) {
+                    // Last resort: app URL + storage path
+                    return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
+                }
             }
-            
+
+            // Local/dev: serve via storage symlink
             return '/storage/' . $imagePath;
         }
         
