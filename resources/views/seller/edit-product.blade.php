@@ -120,6 +120,14 @@
         .left-box, .right-box { flex: 1 1 100%; padding: 30px 20px; }
         .btn-horizontal-group { flex-direction: column; gap: 15px; }
     }
+    /* Subtle hover effect for form fields */
+    input.form-control:hover, select.form-select:hover, textarea.form-control:hover {
+        border-color: #06b6d4;
+        box-shadow: 0 0 0 0.12rem rgba(6,182,212,0.13);
+    }
+    /* Section spacing for better readability */
+    .row.g-4 > [class^='col-'] { margin-bottom: 18px; }
+    .alert { font-size:1rem; font-weight:600; letter-spacing:0.2px; }
     </style>
 </head>
 
@@ -248,14 +256,6 @@
                         <img id="previewImg" src="" alt="Preview" style="max-width: 170px; max-height: 170px; border-radius: 10px; border: 2px solid #3b82f6; box-shadow:0 2px 8px rgba(59,130,246,0.10);">
                         <div><small class="text-muted">New image preview</small></div>
                     </div>
-    /* Subtle hover effect for form fields */
-    input.form-control:hover, select.form-select:hover, textarea.form-control:hover {
-        border-color: #06b6d4;
-        box-shadow: 0 0 0 0.12rem rgba(6,182,212,0.13);
-    }
-    /* Section spacing for better readability */
-    .row.g-4 > [class^='col-'] { margin-bottom: 18px; }
-    .alert { font-size:1rem; font-weight:600; letter-spacing:0.2px; }
                 </div>
 
             </div>
