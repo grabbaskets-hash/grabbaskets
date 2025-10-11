@@ -1,10 +1,3 @@
-// Admin: Update product seller
-Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
-    if (!session('is_admin')) {
-        return redirect()->route('admin.login');
-    }
-    return app(\App\Http\Controllers\AdminController::class)->updateProductSeller($request, \App\Models\Product::findOrFail($product));
-})->name('admin.products.updateSeller');
 <?php
 
 use App\Http\Controllers\BuyerController;
@@ -26,6 +19,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
+
+// Admin: Update product seller
+Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
+    if (!session('is_admin')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\AdminController::class)->updateProductSeller($request, \App\Models\Product::findOrFail($product));
+})->name('admin.products.updateSeller');
 
 /*
 |--------------------------------------------------------------------------
