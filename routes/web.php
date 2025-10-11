@@ -1,4 +1,8 @@
 <?php
+// Debug logging for edit product route
+use Illuminate\Support\Facades\Log;
+
+
 
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\SellerController;
@@ -16,13 +20,32 @@ use App\Http\Controllers\CourierTrackingController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+#use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 // Test image upload route
 #use Illuminate\Http\Request;
 #use Illuminate\Support\Facades\Storage;
+// Universal image serving route for public and R2 disks
+use App\Http\Controllers\ImageServeController;
+Route::get('/serve-image/{disk}/{folder}/{filename}', [ImageServeController::class, 'serve'])
+    ->where(['disk' => 'public|r2', 'folder' => '[^/]+', 'filename' => '.+'])
+    ->name('serve.image');
 
+
+
+
+Route::get('/seller/product/{product}/edit', function($product) {
+    Log::info('Route: /seller/product/{product}/edit called', ['product_param' => $product, 'user_id' => auth()->id()]);
+    try {
+        $productModel = \App\Models\Product::find($product);
+        Log::info('Route: Product loaded', ['product_id' => $productModel ? $productModel->id : null]);
+    } catch (\Throwable $e) {
+        Log::error('Route: Exception loading product', ['error' => $e->getMessage()]);
+    }
+    // Pass to controller
+    return app(\App\Http\Controllers\SellerController::class)->editProduct(\App\Models\Product::findOrFail($product));
+})->name('seller.editProduct');
 Route::match(['get', 'post'], '/test-upload', function(Request $request) {
     if ($request->isMethod('post')) {
         if ($request->hasFile('image')) {

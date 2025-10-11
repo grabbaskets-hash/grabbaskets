@@ -438,12 +438,13 @@ class SellerController extends Controller {
                             $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
                             $uniqueName = Str::random(40) . '.' . $extension;
                             $storagePath = 'products/' . $product->id . '/' . $uniqueName;
-                            
-                            // Try AWS (R2) first, fallback to local/public
-                            $saved = false;
+
+                            // Always try to store to both R2 and public
+                            $savedR2 = false;
+                            $savedPublic = false;
                             try {
-                                $saved = Storage::disk('r2')->put($storagePath, $imageContent);
-                                if ($saved) {
+                                $savedR2 = Storage::disk('r2')->put($storagePath, $imageContent);
+                                if ($savedR2) {
                                     Log::info('Bulk image stored in AWS (r2)', [
                                         'product_id' => $product->id,
                                         'unique_id' => $uniqueId,
@@ -451,28 +452,39 @@ class SellerController extends Controller {
                                     ]);
                                 }
                             } catch (\Throwable $e) {
-                                Log::warning('AWS upload failed for bulk image, using local', [
+                                Log::warning('AWS upload failed for bulk image', [
                                     'product_id' => $product->id,
                                     'error' => $e->getMessage()
                                 ]);
-                                $saved = false;
                             }
-                            
-                            if (!$saved) {
-                                $saved = Storage::disk('public')->put($storagePath, $imageContent);
+
+                            try {
+                                $savedPublic = Storage::disk('public')->put($storagePath, $imageContent);
+                                if ($savedPublic) {
+                                    Log::info('Bulk image stored in public disk', [
+                                        'product_id' => $product->id,
+                                        'unique_id' => $uniqueId,
+                                        'path' => $storagePath
+                                    ]);
+                                }
+                            } catch (\Throwable $e) {
+                                Log::warning('Public disk upload failed for bulk image', [
+                                    'product_id' => $product->id,
+                                    'error' => $e->getMessage()
+                                ]);
                             }
-                            
-                            if ($saved) {
+
+                            if ($savedR2 || $savedPublic) {
                                 // Delete old legacy image if exists
                                 if ($product->image) {
                                     try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
                                     try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
                                 }
-                                
+
                                 // Update legacy image field
                                 $product->image = $storagePath;
                                 $product->save();
-                                
+
                                 // Also create/update ProductImage record for gallery system
                                 try {
                                     \App\Models\ProductImage::updateOrCreate(
@@ -494,10 +506,16 @@ class SellerController extends Controller {
                                         'error' => $e->getMessage()
                                     ]);
                                 }
-                                
+
                                 $updated++;
+                                if (!$savedR2) {
+                                    $errors[] = "Image for product $uniqueId saved to public but failed to save to R2.";
+                                }
+                                if (!$savedPublic) {
+                                    $errors[] = "Image for product $uniqueId saved to R2 but failed to save to public.";
+                                }
                             } else {
-                                $errors[] = "Failed to save image for product $uniqueId";
+                                $errors[] = "Failed to save image for product $uniqueId to either R2 or public.";
                             }
                         } else {
                             $errors[] = "No product found for unique_id: $uniqueId";
@@ -759,13 +777,39 @@ public function storeCategorySubcategory(Request $request)
 
     public function editProduct(Product $product)
     {
-        // Ensure only owner can edit
-        if ($product->seller_id !== Auth::id()) {
-            return redirect()->route('seller.dashboard')->with('error', 'Unauthorized access to product.');
+        try {
+            Log::info('editProduct called', [
+                'product_id' => $product->id ?? null,
+                'seller_id' => $product->seller_id ?? null,
+                'auth_id' => Auth::id(),
+                'product_exists' => $product ? true : false
+            ]);
+            // Ensure only owner can edit
+            if (!$product || !isset($product->seller_id)) {
+                Log::error('editProduct: Product not found or missing seller_id', ['product' => $product]);
+                return response('<h2 style="color:red;">Product not found.</h2>', 500);
+            }
+            if ($product->seller_id !== Auth::id()) {
+                Log::warning('editProduct: Unauthorized access', [
+                    'product_seller_id' => $product->seller_id,
+                    'auth_id' => Auth::id()
+                ]);
+                return response('<h2 style="color:red;">Unauthorized access to product.</h2>', 403);
+            }
+            $categories = Category::all();
+            $subcategories = Subcategory::all();
+            Log::info('editProduct: categories/subcategories loaded', [
+                'categories_count' => $categories->count(),
+                'subcategories_count' => $subcategories->count()
+            ]);
+            return view('seller.edit-product', compact('product', 'categories', 'subcategories'));
+        } catch (\Throwable $e) {
+            Log::error('editProduct: Exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response('<h2 style="color:red;">Exception: ' . htmlspecialchars($e->getMessage()) . '</h2><pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>', 500);
         }
-        $categories = Category::all();
-        $subcategories = Subcategory::all();
-        return view('seller.edit-product', compact('product', 'categories', 'subcategories'));
     }
 
     public function updateProduct(Request $request, Product $product)
