@@ -16,18 +16,121 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing as SheetDrawing;
 
-class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows
+class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
 {
     protected $errors = [];
     protected $successCount = 0;
     protected $zipFile;
     protected $sellerId;
+    protected $embeddedImagesByRow = [];
+    protected $imageColumnLetter = null;
+    protected $headingRowIndex = 1;
 
     public function __construct($zipFile = null, $sellerId = null)
     {
         $this->zipFile = $zipFile;
         $this->sellerId = $sellerId ?: (Auth::check() ? Auth::id() : null);
+    }
+
+    public function headingRow(): int
+    {
+        return 1;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $worksheet = $event->sheet->getDelegate();
+                $this->headingRowIndex = $this->headingRow();
+
+                // Try to detect the column letter for the 'image' header, if present
+                try {
+                    $highestColumn = $worksheet->getHighestColumn();
+                    $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+                    for ($colIndex = 1; $colIndex <= $highestColumnIndex; $colIndex++) {
+                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+                        $value = $worksheet->getCell($colLetter . $this->headingRowIndex)->getValue();
+                        $norm = is_string($value) ? strtolower(trim($value)) : '';
+                        if ($norm === 'image' || $norm === 'images' || $norm === 'image_file' || $norm === 'image name' || $norm === 'image filename') {
+                            $this->imageColumnLetter = $colLetter;
+                            break;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // If we fail to detect, we will still map by row number only
+                    $this->imageColumnLetter = null;
+                }
+
+                // Collect drawings (embedded images) mapped by row
+                try {
+                    $drawings = $worksheet->getDrawingCollection();
+                    foreach ($drawings as $drawing) {
+                        $coord = $drawing->getCoordinates(); // e.g., G2
+                        // Validate column if we detected the image column letter
+                        $colLetter = preg_replace('/\d+/', '', $coord);
+                        $rowNumber = (int) preg_replace('/\D+/', '', $coord);
+                        if ($this->imageColumnLetter && strtoupper($colLetter) !== strtoupper($this->imageColumnLetter)) {
+                            continue; // Skip drawings not in the image column
+                        }
+
+                        $content = null;
+                        $mime = null;
+                        $ext = 'jpg';
+
+                        if ($drawing instanceof MemoryDrawing) {
+                            $mime = $drawing->getMimeType();
+                            $imageResource = $drawing->getImageResource();
+                            ob_start();
+                            switch ($mime) {
+                                case MemoryDrawing::MIMETYPE_PNG:
+                                    imagepng($imageResource);
+                                    $ext = 'png';
+                                    break;
+                                case MemoryDrawing::MIMETYPE_GIF:
+                                    imagegif($imageResource);
+                                    $ext = 'gif';
+                                    break;
+                                case MemoryDrawing::MIMETYPE_JPEG:
+                                default:
+                                    imagejpeg($imageResource, null, 90);
+                                    $ext = 'jpg';
+                                    break;
+                            }
+                            $content = ob_get_clean();
+                        } elseif ($drawing instanceof SheetDrawing) {
+                            $path = $drawing->getPath();
+                            if (is_readable($path)) {
+                                $content = @file_get_contents($path);
+                                $guessedExt = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                if ($guessedExt) { $ext = $guessedExt; }
+                                // Best-effort mime from extension or finfo
+                                if (function_exists('mime_content_type')) {
+                                    $mime = @mime_content_type($path) ?: null;
+                                } else {
+                                    $mime = null;
+                                }
+                            }
+                        }
+
+                        if ($content) {
+                            $this->embeddedImagesByRow[$rowNumber] = [
+                                'content' => $content,
+                                'mime' => $mime,
+                                'ext' => $ext,
+                            ];
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to read embedded images from sheet', ['error' => $e->getMessage()]);
+                }
+            }
+        ];
     }
 
     protected function normalizeColumnName($columnName)
@@ -89,7 +192,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             'name', 'unique_id', 'category_id', 'category_name', 'subcategory_id', 'subcategory_name', 'image', 'description', 'price', 'discount', 'delivery_charge', 'gift_option', 'stock'
         ];
 
-        foreach ($rows as $rowIndex => $row) {
+    foreach ($rows as $rowIndex => $row) {
             $rowArr = $row->toArray();
             if ($hasHeaders) {
                 // Normalize the row data
@@ -115,18 +218,42 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     continue;
                 }
 
-                // Find or create category
+                // Try to locate existing product for this seller early (trim identifiers)
+                $existing = null;
+                $rowUniqueId = isset($row['unique_id']) ? trim((string)$row['unique_id']) : null;
+                $rowName = trim((string)$row['name']);
+                if (!empty($rowUniqueId)) {
+                    $existing = Product::where('seller_id', $this->sellerId)
+                        ->where('unique_id', $rowUniqueId)
+                        ->first();
+                }
+                if (!$existing) {
+                    $existing = Product::where('seller_id', $this->sellerId)
+                        ->where('name', $rowName)
+                        ->first();
+                }
+
+                // Find or create category (or reuse existing's category for updates)
                 $category = $this->findOrCreateCategory($row);
-                if (!$category) {
+                if (!$category && $existing) {
+                    $category = $existing->category_id ? \App\Models\Category::find($existing->category_id) : null;
+                }
+                if (!$category && !$existing) {
                     $this->errors[] = "Row " . ($rowIndex + 2) . ": Category not found or could not be created";
                     continue;
                 }
 
-                // Find or create subcategory
+                // Find or create subcategory (or reuse existing's subcategory for updates)
                 $subcategory = $this->findOrCreateSubcategory($row, $category);
+                if (!$subcategory && $existing && $existing->subcategory_id) {
+                    $subcategory = \App\Models\Subcategory::find($existing->subcategory_id);
+                }
 
-                // Handle image upload from zip
-                $imagePath = $this->handleImageUpload($row);
+                // Compute sheet row number for mapping embedded drawings
+                $sheetRowNumber = $hasHeaders ? ($rowIndex + $this->headingRowIndex + 1) : ($rowIndex + $this->headingRowIndex);
+
+                // Handle image upload from zip or embedded image in the sheet
+                $imagePath = $this->handleImageUpload($row, $sheetRowNumber);
 
                 // Normalize discount value - handle "no", "none", empty as 0
                 $discount = 0;
@@ -139,21 +266,84 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     }
                 }
 
-                // Create product
-                $product = Product::create([
-                    'name' => $row['name'],
-                    'unique_id' => $row['unique_id'] ?? 'PROD-' . Str::random(8),
-                    'category_id' => $category->id,
-                    'subcategory_id' => $subcategory ? $subcategory->id : null,
-                    'seller_id' => $this->sellerId,
-                    'image' => $imagePath,
-                    'description' => $row['description'] ?? '',
-                    'price' => (float) $row['price'],
-                    'discount' => $discount,
-                    'delivery_charge' => (float) ($row['delivery_charge'] ?? 0),
-                    'gift_option' => filter_var($row['gift_option'] ?? false, FILTER_VALIDATE_BOOLEAN),
-                    'stock' => (int) ($row['stock'] ?? 1),
-                ]);
+                // Upsert product by unique_id for this seller; fallback to name match if unique_id missing
+
+                if ($existing) {
+                    // Update existing product fields
+                    $existing->name = $rowName;
+                    if ($category) { $existing->category_id = $category->id; }
+                    $existing->subcategory_id = $subcategory ? $subcategory->id : $existing->subcategory_id;
+                    $existing->description = $row['description'] ?? $existing->description;
+                    $existing->price = (float) $row['price'];
+                    $existing->discount = $discount;
+                    $existing->delivery_charge = (float) ($row['delivery_charge'] ?? 0);
+                    $existing->gift_option = filter_var($row['gift_option'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                    $existing->stock = (int) ($row['stock'] ?? $existing->stock ?? 1);
+                    if ($imagePath) {
+                        $existing->image = $imagePath;
+                    }
+                    $existing->save();
+
+                    // Ensure a primary ProductImage exists/updated when we have a new image
+                    if ($imagePath) {
+                        try {
+                            \App\Models\ProductImage::updateOrCreate(
+                                [
+                                    'product_id' => $existing->id,
+                                    'is_primary' => true
+                                ],
+                                [
+                                    'image_path' => $imagePath,
+                                    'original_name' => basename($imagePath),
+                                    'mime_type' => null,
+                                    'file_size' => null,
+                                    'sort_order' => 1,
+                                ]
+                            );
+                        } catch (\Throwable $e) {
+                            Log::warning('Failed to upsert primary ProductImage during bulk update', [
+                                'product_id' => $existing->id,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+                } else {
+                    // Create product
+                    $product = Product::create([
+                        'name' => $rowName,
+                        'unique_id' => $rowUniqueId ?: ('PROD-' . Str::random(8)),
+                        'category_id' => $category->id,
+                        'subcategory_id' => $subcategory ? $subcategory->id : null,
+                        'seller_id' => $this->sellerId,
+                        'image' => $imagePath,
+                        'description' => $row['description'] ?? '',
+                        'price' => (float) $row['price'],
+                        'discount' => $discount,
+                        'delivery_charge' => (float) ($row['delivery_charge'] ?? 0),
+                        'gift_option' => filter_var($row['gift_option'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                        'stock' => (int) ($row['stock'] ?? 1),
+                    ]);
+
+                    // Create a primary ProductImage if we have an image
+                    if ($imagePath) {
+                        try {
+                            \App\Models\ProductImage::create([
+                                'product_id' => $product->id,
+                                'image_path' => $imagePath,
+                                'original_name' => basename($imagePath),
+                                'mime_type' => null,
+                                'file_size' => null,
+                                'sort_order' => 1,
+                                'is_primary' => true,
+                            ]);
+                        } catch (\Throwable $e) {
+                            Log::warning('Failed to create primary ProductImage during bulk create', [
+                                'product_id' => $product->id,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+                }
 
                 $this->successCount++;
 
@@ -228,7 +418,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
         return null;
     }
 
-    protected function handleImageUpload($row)
+    protected function handleImageUpload($row, int $sheetRowNumber)
     {
         // Build candidate names to match: image column and unique_id
         $candidates = [];
@@ -248,7 +438,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             return null;
         }
 
-        // If we have a zip file, extract the image
+    // If we have a zip file, extract the image
         if ($this->zipFile && Storage::exists($this->zipFile)) {
             try {
                 $zip = new \ZipArchive();
@@ -305,6 +495,52 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                 }
             } catch (\Exception $e) {
                 Log::error('Error extracting image from zip: ' . $e->getMessage());
+            }
+        }
+
+        // If no match from ZIP, check for an embedded image anchored to this sheet row
+        if (isset($this->embeddedImagesByRow[$sheetRowNumber])) {
+            try {
+                $payload = $this->embeddedImagesByRow[$sheetRowNumber];
+                $content = $payload['content'];
+                $ext = $payload['ext'] ?: 'jpg';
+                $uniqueName = Str::random(40) . '.' . $ext;
+                $storagePath = 'products/' . $uniqueName;
+
+                // Save to both R2 and public
+                $r2Saved = false; $localSaved = false;
+                try { $r2Saved = Storage::disk('r2')->put($storagePath, $content); } catch (\Throwable $e) { $r2Saved = false; }
+                try { $localSaved = Storage::disk('public')->put($storagePath, $content); } catch (\Throwable $e) { $localSaved = false; }
+
+                if ($r2Saved || $localSaved) {
+                    Log::info('Embedded Excel image stored', ['row' => $sheetRowNumber, 'path' => $storagePath]);
+                    return $storagePath;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to save embedded image from Excel', ['row' => $sheetRowNumber, 'error' => $e->getMessage()]);
+            }
+        }
+
+        // Also support data URI directly in the image column
+        if (!empty($row['image']) && is_string($row['image']) && str_starts_with(trim($row['image']), 'data:image/')) {
+            try {
+                [$meta, $data] = explode(',', $row['image'], 2);
+                $content = base64_decode($data);
+                $ext = 'jpg';
+                if (preg_match('#data:image/(png|jpeg|jpg|gif|webp)#i', $meta, $m)) {
+                    $ext = strtolower($m[1] === 'jpeg' ? 'jpg' : $m[1]);
+                }
+                $uniqueName = Str::random(40) . '.' . $ext;
+                $storagePath = 'products/' . $uniqueName;
+                $r2Saved = false; $localSaved = false;
+                try { $r2Saved = Storage::disk('r2')->put($storagePath, $content); } catch (\Throwable $e) { $r2Saved = false; }
+                try { $localSaved = Storage::disk('public')->put($storagePath, $content); } catch (\Throwable $e) { $localSaved = false; }
+                if ($r2Saved || $localSaved) {
+                    Log::info('Data URI image stored from Excel image field', ['row' => $sheetRowNumber, 'path' => $storagePath]);
+                    return $storagePath;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to parse data URI image in Excel field', ['row' => $sheetRowNumber, 'error' => $e->getMessage()]);
             }
         }
 
