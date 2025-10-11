@@ -22,10 +22,12 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
     protected $errors = [];
     protected $successCount = 0;
     protected $zipFile;
+    protected $sellerId;
 
-    public function __construct($zipFile = null)
+    public function __construct($zipFile = null, $sellerId = null)
     {
         $this->zipFile = $zipFile;
+        $this->sellerId = $sellerId ?: (Auth::check() ? Auth::id() : null);
     }
 
     protected function normalizeColumnName($columnName)
@@ -143,7 +145,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     'unique_id' => $row['unique_id'] ?? 'PROD-' . Str::random(8),
                     'category_id' => $category->id,
                     'subcategory_id' => $subcategory ? $subcategory->id : null,
-                    'seller_id' => Auth::id(),
+                    'seller_id' => $this->sellerId,
                     'image' => $imagePath,
                     'description' => $row['description'] ?? '',
                     'price' => (float) $row['price'],
