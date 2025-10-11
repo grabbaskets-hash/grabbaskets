@@ -1,3 +1,42 @@
+@php
+    // Print all product fields and key accessors for debugging
+    if (isset($product) && $product) {
+        echo '<div style="color:blue;font-weight:bold;">[DEBUG] Product fields:</div>';
+        foreach ($product->getAttributes() as $key => $val) {
+            echo '<div style="color:blue;">' . htmlspecialchars($key) . ': ' . htmlspecialchars((string)$val) . '</div>';
+        }
+        // Try image_url accessor
+        try {
+            $imgUrl = $product->image_url;
+            echo '<div style="color:green;">[DEBUG] $product->image_url: ' . htmlspecialchars($imgUrl) . '</div>';
+        } catch (Throwable $e) {
+            echo '<div style="color:red;">[DEBUG] Exception in $product->image_url: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
+        // Try getLegacyImageUrl()
+        try {
+            $legacyUrl = $product->getLegacyImageUrl();
+            echo '<div style="color:green;">[DEBUG] $product->getLegacyImageUrl(): ' . htmlspecialchars($legacyUrl) . '</div>';
+        } catch (Throwable $e) {
+            echo '<div style="color:red;">[DEBUG] Exception in $product->getLegacyImageUrl(): ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
+    }
+@endphp
+@php
+    // Debug output for null checks
+    if (!isset($product) || !$product) {
+        echo '<div style="color:red;font-weight:bold;">[DEBUG] $product is null or not set</div>';
+    }
+    if (!isset($categories) || !$categories) {
+        echo '<div style="color:red;font-weight:bold;">[DEBUG] $categories is null or not set</div>';
+    } else {
+        echo '<div style="color:green;">[DEBUG] $categories count: ' . (is_countable($categories) ? count($categories) : 'N/A') . '</div>';
+    }
+    if (!isset($subcategories) || !$subcategories) {
+        echo '<div style="color:red;font-weight:bold;">[DEBUG] $subcategories is null or not set</div>';
+    } else {
+        echo '<div style="color:green;">[DEBUG] $subcategories count: ' . (is_countable($subcategories) ? count($subcategories) : 'N/A') . '</div>';
+    }
+@endphp
 
 <!DOCTYPE html>
 <html lang="en">
