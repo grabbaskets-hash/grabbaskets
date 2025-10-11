@@ -249,6 +249,7 @@
                         <tr>
                             <th>Image</th>
                             <th>Name</th>
+                            <th>Unique ID</th>
                             <th>Category</th>
                             <th>Subcategory</th>
                             <th>Price</th>
@@ -270,8 +271,8 @@
                                 <span class="text-muted small">No Image</span>
                                 @endif
                             </td>
-                            <td><a href="{{ route('product.details', $p->id) }}" class="text-decoration-none text-dark">{{ $p->name }}</a>
-                            </td>
+                            <td><a href="{{ route('product.details', $p->id) }}" class="text-decoration-none text-dark">{{ $p->name }}</a></td>
+                            <td><span class="badge bg-secondary">{{ $p->unique_id ?? '-' }}</span></td>
                             <td>{{ optional($p->category)->name ?? '-' }}</td>
                             <td>{{ optional($p->subcategory)->name ?? '-' }}</td>
                             <td>₹{{ number_format($p->price, 2) }}</td>

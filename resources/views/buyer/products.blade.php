@@ -21,7 +21,8 @@
 
         /* Sidebar Filters */
         .filter-card {
-            background: #fff;
+                @if($products->count() > 0)
+                    @foreach($products as $product)
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -99,9 +100,10 @@
         footer a { color: #fff; text-decoration: none; }
         footer a:hover { color: #ddd; }
 
-        .footer-main-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+                    @endforeach
+                @else
+                    <div class="alert alert-info">No products found in this subcategory yet. Please check back later or browse other subcategories from the menu.</div>
+                @endif
             gap: 3rem;
             align-items: start;
             max-width: 1200px;
