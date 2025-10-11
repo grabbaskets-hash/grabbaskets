@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Order;
 use App\Imports\ProductsImport;
 use App\Services\GitHubImageService;
@@ -107,8 +108,118 @@ class SellerController extends Controller {
             try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
             try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
         }
+
+        // Delete all product images
+        foreach ($product->productImages as $productImage) {
+            try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
+            try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+            $productImage->delete();
+        }
+
         $product->delete();
         return redirect()->route('seller.dashboard')->with('success', 'Product deleted!');
+    }
+
+    // Upload multiple images for a product
+    public function uploadProductImages(Request $request, Product $product)
+    {
+        if ($product->seller_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'images' => 'required|array|min:1|max:10',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max per image
+        ]);
+
+        $uploadedCount = 0;
+        $errors = [];
+
+        foreach ($request->file('images') as $index => $image) {
+            try {
+                $folder = 'products/' . $product->id;
+                $originalName = $image->getClientOriginalName();
+                $mimeType = $image->getMimeType();
+                $fileSize = $image->getSize();
+
+                // Try cloud first, fallback to local/public
+                try {
+                    $path = $image->store($folder, 'r2');
+                } catch (\Throwable $e) {
+                    $path = $image->store($folder, 'public');
+                }
+
+                // Get the next sort order
+                $nextSortOrder = ProductImage::where('product_id', $product->id)
+                    ->max('sort_order') + 1;
+
+                // Create ProductImage record
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                    'original_name' => $originalName,
+                    'mime_type' => $mimeType,
+                    'file_size' => $fileSize,
+                    'sort_order' => $nextSortOrder,
+                    'is_primary' => $index === 0 && $product->productImages()->count() === 0, // First image is primary if no images exist
+                ]);
+
+                $uploadedCount++;
+            } catch (\Exception $e) {
+                $errors[] = "Failed to upload {$originalName}: " . $e->getMessage();
+            }
+        }
+
+        $message = "{$uploadedCount} images uploaded successfully.";
+        if (!empty($errors)) {
+            $message .= " Errors: " . implode(', ', $errors);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    // Delete a specific product image
+    public function deleteProductImage(ProductImage $productImage)
+    {
+        if ($productImage->product->seller_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Delete from storage
+        try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
+        try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+
+        $productImage->delete();
+
+        return redirect()->back()->with('success', 'Image deleted successfully.');
+    }
+
+    // Set primary image
+    public function setPrimaryImage(ProductImage $productImage)
+    {
+        if ($productImage->product->seller_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Remove primary flag from all images of this product
+        ProductImage::where('product_id', $productImage->product_id)
+            ->update(['is_primary' => false]);
+
+        // Set this image as primary
+        $productImage->update(['is_primary' => true]);
+
+        return redirect()->back()->with('success', 'Primary image updated.');
+    }
+
+    // Show product gallery management
+    public function productGallery(Product $product)
+    {
+        if ($product->seller_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $images = $product->productImages()->ordered()->get();
+        return view('seller.product-gallery', compact('product', 'images'));
     }
     public function storeProducts(\App\Models\Seller $seller)
     {
@@ -513,6 +624,18 @@ public function storeCategorySubcategory(Request $request)
             try {
                 $path = $image->store($folder, 'r2');
                 $product->update(['image' => $path]);
+                
+                // Also create a ProductImage record for the new gallery system
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                    'original_name' => $image->getClientOriginalName(),
+                    'mime_type' => $image->getMimeType(),
+                    'file_size' => $image->getSize(),
+                    'sort_order' => 1,
+                    'is_primary' => true, // First image is primary
+                ]);
+                
                 Log::info('Image stored in AWS (r2) successfully', [
                     'product_id' => $product->id,
                     'path' => $path,
@@ -525,6 +648,18 @@ public function storeCategorySubcategory(Request $request)
                 try {
                     $path = $image->store($folder, 'public');
                     $product->update(['image' => $path]);
+                    
+                    // Also create a ProductImage record for the new gallery system
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $path,
+                        'original_name' => $image->getClientOriginalName(),
+                        'mime_type' => $image->getMimeType(),
+                        'file_size' => $image->getSize(),
+                        'sort_order' => 1,
+                        'is_primary' => true,
+                    ]);
+                    
                     Log::info('Image stored in local/public storage (fallback)', [
                         'product_id' => $product->id,
                         'path' => $path,

@@ -301,6 +301,12 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/product/{product}/edit', [SellerController::class, 'editProduct'])->name('seller.editProduct');
     Route::put('/seller/product/{product}', [SellerController::class, 'updateProduct'])->name('seller.updateProduct');
     Route::delete('/seller/product/{product}', [SellerController::class, 'destroyProduct'])->name('seller.destroyProduct');
+    
+    // Product Gallery Management
+    Route::get('/seller/product/{product}/gallery', [SellerController::class, 'productGallery'])->name('seller.productGallery');
+    Route::post('/seller/product/{product}/images', [SellerController::class, 'uploadProductImages'])->name('seller.uploadProductImages');
+    Route::delete('/seller/product-image/{productImage}', [SellerController::class, 'deleteProductImage'])->name('seller.deleteProductImage');
+    Route::patch('/seller/product-image/{productImage}/primary', [SellerController::class, 'setPrimaryImage'])->name('seller.setPrimaryImage');
 
     // Bulk Image Reupload
     Route::get('/seller/bulk-image-reupload', [SellerController::class, 'showBulkImageReupload'])->name('seller.bulkImageReupload');
