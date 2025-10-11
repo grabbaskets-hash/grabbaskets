@@ -19,6 +19,35 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+// Test image upload route
+#use Illuminate\Http\Request;
+#use Illuminate\Support\Facades\Storage;
+
+Route::match(['get', 'post'], '/test-upload', function(Request $request) {
+    if ($request->isMethod('post')) {
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->storeAs('products', $file->getClientOriginalName(), 'public');
+            return back()->with('success', 'Image uploaded: ' . $path);
+        } else {
+            return back()->with('error', 'No file uploaded.');
+        }
+    }
+    return view('test-upload');
+});
+// Test direct upload to R2
+Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
+    if ($request->isMethod('post')) {
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->storeAs('products', $file->getClientOriginalName(), 'r2');
+            return back()->with('success', 'Image uploaded to R2: ' . $path);
+        } else {
+            return back()->with('error', 'No file uploaded.');
+        }
+    }
+    return view('test-upload');
+});
 
 // Admin: Update product seller
 Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {

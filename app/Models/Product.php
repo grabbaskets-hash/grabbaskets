@@ -114,12 +114,23 @@ class Product extends Model
     // Helper method for legacy image URL generation
     private function getLegacyImageUrl()
     {
-        // Priority 1: Direct external image URL (https://)
+        // Priority 1: Direct external image URL (https:// or GitHub raw)
         if ($this->image && (str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'http://'))) {
             return $this->image;
         }
-        
-        // Priority 2: File system image
+        // Priority 2: GitHub raw URL (if image path starts with github/)
+        if ($this->image && str_starts_with($this->image, 'github/')) {
+            // Example: github/user/repo/branch/path/to/image.jpg
+            $parts = explode('/', $this->image, 5);
+            if (count($parts) === 5) {
+                $user = $parts[1];
+                $repo = $parts[2];
+                $branch = $parts[3];
+                $filePath = $parts[4];
+                return "https://raw.githubusercontent.com/$user/$repo/$branch/$filePath";
+            }
+        }
+        // Priority 3: File system image
         if ($this->image) {
             $imagePath = ltrim($this->image, '/');
 

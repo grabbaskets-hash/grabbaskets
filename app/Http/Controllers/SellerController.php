@@ -10,8 +10,8 @@ use App\Imports\ProductsImport;
 use App\Services\GitHubImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -784,69 +784,68 @@ public function storeCategorySubcategory(Request $request)
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
-        
-        // Handle image update: DUAL STORAGE for redundancy (AWS R2 + Git storage)
+
+        // Debug: Log if file is present
+        Log::info('Image upload debug', [
+            'hasFile' => $request->hasFile('image'),
+            'file' => $request->file('image'),
+            'all_files' => $request->allFiles(),
+        ]);
+
+        // Handle image update: Try public first, then private, then github (log error if all fail)
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $folder = 'products';
-            $imageUploaded = false;
+            $nameSlug = Str::slug($request->input('name', $product->name));
+            $ext = $image->getClientOriginalExtension();
+            $filename = $nameSlug . '.' . $ext;
             $imagePath = null;
-
+            $uploaded = false;
             try {
-                // Save to both AWS R2 and Git storage
-                $r2Path = null;
-                $publicPath = null;
-                $r2Success = false;
-                $publicSuccess = false;
-
-                // Try AWS R2 first
+                // Try public disk first
                 try {
-                    $r2Path = $image->store($folder, 'r2');
-                    $r2Success = !empty($r2Path);
-                } catch (\Throwable $r2Ex) {
-                    Log::warning('AWS R2 upload failed during product update', [
-                        'error' => $r2Ex->getMessage(),
-                        'product_id' => $product->id
-                    ]);
-                }
-
-                // Then save to Git storage (public disk)
-                try {
-                    $publicPath = $image->store($folder, 'public');
-                    $publicSuccess = !empty($publicPath);
+                    $imagePath = $image->storeAs($folder, $filename, 'public');
+                    $uploaded = !empty($imagePath);
                 } catch (\Throwable $publicEx) {
-                    Log::warning('Git storage (public) upload failed during product update', [
+                    Log::warning('Public disk upload failed during product update', [
                         'error' => $publicEx->getMessage(),
                         'product_id' => $product->id
                     ]);
                 }
-
-                // Use whichever path was successful (prefer R2)
-                $imagePath = $r2Success ? $r2Path : $publicPath;
-                $imageUploaded = $r2Success || $publicSuccess;
-
-                if ($imageUploaded) {
-                    // Remove all ProductImage records for this product so the new image replaces the old one
-                    foreach ($product->productImages as $productImage) {
-                        try { \Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                        try { \Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                        $productImage->delete();
+                // If public failed, try private disk
+                if (!$uploaded) {
+                    try {
+                        $imagePath = $image->storeAs($folder, $filename, 'private');
+                        $uploaded = !empty($imagePath);
+                    } catch (\Throwable $privateEx) {
+                        Log::warning('Private disk upload failed during product update', [
+                            'error' => $privateEx->getMessage(),
+                            'product_id' => $product->id
+                        ]);
                     }
-                    $data['image'] = $imagePath;
-                    Log::info('Product image updated with dual storage redundancy and old productImages removed', [
-                        'product_id' => $product->id,
-                        'path' => $imagePath,
-                        'r2_success' => $r2Success,
-                        'public_success' => $publicSuccess
-                    ]);
-                } else {
-                    Log::error('Both AWS R2 and Git storage failed during product update', [
+                }
+                // If both failed, fallback to github (or log error)
+                if (!$uploaded) {
+                    // Place github upload logic here if available, else log error
+                    Log::error('All storage uploads failed during product update (public, private, github)', [
                         'product_id' => $product->id
                     ]);
                     return redirect()->back()->with('error', 'Failed to upload image to any storage. Please try again.');
                 }
+                // Remove all ProductImage records for this product so the new image replaces the old one
+                foreach ($product->productImages as $productImage) {
+                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    try { Storage::disk('private')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    $productImage->delete();
+                }
+                $data['image'] = $imagePath;
+                Log::info('Product image updated (public preferred, private fallback)', [
+                    'product_id' => $product->id,
+                    'path' => $imagePath
+                ]);
             } catch (\Throwable $ex) {
-                Log::error('Exception during dual storage image update', [
+                Log::error('Exception during image update', [
                     'error' => $ex->getMessage(),
                     'product_id' => $product->id
                 ]);

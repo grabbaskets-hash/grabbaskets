@@ -38,4 +38,9 @@ class ProductController extends Controller
         ]);
         return back()->with('success', 'Review added!');
     }
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('products.edit', compact('product'));
+    }
 }

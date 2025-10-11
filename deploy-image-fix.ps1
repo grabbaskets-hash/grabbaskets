@@ -8,6 +8,10 @@ php artisan route:clear
 php artisan view:clear
 php artisan cache:clear
 
+# Step 1.5: Ensure storage symlink exists
+Write-Host "Ensuring storage symlink exists..." -ForegroundColor Yellow
+php artisan storage:link
+
 # Step 2: Test a specific image URL
 Write-Host "2. Testing image serving..." -ForegroundColor Yellow
 
@@ -37,6 +41,21 @@ try {
     }
 } catch {
     Write-Host "❌ Index page failed: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Step 4: Test edit form page
+Write-Host "4. Testing edit form page..." -ForegroundColor Yellow
+$editFormUrl = "https://grabbaskets.laravel.cloud/products/1/edit"
+Write-Host "Testing URL: $editFormUrl"
+try {
+    $editFormResponse = Invoke-WebRequest -Uri $editFormUrl -ErrorAction SilentlyContinue
+    if ($editFormResponse.StatusCode -eq 200) {
+        Write-Host "✅ Edit form page accessible!" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Edit form page error: $($editFormResponse.StatusCode)" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ Edit form page failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host "Deployment complete!" -ForegroundColor Green
