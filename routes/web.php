@@ -679,31 +679,39 @@ Route::get('/serve-image/{type}/{filename}', function ($type, $filename) {
     if ($type !== 'products') {
         abort(404);
     }
-    
     $path = $type . '/' . $filename;
-    
-    // Check if file exists
-    if (!Storage::disk('public')->exists($path)) {
-        abort(404);
-    }
-    
-    // Get file contents and mime type
-    $file = Storage::disk('public')->get($path);
-    $fullPath = Storage::disk('public')->path($path);
-    
-    // Detect mime type
-    $mimeType = 'image/jpeg'; // default
-    if (function_exists('mime_content_type')) {
-        $detectedType = mime_content_type($fullPath);
-        if ($detectedType) {
-            $mimeType = $detectedType;
+
+    // Try public disk first
+    if (Storage::disk('public')->exists($path)) {
+        $file = Storage::disk('public')->get($path);
+        $fullPath = Storage::disk('public')->path($path);
+        $mimeType = 'image/jpeg';
+        if (function_exists('mime_content_type')) {
+            $detectedType = mime_content_type($fullPath);
+            if ($detectedType) {
+                $mimeType = $detectedType;
+            }
         }
+        return Response::make($file, 200, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
     }
-    
-    return Response::make($file, 200, [
-        'Content-Type' => $mimeType,
-        'Cache-Control' => 'public, max-age=86400', // Cache for 1 day
-    ]);
+    // Try R2 disk if not found in public
+    if (Storage::disk('r2')->exists($path)) {
+        $file = Storage::disk('r2')->get($path);
+        // R2 may not have a local path, so guess mime from extension
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        $mimeType = 'image/jpeg';
+        if (in_array($ext, ['png', 'gif', 'webp'])) {
+            $mimeType = 'image/' . $ext;
+        }
+        return Response::make($file, 200, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+    abort(404);
 })->name('serve.image');
 
 // Debug: Inspect a product's image resolution details by id or name

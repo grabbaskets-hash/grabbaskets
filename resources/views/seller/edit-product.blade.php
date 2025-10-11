@@ -143,6 +143,10 @@
                     <div class="text-white small">Path: {{ $product->image }}</div>
                 </div>
                 <div class="text-white small mt-2">Current Product Image</div>
+                <div class="text-white small mt-2">Debug: <span style="word-break:break-all">{{ $product->image }}</span></div>
+                @if($product->image)
+                    <div class="text-white small mt-1">Direct link: <a href="{{ $product->getLegacyImageUrl() }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
+                @endif
             </div>
         @else
             <div class="mt-4" style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">

@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+
 use Exception;
+#use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class SellerController extends Controller {
@@ -789,14 +791,14 @@ public function storeCategorySubcategory(Request $request)
             $folder = 'products';
             $imageUploaded = false;
             $imagePath = null;
-            
+
             try {
                 // Save to both AWS R2 and Git storage
                 $r2Path = null;
                 $publicPath = null;
                 $r2Success = false;
                 $publicSuccess = false;
-                
+
                 // Try AWS R2 first
                 try {
                     $r2Path = $image->store($folder, 'r2');
@@ -807,7 +809,7 @@ public function storeCategorySubcategory(Request $request)
                         'product_id' => $product->id
                     ]);
                 }
-                
+
                 // Then save to Git storage (public disk)
                 try {
                     $publicPath = $image->store($folder, 'public');
@@ -818,14 +820,20 @@ public function storeCategorySubcategory(Request $request)
                         'product_id' => $product->id
                     ]);
                 }
-                
+
                 // Use whichever path was successful (prefer R2)
                 $imagePath = $r2Success ? $r2Path : $publicPath;
                 $imageUploaded = $r2Success || $publicSuccess;
-                
+
                 if ($imageUploaded) {
+                    // Remove all ProductImage records for this product so the new image replaces the old one
+                    foreach ($product->productImages as $productImage) {
+                        try { \Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                        try { \Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                        $productImage->delete();
+                    }
                     $data['image'] = $imagePath;
-                    Log::info('Product image updated with dual storage redundancy', [
+                    Log::info('Product image updated with dual storage redundancy and old productImages removed', [
                         'product_id' => $product->id,
                         'path' => $imagePath,
                         'r2_success' => $r2Success,
