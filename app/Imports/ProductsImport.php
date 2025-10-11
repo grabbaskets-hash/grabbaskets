@@ -269,34 +269,31 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                                 $uniqueName = Str::random(40) . '.' . $extension;
                                 $storagePath = 'products/' . $uniqueName;
 
-                                // Try AWS (R2) first, then fallback to local
-                                $saved = false;
+                                // Save to AWS (R2) and local public for reliability across envs
+                                $r2Saved = false;
                                 try {
-                                    $saved = Storage::disk('r2')->put($storagePath, $imageContent);
-                                    if ($saved) {
+                                    $r2Saved = Storage::disk('r2')->put($storagePath, $imageContent);
+                                    if ($r2Saved) {
                                         Log::info('Image stored in AWS (r2) from bulk import', [
                                             'matched' => $basename,
                                             'path' => $storagePath
                                         ]);
                                     }
                                 } catch (\Throwable $e) {
-                                    Log::warning('AWS (r2) upload failed in bulk import, trying local', [
+                                    Log::warning('AWS (r2) upload failed in bulk import', [
                                         'error' => $e->getMessage()
                                     ]);
-                                    $saved = false;
                                 }
 
-                                if (!$saved) {
-                                    $saved = Storage::disk('public')->put($storagePath, $imageContent);
-                                    if ($saved) {
-                                        Log::info('Image stored in local storage from bulk import (fallback)', [
-                                            'matched' => $basename,
-                                            'path' => $storagePath
-                                        ]);
-                                    }
+                                $localSaved = Storage::disk('public')->put($storagePath, $imageContent);
+                                if ($localSaved) {
+                                    Log::info('Image stored in local storage from bulk import', [
+                                        'matched' => $basename,
+                                        'path' => $storagePath
+                                    ]);
                                 }
 
-                                if ($saved) {
+                                if ($r2Saved || $localSaved) {
                                     $zip->close();
                                     return $storagePath;
                                 }
