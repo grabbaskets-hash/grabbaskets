@@ -248,7 +248,17 @@
                                     </td>
                                     <td>{{ $product->category->name ?? 'Uncategorized' }}</td>
                                     <td>{{ $product->subcategory->name ?? '—' }}</td>
-                                    <td>{{ $product->seller->name ?? '—' }}</td>
+                                    <td>
+                                        <form action="{{ route('admin.products.updateSeller', $product->id) }}" method="POST" class="d-flex align-items-center" style="gap: 4px;">
+                                            @csrf
+                                            <select name="seller_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <option value="">— Select Seller —</option>
+                                                @foreach($sellers as $id => $name)
+                                                    <option value="{{ $id }}" {{ $product->seller_id == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    </td>
 
                                     {{-- Actions Column --}}
                                     <td>

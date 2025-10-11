@@ -148,10 +148,11 @@ class AdminController extends Controller
             });
         }
 
-        $categories = Category::pluck('name')->toArray();
-        $products = $query->paginate(10)->appends($request->only(['search', 'category']));
+    $categories = Category::pluck('name')->toArray();
+    $products = $query->paginate(10)->appends($request->only(['search', 'category']));
+    $sellers = User::where('role', 'seller')->pluck('name', 'id');
 
-        return view('admin.products', compact('products', 'categories'));
+    return view('admin.products', compact('products', 'categories', 'sellers'));
     }
 
     // ✅ Enhanced users() with search, role, and status filters
@@ -501,5 +502,21 @@ Grabbasket Team
         $sentCount = NotificationService::sendAutomatedPromotionalEmail($type);
 
         return back()->with('success', "Promotional emails sent to {$sentCount} buyers successfully!");
+    }
+    /**
+     * Update the seller for a product (admin action)
+     */
+    public function updateProductSeller(Request $request, Product $product)
+    {
+        $request->validate([
+            'seller_id' => 'required|exists:users,id',
+        ]);
+        $seller = User::where('id', $request->seller_id)->where('role', 'seller')->first();
+        if (!$seller) {
+            return back()->with('error', 'Selected user is not a valid seller.');
+        }
+        $product->seller_id = $seller->id;
+        $product->save();
+        return back()->with('success', 'Seller updated successfully.');
     }
 }
