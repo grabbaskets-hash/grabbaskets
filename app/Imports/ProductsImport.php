@@ -126,6 +126,17 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                 // Handle image upload from zip
                 $imagePath = $this->handleImageUpload($row);
 
+                // Normalize discount value - handle "no", "none", empty as 0
+                $discount = 0;
+                if (!empty($row['discount'])) {
+                    $discountValue = trim(strtolower($row['discount']));
+                    if (in_array($discountValue, ['no', 'none', 'n/a', 'na', '0', 'null'])) {
+                        $discount = 0;
+                    } else {
+                        $discount = (float) $row['discount'];
+                    }
+                }
+
                 // Create product
                 $product = Product::create([
                     'name' => $row['name'],
@@ -136,7 +147,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     'image' => $imagePath,
                     'description' => $row['description'] ?? '',
                     'price' => (float) $row['price'],
-                    'discount' => (float) ($row['discount'] ?? 0),
+                    'discount' => $discount,
                     'delivery_charge' => (float) ($row['delivery_charge'] ?? 0),
                     'gift_option' => filter_var($row['gift_option'] ?? false, FILTER_VALIDATE_BOOLEAN),
                     'stock' => (int) ($row['stock'] ?? 1),
@@ -246,15 +257,34 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                                 $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
                                 $uniqueName = Str::random(40) . '.' . $extension;
                                 $storagePath = 'products/' . $uniqueName;
+                                
+                                // Try AWS (R2) first, then fallback to local
                                 $saved = false;
                                 try {
                                     $saved = Storage::disk('r2')->put($storagePath, $imageContent);
+                                    if ($saved) {
+                                        Log::info('Image stored in AWS (r2) from bulk import', [
+                                            'image_name' => $imageName,
+                                            'path' => $storagePath
+                                        ]);
+                                    }
                                 } catch (\Throwable $e) {
+                                    Log::warning('AWS (r2) upload failed in bulk import, trying local', [
+                                        'error' => $e->getMessage()
+                                    ]);
                                     $saved = false;
                                 }
+                                
                                 if (!$saved) {
-                                    $saved = Storage::put($storagePath, $imageContent);
+                                    $saved = Storage::disk('public')->put($storagePath, $imageContent);
+                                    if ($saved) {
+                                        Log::info('Image stored in local storage from bulk import (fallback)', [
+                                            'image_name' => $imageName,
+                                            'path' => $storagePath
+                                        ]);
+                                    }
                                 }
+                                
                                 if ($saved) {
                                     $zip->close();
                                     return $storagePath;

@@ -93,6 +93,7 @@ return array(
     'App\\Models\\Order' => $baseDir . '/app/Models/Order.php',
     'App\\Models\\Otp' => $baseDir . '/app/Models/Otp.php',
     'App\\Models\\Product' => $baseDir . '/app/Models/Product.php',
+    'App\\Models\\ProductImage' => $baseDir . '/app/Models/ProductImage.php',
     'App\\Models\\Review' => $baseDir . '/app/Models/Review.php',
     'App\\Models\\Seller' => $baseDir . '/app/Models/Seller.php',
     'App\\Models\\Subcategory' => $baseDir . '/app/Models/Subcategory.php',
