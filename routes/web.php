@@ -701,6 +701,38 @@ Route::get('/serve-image/{type}/{filename}', function ($type, $filename) {
 // Public test route for simple upload (no auth required)
 Route::get('/test-simple-upload', function() {
     try {
+        // Add deployment verification to existing route
+        $deploymentInfo = [
+            'serve_route_exists' => false,
+            'product_count_with_seller' => 0,
+            'sample_image_url' => '',
+            'routes_found' => []
+        ];
+        
+        // Check for serve-image route
+        $router = app('router');
+        $routes = $router->getRoutes();
+        
+        foreach ($routes->getRoutes() as $route) {
+            if (str_contains($route->uri(), 'serve-image')) {
+                $deploymentInfo['serve_route_exists'] = true;
+                $deploymentInfo['routes_found'][] = $route->uri();
+            }
+        }
+        
+        // Check product filtering
+        $deploymentInfo['product_count_with_seller'] = \App\Models\Product::whereNotNull('seller_id')->count();
+        
+        // Get sample image URL
+        $sampleProduct = \App\Models\Product::whereNotNull('seller_id')
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->first();
+            
+        if ($sampleProduct) {
+            $deploymentInfo['sample_image_url'] = $sampleProduct->image_url;
+        }
+        
         return response()->json([
             'status' => 'Simple upload system working',
             'routes_available' => [
@@ -708,7 +740,8 @@ Route::get('/test-simple-upload', function() {
                 'login_first' => url('/login'),
                 'dashboard' => url('/seller/dashboard')
             ],
-            'note' => 'You need to login first to access seller routes'
+            'note' => 'You need to login first to access seller routes',
+            'deployment_verification' => $deploymentInfo
         ]);
     } catch (Exception $e) {
         return response()->json([
