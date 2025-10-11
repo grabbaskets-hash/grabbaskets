@@ -24,6 +24,23 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing as SheetDrawing;
 class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
 {
     protected $errors = [];
+
+    /**
+     * Import a single product row (array) as if from Excel, for scripting.
+     * Handles all normalization, image assignment, and error tracking.
+     */
+    public function importSingleRow(array $row)
+    {
+        // Normalize keys as in collection()
+        $normalizedRow = [];
+        foreach ($row as $key => $value) {
+            $normalizedKey = $this->normalizeColumnName($key);
+            $normalizedRow[$normalizedKey] = $value;
+        }
+        // Wrap as object to match Excel row type
+        $rowObj = (object)$normalizedRow;
+        $this->collection(collect([$rowObj]));
+    }
     protected $successCount = 0;
     protected $zipFile;
     protected $sellerId;
@@ -422,7 +439,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
 
     protected function handleImageUpload($row, int $sheetRowNumber)
     {
-        // Build candidate names to match: image column and unique_id
+        // Build candidate names to match: image column, unique_id, and product name
         $candidates = [];
         if (!empty($row['image'])) {
             $imageName = trim($row['image']);
@@ -433,6 +450,38 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             $uid = trim($row['unique_id']);
             $candidates[] = strtolower($uid);
             $candidates[] = strtolower(pathinfo($uid, PATHINFO_FILENAME));
+        }
+        // Add product name as candidate (spaces to underscores/dashes, lowercased)
+        if (!empty($row['name'])) {
+            $name = trim($row['name']);
+            $nameVariants = [
+                strtolower($name),
+                strtolower(str_replace(' ', '_', $name)),
+                strtolower(str_replace(' ', '-', $name)),
+                strtolower(preg_replace('/\s+/', '', $name)),
+            ];
+            foreach ($nameVariants as $variant) {
+                $candidates[] = $variant;
+            }
+        }
+
+        // NEW: Check AWS (r2) for an image matching unique_id
+        if (!empty($row['unique_id'])) {
+            $uid = trim($row['unique_id']);
+            $possibleExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            foreach ($possibleExtensions as $ext) {
+                $awsPath = 'products/' . $uid . '.' . $ext;
+                if (Storage::disk('r2')->exists($awsPath)) {
+                    // Optionally, also copy to local if needed
+                    try {
+                        $content = Storage::disk('r2')->get($awsPath);
+                        Storage::disk('public')->put($awsPath, $content);
+                    } catch (\Throwable $e) {
+                        // Ignore local copy errors
+                    }
+                    return $awsPath;
+                }
+            }
         }
 
         // Nothing to match
