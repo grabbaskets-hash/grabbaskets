@@ -147,7 +147,11 @@
                     <img src="{{ $product->image_url }}" 
                          alt="{{ $product->name }}" 
                          style="width:180px;max-height:180px;border-radius:0.7rem;border:2px solid #e0e7ef;box-shadow:0 2px 8px rgba(59,130,246,0.08);background:#fafafa;object-fit:contain;"
-                         onerror="this.onerror=null; if(this.src.includes('githubusercontent.com')) { const path = this.src.split('/storage/app/public/')[1]; this.src = '{{ url('/serve-image/') }}/' + path.split('/')[0] + '/' + path.split('/').slice(1).join('/'); }">
+                         onerror="this.onerror=null; 
+                                  if(this.src.includes('githubusercontent.com')) { 
+                                      const path = this.src.split('/storage/app/public/')[1]; 
+                                      this.src = '{{ url('/serve-image/') }}/' + path; 
+                                  }">
                 </div>
                 <div class="text-white small mt-2">Current Product Image</div>
                 <div class="text-white small mt-1">Direct link: <a href="{{ $product->original_image_url }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
