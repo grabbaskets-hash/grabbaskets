@@ -46,13 +46,18 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // Production: Use GitHub CDN (images already pushed)
-        if (app()->environment('production')) {
+        // Production Laravel Cloud ONLY: Use GitHub CDN
+        // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
+        $isLaravelCloud = app()->environment('production') && 
+                          (request()->getHost() === 'grabbaskets.laravel.cloud' || 
+                           str_contains(request()->getHost(), '.laravel.cloud'));
+        
+        if ($isLaravelCloud) {
             $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
             return "{$githubBaseUrl}/{$imagePath}";
         }
 
-        // Development: Use serve-image route (checks local storage)
+        // Local (even if APP_ENV=production): Use serve-image route
         $parts = explode('/', $imagePath, 2);
         if (count($parts) === 2) {
             return url('/serve-image/' . $parts[0] . '/' . $parts[1]);

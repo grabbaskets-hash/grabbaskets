@@ -129,15 +129,19 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Production - use GitHub CDN with JavaScript fallback to serve-image
-            // This ensures existing images (in GitHub) load fast, new images (not yet in GitHub) fall back to serve-image
-            if (app()->environment('production')) {
+            // Case B: Production Laravel Cloud ONLY - use GitHub CDN with JavaScript fallback
+            // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
+            $isLaravelCloud = app()->environment('production') && 
+                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
+                               str_contains(request()->getHost(), '.laravel.cloud'));
+            
+            if ($isLaravelCloud) {
                 // Return GitHub CDN URL - images are already there
                 $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
                 return "{$githubBaseUrl}/{$imagePath}";
             }
 
-            // Case C: Development - use serve-image route (checks local storage)
+            // Case C: Local (even if APP_ENV=production) - use serve-image route
             return url('/serve-image/products/' . $imagePath);
         }
 
