@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - Use storage symlink (works when configured)
+    // Get the image URL - Use serve-image route (works on Laravel Cloud)
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -43,12 +43,16 @@ class ProductImage extends Model
 
         // Static public images shipped with app (e.g., images/srm/...)
         if (str_starts_with($imagePath, 'images/')) {
-            return '/' . $imagePath;
+            return asset($imagePath);
         }
 
-        // For all uploaded images, use storage symlink
-        // This works when php artisan storage:link has been run
-        return asset('storage/' . $imagePath);
+        // For uploaded images, use serve-image route
+        // This checks public disk, then R2, then legacy paths
+        $parts = explode('/', $imagePath, 2);
+        if (count($parts) === 2) {
+            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
+        }
+        return url('/serve-image/products/' . $imagePath);
     }
 
     // Get the original, direct image URL (prefer R2 public URL)

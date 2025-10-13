@@ -137,12 +137,16 @@ class Product extends Model
             // Case A: Static public images shipped with app (e.g., images/srm/...)
             if (str_starts_with($imagePath, 'images/')) {
                 // Serve directly from public/images in both envs
-                return '/' . $imagePath;
+                return asset($imagePath);
             }
 
-            // Case B: Stored uploads - Try storage symlink first (fastest)
-            // Storage symlink works when properly configured
-            return asset('storage/' . $imagePath);
+            // Case B: Stored uploads - Use serve-image route (works on Laravel Cloud)
+            // This checks public disk, then R2, then legacy paths
+            $pathParts = explode('/', $imagePath, 2);
+            if (count($pathParts) === 2) {
+                return url('/serve-image/' . $pathParts[0] . '/' . $pathParts[1]);
+            }
+            return url('/serve-image/products/' . $imagePath);
         }
 
     return null;
