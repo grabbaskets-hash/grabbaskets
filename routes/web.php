@@ -770,17 +770,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 'error' => $publicEx->getMessage()
             ]);
         }
-        // If not found locally, prefer redirecting to R2 public URL if configured
-        $r2Base = config('filesystems.disks.r2.url');
-        if (!empty($r2Base)) {
-            $target = rtrim($r2Base, '/') . '/' . ltrim($storagePath, '/');
-            Log::info("/serve-image: Redirecting to R2 public URL", ['target' => $target]);
-            return redirect()->away($target, 302, [
-                'Cache-Control' => 'public, max-age=86400'
-            ]);
-        }
-
-        // As a last resort, try fetching via SDK (guarded against exceptions)
+        // If not found locally, try R2 SDK directly since R2 public URL might not be configured
         try {
             if (Storage::disk('r2')->exists($storagePath)) {
                 Log::info("/serve-image: Found in r2 disk via SDK", ['path' => $storagePath]);
@@ -798,11 +788,23 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 Log::info("/serve-image: Not found in r2 disk via SDK", ['path' => $storagePath]);
             }
         } catch (\Throwable $sdkEx) {
-            Log::warning('R2 SDK error in /serve-image, proceeding to 404', [
+            Log::warning('R2 SDK error in /serve-image', [
                 'path' => $storagePath,
                 'message' => $sdkEx->getMessage(),
             ]);
         }
+        
+        // If R2 public URL is configured, try redirect as fallback
+        $r2Base = config('filesystems.disks.r2.url');
+        if (!empty($r2Base)) {
+            $target = rtrim($r2Base, '/') . '/' . ltrim($storagePath, '/');
+            Log::info("/serve-image: Redirecting to R2 public URL", ['target' => $target]);
+            return redirect()->away($target, 302, [
+                'Cache-Control' => 'public, max-age=86400'
+            ]);
+        }
+
+
     Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
         return response()->json([
             'error' => 'File not found in any disk',
