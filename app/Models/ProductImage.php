@@ -46,22 +46,10 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // Production Laravel Cloud: Use R2 direct public URL
-        // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
-        $isLaravelCloud = $this->isLaravelCloud();
-        
-        if ($isLaravelCloud) {
-            // Return R2 public URL directly
-            $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
-            return "{$r2PublicUrl}/{$imagePath}";
-        }
-
-        // Local (even if APP_ENV=production): Use serve-image route
-        $parts = explode('/', $imagePath, 2);
-        if (count($parts) === 2) {
-            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
-        }
-        return url('/serve-image/products/' . $imagePath);
+        // Product images - use serve-image route
+        // Remove 'products/' prefix if it exists for the route
+        $cleanPath = preg_replace('/^products\//', '', $imagePath);
+        return url('/serve-image/products/' . $cleanPath);
     }
 
     /**
@@ -89,7 +77,7 @@ class ProductImage extends Model
         return false;
     }
 
-    // Get the original, direct image URL (R2 direct URL)
+    // Get the original, direct image URL (use serve-image route)
     public function getOriginalUrlAttribute()
     {
         if (!$this->image_path) {
@@ -103,20 +91,10 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // Use R2 direct URL on Laravel Cloud
-        $isLaravelCloud = $this->isLaravelCloud();
-        
-        if ($isLaravelCloud) {
-            $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
-            return "{$r2PublicUrl}/{$imagePath}";
-        }
-
-        // Local: use serve-image route
-        $parts = explode('/', $imagePath, 2);
-        if (count($parts) === 2) {
-            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
-        }
-        return url('/serve-image/products/' . $imagePath);
+        // Product images - use serve-image route
+        // Remove 'products/' prefix if it exists for the route
+        $cleanPath = preg_replace('/^products\//', '', $imagePath);
+        return url('/serve-image/products/' . $cleanPath);
     }
 
     // Get formatted file size

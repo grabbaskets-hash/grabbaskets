@@ -129,18 +129,10 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Production Laravel Cloud - use R2 direct public URL
-            // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
-            $isLaravelCloud = $this->isLaravelCloud();
-            
-            if ($isLaravelCloud) {
-                // Return R2 public URL directly
-                $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
-                return "{$r2PublicUrl}/{$imagePath}";
-            }
-
-            // Case C: Local (even if APP_ENV=production) - use serve-image route
-            return url('/serve-image/products/' . $imagePath);
+            // Case B: Product images - use serve-image route
+            // Remove 'products/' prefix if it exists for the route
+            $cleanPath = preg_replace('/^products\//', '', $imagePath);
+            return url('/serve-image/products/' . $cleanPath);
         }
 
         return null;
