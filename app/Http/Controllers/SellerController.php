@@ -684,6 +684,12 @@ public function storeCategorySubcategory(Request $request)
 
     public function storeProduct(Request $request)
     {
+        Log::info('storeProduct called', [
+            'has_image_file' => $request->hasFile('image'),
+            'all_files' => $request->allFiles(),
+            'input_keys' => array_keys($request->all())
+        ]);
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -720,22 +726,49 @@ public function storeCategorySubcategory(Request $request)
             'gift_option' => $request->gift_option,
             'stock' => $request->stock,
         ]);
+        
+        Log::info('Product created, checking for image', [
+            'product_id' => $product->id,
+            'hasFile' => $request->hasFile('image')
+        ]);
+        
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            // Store under product-specific folder for consistency
-            $folder = 'products/' . $product->id;
+            $sellerId = Auth::id();
+            
+            // Use seller-specific folder structure (same as uploadProductImages)
+            $folder = 'products/seller-' . $sellerId;
+            
+            // Preserve original filename with timestamp
+            $ext = $image->getClientOriginalExtension();
+            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $filename = Str::slug($originalName) . '-' . time() . '.' . $ext;
+            
             $imageUploaded = false;
             $imagePath = null;
             
             // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
             try {
+                $r2Success = false;
+                $publicSuccess = false;
+                
                 // First try to save to AWS R2
-                $r2Path = $image->store($folder, 'r2');
-                $r2Success = !empty($r2Path);
+                try {
+                    $r2Path = $image->storeAs($folder, $filename, 'r2');
+                    $r2Success = !empty($r2Path);
+                    Log::info('R2 upload attempt', ['success' => $r2Success, 'path' => $r2Path]);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('R2 upload failed', ['error' => $r2Ex->getMessage()]);
+                }
                 
                 // Then save to local/public Git storage (same path for consistency)
-                $publicPath = $image->store($folder, 'public');
-                $publicSuccess = !empty($publicPath);
+                try {
+                    $publicPath = $image->storeAs($folder, $filename, 'public');
+                    $publicSuccess = !empty($publicPath);
+                    Log::info('Public disk upload attempt', ['success' => $publicSuccess, 'path' => $publicPath]);
+                } catch (\Throwable $publicEx) {
+                    Log::warning('Public disk upload failed', ['error' => $publicEx->getMessage()]);
+                }
                 
                 // Use whichever path was successful (prefer R2 for URL generation)
                 $imagePath = $r2Success ? $r2Path : $publicPath;
@@ -760,7 +793,8 @@ public function storeCategorySubcategory(Request $request)
                         'path' => $imagePath,
                         'r2_success' => $r2Success,
                         'public_success' => $publicSuccess,
-                        'size' => $image->getSize()
+                        'size' => $image->getSize(),
+                        'original_name' => $image->getClientOriginalName()
                     ]);
                 } else {
                     Log::error('Both AWS R2 and Git storage failed for image upload', [
@@ -771,11 +805,15 @@ public function storeCategorySubcategory(Request $request)
             } catch (\Throwable $ex) {
                 Log::error('Exception during dual storage image upload', [
                     'error' => $ex->getMessage(),
+                    'trace' => $ex->getTraceAsString(),
                     'product_id' => $product->id
                 ]);
                 return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
             }
+        } else {
+            Log::info('No image file uploaded with product', ['product_id' => $product->id]);
         }
+        
         $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
         return redirect()->route('seller.dashboard')->with('success', $successMessage);
     }
