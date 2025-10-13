@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - Use serve-image route (works on Laravel Cloud)
+    // Get the image URL - Use GitHub CDN for all images
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -46,21 +46,13 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // For uploaded images in production, use R2 public URL
-        if (app()->environment('production')) {
-            $r2BaseUrl = config('filesystems.disks.r2.url');
-            if (!empty($r2BaseUrl)) {
-                return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
-            }
-            // Fallback to app URL + storage path
-            return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
-        }
-
-        // Development: use storage symlink
-        return asset('storage/' . $imagePath);
+        // Use GitHub as CDN for all uploaded images
+        // This ensures images are version-controlled and globally accessible
+        $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
+        return "{$githubBaseUrl}/{$imagePath}";
     }
 
-    // Get the original, direct image URL (prefer R2 public URL)
+    // Get the original, direct image URL (GitHub CDN)
     public function getOriginalUrlAttribute()
     {
         if (!$this->image_path) {
@@ -74,19 +66,9 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // Prefer R2 public URL when configured (original file in bucket)
-        $r2BaseUrl = config('filesystems.disks.r2.url');
-        if (!empty($r2BaseUrl)) {
-            return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
-        }
-
-        // Fallback to the serve-image route for cloud safety (no storage symlink needed)
-        $pathParts = explode('/', $imagePath, 2);
-        if (count($pathParts) === 2) {
-            return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
-        }
-        // Last resort: storage URL (mostly for local dev)
-        return (app()->environment('production') ? rtrim(config('app.url'), '/') : '') . '/storage/' . $imagePath;
+        // Use GitHub as CDN for original images too
+        $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
+        return "{$githubBaseUrl}/{$imagePath}";
     }
 
     // Get formatted file size

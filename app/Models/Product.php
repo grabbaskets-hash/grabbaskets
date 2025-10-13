@@ -118,19 +118,8 @@ class Product extends Model
         if ($this->image && (str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'http://'))) {
             return $this->image;
         }
-        // Priority 2: GitHub raw URL (if image path starts with github/)
-        if ($this->image && str_starts_with($this->image, 'github/')) {
-            // Example: github/user/repo/branch/path/to/image.jpg
-            $parts = explode('/', $this->image, 5);
-            if (count($parts) === 5) {
-                $user = $parts[1];
-                $repo = $parts[2];
-                $branch = $parts[3];
-                $filePath = $parts[4];
-                return "https://raw.githubusercontent.com/$user/$repo/$branch/$filePath";
-            }
-        }
-        // Priority 3: File/system-stored image
+        
+        // Priority 2: File/system-stored image
         if ($this->image) {
             $imagePath = ltrim($this->image, '/');
 
@@ -140,22 +129,13 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Stored uploads (public disk or R2)
-            if (app()->environment('production')) {
-                // On production, use R2 public URL directly
-                $r2BaseUrl = config('filesystems.disks.r2.url');
-                if (!empty($r2BaseUrl)) {
-                    return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
-                }
-                // Fallback to app URL + storage path
-                return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
-            }
-
-            // Case C: Development - use storage symlink
-            return asset('storage/' . $imagePath);
+            // Case B: Use GitHub as CDN for all uploaded images
+            // This ensures images are version-controlled and globally accessible
+            $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
+            return "{$githubBaseUrl}/{$imagePath}";
         }
 
-    return null;
+        return null;
     }
 
     // Provide the original, direct image URL for showcasing (prefer gallery primary)
