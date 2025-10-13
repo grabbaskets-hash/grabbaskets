@@ -749,50 +749,65 @@ public function storeCategorySubcategory(Request $request)
             $imageUploaded = false;
             $imagePath = null;
             
-            // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
+            // PRIMARY STORAGE: Public disk (always works locally and on cloud)
+            // BACKUP STORAGE: R2 (for redundancy)
             try {
-                $r2Success = false;
                 $publicSuccess = false;
+                $r2Success = false;
                 
-                // First try to save to AWS R2
+                // STEP 1: Save to public disk FIRST (this is our primary storage)
                 try {
-                    $r2Path = $image->storeAs($folder, $filename, 'r2');
-                    $r2Success = !empty($r2Path);
-                    Log::info('R2 upload attempt', ['success' => $r2Success, 'path' => $r2Path]);
-                } catch (\Throwable $r2Ex) {
-                    Log::warning('R2 upload failed', ['error' => $r2Ex->getMessage()]);
-                }
-                
-                // Then save to local/public Git storage (same path for consistency)
-                try {
-                    Log::info('Attempting public disk upload', [
-                        'folder' => $folder,
-                        'filename' => $filename,
-                        'disk_root' => config('filesystems.disks.public.root'),
-                        'full_path' => config('filesystems.disks.public.root') . '/' . $folder . '/' . $filename
-                    ]);
+                    // Ensure directory exists
+                    $folderPath = storage_path('app/public/' . $folder);
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0755, true);
+                        Log::info('Created folder', ['path' => $folderPath]);
+                    }
                     
+                    // Save using Laravel's storeAs method
                     $publicPath = $image->storeAs($folder, $filename, 'public');
-                    $publicSuccess = !empty($publicPath);
                     
-                    Log::info('Public disk upload result', [
-                        'success' => $publicSuccess,
-                        'path' => $publicPath,
-                        'file_exists' => Storage::disk('public')->exists($publicPath)
-                    ]);
+                    if ($publicPath && Storage::disk('public')->exists($publicPath)) {
+                        $publicSuccess = true;
+                        $imagePath = $publicPath; // Use public disk path as primary
+                        
+                        Log::info('Public disk upload SUCCESS', [
+                            'path' => $publicPath,
+                            'size' => Storage::disk('public')->size($publicPath),
+                            'full_path' => storage_path('app/public/' . $publicPath)
+                        ]);
+                    } else {
+                        Log::error('Public disk upload returned false or file not found', [
+                            'returned_path' => $publicPath,
+                            'exists' => Storage::disk('public')->exists($publicPath ?? '')
+                        ]);
+                    }
                 } catch (\Throwable $publicEx) {
-                    Log::error('Public disk upload exception', [
+                    Log::error('Public disk upload EXCEPTION', [
                         'error' => $publicEx->getMessage(),
                         'trace' => $publicEx->getTraceAsString(),
                         'file' => $publicEx->getFile(),
                         'line' => $publicEx->getLine()
                     ]);
-                    $publicSuccess = false;
                 }
                 
-                // Use whichever path was successful (prefer R2 for URL generation)
-                $imagePath = $r2Success ? $r2Path : $publicPath;
-                $imageUploaded = $r2Success || $publicSuccess;
+                // STEP 2: Also save to R2 as backup (non-blocking)
+                try {
+                    $r2Path = $image->storeAs($folder, $filename, 'r2');
+                    $r2Success = !empty($r2Path);
+                    
+                    if ($r2Success) {
+                        Log::info('R2 backup upload SUCCESS', ['path' => $r2Path]);
+                    }
+                } catch (\Throwable $r2Ex) {
+                    // R2 failure is not critical - we have public disk
+                    Log::warning('R2 backup upload failed (non-critical)', [
+                        'error' => $r2Ex->getMessage()
+                    ]);
+                }
+                
+                // STEP 3: Verify we have at least public disk working
+                $imageUploaded = $publicSuccess;
                 
                 if ($imageUploaded) {
                     $product->update(['image' => $imagePath]);
@@ -808,27 +823,29 @@ public function storeCategorySubcategory(Request $request)
                         'is_primary' => true, // First image is primary
                     ]);
                     
-                    Log::info('Image stored with dual storage redundancy', [
+                    Log::info('Product image stored successfully', [
                         'product_id' => $product->id,
                         'path' => $imagePath,
-                        'r2_success' => $r2Success,
-                        'public_success' => $publicSuccess,
+                        'r2_backup' => $r2Success,
+                        'public_primary' => $publicSuccess,
                         'size' => $image->getSize(),
                         'original_name' => $image->getClientOriginalName()
                     ]);
                 } else {
-                    Log::error('Both AWS R2 and Git storage failed for image upload', [
-                        'product_id' => $product->id
+                    Log::error('Public disk storage failed for image upload', [
+                        'product_id' => $product->id,
+                        'public_success' => $publicSuccess,
+                        'r2_success' => $r2Success
                     ]);
-                    return redirect()->back()->withInput()->with('error', 'Image upload failed to both storages. Please try again.');
+                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Please check storage permissions.');
                 }
             } catch (\Throwable $ex) {
-                Log::error('Exception during dual storage image upload', [
+                Log::error('Exception during image upload', [
                     'error' => $ex->getMessage(),
                     'trace' => $ex->getTraceAsString(),
                     'product_id' => $product->id
                 ]);
-                return redirect()->back()->withInput()->with('error', 'Image upload failed. Please try again.');
+                return redirect()->back()->withInput()->with('error', 'Image upload failed. Error: ' . $ex->getMessage());
             }
         } else {
             Log::info('No image file uploaded with product', ['product_id' => $product->id]);
@@ -906,7 +923,7 @@ public function storeCategorySubcategory(Request $request)
             'all_files' => $request->allFiles(),
         ]);
 
-        // Handle image update: dual-store to R2 and public for reliability
+        // Handle image update: PUBLIC DISK primary, R2 backup
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $sellerId = Auth::id();
@@ -915,50 +932,70 @@ public function storeCategorySubcategory(Request $request)
             $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
             $filename = Str::slug($originalName) . '-' . time() . '.' . $ext;
             $finalPath = null;
-            $r2Success = false;
             $publicSuccess = false;
+            $r2Success = false;
+            
             try {
                 // Remove all old ProductImage records and files before uploading new image
                 foreach ($product->productImages as $productImage) {
-                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
                     try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
                     $productImage->delete();
                 }
                 // Also delete legacy image file paths if they exist
                 if (!empty($product->image)) {
-                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
                     try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
+                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
                 }
 
-                // Try AWS R2 first
+                // PRIMARY: Save to public disk FIRST
+                try {
+                    // Ensure directory exists
+                    $folderPath = storage_path('app/public/' . $folder);
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0755, true);
+                    }
+                    
+                    $publicPath = $image->storeAs($folder, $filename, 'public');
+                    
+                    if ($publicPath && Storage::disk('public')->exists($publicPath)) {
+                        $publicSuccess = true;
+                        $finalPath = $publicPath; // Use public disk path as primary
+                        
+                        Log::info('Public disk upload SUCCESS (update)', [
+                            'path' => $publicPath,
+                            'size' => Storage::disk('public')->size($publicPath)
+                        ]);
+                    }
+                } catch (\Throwable $publicEx) {
+                    Log::error('Public disk upload failed during product update', [
+                        'error' => $publicEx->getMessage(),
+                        'product_id' => $product->id,
+                        'trace' => $publicEx->getTraceAsString()
+                    ]);
+                }
+                
+                // BACKUP: Also save to R2
                 try {
                     $r2Path = $image->storeAs($folder, $filename, 'r2');
                     $r2Success = !empty($r2Path);
+                    
+                    if ($r2Success) {
+                        Log::info('R2 backup upload SUCCESS (update)', ['path' => $r2Path]);
+                    }
                 } catch (\Throwable $r2Ex) {
-                    Log::warning('R2 upload failed during product update', [
+                    Log::warning('R2 backup failed (non-critical)', [
                         'error' => $r2Ex->getMessage(),
                         'product_id' => $product->id
                     ]);
                 }
-                // Then public disk
-                try {
-                    $publicPath = $image->storeAs($folder, $filename, 'public');
-                    $publicSuccess = !empty($publicPath);
-                } catch (\Throwable $publicEx) {
-                    Log::warning('Public disk upload failed during product update', [
-                        'error' => $publicEx->getMessage(),
+
+                if (!$publicSuccess) {
+                    Log::error('Public disk upload failed - cannot update product', [
                         'product_id' => $product->id
                     ]);
+                    return redirect()->back()->with('error', 'Failed to upload image. Please check storage permissions.');
                 }
-
-                if (!$r2Success && !$publicSuccess) {
-                    Log::error('All storage uploads failed during product update (r2, public)', [
-                        'product_id' => $product->id
-                    ]);
-                    return redirect()->back()->with('error', 'Failed to upload image to storage. Please try again.');
-                }
-
-                $finalPath = $r2Success ? $r2Path : $publicPath;
 
                 // Update legacy image path
                 $data['image'] = $finalPath;
@@ -974,11 +1011,11 @@ public function storeCategorySubcategory(Request $request)
                     'is_primary' => true,
                 ]);
 
-                Log::info('Product image updated with dual storage', [
+                Log::info('Product image updated successfully', [
                     'product_id' => $product->id,
                     'path' => $finalPath,
-                    'r2_success' => $r2Success,
-                    'public_success' => $publicSuccess,
+                    'public_primary' => $publicSuccess,
+                    'r2_backup' => $r2Success,
                 ]);
             } catch (\Throwable $ex) {
                 Log::error('Exception during image update', [
