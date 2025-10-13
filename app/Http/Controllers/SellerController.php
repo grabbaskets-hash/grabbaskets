@@ -749,65 +749,94 @@ public function storeCategorySubcategory(Request $request)
             $imageUploaded = false;
             $imagePath = null;
             
-            // PRIMARY STORAGE: Public disk (always works locally and on cloud)
-            // BACKUP STORAGE: R2 (for redundancy)
+            // Determine if we're on Laravel Cloud
+            $isLaravelCloud = app()->environment('production') && 
+                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
+                               str_contains(request()->getHost() ?? '', '.laravel.cloud'));
+            
+            // Environment-aware storage strategy
             try {
                 $publicSuccess = false;
                 $r2Success = false;
                 
-                // STEP 1: Save to public disk FIRST (this is our primary storage)
-                try {
-                    // Ensure directory exists
-                    $folderPath = storage_path('app/public/' . $folder);
-                    if (!file_exists($folderPath)) {
-                        mkdir($folderPath, 0755, true);
-                        Log::info('Created folder', ['path' => $folderPath]);
-                    }
-                    
-                    // Save using Laravel's storeAs method
-                    $publicPath = $image->storeAs($folder, $filename, 'public');
-                    
-                    if ($publicPath && Storage::disk('public')->exists($publicPath)) {
-                        $publicSuccess = true;
-                        $imagePath = $publicPath; // Use public disk path as primary
+                // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
+                if ($isLaravelCloud) {
+                    try {
+                        $r2Path = $image->storeAs($folder, $filename, 'r2');
                         
-                        Log::info('Public disk upload SUCCESS', [
-                            'path' => $publicPath,
-                            'size' => Storage::disk('public')->size($publicPath),
-                            'full_path' => storage_path('app/public/' . $publicPath)
-                        ]);
-                    } else {
-                        Log::error('Public disk upload returned false or file not found', [
-                            'returned_path' => $publicPath,
-                            'exists' => Storage::disk('public')->exists($publicPath ?? '')
+                        if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
+                            $r2Success = true;
+                            $imagePath = $r2Path;
+                            
+                            Log::info('R2 upload SUCCESS on Laravel Cloud (create)', [
+                                'path' => $r2Path,
+                                'size' => $image->getSize()
+                            ]);
+                        }
+                    } catch (\Throwable $r2Ex) {
+                        Log::error('R2 upload FAILED on Laravel Cloud (create)', [
+                            'error' => $r2Ex->getMessage(),
+                            'trace' => $r2Ex->getTraceAsString()
                         ]);
                     }
-                } catch (\Throwable $publicEx) {
-                    Log::error('Public disk upload EXCEPTION', [
-                        'error' => $publicEx->getMessage(),
-                        'trace' => $publicEx->getTraceAsString(),
-                        'file' => $publicEx->getFile(),
-                        'line' => $publicEx->getLine()
-                    ]);
-                }
-                
-                // STEP 2: Also save to R2 as backup (non-blocking)
-                try {
-                    $r2Path = $image->storeAs($folder, $filename, 'r2');
-                    $r2Success = !empty($r2Path);
                     
-                    if ($r2Success) {
-                        Log::info('R2 backup upload SUCCESS', ['path' => $r2Path]);
-                    }
-                } catch (\Throwable $r2Ex) {
-                    // R2 failure is not critical - we have public disk
-                    Log::warning('R2 backup upload failed (non-critical)', [
-                        'error' => $r2Ex->getMessage()
-                    ]);
+                    $imageUploaded = $r2Success;
                 }
-                
-                // STEP 3: Verify we have at least public disk working
-                $imageUploaded = $publicSuccess;
+                // Strategy 2: Local - Public disk primary, R2 backup
+                else {
+                    // Save to public disk FIRST (primary storage locally)
+                    try {
+                        // Ensure directory exists
+                        $folderPath = storage_path('app/public/' . $folder);
+                        if (!file_exists($folderPath)) {
+                            mkdir($folderPath, 0755, true);
+                            Log::info('Created folder', ['path' => $folderPath]);
+                        }
+                        
+                        // Save using Laravel's storeAs method
+                        $publicPath = $image->storeAs($folder, $filename, 'public');
+                        
+                        if ($publicPath && Storage::disk('public')->exists($publicPath)) {
+                            $publicSuccess = true;
+                            $imagePath = $publicPath;
+                            
+                            Log::info('Public disk upload SUCCESS (local create)', [
+                                'path' => $publicPath,
+                                'size' => Storage::disk('public')->size($publicPath),
+                                'full_path' => storage_path('app/public/' . $publicPath)
+                            ]);
+                        } else {
+                            Log::error('Public disk upload returned false or file not found', [
+                                'returned_path' => $publicPath,
+                                'exists' => Storage::disk('public')->exists($publicPath ?? '')
+                            ]);
+                        }
+                    } catch (\Throwable $publicEx) {
+                        Log::error('Public disk upload EXCEPTION', [
+                            'error' => $publicEx->getMessage(),
+                            'trace' => $publicEx->getTraceAsString(),
+                            'file' => $publicEx->getFile(),
+                            'line' => $publicEx->getLine()
+                        ]);
+                    }
+                    
+                    // Also save to R2 as backup (non-blocking)
+                    try {
+                        $r2Path = $image->storeAs($folder, $filename, 'r2');
+                        $r2Success = !empty($r2Path);
+                        
+                        if ($r2Success) {
+                            Log::info('R2 backup upload SUCCESS (local create)', ['path' => $r2Path]);
+                        }
+                    } catch (\Throwable $r2Ex) {
+                        // R2 failure is not critical on local
+                        Log::warning('R2 backup upload failed (non-critical)', [
+                            'error' => $r2Ex->getMessage()
+                        ]);
+                    }
+                    
+                    $imageUploaded = $publicSuccess;
+                }
                 
                 if ($imageUploaded) {
                     $product->update(['image' => $imagePath]);
@@ -960,7 +989,7 @@ public function storeCategorySubcategory(Request $request)
                 }
             }
         }
-        // Handle image update: PUBLIC DISK primary, R2 backup
+        // Handle image update: Environment-aware storage strategy
         elseif ($request->hasFile('image')) {
             $image = $request->file('image');
             $sellerId = Auth::id();
@@ -972,6 +1001,11 @@ public function storeCategorySubcategory(Request $request)
             $publicSuccess = false;
             $r2Success = false;
             
+            // Determine if we're on Laravel Cloud
+            $isLaravelCloud = app()->environment('production') && 
+                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
+                               str_contains(request()->getHost() ?? '', '.laravel.cloud'));
+            
             try {
                 // Remove all old ProductImage records and files before uploading new image
                 // Get old paths for deletion (do after upload succeeds)
@@ -981,53 +1015,84 @@ public function storeCategorySubcategory(Request $request)
                 // Delete database records first
                 $product->productImages()->delete();
 
-                // PRIMARY: Save to public disk FIRST
-                try {
-                    // Ensure directory exists
-                    $folderPath = storage_path('app/public/' . $folder);
-                    if (!file_exists($folderPath)) {
-                        mkdir($folderPath, 0755, true);
-                    }
-                    
-                    $publicPath = $image->storeAs($folder, $filename, 'public');
-                    
-                    if ($publicPath && Storage::disk('public')->exists($publicPath)) {
-                        $publicSuccess = true;
-                        $finalPath = $publicPath; // Use public disk path as primary
+                // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
+                if ($isLaravelCloud) {
+                    try {
+                        $r2Path = $image->storeAs($folder, $filename, 'r2');
                         
-                        Log::info('Public disk upload SUCCESS (update)', [
-                            'path' => $publicPath,
-                            'size' => Storage::disk('public')->size($publicPath)
+                        if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
+                            $r2Success = true;
+                            $finalPath = $r2Path;
+                            
+                            Log::info('R2 upload SUCCESS on Laravel Cloud (update)', [
+                                'path' => $r2Path,
+                                'size' => $image->getSize()
+                            ]);
+                        }
+                    } catch (\Throwable $r2Ex) {
+                        Log::error('R2 upload FAILED on Laravel Cloud (update)', [
+                            'error' => $r2Ex->getMessage(),
+                            'product_id' => $product->id,
+                            'trace' => $r2Ex->getTraceAsString()
                         ]);
                     }
-                } catch (\Throwable $publicEx) {
-                    Log::error('Public disk upload failed during product update', [
-                        'error' => $publicEx->getMessage(),
-                        'product_id' => $product->id,
-                        'trace' => $publicEx->getTraceAsString()
-                    ]);
-                }
-                
-                // BACKUP: Also save to R2
-                try {
-                    $r2Path = $image->storeAs($folder, $filename, 'r2');
-                    $r2Success = !empty($r2Path);
                     
-                    if ($r2Success) {
-                        Log::info('R2 backup upload SUCCESS (update)', ['path' => $r2Path]);
+                    if (!$r2Success) {
+                        Log::error('R2 upload failed on Laravel Cloud - cannot update product', [
+                            'product_id' => $product->id
+                        ]);
+                        return redirect()->back()->with('error', 'Failed to upload image to cloud storage. Please try again.');
                     }
-                } catch (\Throwable $r2Ex) {
-                    Log::warning('R2 backup failed (non-critical)', [
-                        'error' => $r2Ex->getMessage(),
-                        'product_id' => $product->id
-                    ]);
                 }
+                // Strategy 2: Local - Public disk primary, R2 backup
+                else {
+                    try {
+                        // Ensure directory exists
+                        $folderPath = storage_path('app/public/' . $folder);
+                        if (!file_exists($folderPath)) {
+                            mkdir($folderPath, 0755, true);
+                        }
+                        
+                        $publicPath = $image->storeAs($folder, $filename, 'public');
+                        
+                        if ($publicPath && Storage::disk('public')->exists($publicPath)) {
+                            $publicSuccess = true;
+                            $finalPath = $publicPath;
+                            
+                            Log::info('Public disk upload SUCCESS (local update)', [
+                                'path' => $publicPath,
+                                'size' => Storage::disk('public')->size($publicPath)
+                            ]);
+                        }
+                    } catch (\Throwable $publicEx) {
+                        Log::error('Public disk upload failed during product update', [
+                            'error' => $publicEx->getMessage(),
+                            'product_id' => $product->id,
+                            'trace' => $publicEx->getTraceAsString()
+                        ]);
+                    }
+                    
+                    // BACKUP: Also save to R2 (optional on local)
+                    try {
+                        $r2Path = $image->storeAs($folder, $filename, 'r2');
+                        $r2Success = !empty($r2Path);
+                        
+                        if ($r2Success) {
+                            Log::info('R2 backup upload SUCCESS (local update)', ['path' => $r2Path]);
+                        }
+                    } catch (\Throwable $r2Ex) {
+                        Log::warning('R2 backup failed on local (non-critical)', [
+                            'error' => $r2Ex->getMessage(),
+                            'product_id' => $product->id
+                        ]);
+                    }
 
-                if (!$publicSuccess) {
-                    Log::error('Public disk upload failed - cannot update product', [
-                        'product_id' => $product->id
-                    ]);
-                    return redirect()->back()->with('error', 'Failed to upload image. Please check storage permissions.');
+                    if (!$publicSuccess) {
+                        Log::error('Public disk upload failed - cannot update product', [
+                            'product_id' => $product->id
+                        ]);
+                        return redirect()->back()->with('error', 'Failed to upload image. Please check storage permissions.');
+                    }
                 }
 
                 // Update legacy image path
@@ -1047,8 +1112,9 @@ public function storeCategorySubcategory(Request $request)
                 Log::info('Product image updated successfully', [
                     'product_id' => $product->id,
                     'path' => $finalPath,
-                    'public_primary' => $publicSuccess,
-                    'r2_backup' => $r2Success,
+                    'public_success' => $publicSuccess,
+                    'r2_success' => $r2Success,
+                    'is_laravel_cloud' => $isLaravelCloud ?? false,
                 ]);
                 
                 // Clean up old files AFTER successful upload (non-blocking)
