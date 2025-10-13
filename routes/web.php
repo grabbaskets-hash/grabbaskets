@@ -822,6 +822,33 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     }
 })->where('path', '.*');
 
+// Debug: List files in storage to see what actually exists
+Route::get('/debug/storage-files', function (Request $request) {
+    $directory = $request->get('dir', 'products');
+    $result = [
+        'directory' => $directory,
+        'public_files' => [],
+        'r2_files' => [],
+        'errors' => []
+    ];
+    
+    try {
+        $publicFiles = Storage::disk('public')->allFiles($directory);
+        $result['public_files'] = array_slice($publicFiles, 0, 20); // Limit to first 20
+    } catch (\Throwable $e) {
+        $result['errors']['public'] = $e->getMessage();
+    }
+    
+    try {
+        $r2Files = Storage::disk('r2')->allFiles($directory);
+        $result['r2_files'] = array_slice($r2Files, 0, 20); // Limit to first 20
+    } catch (\Throwable $e) {
+        $result['errors']['r2'] = $e->getMessage();
+    }
+    
+    return response()->json($result);
+});
+
 // Debug: Check file system and storage configuration
 Route::get('/debug/file-system', function (Request $request) {
     $path = $request->get('path', 'products/1551/teat-1760330018-OtAw4b.jpg');
