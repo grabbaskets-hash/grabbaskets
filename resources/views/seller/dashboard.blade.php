@@ -270,7 +270,12 @@
                             <td>
                                 @if($p->image_url)
                                     <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
-                                        <img src="{{ $p->image_url }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)';">
+                                        <img src="{{ $p->image_url }}" 
+                                             alt="{{ $p->name }}" 
+                                             style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" 
+                                             onmouseover="this.style.transform='scale(1.1)'" 
+                                             onmouseout="this.style.transform='scale(1)'"
+                                             onerror="this.onerror=null; if(this.src.includes('githubusercontent.com')) { const path = this.src.split('/storage/app/public/')[1]; this.src = '{{ url('/serve-image/') }}/' + path.split('/')[0] + '/' + path.split('/').slice(1).join('/'); }">
                                     </a>
                                 @endif
                                 @if($p->image)
