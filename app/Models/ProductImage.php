@@ -89,7 +89,7 @@ class ProductImage extends Model
         return false;
     }
 
-    // Get the original, direct image URL (GitHub CDN)
+    // Get the original, direct image URL (R2 direct URL)
     public function getOriginalUrlAttribute()
     {
         if (!$this->image_path) {
@@ -103,9 +103,20 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // Use GitHub as CDN for original images too
-        $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
-        return "{$githubBaseUrl}/{$imagePath}";
+        // Use R2 direct URL on Laravel Cloud
+        $isLaravelCloud = $this->isLaravelCloud();
+        
+        if ($isLaravelCloud) {
+            $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
+            return "{$r2PublicUrl}/{$imagePath}";
+        }
+
+        // Local: use serve-image route
+        $parts = explode('/', $imagePath, 2);
+        if (count($parts) === 2) {
+            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
+        }
+        return url('/serve-image/products/' . $imagePath);
     }
 
     // Get formatted file size

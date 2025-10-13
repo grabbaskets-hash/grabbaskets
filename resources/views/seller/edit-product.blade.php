@@ -154,7 +154,9 @@
                                   }">
                 </div>
                 <div class="text-white small mt-2">Current Product Image</div>
-                <div class="text-white small mt-1">Direct link: <a href="{{ $product->original_image_url }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
+                @if($product->image)
+                    <div class="text-white small mt-1">Path: <code style="font-size:0.75rem;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;">{{ $product->image }}</code></div>
+                @endif
             @else
                 <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 1rem;">
                     <i class="fas fa-upload" style="font-size: 2rem; opacity: 0.5;"></i>
