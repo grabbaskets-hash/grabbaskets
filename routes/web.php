@@ -820,22 +820,45 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     }
 })->where('path', '.*');
 
-// Debug: Show recent logs for serve-image debugging
-Route::get('/debug/logs', function (Request $request) {
-    $logFile = storage_path('logs/laravel.log');
-    if (file_exists($logFile)) {
-        $logs = file_get_contents($logFile);
-        $lines = explode("\n", $logs);
-        $recentLines = array_slice($lines, -50); // Last 50 lines
-        $serveImageLines = array_filter($recentLines, function($line) {
-            return str_contains($line, 'serve-image');
-        });
-        return response()->json([
-            'recent_serve_image_logs' => array_values($serveImageLines),
-            'total_recent_lines' => count($recentLines)
-        ]);
+// Debug: Check file system and storage configuration
+Route::get('/debug/file-system', function (Request $request) {
+    $path = $request->get('path', 'products/1551/teat-1760330018-OtAw4b.jpg');
+    
+    $result = [
+        'path_tested' => $path,
+        'public_disk' => [
+            'exists' => false,
+            'root_path' => '',
+            'full_path' => '',
+            'error' => null,
+        ],
+        'r2_disk' => [
+            'exists' => false,
+            'config' => [],
+            'error' => null,
+        ],
+        'app_env' => app()->environment(),
+        'storage_link_exists' => is_link(public_path('storage')),
+    ];
+    
+    // Test public disk
+    try {
+        $result['public_disk']['root_path'] = Storage::disk('public')->path('');
+        $result['public_disk']['full_path'] = Storage::disk('public')->path($path);
+        $result['public_disk']['exists'] = Storage::disk('public')->exists($path);
+    } catch (\Throwable $e) {
+        $result['public_disk']['error'] = $e->getMessage();
     }
-    return response()->json(['error' => 'Log file not found']);
+    
+    // Test R2 disk
+    try {
+        $result['r2_disk']['config'] = config('filesystems.disks.r2');
+        $result['r2_disk']['exists'] = Storage::disk('r2')->exists($path);
+    } catch (\Throwable $e) {
+        $result['r2_disk']['error'] = $e->getMessage();
+    }
+    
+    return response()->json($result);
 });
 
 // Debug: Inspect a product's image resolution details by id or name
