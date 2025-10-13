@@ -140,13 +140,19 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Stored uploads - Use serve-image route (works on Laravel Cloud)
-            // This checks public disk, then R2, then legacy paths
-            $pathParts = explode('/', $imagePath, 2);
-            if (count($pathParts) === 2) {
-                return url('/serve-image/' . $pathParts[0] . '/' . $pathParts[1]);
+            // Case B: Stored uploads (public disk or R2)
+            if (app()->environment('production')) {
+                // On production, use R2 public URL directly
+                $r2BaseUrl = config('filesystems.disks.r2.url');
+                if (!empty($r2BaseUrl)) {
+                    return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+                }
+                // Fallback to app URL + storage path
+                return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
             }
-            return url('/serve-image/products/' . $imagePath);
+
+            // Case C: Development - use storage symlink
+            return asset('storage/' . $imagePath);
         }
 
     return null;

@@ -46,13 +46,18 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // For uploaded images, use serve-image route
-        // This checks public disk, then R2, then legacy paths
-        $parts = explode('/', $imagePath, 2);
-        if (count($parts) === 2) {
-            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
+        // For uploaded images in production, use R2 public URL
+        if (app()->environment('production')) {
+            $r2BaseUrl = config('filesystems.disks.r2.url');
+            if (!empty($r2BaseUrl)) {
+                return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+            }
+            // Fallback to app URL + storage path
+            return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
         }
-        return url('/serve-image/products/' . $imagePath);
+
+        // Development: use storage symlink
+        return asset('storage/' . $imagePath);
     }
 
     // Get the original, direct image URL (prefer R2 public URL)
