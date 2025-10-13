@@ -178,8 +178,12 @@ class SellerController extends Controller {
 
         foreach ($request->file('images') as $index => $image) {
             try {
-                $folder = 'products/' . $product->id;
+                $sellerId = Auth::id();
+                $folder = 'products/seller-' . $sellerId;
                 $originalName = $image->getClientOriginalName();
+                $originalNameSlug = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+                $ext = $image->getClientOriginalExtension();
+                $filename = $originalNameSlug . '-' . time() . '-' . Str::random(4) . '.' . $ext;
                 $mimeType = $image->getMimeType();
                 $fileSize = $image->getSize();
 
@@ -192,7 +196,7 @@ class SellerController extends Controller {
 
                 // Try AWS R2 first
                 try {
-                    $r2Path = $image->store($folder, 'r2');
+                    $r2Path = $image->storeAs($folder, $filename, 'r2');
                     $r2Success = !empty($r2Path);
                 } catch (\Throwable $r2Ex) {
                     Log::warning('AWS R2 upload failed for product gallery image', [
@@ -204,7 +208,7 @@ class SellerController extends Controller {
 
                 // Then save to Git storage (public disk)
                 try {
-                    $publicPath = $image->store($folder, 'public');
+                    $publicPath = $image->storeAs($folder, $filename, 'public');
                     $publicSuccess = !empty($publicPath);
                 } catch (\Throwable $publicEx) {
                     Log::warning('Git storage (public) upload failed for product gallery image', [
@@ -847,10 +851,11 @@ public function storeCategorySubcategory(Request $request)
         // Handle image update: dual-store to R2 and public for reliability
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $folder = 'products/' . $product->id;
+            $sellerId = Auth::id();
+            $folder = 'products/seller-' . $sellerId;
             $ext = $image->getClientOriginalExtension();
-            $nameSlug = Str::slug($request->input('name', $product->name));
-            $filename = $nameSlug . '-' . time() . '-' . Str::random(6) . '.' . $ext;
+            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $filename = Str::slug($originalName) . '-' . time() . '.' . $ext;
             $finalPath = null;
             $r2Success = false;
             $publicSuccess = false;
