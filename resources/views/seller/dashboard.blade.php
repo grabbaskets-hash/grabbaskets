@@ -174,6 +174,11 @@
                 </a>
             </li>
             <li>
+                <a class="nav-link" href="{{ route('seller.importExport') }}">
+                    <i class="bi bi-arrow-down-up"></i> Import / Export
+                </a>
+            </li>
+            <li>
                 <a class="nav-link" href="{{ route('tracking.form') }}">
                     <i class="bi bi-truck"></i> Track Package
                 </a>

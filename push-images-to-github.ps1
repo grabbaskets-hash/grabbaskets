@@ -57,4 +57,5 @@ Get-ChildItem -Path "storage/app/public/products" -File -Include *.jpg,*.jpeg,*.
     Write-Host "   https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public/$relativePath" -ForegroundColor White
 }
 Write-Host ""
-Write-Host "🎉 Done! Clear your Laravel Cloud cache and test the website" -ForegroundColor Green
+Write-Host "Done! Clear your Laravel Cloud cache" -ForegroundColor Green
+

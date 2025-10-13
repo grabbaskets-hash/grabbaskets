@@ -384,6 +384,14 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::post('/seller/bulk-upload-excel', [SellerController::class, 'processBulkUpload'])->name('seller.processBulkUpload');
     Route::get('/seller/download-sample-excel', [SellerController::class, 'downloadSampleExcel'])->name('seller.downloadSampleExcel');
 
+    // Import/Export Products Routes
+    Route::get('/seller/import-export', [\App\Http\Controllers\ProductImportExportController::class, 'index'])->name('seller.importExport');
+    Route::post('/seller/products/export/excel', [\App\Http\Controllers\ProductImportExportController::class, 'exportExcel'])->name('seller.products.export.excel');
+    Route::post('/seller/products/export/csv', [\App\Http\Controllers\ProductImportExportController::class, 'exportCsv'])->name('seller.products.export.csv');
+    Route::post('/seller/products/export/pdf', [\App\Http\Controllers\ProductImportExportController::class, 'exportPdf'])->name('seller.products.export.pdf');
+    Route::post('/seller/products/import', [\App\Http\Controllers\ProductImportExportController::class, 'import'])->name('seller.products.import');
+    Route::get('/seller/products/template', [\App\Http\Controllers\ProductImportExportController::class, 'downloadTemplate'])->name('seller.products.template');
+
     // Seller: Dashboard & Profile
     Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
     Route::get('/seller/my-profile', [SellerController::class, 'myProfile'])->name('seller.profile');
