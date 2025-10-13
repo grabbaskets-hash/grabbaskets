@@ -140,16 +140,17 @@ class Product extends Model
                 return '/' . $imagePath;
             }
 
-            // Case B: Stored uploads (public disk or R2). Always use serve-image in production
+            // Case B: Stored uploads (public disk or R2). Use R2 public URL in production
             if (app()->environment('production')) {
-                $pathParts = explode('/', $imagePath, 2);
-                if (count($pathParts) === 2) {
-                    return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
-                }
-                // Fallback to R2 base URL if serve path can't be formed
+                // Directly use R2 public URL for faster loading
                 $r2BaseUrl = config('filesystems.disks.r2.url');
                 if (!empty($r2BaseUrl)) {
                     return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+                }
+                // Fallback to serve-image route
+                $pathParts = explode('/', $imagePath, 2);
+                if (count($pathParts) === 2) {
+                    return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
                 }
                 return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
             }

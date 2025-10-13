@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - ALWAYS use serve-image route for consistency
+    // Get the image URL - Use R2 public URL in production, serve-image in dev
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -46,9 +46,15 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // For stored uploads, ALWAYS use serve-image route
-        // This route checks public disk first, then falls back to R2
-        // This ensures consistent behavior and reliable image serving
+        // In production, use R2 public URL directly (faster and more reliable)
+        if (app()->environment('production')) {
+            $r2BaseUrl = config('filesystems.disks.r2.url');
+            if (!empty($r2BaseUrl)) {
+                return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+            }
+        }
+
+        // In development, use serve-image route (checks local disk first)
         return url('serve-image/' . $imagePath);
     }
 
