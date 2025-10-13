@@ -937,16 +937,12 @@ public function storeCategorySubcategory(Request $request)
             
             try {
                 // Remove all old ProductImage records and files before uploading new image
-                foreach ($product->productImages as $productImage) {
-                    try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                    $productImage->delete();
-                }
-                // Also delete legacy image file paths if they exist
-                if (!empty($product->image)) {
-                    try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
-                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
-                }
+                // Get old paths for deletion (do after upload succeeds)
+                $oldImagePaths = $product->productImages->pluck('image_path')->toArray();
+                $oldLegacyPath = $product->image;
+                
+                // Delete database records first
+                $product->productImages()->delete();
 
                 // PRIMARY: Save to public disk FIRST
                 try {
@@ -1017,6 +1013,18 @@ public function storeCategorySubcategory(Request $request)
                     'public_primary' => $publicSuccess,
                     'r2_backup' => $r2Success,
                 ]);
+                
+                // Clean up old files AFTER successful upload (non-blocking)
+                dispatch(function() use ($oldImagePaths, $oldLegacyPath) {
+                    foreach ($oldImagePaths as $path) {
+                        try { Storage::disk('public')->delete($path); } catch (\Throwable $e) {}
+                        try { Storage::disk('r2')->delete($path); } catch (\Throwable $e) {}
+                    }
+                    if (!empty($oldLegacyPath)) {
+                        try { Storage::disk('public')->delete($oldLegacyPath); } catch (\Throwable $e) {}
+                        try { Storage::disk('r2')->delete($oldLegacyPath); } catch (\Throwable $e) {}
+                    }
+                })->afterResponse();
             } catch (\Throwable $ex) {
                 Log::error('Exception during image update', [
                     'error' => $ex->getMessage(),
