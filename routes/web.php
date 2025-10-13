@@ -820,6 +820,24 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     }
 })->where('path', '.*');
 
+// Debug: Show recent logs for serve-image debugging
+Route::get('/debug/logs', function (Request $request) {
+    $logFile = storage_path('logs/laravel.log');
+    if (file_exists($logFile)) {
+        $logs = file_get_contents($logFile);
+        $lines = explode("\n", $logs);
+        $recentLines = array_slice($lines, -50); // Last 50 lines
+        $serveImageLines = array_filter($recentLines, function($line) {
+            return str_contains($line, 'serve-image');
+        });
+        return response()->json([
+            'recent_serve_image_logs' => array_values($serveImageLines),
+            'total_recent_lines' => count($recentLines)
+        ]);
+    }
+    return response()->json(['error' => 'Log file not found']);
+});
+
 // Debug: Inspect a product's image resolution details by id or name
 Route::get('/debug/product-image', function (Request $request) {
     $query = \App\Models\Product::with(['productImages' => function($q){ $q->orderByDesc('is_primary')->orderBy('id'); }]);
