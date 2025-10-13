@@ -881,6 +881,46 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     }
 })->where('path', '.*');
 
+// DEBUG: Test specific image path
+Route::get('/debug/test-image-path', function () {
+    $testPath = 'products/seller-2/srm340-1760342455.jpg';
+    
+    $result = [
+        'test_path' => $testPath,
+        'r2_configured' => config('filesystems.disks.r2') !== null,
+        'r2_bucket' => config('filesystems.disks.r2.bucket', 'NOT SET'),
+        'checks' => []
+    ];
+    
+    // Check public disk
+    try {
+        $publicExists = Storage::disk('public')->exists($testPath);
+        $result['checks']['public'] = [
+            'exists' => $publicExists,
+            'root' => Storage::disk('public')->path(''),
+        ];
+    } catch (\Exception $e) {
+        $result['checks']['public'] = ['error' => $e->getMessage()];
+    }
+    
+    // Check R2 disk
+    try {
+        $r2Exists = Storage::disk('r2')->exists($testPath);
+        $result['checks']['r2'] = [
+            'exists' => $r2Exists,
+        ];
+        
+        if ($r2Exists) {
+            $result['checks']['r2']['size'] = Storage::disk('r2')->size($testPath);
+            $result['checks']['r2']['last_modified'] = Storage::disk('r2')->lastModified($testPath);
+        }
+    } catch (\Exception $e) {
+        $result['checks']['r2'] = ['error' => $e->getMessage()];
+    }
+    
+    return response()->json($result);
+});
+
 // Debug: List files in storage to see what actually exists
 Route::get('/debug/storage-files', function (Request $request) {
     $directory = $request->get('dir', 'products');
