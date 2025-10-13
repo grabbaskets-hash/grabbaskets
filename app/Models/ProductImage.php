@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - Use GitHub CDN in production, serve-image in development
+    // Get the image URL - Use direct R2 public URL
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -46,10 +46,9 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // Product images - use serve-image route
-        // Remove 'products/' prefix if it exists for the route
-        $cleanPath = preg_replace('/^products\//', '', $imagePath);
-        return url('/serve-image/products/' . $cleanPath);
+        // Product images - use direct R2 public URL (Laravel Cloud managed storage)
+        $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+        return "{$r2PublicUrl}/{$imagePath}";
     }
 
     /**
@@ -77,7 +76,7 @@ class ProductImage extends Model
         return false;
     }
 
-    // Get the original, direct image URL (use serve-image route)
+    // Get the original, direct image URL (use direct R2 public URL)
     public function getOriginalUrlAttribute()
     {
         if (!$this->image_path) {
@@ -91,10 +90,9 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // Product images - use serve-image route
-        // Remove 'products/' prefix if it exists for the route
-        $cleanPath = preg_replace('/^products\//', '', $imagePath);
-        return url('/serve-image/products/' . $cleanPath);
+        // Product images - use direct R2 public URL (Laravel Cloud managed storage)
+        $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+        return "{$r2PublicUrl}/{$imagePath}";
     }
 
     // Get formatted file size

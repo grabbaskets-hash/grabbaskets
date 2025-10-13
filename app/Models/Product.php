@@ -129,10 +129,10 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Product images - use serve-image route
-            // Remove 'products/' prefix if it exists for the route
-            $cleanPath = preg_replace('/^products\//', '', $imagePath);
-            return url('/serve-image/products/' . $cleanPath);
+            // Case B: Product images - use direct R2 public URL
+            // Use AWS_URL from environment (Laravel Cloud managed storage)
+            $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+            return "{$r2PublicUrl}/{$imagePath}";
         }
 
         return null;
