@@ -737,23 +737,38 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
         }
 
         // Try public disk first
-        if (Storage::disk('public')->exists($storagePath)) {
-            Log::info("/serve-image: Found in public disk", ['path' => $storagePath]);
-            $file = Storage::disk('public')->get($storagePath);
-            $fullPath = Storage::disk('public')->path($storagePath);
-            $mimeType = 'image/jpeg';
-            if (function_exists('mime_content_type')) {
-                $detectedType = mime_content_type($fullPath);
-                if ($detectedType) {
-                    $mimeType = $detectedType;
-                }
-            }
-            return Response::make($file, 200, [
-                'Content-Type' => $mimeType,
-                'Cache-Control' => 'public, max-age=86400',
+        try {
+            $publicExists = Storage::disk('public')->exists($storagePath);
+            Log::info("/serve-image: Public disk check", [
+                'path' => $storagePath, 
+                'exists' => $publicExists,
+                'disk_root' => Storage::disk('public')->path(''),
+                'full_path' => Storage::disk('public')->path($storagePath)
             ]);
-        } else {
-            Log::info("/serve-image: Not found in public disk", ['path' => $storagePath]);
+            
+            if ($publicExists) {
+                Log::info("/serve-image: Found in public disk", ['path' => $storagePath]);
+                $file = Storage::disk('public')->get($storagePath);
+                $fullPath = Storage::disk('public')->path($storagePath);
+                $mimeType = 'image/jpeg';
+                if (function_exists('mime_content_type')) {
+                    $detectedType = mime_content_type($fullPath);
+                    if ($detectedType) {
+                        $mimeType = $detectedType;
+                    }
+                }
+                return Response::make($file, 200, [
+                    'Content-Type' => $mimeType,
+                    'Cache-Control' => 'public, max-age=86400',
+                ]);
+            } else {
+                Log::info("/serve-image: Not found in public disk", ['path' => $storagePath]);
+            }
+        } catch (\Throwable $publicEx) {
+            Log::warning("/serve-image: Public disk error", [
+                'path' => $storagePath,
+                'error' => $publicEx->getMessage()
+            ]);
         }
         // If not found locally, prefer redirecting to R2 public URL if configured
         $r2Base = config('filesystems.disks.r2.url');
