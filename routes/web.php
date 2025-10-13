@@ -883,75 +883,94 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
 
 // DEBUG: Visual image test page
 Route::get('/debug/image-display-test', function () {
-    $product = \App\Models\Product::where('image', '!=', '')
-        ->whereNotNull('image')
-        ->where('unique_id', '996')
-        ->first();
-    
-    if (!$product) {
+    try {
         $product = \App\Models\Product::where('image', '!=', '')
             ->whereNotNull('image')
+            ->where('unique_id', '996')
             ->first();
-    }
-    
-    $html = '<!DOCTYPE html><html><head><title>Image Test</title><style>
-        body{font-family:Arial;padding:20px;background:#f5f5f5}
-        .box{background:white;padding:20px;margin:10px 0;border-radius:8px}
-        img{max-width:200px;border:3px solid gray;margin:10px}
-        .success{color:green;font-weight:bold}
-        .error{color:red;font-weight:bold}
-        code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
-        pre{background:#f9f9f9;padding:10px;border:1px solid #ddd;overflow-x:auto}
-    </style></head><body>';
-    
-    $html .= '<h1>🔍 Image Display Test</h1>';
-    
-    if ($product) {
-        $html .= '<div class="box">';
-        $html .= '<h2>Product: ' . htmlspecialchars($product->product_name) . '</h2>';
-        $html .= '<p><strong>ID:</strong> ' . $product->product_id . '</p>';
-        $html .= '<p><strong>Unique ID:</strong> ' . $product->unique_id . '</p>';
-        $html .= '<p><strong>Raw Image Field:</strong> <code>' . htmlspecialchars($product->image) . '</code></p>';
         
-        $imageUrl = $product->image_url;
-        $html .= '<p><strong>Generated URL:</strong><br><code>' . htmlspecialchars($imageUrl) . '</code></p>';
-        
-        if (strpos($imageUrl, '/serve-image/') !== false) {
-            $html .= '<p class="success">✅ Using /serve-image/ route</p>';
-        } elseif (strpos($imageUrl, '/storage/') !== false) {
-            $html .= '<p class="error">❌ Using /storage/ (symlink broken on Laravel Cloud)</p>';
+        if (!$product) {
+            $product = \App\Models\Product::where('image', '!=', '')
+                ->whereNotNull('image')
+                ->first();
         }
         
-        // Check where image actually is
-        $imagePath = $product->image;
-        $publicExists = Storage::disk('public')->exists($imagePath);
-        $r2Exists = Storage::disk('r2')->exists($imagePath);
+        $html = '<!DOCTYPE html><html><head><title>Image Test</title><style>
+            body{font-family:Arial;padding:20px;background:#f5f5f5}
+            .box{background:white;padding:20px;margin:10px 0;border-radius:8px}
+            img{max-width:200px;border:3px solid gray;margin:10px}
+            .success{color:green;font-weight:bold}
+            .error{color:red;font-weight:bold}
+            code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
+            pre{background:#f9f9f9;padding:10px;border:1px solid #ddd;overflow-x:auto}
+        </style></head><body>';
         
-        $html .= '<h3>Storage Check:</h3>';
-        $html .= '<p><strong>Public disk:</strong> ' . ($publicExists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
-        $html .= '<p><strong>R2 disk:</strong> ' . ($r2Exists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
+        $html .= '<h1>🔍 Image Display Test</h1>';
         
-        if ($publicExists) {
-            $html .= '<p><strong>Public disk root:</strong> <code>' . Storage::disk('public')->path('') . '</code></p>';
+        if ($product) {
+            $html .= '<div class="box">';
+            $html .= '<h2>Product: ' . htmlspecialchars($product->product_name ?? 'Unknown') . '</h2>';
+            $html .= '<p><strong>ID:</strong> ' . ($product->product_id ?? 'N/A') . '</p>';
+            $html .= '<p><strong>Unique ID:</strong> ' . ($product->unique_id ?? 'N/A') . '</p>';
+            $html .= '<p><strong>Raw Image Field:</strong> <code>' . htmlspecialchars($product->image ?? 'None') . '</code></p>';
+            
+            $imageUrl = $product->image_url;
+            $html .= '<p><strong>Generated URL:</strong><br><code>' . htmlspecialchars($imageUrl ?? 'None') . '</code></p>';
+            
+            if ($imageUrl && strpos($imageUrl, '/serve-image/') !== false) {
+                $html .= '<p class="success">✅ Using /serve-image/ route</p>';
+            } elseif ($imageUrl && strpos($imageUrl, '/storage/') !== false) {
+                $html .= '<p class="error">❌ Using /storage/ (symlink broken on Laravel Cloud)</p>';
+            }
+            
+            // Check where image actually is (with error handling)
+            $html .= '<h3>Storage Check:</h3>';
+            try {
+                $imagePath = $product->image;
+                $publicExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($imagePath);
+                $r2Exists = \Illuminate\Support\Facades\Storage::disk('r2')->exists($imagePath);
+                
+                $html .= '<p><strong>Public disk:</strong> ' . ($publicExists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
+                $html .= '<p><strong>R2 disk:</strong> ' . ($r2Exists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
+                
+                if ($publicExists) {
+                    $html .= '<p><strong>Public disk root:</strong> <code>' . \Illuminate\Support\Facades\Storage::disk('public')->path('') . '</code></p>';
+                }
+            } catch (\Exception $e) {
+                $html .= '<p class="error">Error checking storage: ' . htmlspecialchars($e->getMessage()) . '</p>';
+            }
+            
+            $html .= '<h3>Image Test:</h3>';
+            if ($imageUrl) {
+                $html .= '<img src="' . htmlspecialchars($imageUrl) . '" alt="' . htmlspecialchars($product->product_name ?? 'Product') . '" 
+                      onload="this.style.border=\'3px solid green\'; this.nextElementSibling.innerHTML=\'✅ Image loaded successfully!\'; this.nextElementSibling.className=\'success\';" 
+                      onerror="this.style.border=\'3px solid red\'; this.nextElementSibling.innerHTML=\'❌ Image failed to load\'; this.nextElementSibling.className=\'error\';">';
+                $html .= '<p>Loading...</p>';
+            } else {
+                $html .= '<p class="error">No image URL generated</p>';
+            }
+            $html .= '</div>';
+        } else {
+            $html .= '<div class="box"><p class="error">No products found with images</p></div>';
         }
         
-        $html .= '<h3>Image Test:</h3>';
-        $html .= '<img src="' . htmlspecialchars($imageUrl) . '" alt="' . htmlspecialchars($product->product_name) . '" 
-                  onload="this.style.border=\'3px solid green\'; this.nextElementSibling.innerHTML=\'✅ Image loaded successfully!\'; this.nextElementSibling.className=\'success\';" 
-                  onerror="this.style.border=\'3px solid red\'; this.nextElementSibling.innerHTML=\'❌ Image failed to load - URL is broken\'; this.nextElementSibling.className=\'error\';">';
-        $html .= '<p>Loading...</p>';
+        $html .= '<div class="box"><h2>Actions</h2>';
+        $html .= '<p><a href="/seller/dashboard" style="color:blue;text-decoration:underline">← Back to Dashboard</a></p>';
+        $html .= '<p><a href="/clear-caches-now.php" style="color:blue;text-decoration:underline">Clear Caches</a></p>';
         $html .= '</div>';
-    } else {
-        $html .= '<p class="error">No products found</p>';
+        
+        $html .= '</body></html>';
+        
+        return response($html)->header('Content-Type', 'text/html');
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Diagnostic page error',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
     }
-    
-    $html .= '<div class="box"><h2>Actions</h2>';
-    $html .= '<p><a href="/seller/dashboard" style="color:blue;text-decoration:underline">← Back to Dashboard</a></p>';
-    $html .= '</div>';
-    
-    $html .= '</body></html>';
-    
-    return response($html)->header('Content-Type', 'text/html');
 });
 
 // DEBUG: Test specific image path
