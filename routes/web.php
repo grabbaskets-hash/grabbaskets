@@ -881,6 +881,66 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     }
 })->where('path', '.*');
 
+// DEBUG: Visual image test page
+Route::get('/debug/image-display-test', function () {
+    $product = \App\Models\Product::where('image', '!=', '')
+        ->whereNotNull('image')
+        ->where('unique_id', '996')
+        ->first();
+    
+    if (!$product) {
+        $product = \App\Models\Product::where('image', '!=', '')
+            ->whereNotNull('image')
+            ->first();
+    }
+    
+    $html = '<!DOCTYPE html><html><head><title>Image Test</title><style>
+        body{font-family:Arial;padding:20px;background:#f5f5f5}
+        .box{background:white;padding:20px;margin:10px 0;border-radius:8px}
+        img{max-width:200px;border:3px solid gray;margin:10px}
+        .success{color:green;font-weight:bold}
+        .error{color:red;font-weight:bold}
+        code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
+    </style></head><body>';
+    
+    $html .= '<h1>🔍 Image Display Test</h1>';
+    
+    if ($product) {
+        $html .= '<div class="box">';
+        $html .= '<h2>Product: ' . htmlspecialchars($product->product_name) . '</h2>';
+        $html .= '<p><strong>ID:</strong> ' . $product->product_id . '</p>';
+        $html .= '<p><strong>Unique ID:</strong> ' . $product->unique_id . '</p>';
+        $html .= '<p><strong>Raw Image Field:</strong> <code>' . htmlspecialchars($product->image) . '</code></p>';
+        
+        $imageUrl = $product->image_url;
+        $html .= '<p><strong>Generated URL:</strong><br><code>' . htmlspecialchars($imageUrl) . '</code></p>';
+        
+        if (strpos($imageUrl, '/serve-image/') !== false) {
+            $html .= '<p class="success">✅ NEW CODE: Using /serve-image/ route</p>';
+        } elseif (strpos($imageUrl, 'r2.cloudflarestorage.com') !== false) {
+            $html .= '<p class="error">❌ OLD CODE: Using R2 direct URL (BROKEN)</p>';
+            $html .= '<p class="error">This is why images show as text!</p>';
+        }
+        
+        $html .= '<h3>Image Test:</h3>';
+        $html .= '<img src="' . htmlspecialchars($imageUrl) . '" alt="' . htmlspecialchars($product->product_name) . '" 
+                  onload="this.style.border=\'3px solid green\'; this.nextElementSibling.innerHTML=\'✅ Image loaded successfully!\'; this.nextElementSibling.className=\'success\';" 
+                  onerror="this.style.border=\'3px solid red\'; this.nextElementSibling.innerHTML=\'❌ Image failed to load - URL is broken\'; this.nextElementSibling.className=\'error\';">';
+        $html .= '<p>Loading...</p>';
+        $html .= '</div>';
+    } else {
+        $html .= '<p class="error">No products found</p>';
+    }
+    
+    $html .= '<div class="box"><h2>Actions</h2>';
+    $html .= '<p><a href="/seller/dashboard" style="color:blue;text-decoration:underline">← Back to Dashboard</a></p>';
+    $html .= '</div>';
+    
+    $html .= '</body></html>';
+    
+    return response($html)->header('Content-Type', 'text/html');
+});
+
 // DEBUG: Test specific image path
 Route::get('/debug/test-image-path', function () {
     $testPath = 'products/seller-2/srm340-1760342455.jpg';
