@@ -23,10 +23,26 @@ class ProductImportExportController extends Controller
      */
     public function index()
     {
-        $seller = Auth::user();
-        $productsCount = Product::where('seller_id', $seller->id)->count();
-        
-        return view('seller.import-export', compact('productsCount'));
+        try {
+            $seller = Auth::user();
+            
+            if (!$seller) {
+                return redirect()->route('login')->with('error', 'Please login to access this page.');
+            }
+            
+            $productsCount = Product::where('seller_id', $seller->id)->count();
+            
+            return view('seller.import-export', compact('productsCount'));
+        } catch (\Exception $e) {
+            Log::error('Import/Export page error: ' . $e->getMessage());
+            
+            if (config('app.debug')) {
+                throw $e;
+            }
+            
+            return redirect()->route('seller.dashboard')
+                ->with('error', 'Unable to load import/export page. Please try again later.');
+        }
     }
 
     /**
