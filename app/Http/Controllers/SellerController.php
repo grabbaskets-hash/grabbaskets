@@ -741,10 +741,10 @@ public function storeCategorySubcategory(Request $request)
             // Use seller-specific folder structure (same as uploadProductImages)
             $folder = 'products/seller-' . $sellerId;
             
-            // Preserve original filename with timestamp
+            // Preserve original filename without timestamp for easier retrieval
             $ext = $image->getClientOriginalExtension();
             $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $filename = Str::slug($originalName) . '-' . time() . '.' . $ext;
+            $filename = Str::slug($originalName) . '.' . $ext;
             
             $imageUploaded = false;
             $imagePath = null;
@@ -1016,7 +1016,7 @@ public function storeCategorySubcategory(Request $request)
             $folder = 'products/seller-' . $sellerId;
             $ext = $image->getClientOriginalExtension();
             $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $filename = Str::slug($originalName) . '-' . time() . '.' . $ext;
+            $filename = Str::slug($originalName) . '.' . $ext;
             $finalPath = null;
             $publicSuccess = false;
             $r2Success = false;
@@ -1640,7 +1640,7 @@ public function storeCategorySubcategory(Request $request)
             try {
                 $ext = $image->getClientOriginalExtension();
                 $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $filename = Str::slug($originalName) . '-' . time() . '-' . uniqid() . '.' . $ext;
+                $filename = Str::slug($originalName) . '-' . uniqid() . '.' . $ext;
 
                 // Upload to R2
                 $path = $image->storeAs($libraryFolder, $filename, 'r2');
