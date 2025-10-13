@@ -860,11 +860,8 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
 
     Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
         
-        // Return a placeholder image instead of 404 for better user experience
-        $placeholderUrl = 'https://via.placeholder.com/200x200/cccccc/666666?text=Image+Not+Found';
-        return redirect()->away($placeholderUrl, 302, [
-            'Cache-Control' => 'public, max-age=3600' // Cache for 1 hour
-        ]);
+        // Return 404 - no placeholder
+        return response()->json(['error' => 'Image not found', 'path' => $storagePath], 404);
     } catch (\Throwable $e) {
         Log::error('Error in /serve-image route', [
             'type' => $type,
