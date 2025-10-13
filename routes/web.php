@@ -392,6 +392,12 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/transactions', [SellerController::class, 'transactions'])->name('seller.transactions');
     Route::get('/store/{seller}', [SellerController::class, 'storeProducts'])->name('store.products');
 
+    // Seller: Image Library
+    Route::get('/seller/image-library', [SellerController::class, 'imageLibrary'])->name('seller.imageLibrary');
+    Route::post('/seller/upload-to-library', [SellerController::class, 'uploadToLibrary'])->name('seller.uploadToLibrary');
+    Route::get('/seller/get-library-images', [SellerController::class, 'getLibraryImages'])->name('seller.getLibraryImages');
+    Route::delete('/seller/delete-library-image', [SellerController::class, 'deleteLibraryImage'])->name('seller.deleteLibraryImage');
+
     // Orders (user & seller)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/track', [OrderController::class, 'track'])->name('orders.track');

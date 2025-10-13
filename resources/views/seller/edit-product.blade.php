@@ -256,8 +256,17 @@
                 <div class="col-12">
                     <label for="image">Product Image</label>
                     <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    <input type="hidden" id="libraryImageUrl" name="library_image_url">
                     @error('image') <div class="text-danger" style="font-weight:600;">{{ $message }}</div> @enderror
                     <small class="text-muted">Choose a new image to replace the current one. Max size: 2MB</small>
+                    
+                    <!-- OR Select from Library -->
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#imageLibraryModal">
+                            <i class="fas fa-images me-1"></i> Or Select from Library
+                        </button>
+                    </div>
+
                     <!-- Image Preview -->
                     <div id="imagePreview" style="display: none; margin-top: 10px; text-align:center;">
                         <img id="previewImg" src="" alt="Preview" style="max-width: 170px; max-height: 170px; border-radius: 10px; border: 2px solid #3b82f6; box-shadow:0 2px 8px rgba(59,130,246,0.10);">
@@ -277,9 +286,27 @@
     </div>
 </div>
 
+{{-- Include Image Library Modal --}}
+@include('seller.partials.image-library-modal')
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+// Handle library image selection
+function handleLibraryImageSelection(url) {
+    // Set the URL in hidden input
+    document.getElementById('libraryImageUrl').value = url;
+    
+    // Clear file input
+    document.getElementById('image').value = '';
+    
+    // Show preview
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    previewImg.src = url;
+    preview.style.display = 'block';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const categorySelect = document.getElementById('category_id');
     const subcategorySelect = document.getElementById('subcategory_id');

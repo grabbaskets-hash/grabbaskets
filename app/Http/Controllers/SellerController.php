@@ -920,11 +920,48 @@ public function storeCategorySubcategory(Request $request)
         Log::info('Image upload debug', [
             'hasFile' => $request->hasFile('image'),
             'file' => $request->file('image'),
+            'library_image_url' => $request->library_image_url,
             'all_files' => $request->allFiles(),
         ]);
 
+        // Handle image from library (URL provided)
+        if ($request->filled('library_image_url') && !$request->hasFile('image')) {
+            $libraryImageUrl = $request->library_image_url;
+            
+            // Extract path from R2 URL
+            $r2BaseUrl = config('filesystems.disks.r2.url');
+            if (str_starts_with($libraryImageUrl, $r2BaseUrl)) {
+                $imagePath = str_replace($r2BaseUrl . '/', '', $libraryImageUrl);
+                
+                // Verify it's from the seller's library
+                $sellerId = Auth::id();
+                if (str_starts_with($imagePath, 'library/seller-' . $sellerId)) {
+                    // Delete old image records
+                    $product->productImages()->delete();
+                    
+                    // Create new ProductImage pointing to library image
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imagePath,
+                        'original_name' => basename($imagePath),
+                        'mime_type' => 'image/jpeg',
+                        'file_size' => 0,
+                        'sort_order' => 1,
+                        'is_primary' => true,
+                    ]);
+                    
+                    // Update legacy field
+                    $data['image'] = $imagePath;
+                    
+                    Log::info('Product image updated from library', [
+                        'product_id' => $product->id,
+                        'library_path' => $imagePath
+                    ]);
+                }
+            }
+        }
         // Handle image update: PUBLIC DISK primary, R2 backup
-        if ($request->hasFile('image')) {
+        elseif ($request->hasFile('image')) {
             $image = $request->file('image');
             $sellerId = Auth::id();
             $folder = 'products/seller-' . $sellerId;
@@ -1436,6 +1473,211 @@ public function storeCategorySubcategory(Request $request)
             is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
         }
         rmdir($dir);
+    }
+
+    // ====== IMAGE LIBRARY MANAGEMENT ======
+    
+    /**
+     * Show seller's image library
+     */
+    public function imageLibrary()
+    {
+        $sellerId = Auth::id();
+        $libraryFolder = 'library/seller-' . $sellerId;
+        $images = [];
+
+        try {
+            // Get images from R2
+            $files = Storage::disk('r2')->files($libraryFolder);
+            
+            foreach ($files as $filePath) {
+                $filename = basename($filePath);
+                
+                // Skip non-image files
+                if (!preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $filename)) {
+                    continue;
+                }
+
+                $images[] = [
+                    'name' => $filename,
+                    'path' => $filePath,
+                    'url' => $this->getImageUrl($filePath),
+                    'size' => $this->formatFileSize(Storage::disk('r2')->size($filePath))
+                ];
+            }
+
+            // Sort by name
+            usort($images, function($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+
+        } catch (\Throwable $e) {
+            Log::error('Failed to load image library', [
+                'error' => $e->getMessage(),
+                'seller_id' => $sellerId
+            ]);
+        }
+
+        return view('seller.image-library', compact('images'));
+    }
+
+    /**
+     * Upload images to seller's library
+     */
+    public function uploadToLibrary(Request $request)
+    {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        $sellerId = Auth::id();
+        $libraryFolder = 'library/seller-' . $sellerId;
+        $uploadedCount = 0;
+        $errors = [];
+
+        foreach ($request->file('images') as $image) {
+            try {
+                $ext = $image->getClientOriginalExtension();
+                $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $filename = Str::slug($originalName) . '-' . time() . '-' . uniqid() . '.' . $ext;
+
+                // Upload to R2
+                $path = $image->storeAs($libraryFolder, $filename, 'r2');
+                
+                if ($path) {
+                    $uploadedCount++;
+                    Log::info('Image uploaded to library', [
+                        'seller_id' => $sellerId,
+                        'filename' => $filename
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                $errors[] = $image->getClientOriginalName();
+                Log::error('Failed to upload image to library', [
+                    'error' => $e->getMessage(),
+                    'filename' => $image->getClientOriginalName()
+                ]);
+            }
+        }
+
+        if ($uploadedCount > 0) {
+            $message = "Successfully uploaded {$uploadedCount} image(s)";
+            if (count($errors) > 0) {
+                $message .= " (" . count($errors) . " failed)";
+            }
+            return redirect()->route('seller.imageLibrary')->with('success', $message);
+        }
+
+        return redirect()->route('seller.imageLibrary')->with('error', 'Failed to upload images');
+    }
+
+    /**
+     * Get list of library images (for AJAX)
+     */
+    public function getLibraryImages()
+    {
+        $sellerId = Auth::id();
+        $libraryFolder = 'library/seller-' . $sellerId;
+        $images = [];
+
+        try {
+            $files = Storage::disk('r2')->files($libraryFolder);
+            
+            foreach ($files as $filePath) {
+                $filename = basename($filePath);
+                
+                if (!preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $filename)) {
+                    continue;
+                }
+
+                $images[] = [
+                    'name' => $filename,
+                    'path' => $filePath,
+                    'url' => $this->getImageUrl($filePath),
+                    'size' => Storage::disk('r2')->size($filePath)
+                ];
+            }
+
+        } catch (\Throwable $e) {
+            Log::error('Failed to get library images', ['error' => $e->getMessage()]);
+        }
+
+        return response()->json(['images' => $images]);
+    }
+
+    /**
+     * Delete image from library
+     */
+    public function deleteLibraryImage(Request $request)
+    {
+        $request->validate([
+            'path' => 'required|string'
+        ]);
+
+        $sellerId = Auth::id();
+        $path = $request->path;
+
+        // Verify the path belongs to this seller
+        if (!str_starts_with($path, 'library/seller-' . $sellerId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        try {
+            Storage::disk('r2')->delete($path);
+            
+            Log::info('Image deleted from library', [
+                'seller_id' => $sellerId,
+                'path' => $path
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image deleted successfully'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to delete library image', [
+                'error' => $e->getMessage(),
+                'path' => $path
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete image'
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper: Get image URL (R2 public URL or serve-image route)
+     */
+    private function getImageUrl($path)
+    {
+        if (app()->environment('production')) {
+            $r2BaseUrl = config('filesystems.disks.r2.url');
+            if (!empty($r2BaseUrl)) {
+                return rtrim($r2BaseUrl, '/') . '/' . ltrim($path, '/');
+            }
+        }
+        
+        return url('serve-image/' . str_replace('library/', 'library/', $path));
+    }
+
+    /**
+     * Helper: Format file size
+     */
+    private function formatFileSize($bytes)
+    {
+        if ($bytes < 1024) {
+            return $bytes . ' B';
+        } elseif ($bytes < 1048576) {
+            return round($bytes / 1024, 2) . ' KB';
+        } else {
+            return round($bytes / 1048576, 2) . ' MB';
+        }
     }
 
 }

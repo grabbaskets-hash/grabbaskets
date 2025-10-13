@@ -144,6 +144,11 @@
                 </a>
             </li>
             <li>
+                <a class="nav-link" href="{{ route('seller.imageLibrary') }}">
+                    <i class="bi bi-images"></i> Image Library
+                </a>
+            </li>
+            <li>
                 <a class="nav-link" href="{{ route('seller.bulkUploadForm') }}">
                     <i class="bi bi-cloud-upload"></i> Bulk Upload Excel
                 </a>
