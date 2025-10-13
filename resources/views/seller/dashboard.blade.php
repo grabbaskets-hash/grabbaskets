@@ -251,7 +251,20 @@
 
         <!-- Products Table -->
         <div class="orders-table p-3">
-            <h4 class="mb-3"><i class="bi bi-clock-history"></i> Your Products</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0"><i class="bi bi-clock-history"></i> Your Products</h4>
+                <div class="btn-group" role="group">
+                    <a href="{{ route('seller.importExport') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-arrow-down-up"></i> Import/Export
+                    </a>
+                    <form action="{{ route('seller.products.export.excel') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-file-earmark-excel"></i> Quick Export
+                        </button>
+                    </form>
+                </div>
+            </div>
             @if(isset($products) && $products->count())
             <div class="table-responsive">
                 <table class="table table-striped table-hover align-middle">

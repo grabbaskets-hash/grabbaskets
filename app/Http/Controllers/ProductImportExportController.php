@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Subcategory;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -319,12 +320,24 @@ class ProductImportExportController extends Controller
                     if ($product) {
                         // Update existing product
                         $product->update($productData);
+                        
+                        // Handle image update if provided
+                        if (!empty($productData['image'])) {
+                            $this->processProductImage($product, $productData['image']);
+                        }
+                        
                         $updated++;
                     } else {
                         // Create new product
                         $productData['seller_id'] = $seller->id;
                         $productData['unique_id'] = $productData['unique_id'] ?? 'PRD-' . strtoupper(Str::random(8));
-                        Product::create($productData);
+                        $newProduct = Product::create($productData);
+                        
+                        // Handle image if provided
+                        if (!empty($productData['image'])) {
+                            $this->processProductImage($newProduct, $productData['image']);
+                        }
+                        
                         $imported++;
                     }
 
@@ -488,89 +501,135 @@ class ProductImportExportController extends Controller
     /**
      * Map row data to product attributes based on detected headers
      */
+    /**
+     * Map row data to product attributes
+     * FLEXIBLE: Only uses fields that are present in the Excel file
+     * Skips empty/null values - leaves them as is in database
+     */
     private function mapRowToProduct($row, $headerMap, $seller)
     {
         $productData = [];
 
-        // Map each field
-        if (isset($headerMap['unique_id'])) {
-            $productData['unique_id'] = $row[$headerMap['unique_id']] ?? null;
+        // Product ID - OPTIONAL (for updating existing products)
+        if (isset($headerMap['unique_id']) && !empty($row[$headerMap['unique_id']])) {
+            $productData['unique_id'] = trim($row[$headerMap['unique_id']]);
         }
 
-        if (isset($headerMap['name'])) {
-            $productData['name'] = $row[$headerMap['name']] ?? null;
+        // Name - OPTIONAL but recommended
+        if (isset($headerMap['name']) && !empty($row[$headerMap['name']])) {
+            $productData['name'] = trim($row[$headerMap['name']]);
         }
 
-        if (isset($headerMap['description'])) {
-            $productData['description'] = $row[$headerMap['description']] ?? null;
+        // Description - OPTIONAL
+        if (isset($headerMap['description']) && !empty($row[$headerMap['description']])) {
+            $productData['description'] = trim($row[$headerMap['description']]);
         }
 
-        // Category - find or create
-        if (isset($headerMap['category'])) {
-            $categoryName = $row[$headerMap['category']] ?? null;
+        // Category - OPTIONAL (find or create if provided)
+        if (isset($headerMap['category']) && !empty($row[$headerMap['category']])) {
+            $categoryName = trim($row[$headerMap['category']]);
             if ($categoryName) {
-                $category = Category::firstOrCreate(
-                    ['name' => $categoryName],
-                    ['slug' => Str::slug($categoryName)]
-                );
-                $productData['category_id'] = $category->id;
+                try {
+                    $category = Category::firstOrCreate(
+                        ['name' => $categoryName],
+                        ['slug' => Str::slug($categoryName)]
+                    );
+                    $productData['category_id'] = $category->id;
+                } catch (\Exception $e) {
+                    Log::warning("Could not create category '{$categoryName}': " . $e->getMessage());
+                }
             }
         }
 
-        // Subcategory - find or create
-        if (isset($headerMap['subcategory']) && !empty($productData['category_id'])) {
-            $subcategoryName = $row[$headerMap['subcategory']] ?? null;
+        // Subcategory - OPTIONAL (find or create if provided)
+        if (isset($headerMap['subcategory']) && !empty($row[$headerMap['subcategory']]) && !empty($productData['category_id'])) {
+            $subcategoryName = trim($row[$headerMap['subcategory']]);
             if ($subcategoryName) {
-                $subcategory = Subcategory::firstOrCreate(
-                    ['name' => $subcategoryName, 'category_id' => $productData['category_id']],
-                    ['slug' => Str::slug($subcategoryName)]
-                );
-                $productData['subcategory_id'] = $subcategory->id;
+                try {
+                    $subcategory = Subcategory::firstOrCreate(
+                        ['name' => $subcategoryName, 'category_id' => $productData['category_id']],
+                        ['slug' => Str::slug($subcategoryName)]
+                    );
+                    $productData['subcategory_id'] = $subcategory->id;
+                } catch (\Exception $e) {
+                    Log::warning("Could not create subcategory '{$subcategoryName}': " . $e->getMessage());
+                }
             }
         }
 
-        // Numeric fields
-        if (isset($headerMap['price'])) {
-            $productData['price'] = $this->parseNumeric($row[$headerMap['price']]);
+        // Numeric fields - OPTIONAL (only add if present and valid)
+        if (isset($headerMap['price']) && isset($row[$headerMap['price']]) && $row[$headerMap['price']] !== '') {
+            $price = $this->parseNumeric($row[$headerMap['price']]);
+            if ($price !== null) {
+                $productData['price'] = $price;
+            }
         }
 
-        if (isset($headerMap['original_price'])) {
-            $productData['original_price'] = $this->parseNumeric($row[$headerMap['original_price']]);
+        if (isset($headerMap['original_price']) && isset($row[$headerMap['original_price']]) && $row[$headerMap['original_price']] !== '') {
+            $originalPrice = $this->parseNumeric($row[$headerMap['original_price']]);
+            if ($originalPrice !== null) {
+                $productData['original_price'] = $originalPrice;
+            }
         }
 
-        if (isset($headerMap['discount'])) {
-            $productData['discount'] = $this->parseNumeric($row[$headerMap['discount']]);
+        if (isset($headerMap['discount']) && isset($row[$headerMap['discount']]) && $row[$headerMap['discount']] !== '') {
+            $discount = $this->parseNumeric($row[$headerMap['discount']]);
+            if ($discount !== null) {
+                $productData['discount'] = $discount;
+            }
         }
 
-        if (isset($headerMap['stock'])) {
-            $productData['stock'] = (int) ($row[$headerMap['stock']] ?? 0);
+        if (isset($headerMap['stock']) && isset($row[$headerMap['stock']]) && $row[$headerMap['stock']] !== '') {
+            $productData['stock'] = (int) $row[$headerMap['stock']];
         }
 
-        // String fields
-        $stringFields = ['sku', 'barcode', 'weight', 'dimensions', 'brand', 'model', 'color', 'size', 'material', 'tags', 'meta_title', 'meta_description'];
+        if (isset($headerMap['delivery_charge']) && isset($row[$headerMap['delivery_charge']]) && $row[$headerMap['delivery_charge']] !== '') {
+            $deliveryCharge = $this->parseNumeric($row[$headerMap['delivery_charge']]);
+            if ($deliveryCharge !== null) {
+                $productData['delivery_charge'] = $deliveryCharge;
+            }
+        }
+
+        // String fields - OPTIONAL (only add if present and not empty)
+        $stringFields = [
+            'sku', 'barcode', 'weight', 'dimensions', 'brand', 
+            'model', 'color', 'size', 'material', 'tags', 
+            'meta_title', 'meta_description'
+        ];
         
         foreach ($stringFields as $field) {
-            if (isset($headerMap[$field])) {
-                $productData[$field] = $row[$headerMap[$field]] ?? null;
+            if (isset($headerMap[$field]) && isset($row[$headerMap[$field]]) && $row[$headerMap[$field]] !== '') {
+                $value = trim($row[$headerMap[$field]]);
+                if ($value !== '') {
+                    $productData[$field] = $value;
+                }
             }
         }
 
-        // Status
-        if (isset($headerMap['status'])) {
-            $status = strtolower($row[$headerMap['status']] ?? 'active');
-            $productData['status'] = in_array($status, ['active', 'inactive', 'draft']) ? $status : 'active';
+        // Status - OPTIONAL (only if provided)
+        if (isset($headerMap['status']) && isset($row[$headerMap['status']]) && $row[$headerMap['status']] !== '') {
+            $status = strtolower(trim($row[$headerMap['status']]));
+            if (in_array($status, ['active', 'inactive', 'draft'])) {
+                $productData['status'] = $status;
+            }
         }
 
-        // Featured (boolean)
-        if (isset($headerMap['featured'])) {
-            $featured = strtolower($row[$headerMap['featured']] ?? 'no');
-            $productData['featured'] = in_array($featured, ['yes', 'true', '1', 'featured']);
+        // Featured (boolean) - OPTIONAL (only if provided)
+        if (isset($headerMap['featured']) && isset($row[$headerMap['featured']]) && $row[$headerMap['featured']] !== '') {
+            $featured = strtolower(trim($row[$headerMap['featured']]));
+            $productData['featured'] = in_array($featured, ['yes', 'true', '1', 'featured', 'y']) ? 1 : 0;
         }
 
-        // Image URL (if provided)
-        if (isset($headerMap['image'])) {
-            $imageUrl = $row[$headerMap['image']] ?? null;
-            if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+        // Gift Option - OPTIONAL (only if provided)
+        if (isset($headerMap['gift_option']) && isset($row[$headerMap['gift_option']]) && $row[$headerMap['gift_option']] !== '') {
+            $giftOption = strtolower(trim($row[$headerMap['gift_option']]));
+            $productData['gift_option'] = in_array($giftOption, ['yes', 'true', '1', 'available', 'y']) ? 1 : 0;
+        }
+
+        // Image URL - OPTIONAL (if provided, accept any value)
+        if (isset($headerMap['image']) && isset($row[$headerMap['image']]) && $row[$headerMap['image']] !== '') {
+            $imageUrl = trim($row[$headerMap['image']]);
+            if ($imageUrl) {
                 $productData['image'] = $imageUrl;
             }
         }
@@ -651,4 +710,161 @@ class ProductImportExportController extends Controller
             return back()->with('error', 'Failed to download template.');
         }
     }
+
+    /**
+     * Process product image from import
+     * Supports: URLs, file paths, base64 data
+     */
+    private function processProductImage($product, $imageData)
+    {
+        try {
+            if (empty($imageData)) {
+                return;
+            }
+
+            // Handle multiple images (comma-separated)
+            $images = array_map('trim', explode(',', $imageData));
+            
+            foreach ($images as $index => $imageUrl) {
+                if (empty($imageUrl)) {
+                    continue;
+                }
+
+                // Case 1: Direct URL (http:// or https://)
+                if (filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                    // Download and upload to R2
+                    $this->downloadAndUploadImage($product, $imageUrl, $index === 0);
+                }
+                // Case 2: Local file path (for bulk uploads)
+                elseif (file_exists(public_path($imageUrl))) {
+                    $this->uploadLocalImage($product, public_path($imageUrl), $index === 0);
+                }
+                // Case 3: Storage path
+                elseif (Storage::disk('r2')->exists($imageUrl)) {
+                    // Create product image record for existing R2 file
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imageUrl,
+                        'is_primary' => $index === 0,
+                        'display_order' => $index
+                    ]);
+                }
+                // Case 4: Just update product's legacy image field
+                else {
+                    $product->update(['image' => $imageUrl]);
+                }
+            }
+
+            Log::info('Product images processed', [
+                'product_id' => $product->id,
+                'images_count' => count($images)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Image processing error: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'image_data' => $imageData
+            ]);
+        }
+    }
+
+    /**
+     * Download image from URL and upload to R2
+     */
+    private function downloadAndUploadImage($product, $url, $isPrimary = false)
+    {
+        try {
+            // Download image
+            $imageContent = @file_get_contents($url);
+            
+            if ($imageContent === false) {
+                Log::warning('Failed to download image', ['url' => $url]);
+                return;
+            }
+
+            // Get file extension from URL or content type
+            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+            if (empty($extension)) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imageContent);
+                $extension = match($mimeType) {
+                    'image/jpeg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                    default => 'jpg'
+                };
+            }
+
+            // Generate unique filename
+            $filename = 'products/' . $product->id . '/' . Str::random(20) . '.' . $extension;
+            
+            // Upload to R2
+            Storage::disk('r2')->put($filename, $imageContent);
+
+            // Create product image record
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $filename,
+                'is_primary' => $isPrimary,
+                'display_order' => ProductImage::where('product_id', $product->id)->count()
+            ]);
+
+            // Update product's legacy image field if primary
+            if ($isPrimary) {
+                $product->update(['image' => $filename]);
+            }
+
+            Log::info('Image downloaded and uploaded', [
+                'product_id' => $product->id,
+                'url' => $url,
+                'r2_path' => $filename
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Download and upload error: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'url' => $url
+            ]);
+        }
+    }
+
+    /**
+     * Upload local file to R2
+     */
+    private function uploadLocalImage($product, $localPath, $isPrimary = false)
+    {
+        try {
+            if (!file_exists($localPath)) {
+                return;
+            }
+
+            $extension = pathinfo($localPath, PATHINFO_EXTENSION);
+            $filename = 'products/' . $product->id . '/' . Str::random(20) . '.' . $extension;
+            
+            // Upload to R2
+            Storage::disk('r2')->put($filename, file_get_contents($localPath));
+
+            // Create product image record
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $filename,
+                'is_primary' => $isPrimary,
+                'display_order' => ProductImage::where('product_id', $product->id)->count()
+            ]);
+
+            // Update product's legacy image field if primary
+            if ($isPrimary) {
+                $product->update(['image' => $filename]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Local upload error: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'local_path' => $localPath
+            ]);
+        }
+    }
 }
+
+```

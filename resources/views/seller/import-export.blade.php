@@ -233,13 +233,43 @@
 
                     <!-- Import Instructions -->
                     <div class="mt-4">
-                        <h6 class="fw-bold mb-2">How Import Works:</h6>
+                        <h6 class="fw-bold mb-2">✨ Super Flexible Import:</h6>
                         <ol class="small text-muted">
-                            <li><strong>Auto-detects headers:</strong> Works with any column names (e.g., "Name", "Product Name", "Title")</li>
+                            <li><strong>Use ANY column names:</strong> Works with any header format automatically</li>
+                            <li><strong>Import ONLY what you have:</strong> Missing columns? No problem! System uses what's available</li>
                             <li><strong>Updates existing products:</strong> Matches by Product ID or Name</li>
                             <li><strong>Creates new products:</strong> Automatically adds products that don't exist</li>
-                            <li><strong>Smart mapping:</strong> Finds categories by name, creates if missing</li>
+                            <li><strong>Auto-creates categories:</strong> Categories/subcategories created if missing</li>
+                            <li><strong>Leaves blank fields alone:</strong> Empty cells won't overwrite existing data</li>
+                            <li><strong>📸 Image Import:</strong> Supports image URLs (comma-separated for multiple)</li>
                         </ol>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="alert alert-success">
+                            <i class="fas fa-magic me-2"></i>
+                            <strong>✅ Maximum Flexibility!</strong>
+                            <ul class="mb-0 mt-2 small">
+                                <li><strong>Minimum Required:</strong> Just "Name" and "Price" are enough!</li>
+                                <li><strong>Add Whatever You Have:</strong> Category, Stock, SKU, Brand, etc. - all optional</li>
+                                <li><strong>Any Format Works:</strong> "Product Name" or "Name" or "Title" - all recognized</li>
+                                <li><strong>Blank = Skip:</strong> Empty cells won't update existing product data</li>
+                                <li><strong>Example:</strong> Import just names and prices, add images later!</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-camera me-2"></i>
+                            <strong>Image Import Options:</strong>
+                            <ul class="mb-0 mt-2 small">
+                                <li>Add "Image URL" column with direct image links</li>
+                                <li>Supports http:// and https:// URLs</li>
+                                <li>Multiple images: separate with commas</li>
+                                <li>Example: https://example.com/image1.jpg, https://example.com/image2.jpg</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="mt-3">
