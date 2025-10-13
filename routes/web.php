@@ -794,46 +794,57 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
             ]);
         }
         
-        // For legacy paths, try without the 'products/' prefix (old storage structure)
+        // For legacy paths, try multiple fallback paths
         if ($type === 'products') {
-            $legacyPath = $leafPath; // Just the filename part without products/ prefix
-            try {
-                if (Storage::disk('public')->exists($legacyPath)) {
-                    Log::info("/serve-image: Found legacy path in public disk", ['path' => $legacyPath]);
-                    $file = Storage::disk('public')->get($legacyPath);
-                    $fullPath = Storage::disk('public')->path($legacyPath);
-                    $mimeType = 'image/jpeg';
-                    if (function_exists('mime_content_type')) {
-                        $detectedType = mime_content_type($fullPath);
-                        if ($detectedType) {
-                            $mimeType = $detectedType;
+            $legacyPaths = [
+                $leafPath, // Just the filename part without products/ prefix
+                'images/' . $leafPath, // Old images/ prefix
+                'storage/' . $leafPath, // Old storage/ prefix
+                'uploads/' . $leafPath, // Old uploads/ prefix
+            ];
+            
+            foreach ($legacyPaths as $legacyPath) {
+                try {
+                    if (Storage::disk('public')->exists($legacyPath)) {
+                        Log::info("/serve-image: Found legacy path in public disk", ['path' => $legacyPath]);
+                        $file = Storage::disk('public')->get($legacyPath);
+                        $fullPath = Storage::disk('public')->path($legacyPath);
+                        $mimeType = 'image/jpeg';
+                        if (function_exists('mime_content_type')) {
+                            $detectedType = mime_content_type($fullPath);
+                            if ($detectedType) {
+                                $mimeType = $detectedType;
+                            }
                         }
+                        return Response::make($file, 200, [
+                            'Content-Type' => $mimeType,
+                            'Cache-Control' => 'public, max-age=86400',
+                        ]);
                     }
-                    return Response::make($file, 200, [
-                        'Content-Type' => $mimeType,
-                        'Cache-Control' => 'public, max-age=86400',
-                    ]);
-                }
-                
-                if (Storage::disk('r2')->exists($legacyPath)) {
-                    Log::info("/serve-image: Found legacy path in r2 disk", ['path' => $legacyPath]);
-                    $file = Storage::disk('r2')->get($legacyPath);
-                    $ext = strtolower(pathinfo($legacyPath, PATHINFO_EXTENSION));
-                    $mimeType = 'image/jpeg';
-                    if (in_array($ext, ['png', 'gif', 'webp'])) {
-                        $mimeType = 'image/' . $ext;
+                    
+                    if (Storage::disk('r2')->exists($legacyPath)) {
+                        Log::info("/serve-image: Found legacy path in r2 disk", ['path' => $legacyPath]);
+                        $file = Storage::disk('r2')->get($legacyPath);
+                        $ext = strtolower(pathinfo($legacyPath, PATHINFO_EXTENSION));
+                        $mimeType = 'image/jpeg';
+                        if (in_array($ext, ['png', 'gif', 'webp'])) {
+                            $mimeType = 'image/' . $ext;
+                        }
+                        return Response::make($file, 200, [
+                            'Content-Type' => $mimeType,
+                            'Cache-Control' => 'public, max-age=86400',
+                        ]);
                     }
-                    return Response::make($file, 200, [
-                        'Content-Type' => $mimeType,
-                        'Cache-Control' => 'public, max-age=86400',
-                    ]);
+                } catch (\Throwable $legacyEx) {
+                    // Continue to next legacy path
+                    Log::debug('Legacy path not found', ['path' => $legacyPath]);
                 }
-            } catch (\Throwable $legacyEx) {
-                Log::warning('Legacy path check error in /serve-image', [
-                    'legacy_path' => $legacyPath,
-                    'message' => $legacyEx->getMessage(),
-                ]);
             }
+            
+            Log::warning('All legacy paths failed for /serve-image', [
+                'tested_paths' => $legacyPaths,
+                'original_path' => $storagePath
+            ]);
         }
         
         // If R2 public URL is configured, try redirect as fallback
@@ -848,10 +859,12 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
 
 
     Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
-        return response()->json([
-            'error' => 'File not found in any disk',
-            'path' => $storagePath
-        ], 404);
+        
+        // Return a placeholder image instead of 404 for better user experience
+        $placeholderUrl = 'https://via.placeholder.com/200x200/cccccc/666666?text=Image+Not+Found';
+        return redirect()->away($placeholderUrl, 302, [
+            'Cache-Control' => 'public, max-age=3600' // Cache for 1 hour
+        ]);
     } catch (\Throwable $e) {
         Log::error('Error in /serve-image route', [
             'type' => $type,
