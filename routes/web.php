@@ -725,20 +725,21 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     Log::info("/serve-image route hit", ['type' => $type, 'path' => $path]);
     // Wrap the entire closure in try/catch for error logging
     try {
-        // Validate allowed types: support legacy 'public/...' and standard 'products/...'
-        $allowedTypes = ['products', 'public'];
+        // Validate allowed types
+        $allowedTypes = ['products', 'public', 'library'];
         if (!in_array($type, $allowedTypes, true)) {
             Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
             return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
         }
 
-        // Normalize the storage-relative path for the public disk
+        // Normalize the storage-relative path
         $leafPath = ltrim($path, '/');
         if ($type === 'public') {
-            // Some legacy DB entries include a leading 'public/' segment; strip it for Storage disk
             $storagePath = preg_replace('/^public\//', '', $leafPath);
+        } elseif ($type === 'library') {
+            $storagePath = 'library/' . $leafPath;
         } else {
-            // Standard case: 'products/<...>'
+            // products
             $storagePath = 'products/' . $leafPath;
         }
 
