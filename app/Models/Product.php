@@ -129,16 +129,14 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Production Laravel Cloud ONLY - use GitHub CDN with JavaScript fallback
+            // Case B: Production Laravel Cloud - use R2 direct public URL
             // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
-            $isLaravelCloud = app()->environment('production') && 
-                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
-                               str_contains(request()->getHost(), '.laravel.cloud'));
+            $isLaravelCloud = $this->isLaravelCloud();
             
             if ($isLaravelCloud) {
-                // Return GitHub CDN URL - images are already there
-                $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
-                return "{$githubBaseUrl}/{$imagePath}";
+                // Return R2 public URL directly
+                $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
+                return "{$r2PublicUrl}/{$imagePath}";
             }
 
             // Case C: Local (even if APP_ENV=production) - use serve-image route
@@ -146,6 +144,31 @@ class Product extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Check if running on Laravel Cloud
+     */
+    private function isLaravelCloud()
+    {
+        // Explicit flag takes precedence
+        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
+            return true;
+        }
+
+        // Check if running on Laravel Cloud based on server name
+        if (app()->environment('production') && 
+            isset($_SERVER['SERVER_NAME']) && 
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+
+        // Check for Laravel Vapor environment
+        if (env('VAPOR_ENVIRONMENT') !== null) {
+            return true;
+        }
+
+        return false;
     }
 
     // Provide the original, direct image URL for showcasing (prefer gallery primary)

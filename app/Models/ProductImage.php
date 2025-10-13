@@ -46,15 +46,14 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // Production Laravel Cloud ONLY: Use GitHub CDN
+        // Production Laravel Cloud: Use R2 direct public URL
         // Check if actually running on Laravel Cloud (not just APP_ENV=production locally)
-        $isLaravelCloud = app()->environment('production') && 
-                          (request()->getHost() === 'grabbaskets.laravel.cloud' || 
-                           str_contains(request()->getHost(), '.laravel.cloud'));
+        $isLaravelCloud = $this->isLaravelCloud();
         
         if ($isLaravelCloud) {
-            $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
-            return "{$githubBaseUrl}/{$imagePath}";
+            // Return R2 public URL directly
+            $r2PublicUrl = config('filesystems.disks.r2.url', env('AWS_URL'));
+            return "{$r2PublicUrl}/{$imagePath}";
         }
 
         // Local (even if APP_ENV=production): Use serve-image route
@@ -63,6 +62,31 @@ class ProductImage extends Model
             return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
         }
         return url('/serve-image/products/' . $imagePath);
+    }
+
+    /**
+     * Check if running on Laravel Cloud
+     */
+    private function isLaravelCloud()
+    {
+        // Explicit flag takes precedence
+        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
+            return true;
+        }
+
+        // Check if running on Laravel Cloud based on server name
+        if (app()->environment('production') && 
+            isset($_SERVER['SERVER_NAME']) && 
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+
+        // Check for Laravel Vapor environment
+        if (env('VAPOR_ENVIRONMENT') !== null) {
+            return true;
+        }
+
+        return false;
     }
 
     // Get the original, direct image URL (GitHub CDN)
