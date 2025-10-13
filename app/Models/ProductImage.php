@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - Use serve-image route for immediate availability
+    // Get the image URL - Use GitHub CDN in production, serve-image in development
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -46,9 +46,13 @@ class ProductImage extends Model
             return asset($imagePath);
         }
 
-        // For uploaded images, use serve-image route
-        // This checks local storage first, then falls back to AWS/R2
-        // Ensures newly uploaded images work immediately before GitHub sync
+        // Production: Use GitHub CDN (images already pushed)
+        if (app()->environment('production')) {
+            $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
+            return "{$githubBaseUrl}/{$imagePath}";
+        }
+
+        // Development: Use serve-image route (checks local storage)
         $parts = explode('/', $imagePath, 2);
         if (count($parts) === 2) {
             return url('/serve-image/' . $parts[0] . '/' . $parts[1]);

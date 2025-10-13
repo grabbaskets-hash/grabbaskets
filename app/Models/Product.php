@@ -129,25 +129,15 @@ class Product extends Model
                 return asset($imagePath);
             }
 
-            // Case B: Uploaded images - Use hybrid approach
-            // In production: Try GitHub CDN first, fallback to serve-image route
-            // In development: Use local storage via serve-image route
-            
+            // Case B: Production - use GitHub CDN with JavaScript fallback to serve-image
+            // This ensures existing images (in GitHub) load fast, new images (not yet in GitHub) fall back to serve-image
             if (app()->environment('production')) {
-                // Use GitHub CDN with serve-image route as fallback via JavaScript
-                // This ensures newly uploaded images (not yet in GitHub) still display
-                $githubUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public/{$imagePath}";
-                
-                // For now, use serve-image route which checks local storage first
-                // This ensures newly uploaded images work immediately
-                $pathParts = explode('/', $imagePath, 2);
-                if (count($pathParts) === 2) {
-                    return url('/serve-image/' . $pathParts[0] . '/' . $pathParts[1]);
-                }
-                return url('/serve-image/products/' . $imagePath);
+                // Return GitHub CDN URL - images are already there
+                $githubBaseUrl = "https://raw.githubusercontent.com/grabbaskets-hash/grabbaskets/main/storage/app/public";
+                return "{$githubBaseUrl}/{$imagePath}";
             }
 
-            // Development: use storage symlink or serve-image route
+            // Case C: Development - use serve-image route (checks local storage)
             return url('/serve-image/products/' . $imagePath);
         }
 
