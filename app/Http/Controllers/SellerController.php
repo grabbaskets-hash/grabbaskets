@@ -749,10 +749,8 @@ public function storeCategorySubcategory(Request $request)
             $imageUploaded = false;
             $imagePath = null;
             
-            // Determine if we're on Laravel Cloud
-            $isLaravelCloud = app()->environment('production') && 
-                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
-                               str_contains(request()->getHost() ?? '', '.laravel.cloud'));
+            // Determine if we're on Laravel Cloud (using helper method)
+            $isLaravelCloud = $this->isLaravelCloud();
             
             // Environment-aware storage strategy
             try {
@@ -770,14 +768,36 @@ public function storeCategorySubcategory(Request $request)
                             
                             Log::info('R2 upload SUCCESS on Laravel Cloud (create)', [
                                 'path' => $r2Path,
-                                'size' => $image->getSize()
+                                'size' => $image->getSize(),
+                                'bucket' => config('filesystems.disks.r2.bucket')
+                            ]);
+                        } else {
+                            Log::error('R2 upload returned path but file not found', [
+                                'returned_path' => $r2Path,
+                                'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
                             ]);
                         }
                     } catch (\Throwable $r2Ex) {
                         Log::error('R2 upload FAILED on Laravel Cloud (create)', [
                             'error' => $r2Ex->getMessage(),
-                            'trace' => $r2Ex->getTraceAsString()
+                            'error_class' => get_class($r2Ex),
+                            'trace' => $r2Ex->getTraceAsString(),
+                            'bucket' => config('filesystems.disks.r2.bucket'),
+                            'endpoint' => config('filesystems.disks.r2.endpoint'),
+                            'has_key' => !empty(config('filesystems.disks.r2.key')),
+                            'has_secret' => !empty(config('filesystems.disks.r2.secret'))
                         ]);
+                    }
+                    
+                    if (!$r2Success) {
+                        Log::error('Image upload to R2 failed on Laravel Cloud', [
+                            'product_name' => $request->name,
+                            'seller_id' => Auth::id(),
+                            'filename' => $filename
+                        ]);
+                        return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
                     }
                     
                     $imageUploaded = $r2Success;
@@ -1001,10 +1021,8 @@ public function storeCategorySubcategory(Request $request)
             $publicSuccess = false;
             $r2Success = false;
             
-            // Determine if we're on Laravel Cloud
-            $isLaravelCloud = app()->environment('production') && 
-                              (request()->getHost() === 'grabbaskets.laravel.cloud' || 
-                               str_contains(request()->getHost() ?? '', '.laravel.cloud'));
+            // Determine if we're on Laravel Cloud (using helper method)
+            $isLaravelCloud = $this->isLaravelCloud();
             
             try {
                 // Remove all old ProductImage records and files before uploading new image
@@ -1026,22 +1044,38 @@ public function storeCategorySubcategory(Request $request)
                             
                             Log::info('R2 upload SUCCESS on Laravel Cloud (update)', [
                                 'path' => $r2Path,
-                                'size' => $image->getSize()
+                                'size' => $image->getSize(),
+                                'bucket' => config('filesystems.disks.r2.bucket')
+                            ]);
+                        } else {
+                            Log::error('R2 upload returned path but file not found (update)', [
+                                'returned_path' => $r2Path,
+                                'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
                             ]);
                         }
                     } catch (\Throwable $r2Ex) {
                         Log::error('R2 upload FAILED on Laravel Cloud (update)', [
                             'error' => $r2Ex->getMessage(),
+                            'error_class' => get_class($r2Ex),
                             'product_id' => $product->id,
-                            'trace' => $r2Ex->getTraceAsString()
+                            'trace' => $r2Ex->getTraceAsString(),
+                            'bucket' => config('filesystems.disks.r2.bucket'),
+                            'endpoint' => config('filesystems.disks.r2.endpoint'),
+                            'has_key' => !empty(config('filesystems.disks.r2.key')),
+                            'has_secret' => !empty(config('filesystems.disks.r2.secret'))
                         ]);
                     }
                     
                     if (!$r2Success) {
-                        Log::error('R2 upload failed on Laravel Cloud - cannot update product', [
-                            'product_id' => $product->id
+                        Log::error('Image upload to R2 failed on Laravel Cloud (update)', [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'seller_id' => Auth::id(),
+                            'filename' => $filename
                         ]);
-                        return redirect()->back()->with('error', 'Failed to upload image to cloud storage. Please try again.');
+                        return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
                     }
                 }
                 // Strategy 2: Local - Public disk primary, R2 backup
@@ -1744,6 +1778,33 @@ public function storeCategorySubcategory(Request $request)
         } else {
             return round($bytes / 1048576, 2) . ' MB';
         }
+    }
+
+    /**
+     * Helper: Detect if running on Laravel Cloud
+     * Uses multiple signals to avoid false positives when testing locally with APP_ENV=production
+     */
+    private function isLaravelCloud()
+    {
+        // Priority 1: Explicit Laravel Cloud deployment flag
+        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
+            return true;
+        }
+        
+        // Priority 2: Check if actually running on Laravel Cloud infrastructure
+        // (not just having APP_URL set to laravel.cloud)
+        if (app()->environment('production') && 
+            isset($_SERVER['SERVER_NAME']) && 
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+        
+        // Priority 3: Vapor environment (Laravel Cloud uses Vapor)
+        if (env('VAPOR_ENVIRONMENT') !== null) {
+            return true;
+        }
+        
+        return false;
     }
 
 }
