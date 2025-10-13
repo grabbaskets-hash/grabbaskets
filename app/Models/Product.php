@@ -53,6 +53,12 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->ordered();
     }
 
+    // Alias for productImages - for compatibility
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->ordered();
+    }
+
     public function primaryImage()
     {
         return $this->hasOne(ProductImage::class)->primary();
