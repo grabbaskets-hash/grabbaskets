@@ -901,6 +901,7 @@ Route::get('/debug/image-display-test', function () {
         .success{color:green;font-weight:bold}
         .error{color:red;font-weight:bold}
         code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
+        pre{background:#f9f9f9;padding:10px;border:1px solid #ddd;overflow-x:auto}
     </style></head><body>';
     
     $html .= '<h1>🔍 Image Display Test</h1>';
@@ -916,10 +917,22 @@ Route::get('/debug/image-display-test', function () {
         $html .= '<p><strong>Generated URL:</strong><br><code>' . htmlspecialchars($imageUrl) . '</code></p>';
         
         if (strpos($imageUrl, '/serve-image/') !== false) {
-            $html .= '<p class="success">✅ NEW CODE: Using /serve-image/ route</p>';
-        } elseif (strpos($imageUrl, 'r2.cloudflarestorage.com') !== false) {
-            $html .= '<p class="error">❌ OLD CODE: Using R2 direct URL (BROKEN)</p>';
-            $html .= '<p class="error">This is why images show as text!</p>';
+            $html .= '<p class="success">✅ Using /serve-image/ route</p>';
+        } elseif (strpos($imageUrl, '/storage/') !== false) {
+            $html .= '<p class="error">❌ Using /storage/ (symlink broken on Laravel Cloud)</p>';
+        }
+        
+        // Check where image actually is
+        $imagePath = $product->image;
+        $publicExists = Storage::disk('public')->exists($imagePath);
+        $r2Exists = Storage::disk('r2')->exists($imagePath);
+        
+        $html .= '<h3>Storage Check:</h3>';
+        $html .= '<p><strong>Public disk:</strong> ' . ($publicExists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
+        $html .= '<p><strong>R2 disk:</strong> ' . ($r2Exists ? '✅ EXISTS' : '❌ NOT FOUND') . '</p>';
+        
+        if ($publicExists) {
+            $html .= '<p><strong>Public disk root:</strong> <code>' . Storage::disk('public')->path('') . '</code></p>';
         }
         
         $html .= '<h3>Image Test:</h3>';
