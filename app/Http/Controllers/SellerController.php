@@ -729,7 +729,9 @@ public function storeCategorySubcategory(Request $request)
         
         Log::info('Product created, checking for image', [
             'product_id' => $product->id,
-            'hasFile' => $request->hasFile('image')
+            'hasFile' => $request->hasFile('image'),
+            'storage_path' => storage_path('app/public'),
+            'storage_writable' => is_writable(storage_path('app/public'))
         ]);
         
         if ($request->hasFile('image')) {
@@ -763,11 +765,29 @@ public function storeCategorySubcategory(Request $request)
                 
                 // Then save to local/public Git storage (same path for consistency)
                 try {
+                    Log::info('Attempting public disk upload', [
+                        'folder' => $folder,
+                        'filename' => $filename,
+                        'disk_root' => config('filesystems.disks.public.root'),
+                        'full_path' => config('filesystems.disks.public.root') . '/' . $folder . '/' . $filename
+                    ]);
+                    
                     $publicPath = $image->storeAs($folder, $filename, 'public');
                     $publicSuccess = !empty($publicPath);
-                    Log::info('Public disk upload attempt', ['success' => $publicSuccess, 'path' => $publicPath]);
+                    
+                    Log::info('Public disk upload result', [
+                        'success' => $publicSuccess,
+                        'path' => $publicPath,
+                        'file_exists' => Storage::disk('public')->exists($publicPath)
+                    ]);
                 } catch (\Throwable $publicEx) {
-                    Log::warning('Public disk upload failed', ['error' => $publicEx->getMessage()]);
+                    Log::error('Public disk upload exception', [
+                        'error' => $publicEx->getMessage(),
+                        'trace' => $publicEx->getTraceAsString(),
+                        'file' => $publicEx->getFile(),
+                        'line' => $publicEx->getLine()
+                    ]);
+                    $publicSuccess = false;
                 }
                 
                 // Use whichever path was successful (prefer R2 for URL generation)
