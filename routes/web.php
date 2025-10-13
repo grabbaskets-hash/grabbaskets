@@ -770,7 +770,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 'error' => $publicEx->getMessage()
             ]);
         }
-        // If not found locally, try R2 SDK directly since R2 public URL might not be configured
+        // Try R2 SDK directly 
         try {
             if (Storage::disk('r2')->exists($storagePath)) {
                 Log::info("/serve-image: Found in r2 disk via SDK", ['path' => $storagePath]);
@@ -792,6 +792,48 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 'path' => $storagePath,
                 'message' => $sdkEx->getMessage(),
             ]);
+        }
+        
+        // For legacy paths, try without the 'products/' prefix (old storage structure)
+        if ($type === 'products') {
+            $legacyPath = $leafPath; // Just the filename part without products/ prefix
+            try {
+                if (Storage::disk('public')->exists($legacyPath)) {
+                    Log::info("/serve-image: Found legacy path in public disk", ['path' => $legacyPath]);
+                    $file = Storage::disk('public')->get($legacyPath);
+                    $fullPath = Storage::disk('public')->path($legacyPath);
+                    $mimeType = 'image/jpeg';
+                    if (function_exists('mime_content_type')) {
+                        $detectedType = mime_content_type($fullPath);
+                        if ($detectedType) {
+                            $mimeType = $detectedType;
+                        }
+                    }
+                    return Response::make($file, 200, [
+                        'Content-Type' => $mimeType,
+                        'Cache-Control' => 'public, max-age=86400',
+                    ]);
+                }
+                
+                if (Storage::disk('r2')->exists($legacyPath)) {
+                    Log::info("/serve-image: Found legacy path in r2 disk", ['path' => $legacyPath]);
+                    $file = Storage::disk('r2')->get($legacyPath);
+                    $ext = strtolower(pathinfo($legacyPath, PATHINFO_EXTENSION));
+                    $mimeType = 'image/jpeg';
+                    if (in_array($ext, ['png', 'gif', 'webp'])) {
+                        $mimeType = 'image/' . $ext;
+                    }
+                    return Response::make($file, 200, [
+                        'Content-Type' => $mimeType,
+                        'Cache-Control' => 'public, max-age=86400',
+                    ]);
+                }
+            } catch (\Throwable $legacyEx) {
+                Log::warning('Legacy path check error in /serve-image', [
+                    'legacy_path' => $legacyPath,
+                    'message' => $legacyEx->getMessage(),
+                ]);
+            }
         }
         
         // If R2 public URL is configured, try redirect as fallback
