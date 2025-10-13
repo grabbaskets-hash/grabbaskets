@@ -32,7 +32,7 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Get the image URL - Use serve-image route for reliable access
+    // Get the image URL - Use storage symlink (works when configured)
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
@@ -46,16 +46,9 @@ class ProductImage extends Model
             return '/' . $imagePath;
         }
 
-        // For all uploaded images, use serve-image route
-        // This route will check public disk first, then R2 as fallback
-        // Split path into type and rest
-        $parts = explode('/', $imagePath, 2);
-        if (count($parts) === 2) {
-            return url('/serve-image/' . $parts[0] . '/' . $parts[1]);
-        }
-
-        // Fallback: try to construct URL
-        return url('/serve-image/products/' . $imagePath);
+        // For all uploaded images, use storage symlink
+        // This works when php artisan storage:link has been run
+        return asset('storage/' . $imagePath);
     }
 
     // Get the original, direct image URL (prefer R2 public URL)

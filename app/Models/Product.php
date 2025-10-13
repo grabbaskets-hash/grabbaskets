@@ -140,15 +140,9 @@ class Product extends Model
                 return '/' . $imagePath;
             }
 
-            // Case B: Stored uploads - Use serve-image route for reliability
-            // Split path into type and rest for serve-image route
-            $pathParts = explode('/', $imagePath, 2);
-            if (count($pathParts) === 2) {
-                return url('/serve-image/' . $pathParts[0] . '/' . $pathParts[1]);
-            }
-            
-            // Fallback: assume it's a product image
-            return url('/serve-image/products/' . $imagePath);
+            // Case B: Stored uploads - Try storage symlink first (fastest)
+            // Storage symlink works when properly configured
+            return asset('storage/' . $imagePath);
         }
 
     return null;
