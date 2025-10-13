@@ -250,8 +250,8 @@
                                 </div>
 
                                 <div class="col-md-4 text-end">
-                                    @if($order->product->image)
-                                        <img src="{{ asset('storage/' . $order->product->image) }}"
+                                    @if($order->product)
+                                        <img src="{{ $order->product->image_url }}"
                                             alt="{{ $order->product->name }}" class="img-fluid rounded mb-3"
                                             style="max-height: 120px; object-fit: cover;">
                                     @endif

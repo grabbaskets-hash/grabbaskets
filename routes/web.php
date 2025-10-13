@@ -1,6 +1,5 @@
 <?php
 // Debug logging for edit product route
-use Illuminate\Support\Facades\Log;
 
 
 
@@ -23,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log;
 // Test image upload route
 #use Illuminate\Http\Request;
 #use Illuminate\Support\Facades\Storage;
@@ -32,17 +32,7 @@ use App\Http\Controllers\ImageServeController;
 
 
 
-Route::get('/seller/product/{product}/edit', function($product) {
-    Log::info('Route: /seller/product/{product}/edit called', ['product_param' => $product, 'user_id' => auth()->id()]);
-    try {
-        $productModel = \App\Models\Product::find($product);
-        Log::info('Route: Product loaded', ['product_id' => $productModel ? $productModel->id : null]);
-    } catch (\Throwable $e) {
-        Log::error('Route: Exception loading product', ['error' => $e->getMessage()]);
-    }
-    // Pass to controller
-    return app(\App\Http\Controllers\SellerController::class)->editProduct(\App\Models\Product::findOrFail($product));
-})->name('seller.editProduct');
+// Removed temporary debug route for seller edit to avoid duplication/conflicts
 Route::match(['get', 'post'], '/test-upload', function(Request $request) {
     if ($request->isMethod('post')) {
         if ($request->hasFile('image')) {
@@ -723,45 +713,97 @@ Route::get('/debug-bulk-system', function() {
 });
 
 // Image serving route as fallback for storage symlink issues
-Route::get('/serve-image/{type}/{filename}', function ($type, $filename) {
-    // Validate type (only allow 'products' for security)
-    if ($type !== 'products') {
-        abort(404);
-    }
-    $path = $type . '/' . $filename;
+// Log facade is available via global alias; explicit import not required here
 
-    // Try public disk first
-    if (Storage::disk('public')->exists($path)) {
-        $file = Storage::disk('public')->get($path);
-        $fullPath = Storage::disk('public')->path($path);
-        $mimeType = 'image/jpeg';
-        if (function_exists('mime_content_type')) {
-            $detectedType = mime_content_type($fullPath);
-            if ($detectedType) {
-                $mimeType = $detectedType;
+Route::get('/serve-image/{type}/{path}', function ($type, $path) {
+    Log::info("/serve-image route hit", ['type' => $type, 'path' => $path]);
+    // Wrap the entire closure in try/catch for error logging
+    try {
+        // Validate allowed types: support legacy 'public/...' and standard 'products/...'
+        $allowedTypes = ['products', 'public'];
+        if (!in_array($type, $allowedTypes, true)) {
+            Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
+            return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
+        }
+
+        // Normalize the storage-relative path for the public disk
+        $leafPath = ltrim($path, '/');
+        if ($type === 'public') {
+            // Some legacy DB entries include a leading 'public/' segment; strip it for Storage disk
+            $storagePath = preg_replace('/^public\//', '', $leafPath);
+        } else {
+            // Standard case: 'products/<...>'
+            $storagePath = 'products/' . $leafPath;
+        }
+
+        // Try public disk first
+        if (Storage::disk('public')->exists($storagePath)) {
+            Log::info("/serve-image: Found in public disk", ['path' => $storagePath]);
+            $file = Storage::disk('public')->get($storagePath);
+            $fullPath = Storage::disk('public')->path($storagePath);
+            $mimeType = 'image/jpeg';
+            if (function_exists('mime_content_type')) {
+                $detectedType = mime_content_type($fullPath);
+                if ($detectedType) {
+                    $mimeType = $detectedType;
+                }
             }
+            return Response::make($file, 200, [
+                'Content-Type' => $mimeType,
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        } else {
+            Log::info("/serve-image: Not found in public disk", ['path' => $storagePath]);
         }
-        return Response::make($file, 200, [
-            'Content-Type' => $mimeType,
-            'Cache-Control' => 'public, max-age=86400',
-        ]);
-    }
-    // Try R2 disk if not found in public
-    if (Storage::disk('r2')->exists($path)) {
-        $file = Storage::disk('r2')->get($path);
-        // R2 may not have a local path, so guess mime from extension
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        $mimeType = 'image/jpeg';
-        if (in_array($ext, ['png', 'gif', 'webp'])) {
-            $mimeType = 'image/' . $ext;
+        // If not found locally, prefer redirecting to R2 public URL if configured
+        $r2Base = config('filesystems.disks.r2.url');
+        if (!empty($r2Base)) {
+            $target = rtrim($r2Base, '/') . '/' . ltrim($storagePath, '/');
+            Log::info("/serve-image: Redirecting to R2 public URL", ['target' => $target]);
+            return redirect()->away($target, 302, [
+                'Cache-Control' => 'public, max-age=86400'
+            ]);
         }
-        return Response::make($file, 200, [
-            'Content-Type' => $mimeType,
-            'Cache-Control' => 'public, max-age=86400',
+
+        // As a last resort, try fetching via SDK (guarded against exceptions)
+        try {
+            if (Storage::disk('r2')->exists($storagePath)) {
+                Log::info("/serve-image: Found in r2 disk via SDK", ['path' => $storagePath]);
+                $file = Storage::disk('r2')->get($storagePath);
+                $ext = strtolower(pathinfo($storagePath, PATHINFO_EXTENSION));
+                $mimeType = 'image/jpeg';
+                if (in_array($ext, ['png', 'gif', 'webp'])) {
+                    $mimeType = 'image/' . $ext;
+                }
+                return Response::make($file, 200, [
+                    'Content-Type' => $mimeType,
+                    'Cache-Control' => 'public, max-age=86400',
+                ]);
+            } else {
+                Log::info("/serve-image: Not found in r2 disk via SDK", ['path' => $storagePath]);
+            }
+        } catch (\Throwable $sdkEx) {
+            Log::warning('R2 SDK error in /serve-image, proceeding to 404', [
+                'path' => $storagePath,
+                'message' => $sdkEx->getMessage(),
+            ]);
+        }
+    Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
+        return response()->json([
+            'error' => 'File not found in any disk',
+            'path' => $storagePath
+        ], 404);
+    } catch (\Throwable $e) {
+        Log::error('Error in /serve-image route', [
+            'type' => $type,
+            'path' => $path,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
         ]);
+        // Fail closed as 404 rather than 500 for better UX when images are missing
+        return response()->json(['error' => 'Not Found'], 404);
     }
-    abort(404);
-})->name('serve.image');
+})->where('path', '.*');
 
 // Debug: Inspect a product's image resolution details by id or name
 Route::get('/debug/product-image', function (Request $request) {

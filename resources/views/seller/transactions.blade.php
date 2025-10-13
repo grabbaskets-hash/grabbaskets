@@ -181,8 +181,8 @@
                 @foreach($orders as $order)
                 <tr>
                   <td>
-                    @if($order->product->image)
-                      <img src="{{ asset('storage/' . $order->product->image) }}" alt="{{ $order->product->name }}">
+                      @if($order->product && ($order->product->image || $order->product->image_data))
+                        <img src="{{ $order->product->image_url }}" alt="{{ $order->product->name }}">
                     @else
                       <img src="{{ asset('images/no-image.png') }}" alt="No Image">
                     @endif

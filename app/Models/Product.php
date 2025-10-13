@@ -130,7 +130,7 @@ class Product extends Model
                 return "https://raw.githubusercontent.com/$user/$repo/$branch/$filePath";
             }
         }
-        // Priority 3: File system image
+        // Priority 3: File/system-stored image
         if ($this->image) {
             $imagePath = ltrim($this->image, '/');
 
@@ -140,39 +140,63 @@ class Product extends Model
                 return '/' . $imagePath;
             }
 
-            // Case B: Stored uploads (public disk or R2)
+            // Case B: Stored uploads (public disk or R2). Always use serve-image in production
             if (app()->environment('production')) {
-                // First try to use local storage path if it's accessible
-                try {
-                    // Check if file exists locally and use serve route as fallback
-                    if (Storage::disk('public')->exists($imagePath)) {
-                        // Use serve route for reliable image serving
-                        $pathParts = explode('/', $imagePath, 2);
-                        if (count($pathParts) === 2) {
-                            return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
-                        }
-                        // Fallback to standard storage path
-                        return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
-                    }
-                } catch (\Throwable $e) {
-                    // Continue to R2 attempt
+                $pathParts = explode('/', $imagePath, 2);
+                if (count($pathParts) === 2) {
+                    return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
                 }
-                
-                // Fallback to R2 URL
+                // Fallback to R2 base URL if serve path can't be formed
                 $r2BaseUrl = config('filesystems.disks.r2.url');
                 if (!empty($r2BaseUrl)) {
                     return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
                 }
-                
-                // Last resort: app URL + storage path
                 return rtrim(config('app.url'), '/') . '/storage/' . $imagePath;
             }
 
-            // Local/dev: serve via storage symlink
+            // Local/dev: prefer serve-image as well (works with symlink via public disk)
+            $pathParts = explode('/', $imagePath, 2);
+            if (count($pathParts) === 2) {
+                return '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
+            }
             return '/storage/' . $imagePath;
         }
 
         return 'https://via.placeholder.com/200?text=No+Image';
+    }
+
+    // Provide the original, direct image URL for showcasing (prefer gallery primary)
+    public function getOriginalImageUrlAttribute()
+    {
+        // Prefer gallery primary original
+        $primary = $this->primaryImage;
+        if ($primary && $primary->original_url) {
+            return $primary->original_url;
+        }
+        // Else first gallery
+        $first = $this->productImages()->first();
+        if ($first && $first->original_url) {
+            return $first->original_url;
+        }
+        // Else legacy single image
+        if ($this->image) {
+            $imagePath = ltrim($this->image, '/');
+            if (str_starts_with($imagePath, 'images/')) {
+                return '/' . $imagePath;
+            }
+            $r2Base = config('filesystems.disks.r2.url');
+            if (!empty($r2Base)) {
+                return rtrim($r2Base, '/') . '/' . $imagePath;
+            }
+            // Fallback to serve-image for cloud environments where storage symlink is not applicable
+            $pathParts = explode('/', $imagePath, 2);
+            if (count($pathParts) === 2) {
+                return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
+            }
+            return (app()->environment('production') ? rtrim(config('app.url'), '/') : '') . '/storage/' . $imagePath;
+        }
+        // Else fallback to computed
+        return $this->image_url;
     }
 
     // Store image in database

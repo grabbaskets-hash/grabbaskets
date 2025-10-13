@@ -186,6 +186,9 @@
                                                         {{ $image->created_at->format('M d, Y') }}
                                                     </small>
                                                 </p>
+                                                <a href="{{ $image->original_url }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                                                    <i class="bi bi-box-arrow-up-right"></i> View original
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

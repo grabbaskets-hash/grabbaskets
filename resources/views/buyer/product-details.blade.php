@@ -319,8 +319,13 @@
       <!-- Image -->
       <div class="col-lg-6 text-center">
         @if($product->image || $product->image_data)
-          <img src="{{ $product->image_url }}" class="product-image img-fluid" alt="{{ $product->name }}" 
+          <img src="{{ $product->original_image_url }}" class="product-image img-fluid" alt="{{ $product->name }}" 
                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="mt-3">
+            <a href="{{ $product->original_image_url }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-box-arrow-up-right"></i> View original
+            </a>
+          </div>
           <div style="display: none; padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
             <i class="bi bi-image" style="font-size: 3rem;"></i>
             <p class="mt-2 mb-0">Image not available</p>

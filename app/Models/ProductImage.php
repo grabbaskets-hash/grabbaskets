@@ -77,6 +77,35 @@ class ProductImage extends Model
         return '/storage/' . $imagePath;
     }
 
+    // Get the original, direct image URL (prefer R2 public URL)
+    public function getOriginalUrlAttribute()
+    {
+        if (!$this->image_path) {
+            return 'https://via.placeholder.com/200?text=No+Image';
+        }
+
+        $imagePath = ltrim($this->image_path, '/');
+
+        // Static public images
+        if (str_starts_with($imagePath, 'images/')) {
+            return '/' . $imagePath;
+        }
+
+        // Prefer R2 public URL when configured (original file in bucket)
+        $r2BaseUrl = config('filesystems.disks.r2.url');
+        if (!empty($r2BaseUrl)) {
+            return rtrim($r2BaseUrl, '/') . '/' . $imagePath;
+        }
+
+        // Fallback to the serve-image route for cloud safety (no storage symlink needed)
+        $pathParts = explode('/', $imagePath, 2);
+        if (count($pathParts) === 2) {
+            return rtrim(config('app.url'), '/') . '/serve-image/' . $pathParts[0] . '/' . $pathParts[1];
+        }
+        // Last resort: storage URL (mostly for local dev)
+        return (app()->environment('production') ? rtrim(config('app.url'), '/') : '') . '/storage/' . $imagePath;
+    }
+
     // Get formatted file size
     public function getFormattedFileSizeAttribute()
     {

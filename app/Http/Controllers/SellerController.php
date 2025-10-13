@@ -688,7 +688,7 @@ public function storeCategorySubcategory(Request $request)
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'delivery_charge' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'gift_option' => 'required|in:yes,no',
             'stock' => 'required|integer|min:0',
         ]);
@@ -718,7 +718,8 @@ public function storeCategorySubcategory(Request $request)
         ]);
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $folder = 'products';
+            // Store under product-specific folder for consistency
+            $folder = 'products/' . $product->id;
             $imageUploaded = false;
             $imagePath = null;
             
@@ -784,18 +785,25 @@ public function storeCategorySubcategory(Request $request)
                 'auth_id' => Auth::id(),
                 'product_exists' => $product ? true : false
             ]);
-            // Ensure only owner can edit
+
+            // Ensure product exists and belongs to the authenticated seller
             if (!$product || !isset($product->seller_id)) {
-                Log::error('editProduct: Product not found or missing seller_id', ['product' => $product]);
-                return response('<h2 style="color:red;">Product not found.</h2>', 500);
+                Log::error('editProduct: Product not found or missing seller_id', ['product_id' => $product->id ?? null]);
+                return redirect()->route('seller.dashboard')->with('error', 'Product not found.');
             }
-            if ($product->seller_id !== Auth::id()) {
+
+            if (!Auth::check()) {
+                return redirect()->route('login')->with('error', 'Please login to continue.');
+            }
+
+            if ((int) $product->seller_id !== (int) Auth::id()) {
                 Log::warning('editProduct: Unauthorized access', [
                     'product_seller_id' => $product->seller_id,
                     'auth_id' => Auth::id()
                 ]);
-                return response('<h2 style="color:red;">Unauthorized access to product.</h2>', 403);
+                return redirect()->route('seller.dashboard')->with('error', 'Unauthorized access to product.');
             }
+
             $categories = Category::all();
             $subcategories = Subcategory::all();
             Log::info('editProduct: categories/subcategories loaded', [
@@ -808,7 +816,7 @@ public function storeCategorySubcategory(Request $request)
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return response('<h2 style="color:red;">Exception: ' . htmlspecialchars($e->getMessage()) . '</h2><pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>', 500);
+            return redirect()->route('seller.dashboard')->with('error', 'An unexpected error occurred while opening the edit page.');
         }
     }
 
@@ -825,7 +833,7 @@ public function storeCategorySubcategory(Request $request)
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'delivery_charge' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
         $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
 
@@ -836,57 +844,78 @@ public function storeCategorySubcategory(Request $request)
             'all_files' => $request->allFiles(),
         ]);
 
-        // Handle image update: Try public first, then private, then github (log error if all fail)
+        // Handle image update: dual-store to R2 and public for reliability
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $folder = 'products';
-            $nameSlug = Str::slug($request->input('name', $product->name));
+            $folder = 'products/' . $product->id;
             $ext = $image->getClientOriginalExtension();
-            $filename = $nameSlug . '.' . $ext;
-            $imagePath = null;
-            $uploaded = false;
+            $nameSlug = Str::slug($request->input('name', $product->name));
+            $filename = $nameSlug . '-' . time() . '-' . Str::random(6) . '.' . $ext;
+            $finalPath = null;
+            $r2Success = false;
+            $publicSuccess = false;
             try {
-                // Try public disk first
+                // Try AWS R2 first
                 try {
-                    $imagePath = $image->storeAs($folder, $filename, 'public');
-                    $uploaded = !empty($imagePath);
+                    $r2Path = $image->storeAs($folder, $filename, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('R2 upload failed during product update', [
+                        'error' => $r2Ex->getMessage(),
+                        'product_id' => $product->id
+                    ]);
+                }
+                // Then public disk
+                try {
+                    $publicPath = $image->storeAs($folder, $filename, 'public');
+                    $publicSuccess = !empty($publicPath);
                 } catch (\Throwable $publicEx) {
                     Log::warning('Public disk upload failed during product update', [
                         'error' => $publicEx->getMessage(),
                         'product_id' => $product->id
                     ]);
                 }
-                // If public failed, try private disk
-                if (!$uploaded) {
-                    try {
-                        $imagePath = $image->storeAs($folder, $filename, 'private');
-                        $uploaded = !empty($imagePath);
-                    } catch (\Throwable $privateEx) {
-                        Log::warning('Private disk upload failed during product update', [
-                            'error' => $privateEx->getMessage(),
-                            'product_id' => $product->id
-                        ]);
-                    }
-                }
-                // If both failed, fallback to github (or log error)
-                if (!$uploaded) {
-                    // Place github upload logic here if available, else log error
-                    Log::error('All storage uploads failed during product update (public, private, github)', [
+
+                if (!$r2Success && !$publicSuccess) {
+                    Log::error('All storage uploads failed during product update (r2, public)', [
                         'product_id' => $product->id
                     ]);
-                    return redirect()->back()->with('error', 'Failed to upload image to any storage. Please try again.');
+                    return redirect()->back()->with('error', 'Failed to upload image to storage. Please try again.');
                 }
+
+                $finalPath = $r2Success ? $r2Path : $publicPath;
+
                 // Remove all ProductImage records for this product so the new image replaces the old one
                 foreach ($product->productImages as $productImage) {
                     try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
                     try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                    try { Storage::disk('private')->delete($productImage->image_path); } catch (\Throwable $e) {}
                     $productImage->delete();
                 }
-                $data['image'] = $imagePath;
-                Log::info('Product image updated (public preferred, private fallback)', [
+                // Also delete legacy image file paths if they exist
+                if (!empty($product->image)) {
+                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
+                    try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
+                }
+
+                // Update legacy image path
+                $data['image'] = $finalPath;
+
+                // Create new primary ProductImage
+                ProductImage::create([
                     'product_id' => $product->id,
-                    'path' => $imagePath
+                    'image_path' => $finalPath,
+                    'original_name' => $image->getClientOriginalName(),
+                    'mime_type' => $image->getMimeType(),
+                    'file_size' => $image->getSize(),
+                    'sort_order' => 1,
+                    'is_primary' => true,
+                ]);
+
+                Log::info('Product image updated with dual storage', [
+                    'product_id' => $product->id,
+                    'path' => $finalPath,
+                    'r2_success' => $r2Success,
+                    'public_success' => $publicSuccess,
                 ]);
             } catch (\Throwable $ex) {
                 Log::error('Exception during image update', [
@@ -965,15 +994,16 @@ public function storeCategorySubcategory(Request $request)
                 $zipPath = $zipFile->store('temp/bulk-uploads', 'local');
             }
 
-            $totalSuccess = 0;
+            $totalSuccess = 0; // optional counter; may be unknown if importer doesn't expose
             $allErrors = [];
             $files = $request->file('excel_file');
             foreach ($files as $excelFile) {
                 // Pass zip path and current seller id to ensure updates are scoped to the seller
                 $import = new \App\Imports\ProductsImport($zipPath, Auth::id());
                 \Maatwebsite\Excel\Facades\Excel::import($import, $excelFile);
-                $totalSuccess += $import->getSuccessCount();
-                $allErrors = array_merge($allErrors, $import->getErrors());
+                // Best-effort accumulate; suppress if methods unavailable
+                try { $totalSuccess += (int) $import->getSuccessCount(); } catch (\Throwable $e) {}
+                try { $allErrors = array_merge($allErrors, (array) $import->getErrors()); } catch (\Throwable $e) {}
             }
 
             // Clean up temporary zip file
@@ -981,7 +1011,9 @@ public function storeCategorySubcategory(Request $request)
                 Storage::disk('local')->delete($zipPath);
             }
 
-            $message = "Successfully imported {$totalSuccess} products from all Excel files.";
+            $message = $totalSuccess > 0
+                ? "Successfully imported {$totalSuccess} products from all Excel files."
+                : "Bulk import completed.";
             // Suppress all errors and always show success
             return redirect()->route('seller.dashboard')->with('success', $message);
         } catch (\Exception $e) {
