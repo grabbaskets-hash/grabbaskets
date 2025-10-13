@@ -144,7 +144,11 @@
         <div class="mt-4" style="width:100%;display:flex;flex-direction:column;align-items:center;">
             @if($product->image_url)
                 <div style="background:#fff;border-radius:1rem;padding:18px 12px 10px 12px;box-shadow:0 2px 12px rgba(59,130,246,0.10);width:210px;max-width:100%;margin-bottom:10px;">
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width:180px;max-height:180px;border-radius:0.7rem;border:2px solid #e0e7ef;box-shadow:0 2px 8px rgba(59,130,246,0.08);background:#fafafa;object-fit:contain;">
+                    @php
+                        // Use serve-image route instead of direct R2 URL for reliability
+                        $imageUrl = $product->image ? url('serve-image/' . $product->image) : $product->image_url;
+                    @endphp
+                    <img src="{{ $imageUrl }}" alt="{{ $product->name }}" style="width:180px;max-height:180px;border-radius:0.7rem;border:2px solid #e0e7ef;box-shadow:0 2px 8px rgba(59,130,246,0.08);background:#fafafa;object-fit:contain;">
                 </div>
                 <div class="text-white small mt-2">Current Product Image</div>
                 <div class="text-white small mt-1">Direct link: <a href="{{ $product->original_image_url }}" target="_blank" style="color:#fff;text-decoration:underline;">Open image</a></div>
