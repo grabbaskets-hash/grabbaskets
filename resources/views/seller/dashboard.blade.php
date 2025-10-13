@@ -265,10 +265,8 @@
                             <td>
                                 @if($p->image_url)
                                     <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
-                                        <img src="{{ $p->image_url }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onerror="this.onerror=null; this.src='https://via.placeholder.com/48?text=No+Image';">
+                                        <img src="{{ $p->image_url }}" alt="{{ $p->name }}" style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)';">
                                     </a>
-                                @else
-                                    <span class="text-muted small">No Image</span>
                                 @endif
                                 @if($p->image)
                                     <div class="mt-1 small text-secondary">Legacy: <span style="word-break:break-all">{{ $p->image }}</span></div>

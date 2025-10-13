@@ -107,8 +107,8 @@ class Product extends Model
             return "data:{$this->image_mime_type};base64,{$this->image_data}";
         }
         
-        // Priority 5: Fallback placeholder
-        return 'https://via.placeholder.com/200?text=No+Image';
+    // Priority 5: No image available
+    return null;
     }
 
     // Helper method for legacy image URL generation
@@ -162,7 +162,7 @@ class Product extends Model
             return '/storage/' . $imagePath;
         }
 
-        return 'https://via.placeholder.com/200?text=No+Image';
+    return null;
     }
 
     // Provide the original, direct image URL for showcasing (prefer gallery primary)
@@ -196,7 +196,7 @@ class Product extends Model
             return (app()->environment('production') ? rtrim(config('app.url'), '/') : '') . '/storage/' . $imagePath;
         }
         // Else fallback to computed
-        return $this->image_url;
+        return null;
     }
 
     // Store image in database

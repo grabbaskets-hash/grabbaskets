@@ -36,7 +36,7 @@ class ProductImage extends Model
     public function getImageUrlAttribute()
     {
         if (!$this->image_path) {
-            return 'https://via.placeholder.com/200?text=No+Image';
+            return null;
         }
 
         $imagePath = ltrim($this->image_path, '/');
@@ -81,7 +81,7 @@ class ProductImage extends Model
     public function getOriginalUrlAttribute()
     {
         if (!$this->image_path) {
-            return 'https://via.placeholder.com/200?text=No+Image';
+            return null;
         }
 
         $imagePath = ltrim($this->image_path, '/');

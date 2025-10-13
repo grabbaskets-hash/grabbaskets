@@ -855,6 +855,18 @@ public function storeCategorySubcategory(Request $request)
             $r2Success = false;
             $publicSuccess = false;
             try {
+                // Remove all old ProductImage records and files before uploading new image
+                foreach ($product->productImages as $productImage) {
+                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+                    $productImage->delete();
+                }
+                // Also delete legacy image file paths if they exist
+                if (!empty($product->image)) {
+                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
+                    try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
+                }
+
                 // Try AWS R2 first
                 try {
                     $r2Path = $image->storeAs($folder, $filename, 'r2');
@@ -884,18 +896,6 @@ public function storeCategorySubcategory(Request $request)
                 }
 
                 $finalPath = $r2Success ? $r2Path : $publicPath;
-
-                // Remove all ProductImage records for this product so the new image replaces the old one
-                foreach ($product->productImages as $productImage) {
-                    try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                    try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
-                    $productImage->delete();
-                }
-                // Also delete legacy image file paths if they exist
-                if (!empty($product->image)) {
-                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
-                    try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
-                }
 
                 // Update legacy image path
                 $data['image'] = $finalPath;
