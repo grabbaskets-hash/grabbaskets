@@ -122,7 +122,7 @@
     <div class="info-box">
         <strong>Total Products: {{ $products->count() }}</strong>
         <strong>Seller: {{ $seller->name }} ({{ $seller->email }})</strong>
-        @if($seller->phone)
+        @if(isset($seller->phone) && $seller->phone)
         <strong>Phone: {{ $seller->phone }}</strong>
         @endif
     </div>
