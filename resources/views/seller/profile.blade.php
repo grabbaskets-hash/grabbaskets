@@ -188,12 +188,17 @@
             <h2>Seller Profile</h2>
           </div>
           <div class="card-body text-center">
-            @php
-              $user = Auth::user();
-              $profilePhoto = $user && $user->profile_picture 
-                ? $user->profile_picture 
-                : "https://ui-avatars.com/api/?name=" . urlencode($seller->name) . "&background=0d6efd&color=fff";
-            @endphp
+            @auth
+              @php
+                $profilePhoto = Auth::user()->profile_picture 
+                  ? Auth::user()->profile_picture 
+                  : "https://ui-avatars.com/api/?name=" . urlencode($seller->name) . "&background=0d6efd&color=fff";
+              @endphp
+            @else
+              @php
+                $profilePhoto = "https://ui-avatars.com/api/?name=" . urlencode($seller->name) . "&background=0d6efd&color=fff";
+              @endphp
+            @endauth
             <img src="{{ $profilePhoto }}"
               alt="Avatar" class="profile-avatar shadow" id="profileAvatarImg">
             <h4 class="mt-3">{{ $seller->name }}</h4>

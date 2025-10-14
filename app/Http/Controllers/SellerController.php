@@ -1225,16 +1225,40 @@ public function storeCategorySubcategory(Request $request)
     // Seller profile pages
     public function myProfile()
     {
-        $user = Auth::user();
-        // Resolve Seller model by email or create a bridge if needed
-        $seller = \App\Models\Seller::where('email', $user->email)->first();
-        if (!$seller) {
-            abort(404, 'Seller profile not found');
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                Log::error('myProfile: User not authenticated');
+                return redirect()->route('login')->with('error', 'Please log in to view your profile.');
+            }
+            
+            // Resolve Seller model by email or create a bridge if needed
+            $seller = \App\Models\Seller::where('email', $user->email)->first();
+            
+            if (!$seller) {
+                Log::error('myProfile: Seller not found', [
+                    'user_id' => $user->id,
+                    'email' => $user->email
+                ]);
+                abort(404, 'Seller profile not found');
+            }
+            
+            $products = Product::with(['category', 'subcategory'])
+                ->where('seller_id', $user->id)
+                ->latest()->get();
+                
+            return view('seller.profile', compact('seller', 'products'));
+            
+        } catch (\Exception $e) {
+            Log::error('myProfile error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('seller.dashboard')
+                ->with('error', 'Unable to load profile page. Please try again.');
         }
-        $products = Product::with(['category', 'subcategory'])
-            ->where('seller_id', $user->id)
-            ->latest()->get();
-        return view('seller.profile', compact('seller', 'products'));
     }
 
     public function publicProfileBySeller(\App\Models\Seller $seller)
