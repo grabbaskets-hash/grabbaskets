@@ -756,6 +756,13 @@ Route::prefix('admin/category-emojis')->group(function () {
     Route::post('/suggestions', [App\Http\Controllers\Admin\CategoryEmojiController::class, 'getSuggestions'])->name('admin.category-emojis.suggestions');
 });
 
+// Admin Index Page Editor Routes
+Route::prefix('admin/index-editor')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\IndexPageEditorController::class, 'index'])->name('admin.index-editor.index');
+    Route::put('/update', [App\Http\Controllers\Admin\IndexPageEditorController::class, 'update'])->name('admin.index-editor.update');
+    Route::get('/preview', [App\Http\Controllers\Admin\IndexPageEditorController::class, 'preview'])->name('admin.index-editor.preview');
+});
+
 // Debug route to check emojis
 Route::get('/debug/emojis', function () {
     $categories = App\Models\Category::select('id', 'name', 'emoji')->get();

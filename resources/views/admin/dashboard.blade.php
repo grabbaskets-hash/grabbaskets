@@ -250,6 +250,9 @@
             <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
             <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
             <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
+            <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>
+            <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
+            <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
             <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i> Promotional Notifications</a></li>
             <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
             <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
