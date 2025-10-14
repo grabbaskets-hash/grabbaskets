@@ -2190,7 +2190,7 @@ li a{
               </div>
             @endif
           </div>
-          @endforeach
+          @endforeach <!-- Close carousel items foreach -->
         </div>
         @if($banners->count() > 1)
         <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
@@ -2735,7 +2735,6 @@ li a{
                         <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 0, 0.1)); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 107, 0, 0.2);">
                           <span class="fw-bold" style="color: #FF6B00; font-size: 1.4rem;">₹{{ number_format($product->price, 2) }}</span>
                         </div>
-                      @endif
                       @endif
                       <!-- Stock Status with Festive Style -->
                       @if($product->stock > 0)
