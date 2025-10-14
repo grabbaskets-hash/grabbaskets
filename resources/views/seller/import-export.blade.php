@@ -159,8 +159,18 @@
                             @csrf
                             <button type="submit" class="btn btn-outline-success btn-lg w-100">
                                 <i class="fas fa-file-pdf me-2"></i>
-                                Export to PDF
-                                <small class="d-block mt-1 opacity-75">For printing and sharing</small>
+                                Export to PDF (Simple)
+                                <small class="d-block mt-1 opacity-75">Table format, no images</small>
+                            </button>
+                        </form>
+
+                        <!-- Export to PDF with Images -->
+                        <form action="{{ route('seller.products.export.pdfWithImages') }}" method="POST" class="export-form">
+                            @csrf
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-file-image me-2"></i>
+                                Export Catalog PDF with Images
+                                <small class="d-block mt-1 opacity-75">Professional catalog with photos, organized by category</small>
                             </button>
                         </form>
                     </div>

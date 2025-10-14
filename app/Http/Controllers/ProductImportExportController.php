@@ -261,6 +261,63 @@ class ProductImportExportController extends Controller
     }
 
     /**
+     * Export products to PDF with images, organized by category
+     */
+    public function exportPdfWithImages()
+    {
+        try {
+            $seller = Auth::user();
+            
+            // Get all products with images, grouped by category
+            $products = Product::where('seller_id', $seller->id)
+                ->with(['category', 'subcategory', 'images'])
+                ->orderBy('category_id')
+                ->orderBy('name')
+                ->get();
+
+            // Group products by category
+            $productsByCategory = $products->groupBy(function($product) {
+                return $product->category->name ?? 'Uncategorized';
+            });
+
+            // Calculate statistics
+            $stats = [
+                'total_products' => $products->count(),
+                'total_categories' => $productsByCategory->count(),
+                'total_stock' => $products->sum('stock'),
+                'total_value' => $products->sum(function($product) {
+                    return $product->price * $product->stock;
+                }),
+                'active_products' => $products->where('status', 'active')->count(),
+                'out_of_stock' => $products->where('stock', '<=', 0)->count(),
+            ];
+
+            $pdf = Pdf::loadView('seller.exports.products-pdf-with-images', [
+                'productsByCategory' => $productsByCategory,
+                'seller' => $seller,
+                'exportDate' => now(),
+                'stats' => $stats
+            ]);
+
+            // Set paper size to A4 portrait for better image display
+            $pdf->setPaper('a4', 'portrait');
+            
+            // Increase timeout for large PDFs with images
+            $pdf->setOption('enable-local-file-access', true);
+            
+            $filename = 'products_with_images_' . Str::slug($seller->business_name ?? $seller->name) . '_' . date('Y-m-d') . '.pdf';
+            
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            Log::error('Export PDF with Images Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Failed to export PDF with images: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Import products from file (Excel/CSV)
      * Intelligently detects headers and maps to correct fields
      */

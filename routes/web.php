@@ -493,6 +493,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::post('/seller/products/export/excel', [\App\Http\Controllers\ProductImportExportController::class, 'exportExcel'])->name('seller.products.export.excel');
     Route::post('/seller/products/export/csv', [\App\Http\Controllers\ProductImportExportController::class, 'exportCsv'])->name('seller.products.export.csv');
     Route::post('/seller/products/export/pdf', [\App\Http\Controllers\ProductImportExportController::class, 'exportPdf'])->name('seller.products.export.pdf');
+    Route::post('/seller/products/export/pdf-with-images', [\App\Http\Controllers\ProductImportExportController::class, 'exportPdfWithImages'])->name('seller.products.export.pdfWithImages');
     Route::post('/seller/products/import', [\App\Http\Controllers\ProductImportExportController::class, 'import'])->name('seller.products.import');
     Route::get('/seller/products/template', [\App\Http\Controllers\ProductImportExportController::class, 'downloadTemplate'])->name('seller.products.template');
 
