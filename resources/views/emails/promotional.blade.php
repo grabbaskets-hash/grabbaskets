@@ -196,7 +196,7 @@
             @endif
 
             <div style="text-align: center;">
-                <a href="{{ url('/') }}" class="cta-button">
+                <a href="{{ config('app.url') }}" class="cta-button">
                     🛒 Shop Now & Save Big!
                 </a>
             </div>

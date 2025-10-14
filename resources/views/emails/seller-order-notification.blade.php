@@ -77,7 +77,7 @@
             <strong>Reminder:</strong> After you courier the package, please enter the tracking number for this order in your dashboard. The buyer will be notified automatically.
         </div>
         <p style="margin-top: 30px;">
-            <a href="{{ route('seller.orders') }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View Order Details</a>
+            <a href="{{ config('app.url') . route('seller.orders', [], false) }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View Order Details</a>
         </p>
     </div>
     
