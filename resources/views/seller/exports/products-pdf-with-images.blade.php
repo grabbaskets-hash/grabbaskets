@@ -439,9 +439,6 @@
                     <div class="price-section">
                         <div>
                             <div class="current-price">₹{{ number_format($product->price, 2) }}</div>
-                            @if($product->original_price && $product->original_price > $product->price)
-                            <div class="original-price">₹{{ number_format($product->original_price, 2) }}</div>
-                            @endif
                         </div>
                         @if($product->discount && $product->discount > 0)
                         <div class="discount-badge">{{ $product->discount }}% OFF</div>

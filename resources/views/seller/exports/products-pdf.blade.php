@@ -134,7 +134,7 @@
                 <th style="width: 22%;">Product Name</th>
                 <th style="width: 12%;">Category</th>
                 <th style="width: 10%;">Price</th>
-                <th style="width: 10%;">Original</th>
+                <th style="width: 10%;">Discount</th>
                 <th style="width: 6%;">Stock</th>
                 <th style="width: 10%;">SKU</th>
                 <th style="width: 10%;">Brand</th>
@@ -159,9 +159,9 @@
                     @endif
                 </td>
                 <td class="price">₹{{ number_format($product->price, 2) }}</td>
-                <td style="text-decoration: line-through; color: #999;">
-                    @if($product->original_price)
-                    ₹{{ number_format($product->original_price, 2) }}
+                <td style="text-align: center; color: #666;">
+                    @if($product->discount > 0)
+                    {{ $product->discount }}%
                     @else
                     -
                     @endif
@@ -188,7 +188,7 @@
                     <th style="width: 22%;">Product Name</th>
                     <th style="width: 12%;">Category</th>
                     <th style="width: 10%;">Price</th>
-                    <th style="width: 10%;">Original</th>
+                    <th style="width: 10%;">Discount</th>
                     <th style="width: 6%;">Stock</th>
                     <th style="width: 10%;">SKU</th>
                     <th style="width: 10%;">Brand</th>

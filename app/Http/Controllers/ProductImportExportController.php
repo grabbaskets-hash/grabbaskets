@@ -246,7 +246,7 @@ class ProductImportExportController extends Controller
             // Get products in chunks to avoid memory issues
             $products = Product::where('seller_id', $seller->id)
                 ->with(['category', 'subcategory'])
-                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'original_price', 'stock', 'sku', 'barcode', 'brand', 'status', 'created_at'])
+                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'discount', 'stock', 'sku', 'barcode', 'brand', 'status', 'created_at'])
                 ->get();
 
             if ($products->isEmpty()) {
@@ -324,7 +324,7 @@ class ProductImportExportController extends Controller
                           ->where('is_primary', true)
                           ->limit(1); // Only primary image to reduce load
                 }])
-                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'original_price', 'stock', 'sku', 'brand', 'status'])
+                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'discount', 'stock', 'sku', 'brand', 'status'])
                 ->orderBy('category_id')
                 ->orderBy('name')
                 ->get();
