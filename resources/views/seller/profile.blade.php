@@ -141,6 +141,132 @@
       font-size: 14px;
     }
 
+    /* Photo Menu Dropdown */
+    .profile-photo-actions {
+      position: relative;
+    }
+
+    .photo-menu {
+      position: absolute;
+      bottom: 45px;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      padding: 8px;
+      min-width: 180px;
+      display: none;
+      z-index: 1000;
+      animation: menuSlideUp 0.2s ease-out;
+    }
+
+    .photo-menu.active {
+      display: block;
+    }
+
+    @keyframes menuSlideUp {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .photo-menu button {
+      width: 100%;
+      padding: 10px 15px;
+      border: none;
+      background: white;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .photo-menu button:hover {
+      background: #f0f2f5;
+    }
+
+    .photo-menu button i {
+      font-size: 18px;
+      color: #0d6efd;
+    }
+
+    /* Avatar Picker Modal */
+    .avatar-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .avatar-option {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.3s;
+      object-fit: cover;
+      background: #f8f9fa;
+    }
+
+    .avatar-option:hover {
+      transform: scale(1.1);
+      border-color: #0d6efd;
+      box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .avatar-option.selected {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+    }
+
+    /* Emoji Picker Modal */
+    .emoji-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .emoji-option {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      background: #f8f9fa;
+    }
+
+    .emoji-option:hover {
+      transform: scale(1.2);
+      background: #e9ecef;
+      border-color: #0d6efd;
+    }
+
+    .emoji-option.selected {
+      background: #e7f1ff;
+      border-color: #0d6efd;
+    }
+
     /* Upload Modal Overlay */
     .photo-upload-overlay {
       position: fixed;
@@ -307,10 +433,25 @@
               
               @auth
                 @if(Auth::user()->email === $seller->email)
-                  <!-- Camera overlay button (only for own profile) -->
-                  <button type="button" class="profile-photo-edit-btn" onclick="document.getElementById('quickProfilePhotoInput').click()" title="Change profile photo">
-                    <i class="bi bi-camera-fill"></i>
-                  </button>
+                  <!-- Camera overlay button with dropdown menu (only for own profile) -->
+                  <div class="profile-photo-actions">
+                    <button type="button" class="profile-photo-edit-btn" onclick="togglePhotoMenu()" title="Change profile photo">
+                      <i class="bi bi-camera-fill"></i>
+                    </button>
+                    
+                    <!-- Dropdown menu for photo options -->
+                    <div class="photo-menu" id="photoMenu">
+                      <button type="button" onclick="document.getElementById('quickProfilePhotoInput').click(); togglePhotoMenu();">
+                        <i class="bi bi-camera"></i> Upload Photo
+                      </button>
+                      <button type="button" onclick="showAvatarPicker(); togglePhotoMenu();">
+                        <i class="bi bi-person-circle"></i> Choose Avatar
+                      </button>
+                      <button type="button" onclick="showEmojiPicker(); togglePhotoMenu();">
+                        <i class="bi bi-emoji-smile"></i> Choose Emoji
+                      </button>
+                    </div>
+                  </div>
                   
                   <!-- Hidden file input for quick photo change -->
                   <form id="quickPhotoUploadForm" method="POST" action="{{ route('seller.updateProfile') }}" enctype="multipart/form-data" style="display: none;">
@@ -437,6 +578,296 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+  // Photo Menu Toggle
+  function togglePhotoMenu() {
+    const menu = document.getElementById('photoMenu');
+    menu.classList.toggle('active');
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('photoMenu');
+    const btn = document.querySelector('.profile-photo-edit-btn');
+    if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove('active');
+    }
+  });
+
+  // Human Avatar Options (Professional, Diverse, Inclusive)
+  const humanAvatars = [
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka&backgroundColor=c0aede',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Mittens&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophia&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=John&backgroundColor=c7ceea',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Ava&backgroundColor=c0aede',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=William&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Isabella&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=James&backgroundColor=c7ceea',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Alex&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Sam&backgroundColor=c0aede',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Jordan&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Taylor&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Morgan&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Riley&backgroundColor=c7ceea',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Charlie&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Dakota&backgroundColor=c0aede',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Skyler&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Cameron&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Avery&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/7.x/personas/svg?seed=Quinn&backgroundColor=c7ceea'
+  ];
+
+  // Store & Business Emoji Options
+  const storeEmojis = [
+    '🏪', '🏬', '🏭', '🏢', '🏛️', '🏗️', '🏚️', '🏘️',
+    '🛍️', '🛒', '🛵', '🚚', '📦', '📮', '🎁', '🎀',
+    '💼', '💰', '💳', '💎', '💍', '👔', '👗', '👠',
+    '🍔', '🍕', '🍜', '🍰', '☕', '🍷', '🥘', '🍱',
+    '📱', '💻', '⌚', '📷', '🎮', '🎸', '🎨', '📚',
+    '🌟', '⭐', '✨', '🔥', '💫', '🌈', '🎯', '🎪',
+    '🏆', '🥇', '🎖️', '🏅', '🎗️', '🎫', '🎉', '🎊',
+    '🌸', '🌺', '🌻', '🌹', '🌷', '🌼', '🍀', '🌿'
+  ];
+
+  // Show Avatar Picker
+  function showAvatarPicker() {
+    const overlay = document.createElement('div');
+    overlay.className = 'photo-upload-overlay active';
+    overlay.innerHTML = `
+      <div class="photo-upload-modal" style="max-width: 600px;">
+        <div class="text-center">
+          <h5 class="mb-3"><i class="bi bi-person-circle"></i> Choose Your Avatar</h5>
+          <p class="text-muted small">Select a professional avatar for your profile</p>
+          <div class="avatar-picker-grid">
+            ${humanAvatars.map((avatar, index) => `
+              <img src="${avatar}" 
+                   class="avatar-option" 
+                   data-avatar="${avatar}"
+                   onclick="selectAvatar(this, '${avatar}')"
+                   alt="Avatar ${index + 1}">
+            `).join('')}
+          </div>
+          <div class="d-flex gap-2 justify-content-center mt-3">
+            <button type="button" class="btn btn-secondary" onclick="closePhotoModal()">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="confirmAvatarBtn" disabled onclick="confirmAvatar()">
+              <i class="bi bi-check-circle"></i> Use This Avatar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Close on overlay click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        closePhotoModal();
+      }
+    });
+  }
+
+  let selectedAvatarUrl = '';
+
+  function selectAvatar(element, url) {
+    // Remove previous selection
+    document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+    
+    // Mark as selected
+    element.classList.add('selected');
+    selectedAvatarUrl = url;
+    
+    // Enable confirm button
+    document.getElementById('confirmAvatarBtn').disabled = false;
+  }
+
+  function confirmAvatar() {
+    if (!selectedAvatarUrl) return;
+
+    // Show loading
+    const modal = document.querySelector('.photo-upload-modal');
+    modal.innerHTML = `
+      <div class="text-center py-4">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Updating...</span>
+        </div>
+        <h5>Updating your avatar...</h5>
+        <p class="text-muted">Please wait</p>
+      </div>
+    `;
+
+    // Update avatar via AJAX
+    fetch('{{ route("seller.updateProfile") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({
+        avatar_url: selectedAvatarUrl
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update profile photo
+        const cacheBuster = '?t=' + new Date().getTime();
+        document.getElementById('profileAvatarImg').src = selectedAvatarUrl + cacheBuster;
+        
+        modal.innerHTML = `
+          <div class="text-center py-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-success">Success!</h5>
+            <p class="text-muted">Avatar updated successfully</p>
+          </div>
+        `;
+        
+        setTimeout(() => {
+          closePhotoModal();
+          window.location.reload(true);
+        }, 1500);
+      } else {
+        throw new Error(data.message || 'Update failed');
+      }
+    })
+    .catch(error => {
+      console.error('Avatar update error:', error);
+      modal.innerHTML = `
+        <div class="text-center py-4">
+          <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+          <h5 class="mt-3 text-danger">Update Failed</h5>
+          <p class="text-muted">${error.message}</p>
+          <button class="btn btn-secondary mt-3" onclick="closePhotoModal()">Close</button>
+        </div>
+      `;
+    });
+  }
+
+  // Show Emoji Picker
+  function showEmojiPicker() {
+    const overlay = document.createElement('div');
+    overlay.className = 'photo-upload-overlay active';
+    overlay.innerHTML = `
+      <div class="photo-upload-modal" style="max-width: 600px;">
+        <div class="text-center">
+          <h5 class="mb-3"><i class="bi bi-emoji-smile"></i> Choose Your Store Emoji</h5>
+          <p class="text-muted small">Pick an emoji that represents your business</p>
+          <div class="emoji-picker-grid">
+            ${storeEmojis.map(emoji => `
+              <div class="emoji-option" 
+                   data-emoji="${emoji}"
+                   onclick="selectEmoji(this, '${emoji}')">
+                ${emoji}
+              </div>
+            `).join('')}
+          </div>
+          <div class="d-flex gap-2 justify-content-center mt-3">
+            <button type="button" class="btn btn-secondary" onclick="closePhotoModal()">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="confirmEmojiBtn" disabled onclick="confirmEmoji()">
+              <i class="bi bi-check-circle"></i> Use This Emoji
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Close on overlay click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        closePhotoModal();
+      }
+    });
+  }
+
+  let selectedEmoji = '';
+
+  function selectEmoji(element, emoji) {
+    // Remove previous selection
+    document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+    
+    // Mark as selected
+    element.classList.add('selected');
+    selectedEmoji = emoji;
+    
+    // Enable confirm button
+    document.getElementById('confirmEmojiBtn').disabled = false;
+  }
+
+  function confirmEmoji() {
+    if (!selectedEmoji) return;
+
+    // Generate emoji avatar URL (using a service that renders emoji as image)
+    const emojiUrl = `https://emojicdn.elk.sh/${selectedEmoji}?style=apple`;
+
+    // Show loading
+    const modal = document.querySelector('.photo-upload-modal');
+    modal.innerHTML = `
+      <div class="text-center py-4">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Updating...</span>
+        </div>
+        <h5>Updating your emoji...</h5>
+        <p class="text-muted">Please wait</p>
+      </div>
+    `;
+
+    // Update emoji via AJAX
+    fetch('{{ route("seller.updateProfile") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({
+        avatar_url: emojiUrl
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update profile photo
+        const cacheBuster = '?t=' + new Date().getTime();
+        document.getElementById('profileAvatarImg').src = emojiUrl + cacheBuster;
+        
+        modal.innerHTML = `
+          <div class="text-center py-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-success">Success!</h5>
+            <p class="text-muted">Emoji updated successfully</p>
+          </div>
+        `;
+        
+        setTimeout(() => {
+          closePhotoModal();
+          window.location.reload(true);
+        }, 1500);
+      } else {
+        throw new Error(data.message || 'Update failed');
+      }
+    })
+    .catch(error => {
+      console.error('Emoji update error:', error);
+      modal.innerHTML = `
+        <div class="text-center py-4">
+          <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+          <h5 class="mt-3 text-danger">Update Failed</h5>
+          <p class="text-muted">${error.message}</p>
+          <button class="btn btn-secondary mt-3" onclick="closePhotoModal()">Close</button>
+        </div>
+      `;
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.querySelector(".menu-toggle");
     const sidebar = document.getElementById("sidebarMenu");
@@ -444,9 +875,227 @@
     toggleBtn.addEventListener("click", function () {
       sidebar.classList.toggle("show");
     });
+  });
 
-    // Quick Photo Upload (WhatsApp/Instagram Style)
-    function handleQuickPhotoUpload(input) {
+  // Avatar and Emoji Options
+  const avatarOptions = [
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Max',
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=Lily'
+  ];
+
+  const emojiOptions = [
+      '🏪', '🛒', '🛍️', '📦', '🎁', '👔', '👗', '🍕', '🍔', '🍰',
+      '☕', '🌮', '🎂', '🧁', '🥤', '💼', '🏬', '🏭', '🏢', '📱',
+      '💻', '⌚', '👟', '👜', '🎒', '🎨', '📚', '🎵', '🎮', '⚽'
+  ];
+
+  // Toggle photo menu dropdown
+  function togglePhotoMenu() {
+      const menu = document.getElementById('photoMenuDropdown');
+      if (menu) {
+          menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      }
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+      const menu = document.getElementById('photoMenuDropdown');
+      const cameraBtn = document.querySelector('.profile-photo-edit-btn');
+      
+      if (menu && cameraBtn && !menu.contains(e.target) && !cameraBtn.contains(e.target)) {
+          menu.style.display = 'none';
+      }
+  });
+
+  // Show Avatar Picker Modal
+  function showAvatarPicker() {
+      document.getElementById('photoMenuDropdown').style.display = 'none';
+      
+      const avatarGrid = avatarOptions.map(url => 
+          `<img src="${url}" class="avatar-option" onclick="selectAvatar('${url}')" alt="Avatar">`
+      ).join('');
+      
+      const modal = document.createElement('div');
+      modal.className = 'photo-upload-overlay active';
+      modal.innerHTML = `
+          <div class="photo-upload-modal">
+              <h4 class="text-center mb-3">Choose Your Avatar</h4>
+              <div class="avatar-grid">
+                  ${avatarGrid}
+              </div>
+              <button class="btn btn-secondary w-100 mt-3" onclick="this.closest('.photo-upload-overlay').remove()">Cancel</button>
+          </div>
+      `;
+      document.body.appendChild(modal);
+  }
+
+  // Show Emoji Picker Modal
+  function showEmojiPicker() {
+      document.getElementById('photoMenuDropdown').style.display = 'none';
+      
+      const emojiGrid = emojiOptions.map(emoji => 
+          `<div class="emoji-option" onclick="selectEmoji('${emoji}')">${emoji}</div>`
+      ).join('');
+      
+      const modal = document.createElement('div');
+      modal.className = 'photo-upload-overlay active';
+      modal.innerHTML = `
+          <div class="photo-upload-modal">
+              <h4 class="text-center mb-3">Choose Your Store Icon</h4>
+              <div class="emoji-grid">
+                  ${emojiGrid}
+              </div>
+              <button class="btn btn-secondary w-100 mt-3" onclick="this.closest('.photo-upload-overlay').remove()">Cancel</button>
+          </div>
+      `;
+      document.body.appendChild(modal);
+  }
+
+  // Select Avatar
+  function selectAvatar(avatarUrl) {
+      console.log('Selecting avatar:', avatarUrl);
+      
+      const formData = new FormData();
+      formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+      formData.append('avatar_url', avatarUrl);
+      
+      // Show loading
+      const modal = document.querySelector('.photo-upload-modal');
+      if (modal) {
+          modal.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Updating...</p></div>';
+      }
+      
+      fetch('{{ route("seller.updateProfile") }}', {
+          method: 'POST',
+          headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+              'Accept': 'application/json'
+          },
+          body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log('Avatar response:', data);
+          if (data.success) {
+              // Update image with cache-busting
+              const cacheBuster = '?t=' + new Date().getTime();
+              document.getElementById('profileAvatarImg').src = data.photo_url + cacheBuster;
+              
+              // Show success
+              if (modal) {
+                  modal.innerHTML = `
+                      <div class="text-center py-4">
+                          <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                          <h5 class="mt-3 text-success">Success!</h5>
+                          <p class="text-muted">Avatar updated successfully</p>
+                      </div>
+                  `;
+              }
+              
+              // Hard reload after 1.5 seconds
+              setTimeout(() => {
+                  document.querySelector('.photo-upload-overlay').remove();
+                  window.location.reload(true);
+              }, 1500);
+          } else {
+              throw new Error(data.message || 'Failed to update avatar');
+          }
+      })
+      .catch(error => {
+          console.error('Avatar update error:', error);
+          if (modal) {
+              modal.innerHTML = `
+                  <div class="text-center py-4">
+                      <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                      <h5 class="mt-3 text-danger">Update Failed</h5>
+                      <p class="text-muted">${error.message}</p>
+                      <button class="btn btn-secondary mt-3" onclick="this.closest('.photo-upload-overlay').remove()">Close</button>
+                  </div>
+              `;
+          }
+      });
+  }
+
+  // Select Emoji
+  function selectEmoji(emoji) {
+      console.log('Selecting emoji:', emoji);
+      
+      // Generate DiceBear avatar URL from emoji
+      const avatarUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(emoji)}`;
+      
+      const formData = new FormData();
+      formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+      formData.append('avatar_url', avatarUrl);
+      
+      // Show loading
+      const modal = document.querySelector('.photo-upload-modal');
+      if (modal) {
+          modal.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Updating...</p></div>';
+      }
+      
+      fetch('{{ route("seller.updateProfile") }}', {
+          method: 'POST',
+          headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+              'Accept': 'application/json'
+          },
+          body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log('Emoji response:', data);
+          if (data.success) {
+              // Update image with cache-busting
+              const cacheBuster = '?t=' + new Date().getTime();
+              document.getElementById('profileAvatarImg').src = data.photo_url + cacheBuster;
+              
+              // Show success
+              if (modal) {
+                  modal.innerHTML = `
+                      <div class="text-center py-4">
+                          <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                          <h5 class="mt-3 text-success">Success!</h5>
+                          <p class="text-muted">Store icon updated successfully</p>
+                      </div>
+                  `;
+              }
+              
+              // Hard reload after 1.5 seconds
+              setTimeout(() => {
+                  document.querySelector('.photo-upload-overlay').remove();
+                  window.location.reload(true);
+              }, 1500);
+          } else {
+              throw new Error(data.message || 'Failed to update store icon');
+          }
+      })
+      .catch(error => {
+          console.error('Emoji update error:', error);
+          if (modal) {
+              modal.innerHTML = `
+                  <div class="text-center py-4">
+                      <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                      <h5 class="mt-3 text-danger">Update Failed</h5>
+                      <p class="text-muted">${error.message}</p>
+                      <button class="btn btn-secondary mt-3" onclick="this.closest('.photo-upload-overlay').remove()">Close</button>
+                  </div>
+              `;
+          }
+      });
+  }
+
+  // Quick Photo Upload (WhatsApp/Instagram Style)
+  function handleQuickPhotoUpload(input) {
       const file = input.files[0];
       if (!file) return;
 

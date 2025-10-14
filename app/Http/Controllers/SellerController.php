@@ -321,12 +321,21 @@ class SellerController extends Controller {
                 'store_address' => 'nullable|string|max:500',
                 'store_contact' => 'nullable|string|max:255',
                 'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
+                'avatar_url' => 'nullable|string|url|max:500', // For avatar/emoji URLs
             ]);
 
             $user = Auth::user();
             
             if (!$user) {
                 Log::error('updateProfile: User not authenticated');
+                
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Please log in to update your profile.'
+                    ], 401);
+                }
+                
                 return redirect()->route('login')->with('error', 'Please log in to update your profile.');
             }
             
@@ -337,7 +346,38 @@ class SellerController extends Controller {
                     'user_id' => $user->id,
                     'email' => $user->email
                 ]);
+                
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Seller profile not found.'
+                    ], 404);
+                }
+                
                 return redirect()->back()->with('error', 'Seller profile not found.');
+            }
+            
+            // Handle avatar/emoji URL (simpler than file upload)
+            if ($request->has('avatar_url')) {
+                $avatarUrl = $request->input('avatar_url');
+                
+                // Update user's profile picture with avatar URL
+                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
+                
+                Log::info('Profile avatar updated successfully', [
+                    'user_id' => $user->id,
+                    'avatar_url' => $avatarUrl
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Avatar updated successfully!',
+                        'photo_url' => $avatarUrl
+                    ]);
+                }
+                
+                return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
             }
             
             // Update seller information
