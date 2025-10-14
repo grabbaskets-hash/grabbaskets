@@ -237,10 +237,21 @@ class ProductImportExportController extends Controller
     public function exportPdf()
     {
         try {
+            // Increase limits for large exports
+            ini_set('memory_limit', '1G');
+            set_time_limit(600); // 10 minutes
+            
             $seller = Auth::user();
+            
+            // Get products in chunks to avoid memory issues
             $products = Product::where('seller_id', $seller->id)
                 ->with(['category', 'subcategory'])
+                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'original_price', 'stock', 'sku', 'barcode', 'brand', 'status', 'created_at'])
                 ->get();
+
+            if ($products->isEmpty()) {
+                return back()->with('warning', 'No products found to export.');
+            }
 
             $pdf = Pdf::loadView('seller.exports.products-pdf', [
                 'products' => $products,
@@ -249,6 +260,8 @@ class ProductImportExportController extends Controller
             ]);
 
             $pdf->setPaper('a4', 'landscape');
+            $pdf->setOption('enable_php', false);
+            $pdf->setOption('enable_javascript', false);
             
             $filename = 'products_' . Str::slug($seller->business_name) . '_' . date('Y-m-d') . '.pdf';
             
@@ -264,8 +277,17 @@ class ProductImportExportController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Export PDF Error: ' . $e->getMessage());
-            return back()->with('error', 'Failed to export PDF: ' . $e->getMessage());
+            Log::error('Export PDF Error: ' . $e->getMessage(), [
+                'seller_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Failed to export PDF. Please try with fewer products or contact support. Error: ' . $e->getMessage());
+        } catch (\Error $e) {
+            Log::error('Export PDF Fatal Error: ' . $e->getMessage(), [
+                'seller_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Server error during PDF generation. Please try again or contact support.');
         }
     }
 
@@ -275,11 +297,34 @@ class ProductImportExportController extends Controller
     public function exportPdfWithImages()
     {
         try {
+            // Significantly increase limits for image processing
+            ini_set('memory_limit', '2G'); // Increased from 512M
+            set_time_limit(900); // 15 minutes (increased from 5)
+            ini_set('max_execution_time', '900');
+            
             $seller = Auth::user();
             
-            // Get all products with images, grouped by category
+            // Get product count first to provide feedback
+            $totalProducts = Product::where('seller_id', $seller->id)->count();
+            
+            if ($totalProducts === 0) {
+                return back()->with('warning', 'No products found to export.');
+            }
+            
+            // Limit to prevent server overload (optional safety check)
+            $limit = 500; // Adjust based on your server capacity
+            if ($totalProducts > $limit) {
+                return back()->with('warning', "Too many products ({$totalProducts}). Please export in smaller batches. Maximum: {$limit} products per PDF.");
+            }
+            
+            // Get products with only necessary image data
             $products = Product::where('seller_id', $seller->id)
-                ->with(['category', 'subcategory', 'images'])
+                ->with(['category:id,name', 'subcategory:id,name', 'images' => function($query) {
+                    $query->select('product_id', 'image_path')
+                          ->where('is_primary', true)
+                          ->limit(1); // Only primary image to reduce load
+                }])
+                ->select(['id', 'name', 'category_id', 'subcategory_id', 'price', 'original_price', 'stock', 'sku', 'brand', 'status'])
                 ->orderBy('category_id')
                 ->orderBy('name')
                 ->get();
@@ -301,6 +346,14 @@ class ProductImportExportController extends Controller
                 'out_of_stock' => $products->where('stock', '<=', 0)->count(),
             ];
 
+            // Log start for debugging
+            Log::info('Starting PDF generation with images', [
+                'seller_id' => $seller->id,
+                'product_count' => $products->count(),
+                'memory_limit' => ini_get('memory_limit'),
+                'time_limit' => ini_get('max_execution_time')
+            ]);
+
             $pdf = Pdf::loadView('seller.exports.products-pdf-with-images', [
                 'productsByCategory' => $productsByCategory,
                 'seller' => $seller,
@@ -316,16 +369,26 @@ class ProductImportExportController extends Controller
             $pdf->setOption('isHtml5ParserEnabled', true);
             $pdf->setOption('enable_remote', true);
             $pdf->setOption('chroot', base_path());
+            $pdf->setOption('enable_php', false);
+            $pdf->setOption('enable_javascript', false);
             
-            // Increase timeout for large PDFs with images
-            set_time_limit(300); // 5 minutes
-            ini_set('memory_limit', '512M');
+            $filename = 'products_catalog_' . Str::slug($seller->business_name ?? $seller->name) . '_' . date('Y-m-d') . '.pdf';
             
-            $filename = 'products_with_images_' . Str::slug($seller->business_name ?? $seller->name) . '_' . date('Y-m-d') . '.pdf';
+            // Log before output
+            Log::info('PDF view loaded, generating output', ['seller_id' => $seller->id]);
             
             // Force download with proper headers
-            return response()->streamDownload(function() use ($pdf) {
-                echo $pdf->output();
+            return response()->streamDownload(function() use ($pdf, $seller) {
+                try {
+                    echo $pdf->output();
+                    Log::info('PDF output successful', ['seller_id' => $seller->id]);
+                } catch (\Exception $e) {
+                    Log::error('PDF output failed', [
+                        'seller_id' => $seller->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    throw $e;
+                }
             }, $filename, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -336,9 +399,20 @@ class ProductImportExportController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Export PDF with Images Error: ' . $e->getMessage(), [
+                'seller_id' => Auth::id(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return back()->with('error', 'Failed to export PDF with images: ' . $e->getMessage());
+            return back()->with('error', 'Failed to export PDF with images. Try exporting fewer products or use simple PDF export. Error: ' . $e->getMessage());
+        } catch (\Error $e) {
+            Log::error('Export PDF Fatal Error: ' . $e->getMessage(), [
+                'seller_id' => Auth::id(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Server overload during PDF generation. Please try with fewer products or contact support.');
         }
     }
 

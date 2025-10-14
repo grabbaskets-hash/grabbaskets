@@ -21,20 +21,32 @@
     # Allow access to storage files (Laravel public disk)
     RewriteCond %{REQUEST_URI} ^/storage/
     RewriteRule ^storage/(.*)$ storage/$1 [L,NC]
-
+    RewriteCond %{REQUEST_URI} !^/serve-image/ 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# Increase limits for bulk uploads
+# Increase limits for bulk uploads and PDF exports
 php_value upload_max_filesize 50M
 php_value post_max_size 50M
-php_value max_execution_time 300
-php_value max_input_time 300
-php_value memory_limit 512M
+php_value max_execution_time 900
+php_value max_input_time 900
+php_value memory_limit 2G
 php_value max_file_uploads 100
+php_value default_socket_timeout 900
+
+# Apache timeout settings for long-running requests (PDF generation)
+<IfModule mod_fcgid.c>
+    FcgidIOTimeout 900
+    FcgidBusyTimeout 900
+    FcgidIdleTimeout 900
+    FcgidConnectTimeout 900
+</IfModule>
+
+# Global timeout (if supported)
+TimeOut 900
 
 # Enable compression
 <IfModule mod_deflate.c>
