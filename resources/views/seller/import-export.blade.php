@@ -455,6 +455,7 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Import form handler
 document.getElementById('importForm')?.addEventListener('submit', function(e) {
     const btn = document.getElementById('importBtn');
     const fileInput = document.getElementById('importFile');
@@ -476,6 +477,40 @@ document.getElementById('importFile')?.addEventListener('change', function(e) {
         const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
         console.log(`Selected: ${fileName} (${fileSize} MB)`);
     }
+});
+
+// PDF Export form handlers with loading indicators
+document.querySelectorAll('.export-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        const originalHtml = btn.innerHTML;
+        const isPdfWithImages = this.action.includes('pdfWithImages');
+        
+        // Disable button and show loading
+        btn.disabled = true;
+        
+        if (isPdfWithImages) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating catalog with images...<small class="d-block mt-1">This may take 30-60 seconds</small>';
+        } else {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+        }
+        
+        // Log for debugging
+        console.log('Submitting export form:', this.action);
+        console.log('Form method:', this.method);
+        console.log('CSRF token:', this.querySelector('[name="_token"]')?.value);
+        
+        // Re-enable button after delay (in case download completes)
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }, isPdfWithImages ? 60000 : 10000); // 60s for images, 10s for simple
+    });
+});
+
+// Log any errors
+window.addEventListener('error', function(e) {
+    console.error('Page error:', e.message, e.filename, e.lineno);
 });
 </script>
 </body>
