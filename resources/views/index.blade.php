@@ -2765,24 +2765,23 @@ li a{
               <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                 <div class="card h-100 festive-product-card" style="border: 2px solid rgba(255, 107, 0, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%); box-shadow: 0 8px 25px rgba(255, 107, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.1); transition: all 0.4s ease;">
                   <div style="position: relative; overflow: hidden;">
-                  @php
-                    $fallbackUrl = 'https://picsum.photos/300/250?grayscale&text=' . urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName));
-                  @endphp
-                  <img src="{{ $product->image_url }}" 
-                       class="card-img-top" 
-                       alt="{{ $product->name }}"
-                       style="height: 280px; object-fit: cover; transition: transform 0.4s ease;"
-                       data-fallback="{{ $fallbackUrl }}"
-                       onerror="this.src=this.dataset.fallback"
-                       onmouseover="this.style.transform='scale(1.1)'"
-                       onmouseout="this.style.transform='scale(1)'">
-                  <!-- Festive Corner Badge -->
-                  @if($product->discount > 0)
-                  <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #FF4444, #FF6B00); color: white; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4); border: 2px solid rgba(255, 215, 0, 0.3);">
-                    🎉 {{ $product->discount }}% OFF
-                  </div>
-                  @endif
-                  </div>
+                    @php
+                      $fallbackUrl = 'https://picsum.photos/300/250?grayscale&text=' . urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName));
+                    @endphp
+                    <img src="{{ $product->image_url }}" 
+                         class="card-img-top" 
+                         alt="{{ $product->name }}"
+                         style="height: 280px; object-fit: cover; transition: transform 0.4s ease;"
+                         data-fallback="{{ $fallbackUrl }}"
+                         onerror="this.src=this.dataset.fallback"
+                         onmouseover="this.style.transform='scale(1.1)'"
+                         onmouseout="this.style.transform='scale(1)'">
+                    <!-- Festive Corner Badge -->
+                    @if($product->discount > 0)
+                    <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #FF4444, #FF6B00); color: white; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4); border: 2px solid rgba(255, 215, 0, 0.3);">
+                      🎉 {{ $product->discount }}% OFF
+                    </div>
+                    @endif
                   </div>
                   <div class="card-body d-flex flex-column" style="padding: 20px;">
                     <h6 class="card-title fw-bold mb-2" style="color: #FF4444; font-size: 1.05rem; line-height: 1.4;">
@@ -2829,7 +2828,6 @@ li a{
                            onmouseover="this.style.background='linear-gradient(135deg, #FF6B00, #FFD700)'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.4)'"
                            onmouseout="this.style.background='linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 215, 0, 0.1))'; this.style.color='#FF6B00'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                           <i class="bi bi-eye"></i> View Details
-                        </a>
                         </a>
                         @auth
                           @if($product->stock > 0)
