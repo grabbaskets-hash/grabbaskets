@@ -389,9 +389,21 @@ class ProductImportExportController extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    $errors[] = "Row " . ($i + 1) . ": " . $e->getMessage();
+                    // Hide SQL errors from users, show generic message
+                    $errorMessage = $e->getMessage();
+                    
+                    // Check if it's a SQL error
+                    if (stripos($errorMessage, 'SQLSTATE') !== false || 
+                        stripos($errorMessage, 'SQL') !== false ||
+                        stripos($errorMessage, 'Integrity constraint') !== false) {
+                        $userMessage = "Data validation failed - please check required fields";
+                    } else {
+                        $userMessage = $errorMessage;
+                    }
+                    
+                    $errors[] = "Row " . ($i + 1) . ": " . $userMessage;
                     Log::error("Import error on row " . ($i + 1), [
-                        'error' => $e->getMessage(),
+                        'error' => $errorMessage, // Log full error including SQL
                         'row_data' => $row
                     ]);
                     $skipped++;
@@ -429,7 +441,18 @@ class ProductImportExportController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return back()->with('error', '❌ Failed to import: ' . $e->getMessage() . '. Please check your file format and try again.');
+            
+            // Hide SQL errors from users
+            $errorMessage = $e->getMessage();
+            if (stripos($errorMessage, 'SQLSTATE') !== false || 
+                stripos($errorMessage, 'SQL') !== false ||
+                stripos($errorMessage, 'Integrity constraint') !== false) {
+                $userMessage = 'Failed to import due to data validation errors. Please check your file format and ensure all required fields are filled correctly.';
+            } else {
+                $userMessage = 'Failed to import: ' . $errorMessage . '. Please check your file format and try again.';
+            }
+            
+            return back()->with('error', '❌ ' . $userMessage);
         }
     }
 
