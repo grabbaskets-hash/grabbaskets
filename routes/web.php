@@ -201,6 +201,9 @@ Route::get('/', function () {
     }
     
     try {
+        // Load active banners
+        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
+        
         // Force fresh data by adding a timestamp parameter that changes the cache key
         $categories = \App\Models\Category::with('subcategories')->get();
         
