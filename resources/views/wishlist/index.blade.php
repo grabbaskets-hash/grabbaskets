@@ -214,9 +214,8 @@
                                 <div class="wishlist-item h-100">
                                     <div class="position-relative">
                                         <a href="{{ route('product.details', $wishlist->product->id) }}" class="d-block">
-                                            @if($wishlist->product->image)
-                        @if($wishlist->product && ($wishlist->product->image || $wishlist->product->image_data))
-                          <img src="{{ $wishlist->product->image_url }}" 
+                                            @if($wishlist->product && ($wishlist->product->image || $wishlist->product->image_data))
+                                                <img src="{{ $wishlist->product->image_url }}" 
                                                      alt="{{ $wishlist->product->name }}" 
                                                      class="product-img w-100 mb-3" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                             @else

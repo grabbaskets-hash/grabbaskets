@@ -374,7 +374,25 @@ Route::get('/', function () {
             ->take(8)
             ->get(); // Increased for variety
 
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts', 'banners'));
+        // Load index page settings from config (set by admin in Index Page Editor)
+        $settings = config('index-page', [
+            'hero_title' => 'Welcome to GrabBaskets',
+            'hero_subtitle' => 'Your one-stop shop for all your needs',
+            'show_categories' => true,
+            'show_featured_products' => true,
+            'show_trending' => true,
+            'featured_section_title' => 'Featured Products',
+            'trending_section_title' => 'Trending Now',
+            'products_per_row' => 4,
+            'show_banners' => true,
+            'show_newsletter' => true,
+            'newsletter_title' => 'Subscribe to Our Newsletter',
+            'newsletter_subtitle' => 'Get updates on new products and special offers',
+            'theme_color' => '#FF6B00',
+            'secondary_color' => '#FFD700',
+        ]);
+
+        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts', 'banners', 'settings'));
     } catch (\Exception $e) {
         // Log the error for debugging
         Log::error('Database error on homepage: ' . $e->getMessage());
@@ -398,6 +416,19 @@ Route::get('/', function () {
             'lookbookProduct' => null,
             'blogProducts' => collect([]),
             'banners' => collect([]),
+            'categoryProducts' => [],
+            'settings' => config('index-page', [
+                'hero_title' => 'Welcome to GrabBaskets',
+                'hero_subtitle' => 'Your one-stop shop for all your needs',
+                'show_categories' => true,
+                'show_featured_products' => true,
+                'show_trending' => true,
+                'show_banners' => true,
+                'show_newsletter' => true,
+                'products_per_row' => 4,
+                'theme_color' => '#FF6B00',
+                'secondary_color' => '#FFD700',
+            ]),
             'database_error' => 'Unable to load products at this time. Please try again later.'
         ]);
     }
