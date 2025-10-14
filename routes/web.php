@@ -73,6 +73,72 @@ Route::post('/admin/products/{product}/update-seller', function (Request $reques
 |--------------------------------------------------------------------------
 */
 
+// DIAGNOSTIC ROUTE - Access /test-index-debug to check all components
+Route::get('/test-index-debug', function () {
+    try {
+        $diagnostics = [];
+        
+        // Test 1: Banner model
+        try {
+            $banners = \App\Models\Banner::active()->byPosition('hero')->get();
+            $diagnostics['banners'] = 'OK - ' . $banners->count() . ' banners';
+        } catch (\Exception $e) {
+            $diagnostics['banners'] = 'ERROR: ' . $e->getMessage();
+        }
+        
+        // Test 2: Categories
+        try {
+            $categories = \App\Models\Category::with('subcategories')->get();
+            $diagnostics['categories'] = 'OK - ' . $categories->count() . ' categories';
+        } catch (\Exception $e) {
+            $diagnostics['categories'] = 'ERROR: ' . $e->getMessage();
+        }
+        
+        // Test 3: Products
+        try {
+            $products = \App\Models\Product::whereNotNull('seller_id')->take(5)->get();
+            $diagnostics['products'] = 'OK - ' . $products->count() . ' products';
+        } catch (\Exception $e) {
+            $diagnostics['products'] = 'ERROR: ' . $e->getMessage();
+        }
+        
+        // Test 4: View exists
+        $diagnostics['view_exists'] = view()->exists('index') ? 'YES' : 'NO';
+        
+        // Test 5: Database connection
+        try {
+            DB::connection()->getPdo();
+            $diagnostics['database'] = 'OK - Connected';
+        } catch (\Exception $e) {
+            $diagnostics['database'] = 'ERROR: ' . $e->getMessage();
+        }
+        
+        // Test 6: Try to load the actual index route logic
+        try {
+            $banners = \App\Models\Banner::active()->byPosition('hero')->get();
+            $categories = \App\Models\Category::with('subcategories')->get();
+            $diagnostics['index_route_logic'] = 'OK - Can execute index route code';
+        } catch (\Exception $e) {
+            $diagnostics['index_route_logic'] = 'ERROR: ' . $e->getMessage();
+        }
+        
+        return response()->json([
+            'status' => 'Index Page Diagnostics',
+            'timestamp' => now()->toDateTimeString(),
+            'tests' => $diagnostics,
+            'message' => 'All tests completed. Check results above.',
+            'next_step' => 'If all tests pass, the issue might be in the view rendering. Try accessing /?simple for basic test.'
+        ], 200);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Diagnostic failed',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
 
 Route::get('/', function () {
     // Simple test first - return basic HTML
