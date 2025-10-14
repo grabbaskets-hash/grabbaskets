@@ -15,20 +15,64 @@
     console.error('Database Error: {{ $database_error }}');
   </script>
   @endif
-  <!-- Dark mode toggle removed -->
+  <!-- Festive Diwali Theme -->
   <style>
+    /* 🪔 Diwali Festive Theme Colors */
+    :root {
+      --diwali-gold: #FFD700;
+      --diwali-orange: #FF6B00;
+      --diwali-red: #FF4444;
+      --diwali-purple: #8B008B;
+      --diwali-yellow: #FFA500;
+      --festive-gradient: linear-gradient(135deg, #FF6B00 0%, #FFD700 50%, #FF4444 100%);
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f3f4f6;
+      background: linear-gradient(135deg, #FFF8E7 0%, #FFEBCD 25%, #FFE4B5 50%, #FFDAB9 75%, #FFE4E1 100%);
+      background-attachment: fixed;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    /* Festive Sparkle Animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20% 30%, rgba(255, 215, 0, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255, 107, 0, 0.4), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(255, 68, 68, 0.4), transparent),
+        radial-gradient(1px 1px at 80% 10%, rgba(255, 215, 0, 0.3), transparent),
+        radial-gradient(2px 2px at 90% 60%, rgba(255, 107, 0, 0.3), transparent);
+      background-size: 200% 200%;
+      animation: festiveSparkle 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+    
+    @keyframes festiveSparkle {
+      0%, 100% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+    }
+    
+    /* Container Positioning */
+    body > * {
+      position: relative;
+      z-index: 1;
     }
 
-    /* Modern Navbar Styling */
+    /* Modern Navbar Styling - Festive Theme */
     .navbar {
-      background: linear-gradient(135deg, #f5f5dc 0%, #faebd7 50%, #f5deb3 100%);
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B00 100%);
       backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(139, 69, 19, 0.1);
-      border-bottom: 3px solid rgba(139, 69, 19, 0.1);
+      box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.2);
+      border-bottom: 3px solid rgba(255, 107, 0, 0.3);
       position: sticky;
       top: 0;
       z-index: 1030;
@@ -36,15 +80,15 @@
     }
 
     .navbar.scrolled {
-      background: linear-gradient(135deg, rgba(245, 245, 220, 0.95) 0%, rgba(250, 235, 215, 0.95) 50%, rgba(245, 222, 179, 0.95) 100%);
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 165, 0, 0.95) 50%, rgba(255, 107, 0, 0.95) 100%);
       backdrop-filter: blur(15px);
-      box-shadow: 0 6px 30px rgba(139, 69, 19, 0.15);
+      box-shadow: 0 6px 30px rgba(255, 107, 0, 0.4);
     }
 
     .navbar-brand {
       font-weight: 800;
       font-size: 1.8rem;
-      background: linear-gradient(45deg, #8B4513, #D2691E, #8B4513);
+      background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -59,7 +103,7 @@
     }
 
     .nav-link {
-      color: #8B4513 !important;
+      color: #8B0000 !important; /* Festive dark red */
       font-weight: 600;
       border-radius: 20px;
       padding: 8px 16px !important;
@@ -76,7 +120,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 107, 0, 0.2), transparent);
       transition: left 0.5s ease;
     }
 
@@ -85,26 +129,26 @@
     }
 
     .nav-link:hover {
-      background: rgba(139, 69, 19, 0.08);
-      color: #654321 !important;
+      background: rgba(255, 215, 0, 0.3);
+      color: #8B0000 !important;
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
+      box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
     }
 
     .navbar-toggler {
-      border: 2px solid #8B4513;
+      border: 2px solid #FF6B00;
       border-radius: 10px;
       padding: 6px 10px;
       transition: all 0.3s ease;
     }
 
     .navbar-toggler:hover {
-      background: rgba(139, 69, 19, 0.1);
+      background: rgba(255, 107, 0, 0.2);
       transform: scale(1.05);
     }
 
     .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23654321' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FF6B00' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
 
     /* Search Bar Enhancement */
@@ -2309,18 +2353,19 @@ li a{
     </div>
   {{-- </section> --}}
 
-  <!-- Products by Category Showcase - REDESIGNED WITH EMOJIS -->
-  <section class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);">
+  <!-- Products by Category Showcase - FESTIVE DIWALI THEME -->
+  <section class="py-5" style="background: linear-gradient(135deg, #FFF5E6 0%, #FFEBCD 50%, #FFF5E6 100%);">
     <div class="container">
-      <!-- Section Header -->
+      <!-- Festive Section Header with Diyas -->
       <div class="text-center mb-5">
         <div class="d-inline-block position-relative mb-3">
-          <h2 class="display-4 fw-bold mb-0" style="background: linear-gradient(45deg, #8B4513, #D2691E, #8B4513); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            🛍️ Shop by Category
+          <h2 class="display-4 fw-bold mb-0" style="background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700, #FF6B00, #FF4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);">
+            🪔 Shop by Category 🪔
           </h2>
-          <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 150px; height: 4px; background: linear-gradient(90deg, transparent, #8B4513, transparent); border-radius: 2px;"></div>
+          <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 200px; height: 4px; background: linear-gradient(90deg, transparent, #FF6B00, #FFD700, #FF6B00, transparent); border-radius: 2px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"></div>
         </div>
-        <p class="lead text-muted mt-4">Explore our carefully curated collections with amazing deals 🎉</p>
+        <p class="lead mt-4" style="color: #FF4444; font-weight: 600;">✨ Explore our festive collections with dazzling deals ✨</p>
+        <p class="text-muted">🎆 Special Diwali Offers on Every Category! �</p>
       </div>
 
       <!-- Category Grid with Emojis -->
@@ -2330,100 +2375,106 @@ li a{
             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
               <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
                 <div class="category-card-emoji-design" style="
-                  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+                  background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%);
                   border-radius: 20px;
                   padding: 25px 20px;
-                  border: 2px solid rgba(139, 69, 19, 0.1);
+                  border: 2px solid rgba(255, 107, 0, 0.2);
                   transition: all 0.3s ease;
                   height: 100%;
                   position: relative;
                   overflow: hidden;
-                  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.08);
+                  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1);
                 " onmouseover="
                   this.style.transform='translateY(-10px) scale(1.02)';
-                  this.style.boxShadow='0 15px 40px rgba(139, 69, 19, 0.2)';
-                  this.style.borderColor='rgba(139, 69, 19, 0.3)';
+                  this.style.boxShadow='0 15px 40px rgba(255, 107, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.2)';
+                  this.style.borderColor='rgba(255, 107, 0, 0.5)';
                 " onmouseout="
                   this.style.transform='translateY(0) scale(1)';
-                  this.style.boxShadow='0 4px 15px rgba(139, 69, 19, 0.08)';
-                  this.style.borderColor='rgba(139, 69, 19, 0.1)';
+                  this.style.boxShadow='0 4px 15px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1)';
+                  this.style.borderColor='rgba(255, 107, 0, 0.2)';
                 ">
                   
-                  <!-- Gradient Background Effect -->
-                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(139,69,19,0.03) 0%, transparent 100%); pointer-events: none; opacity: 0; transition: opacity 0.3s;" class="hover-gradient"></div>
+                  <!-- Festive Gradient Background Effect -->
+                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,107,0,0.05) 0%, rgba(255,215,0,0.05) 100%); pointer-events: none; opacity: 0; transition: opacity 0.3s;" class="hover-gradient"></div>
                   
-                  <!-- Emoji Circle -->
+                  <!-- Emoji Circle with Festive Glow -->
                   <div class="text-center mb-3">
                     <div style="
                       width: 100px;
                       height: 100px;
                       margin: 0 auto;
-                      background: linear-gradient(135deg, rgba(139,69,19,0.08) 0%, rgba(210,105,30,0.08) 100%);
+                      background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,107,0,0.15) 100%);
                       border-radius: 50%;
                       display: flex;
                       align-items: center;
                       justify-content: center;
                       font-size: 3.5rem;
                       transition: all 0.3s ease;
-                      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.1);
-                      border: 3px solid rgba(139, 69, 19, 0.1);
+                      box-shadow: 0 5px 15px rgba(255, 107, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.3);
+                      border: 3px solid rgba(255, 107, 0, 0.3);
                     " class="emoji-circle">
                       {{ $category->emoji ?? '🛒' }}
                     </div>
                   </div>
                   
-                  <!-- Category Name -->
-                  <h5 class="text-center fw-bold mb-2" style="color: #8B4513; font-size: 1.1rem;">
+                  <!-- Category Name with Festive Color -->
+                  <h5 class="text-center fw-bold mb-2" style="color: #FF4444; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(255, 68, 68, 0.2);">
                     {{ $category->name }}
                   </h5>
                   
                   <!-- Product Count Badge -->
                   @php
-                    $productCount = $category->products->count() ?? 0;
+                    // Safe way to get product count - check if relationship is loaded
+                    try {
+                      $productCount = $category->products()->count();
+                    } catch (\Exception $e) {
+                      $productCount = 0;
+                    }
                   @endphp
                   <div class="text-center">
                     <span class="badge" style="
-                      background: linear-gradient(45deg, #8B4513, #A0522D);
+                      background: linear-gradient(45deg, #FF6B00, #FF9500);
                       color: white;
                       font-size: 0.85rem;
                       padding: 6px 15px;
                       border-radius: 20px;
                       font-weight: 600;
-                      box-shadow: 0 2px 10px rgba(139, 69, 19, 0.3);
+                      box-shadow: 0 2px 10px rgba(255, 107, 0, 0.4);
                     ">
-                      {{ $productCount }} {{ $productCount === 1 ? 'Product' : 'Products' }}
+                      🎁 {{ $productCount }} {{ $productCount === 1 ? 'Item' : 'Items' }}
                     </span>
                   </div>
                   
                   <!-- Subcategories Preview (if any) -->
                   @if($category->subcategories && $category->subcategories->count() > 0)
-                    <div class="mt-3 pt-3" style="border-top: 1px solid rgba(139, 69, 19, 0.1);">
+                    <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255, 107, 0, 0.2);">
                       <div style="font-size: 0.75rem; color: #666; text-align: center;">
                         @foreach($category->subcategories->take(3) as $subcat)
                           <span style="
                             display: inline-block;
-                            background: rgba(139, 69, 19, 0.05);
+                            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,107,0,0.1));
                             padding: 3px 10px;
                             border-radius: 12px;
                             margin: 2px;
                             font-weight: 500;
-                            color: #8B4513;
+                            color: #FF4444;
+                            border: 1px solid rgba(255, 107, 0, 0.2);
                           ">{{ Str::limit($subcat->name, 12) }}</span>
                         @endforeach
                         @if($category->subcategories->count() > 3)
-                          <span style="font-weight: 600; color: #8B4513;">+{{ $category->subcategories->count() - 3 }}</span>
+                          <span style="font-weight: 600; color: #FF6B00;">+{{ $category->subcategories->count() - 3 }}</span>
                         @endif
                       </div>
                     </div>
                   @endif
                   
-                  <!-- View Arrow Indicator -->
+                  <!-- View Arrow Indicator with Festive Color -->
                   <div class="text-center mt-3">
                     <span style="
                       display: inline-flex;
                       align-items: center;
                       gap: 5px;
-                      color: #8B4513;
+                      color: #FF6B00;
                       font-size: 0.9rem;
                       font-weight: 600;
                       transition: all 0.3s;
@@ -2447,41 +2498,42 @@ li a{
         @endif
       </div>
 
-      <!-- View All Categories Button -->
+      <!-- Festive View All Categories Button -->
       <div class="text-center mt-5">
         <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg" style="
-          background: linear-gradient(45deg, #8B4513, #A0522D);
+          background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700);
           color: white;
           border: none;
           border-radius: 30px;
           padding: 15px 50px;
           font-weight: 700;
           font-size: 1.1rem;
-          box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+          box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.3);
           transition: all 0.3s ease;
+          border: 2px solid rgba(255, 215, 0, 0.5);
         " onmouseover="
           this.style.transform='translateY(-3px) scale(1.05)';
-          this.style.boxShadow='0 12px 35px rgba(139, 69, 19, 0.4)';
-          this.style.background='linear-gradient(45deg, #A0522D, #8B4513)';
+          this.style.boxShadow='0 12px 35px rgba(255, 107, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.5)';
+          this.style.background='linear-gradient(45deg, #FFD700, #FF6B00, #FF4444)';
         " onmouseout="
           this.style.transform='translateY(0) scale(1)';
-          this.style.boxShadow='0 8px 25px rgba(139, 69, 19, 0.3)';
-          this.style.background='linear-gradient(45deg, #8B4513, #A0522D)';
+          this.style.boxShadow='0 8px 25px rgba(255, 107, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.3)';
+          this.style.background='linear-gradient(45deg, #FF4444, #FF6B00, #FFD700)';
         ">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-          Explore All Categories
+          <i class="bi bi-stars me-2"></i>
+          🪔 Explore All Festive Categories 🪔
           <i class="bi bi-arrow-right ms-2"></i>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Hover Effects -->
+  <!-- Enhanced Festive Hover Effects -->
   <style>
     .category-card-emoji-design:hover .emoji-circle {
       transform: scale(1.15) rotate(5deg);
-      background: linear-gradient(135deg, rgba(139,69,19,0.15) 0%, rgba(210,105,30,0.15) 100%);
-      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.2);
+      background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,107,0,0.3) 100%);
+      box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.5);
     }
     
     .category-card-emoji-design:hover .hover-gradient {
@@ -2490,6 +2542,7 @@ li a{
     
     .category-card-emoji-design:hover .view-arrow i {
       transform: translateX(5px);
+      color: #FFD700;
     }
     
     @media (max-width: 576px) {
