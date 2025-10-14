@@ -2658,6 +2658,80 @@ li a{
         transform: translateY(-8px) scale(1.01);
       }
     }
+    
+    /* Featured Products Grid Alignment */
+    .row.g-4 {
+      margin-left: -0.75rem;
+      margin-right: -0.75rem;
+    }
+    
+    .row.g-4 > [class*='col-'] {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    
+    /* Ensure equal height cards in grid */
+    .card.h-100 {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .card.h-100 .card-body {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card.h-100 .card-body .mt-auto {
+      margin-top: auto !important;
+    }
+    
+    /* Responsive grid fixes */
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      /* Small tablets: 2 columns */
+      .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+    
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      /* Medium tablets: 2 columns */
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+    
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      /* Large screens: 3 columns */
+      .col-lg-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+      }
+    }
+    
+    @media (min-width: 1200px) {
+      /* Extra large screens: 4 columns */
+      .col-xl-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+      }
+    }
+    
+    /* Ensure images maintain aspect ratio */
+    .card-img-top {
+      width: 100%;
+      object-fit: cover;
+    }
+    
+    /* Remove extra spacing on mobile */
+    @media (max-width: 575.98px) {
+      .row.g-4 {
+        gap: 1rem !important;
+      }
+    }
   </style>
 
   <!-- Featured Products Section - Festive Diwali Theme -->
@@ -2688,7 +2762,7 @@ li a{
             </div>
             <div class="row g-4">
               @foreach($products as $product)
-              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+              <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                 <div class="card h-100 festive-product-card" style="border: 2px solid rgba(255, 107, 0, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%); box-shadow: 0 8px 25px rgba(255, 107, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.1); transition: all 0.4s ease;">
                   <div style="position: relative; overflow: hidden;">
                   @php
