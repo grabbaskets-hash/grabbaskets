@@ -252,7 +252,16 @@ class ProductImportExportController extends Controller
             
             $filename = 'products_' . Str::slug($seller->business_name) . '_' . date('Y-m-d') . '.pdf';
             
-            return $pdf->download($filename);
+            // Force download with proper headers
+            return response()->streamDownload(function() use ($pdf) {
+                echo $pdf->output();
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Export PDF Error: ' . $e->getMessage());
@@ -314,7 +323,16 @@ class ProductImportExportController extends Controller
             
             $filename = 'products_with_images_' . Str::slug($seller->business_name ?? $seller->name) . '_' . date('Y-m-d') . '.pdf';
             
-            return $pdf->download($filename);
+            // Force download with proper headers
+            return response()->streamDownload(function() use ($pdf) {
+                echo $pdf->output();
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Export PDF with Images Error: ' . $e->getMessage(), [
