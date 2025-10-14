@@ -2309,12 +2309,208 @@ li a{
     </div>
   {{-- </section> --}}
 
-  <!-- Products by Category Showcase -->
+  <!-- Products by Category Showcase - REDESIGNED WITH EMOJIS -->
+  <section class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);">
+    <div class="container">
+      <!-- Section Header -->
+      <div class="text-center mb-5">
+        <div class="d-inline-block position-relative mb-3">
+          <h2 class="display-4 fw-bold mb-0" style="background: linear-gradient(45deg, #8B4513, #D2691E, #8B4513); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            🛍️ Shop by Category
+          </h2>
+          <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 150px; height: 4px; background: linear-gradient(90deg, transparent, #8B4513, transparent); border-radius: 2px;"></div>
+        </div>
+        <p class="lead text-muted mt-4">Explore our carefully curated collections with amazing deals 🎉</p>
+      </div>
+
+      <!-- Category Grid with Emojis -->
+      <div class="row g-4 mb-5">
+        @if(!empty($categories) && $categories->count())
+          @foreach($categories as $category)
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+              <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
+                <div class="category-card-emoji-design" style="
+                  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+                  border-radius: 20px;
+                  padding: 25px 20px;
+                  border: 2px solid rgba(139, 69, 19, 0.1);
+                  transition: all 0.3s ease;
+                  height: 100%;
+                  position: relative;
+                  overflow: hidden;
+                  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.08);
+                " onmouseover="
+                  this.style.transform='translateY(-10px) scale(1.02)';
+                  this.style.boxShadow='0 15px 40px rgba(139, 69, 19, 0.2)';
+                  this.style.borderColor='rgba(139, 69, 19, 0.3)';
+                " onmouseout="
+                  this.style.transform='translateY(0) scale(1)';
+                  this.style.boxShadow='0 4px 15px rgba(139, 69, 19, 0.08)';
+                  this.style.borderColor='rgba(139, 69, 19, 0.1)';
+                ">
+                  
+                  <!-- Gradient Background Effect -->
+                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(139,69,19,0.03) 0%, transparent 100%); pointer-events: none; opacity: 0; transition: opacity 0.3s;" class="hover-gradient"></div>
+                  
+                  <!-- Emoji Circle -->
+                  <div class="text-center mb-3">
+                    <div style="
+                      width: 100px;
+                      height: 100px;
+                      margin: 0 auto;
+                      background: linear-gradient(135deg, rgba(139,69,19,0.08) 0%, rgba(210,105,30,0.08) 100%);
+                      border-radius: 50%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 3.5rem;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.1);
+                      border: 3px solid rgba(139, 69, 19, 0.1);
+                    " class="emoji-circle">
+                      {{ $category->emoji ?? '🛒' }}
+                    </div>
+                  </div>
+                  
+                  <!-- Category Name -->
+                  <h5 class="text-center fw-bold mb-2" style="color: #8B4513; font-size: 1.1rem;">
+                    {{ $category->name }}
+                  </h5>
+                  
+                  <!-- Product Count Badge -->
+                  @php
+                    $productCount = $category->products->count() ?? 0;
+                  @endphp
+                  <div class="text-center">
+                    <span class="badge" style="
+                      background: linear-gradient(45deg, #8B4513, #A0522D);
+                      color: white;
+                      font-size: 0.85rem;
+                      padding: 6px 15px;
+                      border-radius: 20px;
+                      font-weight: 600;
+                      box-shadow: 0 2px 10px rgba(139, 69, 19, 0.3);
+                    ">
+                      {{ $productCount }} {{ $productCount === 1 ? 'Product' : 'Products' }}
+                    </span>
+                  </div>
+                  
+                  <!-- Subcategories Preview (if any) -->
+                  @if($category->subcategories && $category->subcategories->count() > 0)
+                    <div class="mt-3 pt-3" style="border-top: 1px solid rgba(139, 69, 19, 0.1);">
+                      <div style="font-size: 0.75rem; color: #666; text-align: center;">
+                        @foreach($category->subcategories->take(3) as $subcat)
+                          <span style="
+                            display: inline-block;
+                            background: rgba(139, 69, 19, 0.05);
+                            padding: 3px 10px;
+                            border-radius: 12px;
+                            margin: 2px;
+                            font-weight: 500;
+                            color: #8B4513;
+                          ">{{ Str::limit($subcat->name, 12) }}</span>
+                        @endforeach
+                        @if($category->subcategories->count() > 3)
+                          <span style="font-weight: 600; color: #8B4513;">+{{ $category->subcategories->count() - 3 }}</span>
+                        @endif
+                      </div>
+                    </div>
+                  @endif
+                  
+                  <!-- View Arrow Indicator -->
+                  <div class="text-center mt-3">
+                    <span style="
+                      display: inline-flex;
+                      align-items: center;
+                      gap: 5px;
+                      color: #8B4513;
+                      font-size: 0.9rem;
+                      font-weight: 600;
+                      transition: all 0.3s;
+                    " class="view-arrow">
+                      View Collection
+                      <i class="bi bi-arrow-right" style="font-size: 1rem; transition: transform 0.3s;"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          @endforeach
+        @else
+          <div class="col-12">
+            <div class="text-center py-5">
+              <div style="font-size: 4rem; margin-bottom: 20px;">😅</div>
+              <h4 class="text-muted">No categories available yet</h4>
+              <p class="text-muted">Check back soon for amazing deals!</p>
+            </div>
+          </div>
+        @endif
+      </div>
+
+      <!-- View All Categories Button -->
+      <div class="text-center mt-5">
+        <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg" style="
+          background: linear-gradient(45deg, #8B4513, #A0522D);
+          color: white;
+          border: none;
+          border-radius: 30px;
+          padding: 15px 50px;
+          font-weight: 700;
+          font-size: 1.1rem;
+          box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+          transition: all 0.3s ease;
+        " onmouseover="
+          this.style.transform='translateY(-3px) scale(1.05)';
+          this.style.boxShadow='0 12px 35px rgba(139, 69, 19, 0.4)';
+          this.style.background='linear-gradient(45deg, #A0522D, #8B4513)';
+        " onmouseout="
+          this.style.transform='translateY(0) scale(1)';
+          this.style.boxShadow='0 8px 25px rgba(139, 69, 19, 0.3)';
+          this.style.background='linear-gradient(45deg, #8B4513, #A0522D)';
+        ">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+          Explore All Categories
+          <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enhanced Hover Effects -->
+  <style>
+    .category-card-emoji-design:hover .emoji-circle {
+      transform: scale(1.15) rotate(5deg);
+      background: linear-gradient(135deg, rgba(139,69,19,0.15) 0%, rgba(210,105,30,0.15) 100%);
+      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.2);
+    }
+    
+    .category-card-emoji-design:hover .hover-gradient {
+      opacity: 1;
+    }
+    
+    .category-card-emoji-design:hover .view-arrow i {
+      transform: translateX(5px);
+    }
+    
+    @media (max-width: 576px) {
+      .category-card-emoji-design {
+        padding: 20px 15px !important;
+      }
+      
+      .emoji-circle {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 2.8rem !important;
+      }
+    }
+  </style>
+
+  <!-- Category Products Section -->
   <section class="py-5 bg-light">
     <div class="container">
       <div class="text-center mb-5">
-        <h2 class="display-4 fw-bold mb-3">🛍️ Shop by Category</h2>
-        <p class="lead text-muted">Discover our curated collection of premium products across all categories</p>
+        <h2 class="h3 fw-bold text-dark">🎯 Featured Products</h2>
+        <p class="text-muted">Handpicked items from our best categories</p>
       
       </div>
       @if(isset($categoryProducts) && !empty($categoryProducts))
