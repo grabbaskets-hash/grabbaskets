@@ -314,14 +314,62 @@ class SellerController extends Controller {
     }
     public function updateProfile(Request $request)
     {
+        $request->validate([
+            'store_name' => 'nullable|string|max:255',
+            'gst_number' => 'nullable|string|max:255',
+            'store_address' => 'nullable|string|max:500',
+            'store_contact' => 'nullable|string|max:255',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
+        ]);
+
         $user = Auth::user();
         $seller = \App\Models\Seller::where('email', $user->email)->firstOrFail();
+        
+        // Update seller information
         $seller->update($request->only([
             'store_name',
             'gst_number',
             'store_address',
             'store_contact'
         ]));
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            try {
+                $photo = $request->file('profile_photo');
+                
+                // Generate unique filename
+                $filename = 'profile_photos/' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
+                
+                // Upload to R2 storage
+                Storage::disk('r2')->put($filename, file_get_contents($photo->getPathname()));
+                
+                // Construct the public URL (Laravel Cloud R2 public URL)
+                $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+                $photoUrl = $r2PublicUrl . '/' . $filename;
+                
+                // Delete old profile photo if exists
+                if ($user->profile_picture && str_contains($user->profile_picture, 'profile_photos/')) {
+                    $oldPath = basename(dirname($user->profile_picture)) . '/' . basename($user->profile_picture);
+                    if (str_starts_with($oldPath, 'profile_photos/')) {
+                        try {
+                            Storage::disk('r2')->delete($oldPath);
+                        } catch (\Exception $e) {
+                            Log::warning('Failed to delete old profile photo: ' . $e->getMessage());
+                        }
+                    }
+                }
+                
+                // Update user's profile picture
+                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
+                
+                return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
+            } catch (\Exception $e) {
+                Log::error('Profile photo upload failed: ' . $e->getMessage());
+                return redirect()->route('seller.profile')->with('error', 'Profile photo upload failed. Store info updated.');
+            }
+        }
+
         return redirect()->route('seller.profile')->with('success', 'Store info updated!');
     }
     public function dashboard()

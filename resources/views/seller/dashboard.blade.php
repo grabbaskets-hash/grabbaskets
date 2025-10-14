@@ -209,7 +209,13 @@
     <div class="content">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
-            <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Seller Profile">
+            @php
+              $user = Auth::user();
+              $dashboardPhoto = $user && $user->profile_picture 
+                ? $user->profile_picture 
+                : asset('asset/images/grabbasket.png');
+            @endphp
+            <img src="{{ $dashboardPhoto }}" alt="Seller Profile">
             <h2>Welcome, {{ Auth::user()->name ?? 'Seller' }}!</h2>
             <p class="mb-0">Here's an overview of your store performance.</p>
         </div>

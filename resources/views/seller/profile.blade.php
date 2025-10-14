@@ -188,8 +188,14 @@
             <h2>Seller Profile</h2>
           </div>
           <div class="card-body text-center">
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($seller->name) }}&background=0d6efd&color=fff"
-              alt="Avatar" class="profile-avatar shadow">
+            @php
+              $user = Auth::user();
+              $profilePhoto = $user && $user->profile_picture 
+                ? $user->profile_picture 
+                : "https://ui-avatars.com/api/?name=" . urlencode($seller->name) . "&background=0d6efd&color=fff";
+            @endphp
+            <img src="{{ $profilePhoto }}"
+              alt="Avatar" class="profile-avatar shadow" id="profileAvatarImg">
             <h4 class="mt-3">{{ $seller->name }}</h4>
             <p class="text-muted">📍 {{ $seller->city }}, {{ $seller->state }}</p>
             <div class="mt-3">
@@ -216,9 +222,32 @@
                   <i class="bi bi-plus-circle"></i> Add Product
                 </a>
 
-                <form method="POST" action="{{ route('seller.updateProfile') }}" class="border rounded p-3 bg-light">
+                <form method="POST" action="{{ route('seller.updateProfile') }}" class="border rounded p-3 bg-light" enctype="multipart/form-data">
                   @csrf
                   <h5 class="fw-bold mb-3">Update Store Info</h5>
+                  
+                  <!-- Profile Photo Upload -->
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Profile Photo</label>
+                    @if(Auth::user()->profile_picture)
+                      <div class="mb-2">
+                        <img src="{{ Auth::user()->profile_picture }}" alt="Current Photo" 
+                          class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                        <p class="text-muted small mt-1">Current profile photo</p>
+                      </div>
+                    @endif
+                    <input type="file" name="profile_photo" class="form-control" accept="image/jpeg,image/jpg,image/png,image/gif" id="profilePhotoInput">
+                    <small class="text-muted">Accepted formats: JPEG, JPG, PNG, GIF (Max: 2MB)</small>
+                    @if($errors->has('profile_photo'))
+                      <div class="text-danger small mt-1">{{ $errors->first('profile_photo') }}</div>
+                    @endif
+                    <!-- Image Preview -->
+                    <div id="imagePreview" class="mt-2" style="display: none;">
+                      <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                      <p class="text-muted small mt-1">New photo preview</p>
+                    </div>
+                  </div>
+                  
                   <div class="mb-3">
                     <label class="form-label fw-bold">Store Name</label>
                     <input type="text" name="store_name" class="form-control"
@@ -282,9 +311,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  
-
-<script>
+  <script>
   document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.querySelector(".menu-toggle");
     const sidebar = document.getElementById("sidebarMenu");
@@ -292,6 +319,46 @@
     toggleBtn.addEventListener("click", function () {
       sidebar.classList.toggle("show");
     });
+
+    // Profile Photo Preview
+    const photoInput = document.getElementById('profilePhotoInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const profileAvatarImg = document.getElementById('profileAvatarImg');
+
+    if (photoInput) {
+      photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Check file size (2MB = 2097152 bytes)
+          if (file.size > 2097152) {
+            alert('File size must be less than 2MB');
+            photoInput.value = '';
+            imagePreview.style.display = 'none';
+            return;
+          }
+
+          // Check file type
+          const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+          if (!validTypes.includes(file.type)) {
+            alert('Please select a valid image file (JPEG, JPG, PNG, or GIF)');
+            photoInput.value = '';
+            imagePreview.style.display = 'none';
+            return;
+          }
+
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            imagePreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.style.display = 'none';
+        }
+      });
+    }
   });
 </script>
 
