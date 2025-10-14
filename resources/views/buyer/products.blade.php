@@ -21,8 +21,6 @@
 
         /* Sidebar Filters */
         .filter-card {
-                @if($products->count() > 0)
-                    @foreach($products as $product)
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -37,26 +35,36 @@
         /* Product Cards */
         .product-card {
             background: #fff;
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 8px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-            display: flex;
-            gap: 4px;
-            min-height: 80px;
+            border-radius: 12px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .product-card:hover {
-            transform: translateY(-2px) scale(0.97);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card.h-100 {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card.h-100 .card-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.h-100 .card-body .mt-auto {
+            margin-top: auto !important;
         }
 
         .product-img {
-            width: 10px;
-            height: 10px;
+            width: 100%;
+            height: 250px;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 12px 12px 0 0;
         }
 
         .price {
@@ -100,10 +108,9 @@
         footer a { color: #fff; text-decoration: none; }
         footer a:hover { color: #ddd; }
 
-                    @endforeach
-                @else
-                    <div class="alert alert-info">No products found in this subcategory yet. Please check back later or browse other subcategories from the menu.</div>
-                @endif
+        .footer-main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
             gap: 3rem;
             align-items: start;
             max-width: 1200px;
@@ -360,88 +367,125 @@
                     </form>
                 </div>
 
-                <!-- Product Cards -->
+                <!-- Product Cards Grid -->
+                <div class="row g-4">
                 @forelse($products as $product)
-                    <div class="product-card position-relative mb-3">
-                        <!-- Wishlist Heart Button -->
-                        <form method="POST" action="{{ route('wishlist.toggle') }}" class="position-absolute top-0 end-0 m-2" style="z-index:2;">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
-                                <i class="bi bi-heart{{ $product->isWishlistedBy(auth()->user()) ? '-fill text-danger' : '' }} fs-4"></i>
-                            </button>
-                        </form>
-                        <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+                        <div class="card h-100 position-relative" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                            <!-- Wishlist Heart Button -->
+                            <form method="POST" action="{{ route('wishlist.toggle') }}" class="position-absolute top-0 end-0 m-2" style="z-index:10;">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <button type="submit" class="btn btn-link p-0 border-0 bg-white rounded-circle" style="width: 40px; height: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                                    <i class="bi bi-heart{{ $product->isWishlistedBy(auth()->user()) ? '-fill text-danger' : '' }} fs-5"></i>
+                                </button>
+                            </form>
+                            
                             <!-- Product Image -->
-                            <div class="flex-shrink-0 w-32 h-50 rounded-lg overflow-hidden border">
+                            <div style="position: relative; overflow: hidden; height: 250px;">
                                 @php
                                     $categoryName = optional($product->category)->name ?? '';
                                     $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
                                     $unsplashQuery = $unsplashQuery ?: 'product colorful';
                                 @endphp
-                                @if ($product->image || $product->image_data)
-                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
-                                        class="w-full h-full object-cover"
-                                        onerror="
-                                            if (!this.dataset.fallback) {
-                                                this.dataset.fallback = '1';
-                                                this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
-                                            } else {
-                                                this.src = 'https://source.unsplash.com/400x400/?product,shopping,retail,colorful';
-                                            }
-                                        ">
-                                @else
-                                    <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                <a href="{{ route('product.details', $product->id) }}">
+                                    @if ($product->image || $product->image_data)
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                            class="card-img-top" style="height: 250px; object-fit: cover; transition: transform 0.3s;"
+                                            onmouseover="this.style.transform='scale(1.05)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onerror="
+                                                if (!this.dataset.fallback) {
+                                                    this.dataset.fallback = '1';
+                                                    this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
+                                                } else {
+                                                    this.src = 'https://source.unsplash.com/400x400/?product,shopping,retail,colorful';
+                                                }
+                                            ">
+                                    @else
+                                        <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                    @endif
+                                </a>
+                                
+                                @if($product->discount > 0)
+                                <div style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #FF4444, #FF6B00); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);">
+                                    {{ $product->discount }}% OFF
+                                </div>
                                 @endif
                             </div>
 
-                            <!-- Product Info -->
-                            <div class="flex-grow-1 ms-3">
-                                <span class="block fw-bold fs-5">{{ $product->name }}</span>
-
-                                <p class="text-muted small mt-1 line-clamp-3">
-                                    {{ $product->description }}
+                            <!-- Product Body -->
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title fw-bold mb-2" style="color: #333; font-size: 1rem; line-height: 1.4; min-height: 44px;">
+                                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark">
+                                        {{ \Illuminate\Support\Str::limit($product->name, 50) }}
+                                    </a>
+                                </h6>
+                                
+                                <p class="card-text small text-muted mb-3" style="line-height: 1.5; min-height: 60px;">
+                                    {{ \Illuminate\Support\Str::limit($product->description, 80) }}
                                 </p>
 
-                                <div class="price mt-1">
-                                    ₹{{ number_format($product->discount > 0 ? $product->price * (1 - $product->discount / 100) : $product->price, 2) }}
-                                    @if($product->discount > 0)
-                                        <span class="old-price text-muted">₹{{ number_format($product->price, 2) }}</span>
-                                        <span class="badge bg-success ms-2">{{ $product->discount }}% off</span>
-                                    @endif
-                                </div>
+                                <div class="mt-auto">
+                                    <!-- Price Section -->
+                                    <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 0, 0.1)); padding: 10px; border-radius: 10px; border: 1px solid rgba(255, 107, 0, 0.2);">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <span class="fw-bold d-block" style="color: #FF6B00; font-size: 1.3rem;">
+                                                    ₹{{ number_format($product->discount > 0 ? $product->price * (1 - $product->discount / 100) : $product->price, 2) }}
+                                                </span>
+                                                @if($product->discount > 0)
+                                                    <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                                                @endif
+                                            </div>
+                                            @if($product->discount > 0)
+                                            <div class="text-end">
+                                                <small class="badge bg-success">Save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</small>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
 
-                                <!-- Add to Cart Button -->
-                                <div class="mt-2 d-flex gap-2 align-items-center">
-                                    @auth
-                                        <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
-                                        </form>
-                                    @else
-                                        <a href="{{ route('login') }}" class="btn btn-warning btn-sm">Login to add</a>
-                                    @endauth
-                                    
-                                    <!-- Share Button -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();">
-                                            <i class="bi bi-share"></i> Share
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success"></i> WhatsApp</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary"></i> Facebook</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info"></i> Twitter</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg"></i> Copy Link</a></li>
-                                        </ul>
+                                    <!-- Action Buttons -->
+                                    <div class="d-grid gap-2">
+                                        @auth
+                                            <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <button type="submit" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
+                                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                                </button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
+                                                <i class="bi bi-box-arrow-in-right"></i> Login to Buy
+                                            </a>
+                                        @endauth
+                                        
+                                        <!-- Share Button -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-radius: 8px;">
+                                                <i class="bi bi-share"></i> Share
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success"></i> WhatsApp</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary"></i> Facebook</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info"></i> Twitter</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="shareProduct('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg"></i> Copy Link</a></li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </div>
+                    </div>
                 @empty
-                    <div class="alert alert-warning">No products found.</div>
+                    <div class="col-12">
+                        <div class="alert alert-warning">No products found.</div>
+                    </div>
                 @endforelse
+                </div>
 
                 <!-- Pagination -->
                 <div class="mt-4">
