@@ -2140,6 +2140,73 @@ li a{
     }
   </script>
 
+  <!-- Hero Banners Section - Admin Managed -->
+  @if(isset($banners) && $banners->count() > 0)
+  <section class="hero-banners py-4">
+    <div class="container">
+      <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          @foreach($banners as $index => $banner)
+          <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="{{ $index }}" 
+                  class="{{ $index === 0 ? 'active' : '' }}" aria-label="Banner {{ $index + 1 }}"></button>
+          @endforeach
+        </div>
+        <div class="carousel-inner" style="border-radius: 20px; overflow: hidden;">
+          @foreach($banners as $index => $banner)
+          <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+            @if($banner->image_url)
+              <!-- Image Banner -->
+              <div style="position: relative; height: 400px; background: url('{{ asset($banner->image_url) }}') center/cover;">
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 40px;">
+                  <div class="container">
+                    <h2 class="text-white fw-bold mb-2" style="font-size: 2.5rem;">{{ $banner->title }}</h2>
+                    @if($banner->description)
+                    <p class="text-white mb-3" style="font-size: 1.1rem;">{{ $banner->description }}</p>
+                    @endif
+                    @if($banner->link_url)
+                    <a href="{{ $banner->link_url }}" class="btn btn-light btn-lg fw-bold px-4" 
+                       style="border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                      {{ $banner->button_text }} <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    @endif
+                  </div>
+                </div>
+              </div>
+            @else
+              <!-- Color Banner -->
+              <div style="height: 400px; background: {{ $banner->background_color }}; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px;">
+                <div style="color: {{ $banner->text_color }}; max-width: 800px;">
+                  <h2 class="fw-bold mb-3" style="font-size: 3rem;">{{ $banner->title }}</h2>
+                  @if($banner->description)
+                  <p class="mb-4" style="font-size: 1.3rem;">{{ $banner->description }}</p>
+                  @endif
+                  @if($banner->link_url)
+                  <a href="{{ $banner->link_url }}" class="btn btn-lg fw-bold px-5 py-3" 
+                     style="background: {{ $banner->text_color }}; color: {{ $banner->background_color }}; border-radius: 30px; box-shadow: 0 6px 20px rgba(0,0,0,0.2);">
+                    {{ $banner->button_text }} <i class="bi bi-arrow-right ms-2"></i>
+                  </a>
+                  @endif
+                </div>
+              </div>
+            @endif
+          </div>
+          @endforeach
+        </div>
+        @if($banners->count() > 1)
+        <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+        @endif
+      </div>
+    </div>
+  </section>
+  @endif
+
   <!-- Products Section -->
   <section class="products-section">
     <div class="container">

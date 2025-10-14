@@ -85,6 +85,9 @@ Route::get('/', function () {
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
             
+        // Load active banners
+        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
+            
         // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
         $categoryProducts = [];
         foreach ($categories as $category) {
@@ -302,7 +305,7 @@ Route::get('/', function () {
             ->take(8)
             ->get(); // Increased for variety
 
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
+        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts', 'banners'));
     } catch (\Exception $e) {
         // Log the error for debugging
         Log::error('Database error on homepage: ' . $e->getMessage());
@@ -325,6 +328,7 @@ Route::get('/', function () {
             'trending' => collect([]),
             'lookbookProduct' => null,
             'blogProducts' => collect([]),
+            'banners' => collect([]),
             'database_error' => 'Unable to load products at this time. Please try again later.'
         ]);
     }
@@ -663,6 +667,17 @@ Route::post('/admin/sms/order-reminders', function (Request $request) {
     }
     return app(\App\Http\Controllers\SmsController::class)->sendOrderReminders($request);
 })->name('admin.sms.reminders');
+
+// Admin Banner Management Routes
+Route::prefix('admin/banners')->middleware('web')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\BannerController::class, 'index'])->name('admin.banners.index');
+    Route::get('/create', [App\Http\Controllers\Admin\BannerController::class, 'create'])->name('admin.banners.create');
+    Route::post('/', [App\Http\Controllers\Admin\BannerController::class, 'store'])->name('admin.banners.store');
+    Route::get('/{id}/edit', [App\Http\Controllers\Admin\BannerController::class, 'edit'])->name('admin.banners.edit');
+    Route::put('/{id}', [App\Http\Controllers\Admin\BannerController::class, 'update'])->name('admin.banners.update');
+    Route::delete('/{id}', [App\Http\Controllers\Admin\BannerController::class, 'destroy'])->name('admin.banners.destroy');
+    Route::post('/{id}/toggle', [App\Http\Controllers\Admin\BannerController::class, 'toggleStatus'])->name('admin.banners.toggle');
+});
 
 // Admin Category Emoji Management Routes
 Route::prefix('admin/category-emojis')->group(function () {
