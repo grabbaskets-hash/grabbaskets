@@ -103,6 +103,93 @@
             background-color: #e6a600;
         }
 
+        /* Responsive Grid Enhancements */
+        @media (min-width: 1200px) {
+            .col-xl-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .col-lg-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 767px) {
+            .filter-card {
+                margin-bottom: 15px;
+            }
+            
+            .search-bar {
+                width: 100% !important;
+                margin-bottom: 10px;
+            }
+            
+            .card-body {
+                padding: 15px !important;
+            }
+            
+            .card-title {
+                font-size: 0.95rem !important;
+                min-height: 38px !important;
+            }
+            
+            .card-text {
+                font-size: 0.85rem !important;
+                min-height: 50px !important;
+            }
+            
+            .price-section {
+                padding: 8px !important;
+            }
+            
+            .price-section span {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .col-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .navbar-brand img {
+                width: 140px !important;
+            }
+            
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .row.g-4 {
+                gap: 1rem !important;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+
        /* Footer Styles */
         footer { background-color: #343a40; color: #fff; width: 100%; }
         footer a { color: #fff; text-decoration: none; }
@@ -593,6 +680,71 @@
                     break;
             }
         }
+
+        // AJAX Wishlist Toggle - Prevents redirect and updates UI
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all wishlist forms
+            const wishlistForms = document.querySelectorAll('form[action*="wishlist.toggle"]');
+            
+            wishlistForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Prevent form submission/redirect
+                    
+                    const formData = new FormData(form);
+                    const button = form.querySelector('button');
+                    const icon = button.querySelector('i');
+                    
+                    // Send AJAX request
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': formData.get('_token'),
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            product_id: formData.get('product_id')
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Toggle heart icon
+                            if (data.in_wishlist) {
+                                // Added to wishlist - show filled red heart
+                                icon.classList.remove('bi-heart');
+                                icon.classList.add('bi-heart-fill', 'text-danger');
+                            } else {
+                                // Removed from wishlist - show empty heart
+                                icon.classList.remove('bi-heart-fill', 'text-danger');
+                                icon.classList.add('bi-heart');
+                            }
+                            
+                            // Optional: Show brief success message (can be removed if you don't want notifications)
+                            // You can uncomment below for visual feedback
+                            /*
+                            const toast = document.createElement('div');
+                            toast.className = 'position-fixed bottom-0 end-0 p-3';
+                            toast.style.zIndex = '9999';
+                            toast.innerHTML = `
+                                <div class="toast show" role="alert">
+                                    <div class="toast-body bg-success text-white">
+                                        ${data.message}
+                                    </div>
+                                </div>
+                            `;
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 2000);
+                            */
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Optionally show error message
+                    });
+                });
+            });
+        });
     </script>
 </body>
 

@@ -321,7 +321,7 @@
           @foreach($items as $item)
           <div class="cart-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              @if(optional($item->product)->image)
+              @if($item->product && ($item->product->image || $item->product->image_data))
               <a href="{{ route('product.details', $item->product->id) }}" class="me-3">
              <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
               </a>
