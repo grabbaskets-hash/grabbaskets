@@ -337,6 +337,7 @@
                 <div class="product-image-container">
                     @php
                         $imageUrl = null;
+                        $imageData = null;
                         
                         // Try to get primary image from images relationship
                         if ($product->images && $product->images->count() > 0) {
@@ -355,9 +356,43 @@
                                 $imageUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud/' . $product->image;
                             }
                         }
+                        
+                        // Try to convert image to base64 for better PDF compatibility
+                        if ($imageUrl) {
+                            try {
+                                // Set context options to handle HTTPS and timeouts
+                                $context = stream_context_create([
+                                    'http' => [
+                                        'timeout' => 10,
+                                        'ignore_errors' => true
+                                    ],
+                                    'ssl' => [
+                                        'verify_peer' => false,
+                                        'verify_peer_name' => false,
+                                    ]
+                                ]);
+                                
+                                $imageContent = @file_get_contents($imageUrl, false, $context);
+                                
+                                if ($imageContent !== false) {
+                                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                    $mimeType = $finfo->buffer($imageContent);
+                                    $imageData = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+                                }
+                            } catch (\Exception $e) {
+                                // If conversion fails, fall back to direct URL
+                                \Log::warning('Image conversion failed for PDF', [
+                                    'product_id' => $product->id,
+                                    'url' => $imageUrl,
+                                    'error' => $e->getMessage()
+                                ]);
+                            }
+                        }
                     @endphp
 
-                    @if($imageUrl)
+                    @if($imageData)
+                        <img src="{{ $imageData }}" alt="{{ $product->name }}" class="product-image">
+                    @elseif($imageUrl)
                         <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="product-image">
                     @else
                         <div class="no-image">

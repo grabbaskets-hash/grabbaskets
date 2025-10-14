@@ -302,8 +302,15 @@ class ProductImportExportController extends Controller
             // Set paper size to A4 portrait for better image display
             $pdf->setPaper('a4', 'portrait');
             
+            // CRITICAL: Enable remote file access for loading images from URLs
+            $pdf->setOption('isRemoteEnabled', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('enable_remote', true);
+            $pdf->setOption('chroot', base_path());
+            
             // Increase timeout for large PDFs with images
-            $pdf->setOption('enable-local-file-access', true);
+            set_time_limit(300); // 5 minutes
+            ini_set('memory_limit', '512M');
             
             $filename = 'products_with_images_' . Str::slug($seller->business_name ?? $seller->name) . '_' . date('Y-m-d') . '.pdf';
             
