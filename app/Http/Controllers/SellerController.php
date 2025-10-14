@@ -390,12 +390,30 @@ class SellerController extends Controller {
                         'filename' => $filename
                     ]);
                     
+                    // Check if AJAX request (for WhatsApp-style upload)
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Profile photo updated successfully!',
+                            'photo_url' => $photoUrl
+                        ]);
+                    }
+                    
                     return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
                 } catch (\Exception $e) {
                     Log::error('Profile photo upload failed', [
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString()
                     ]);
+                    
+                    // Check if AJAX request
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Upload failed: ' . $e->getMessage()
+                        ], 500);
+                    }
+                    
                     return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
                 }
             }

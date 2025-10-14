@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Seller Profile</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -98,6 +99,105 @@
       border: 3px solid white;
       object-fit: cover;
       margin-top: -45px;
+    }
+
+    /* Profile Photo Wrapper (WhatsApp/Instagram Style) */
+    .profile-photo-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-top: -45px;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo-edit-btn {
+      opacity: 1;
+    }
+
+    .profile-photo-edit-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #0d6efd;
+      border: 2px solid white;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-photo-edit-btn:hover {
+      background: #0b5ed7;
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    .profile-photo-edit-btn i {
+      font-size: 14px;
+    }
+
+    /* Upload Modal Overlay */
+    .photo-upload-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+
+    .photo-upload-overlay.active {
+      display: flex;
+    }
+
+    .photo-upload-modal {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: modalSlideUp 0.3s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .preview-photo-container {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 20px auto;
+      border: 3px solid #0d6efd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+    }
+
+    .preview-photo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Store info box */
@@ -199,8 +299,28 @@
                 $profilePhoto = "https://ui-avatars.com/api/?name=" . urlencode($seller->name) . "&background=0d6efd&color=fff";
               @endphp
             @endauth
-            <img src="{{ $profilePhoto }}"
-              alt="Avatar" class="profile-avatar shadow" id="profileAvatarImg">
+            
+            <!-- Clickable Profile Photo (WhatsApp/Instagram Style) -->
+            <div class="profile-photo-wrapper position-relative d-inline-block">
+              <img src="{{ $profilePhoto }}"
+                alt="Avatar" class="profile-avatar shadow" id="profileAvatarImg">
+              
+              @auth
+                @if(Auth::user()->email === $seller->email)
+                  <!-- Camera overlay button (only for own profile) -->
+                  <button type="button" class="profile-photo-edit-btn" onclick="document.getElementById('quickProfilePhotoInput').click()" title="Change profile photo">
+                    <i class="bi bi-camera-fill"></i>
+                  </button>
+                  
+                  <!-- Hidden file input for quick photo change -->
+                  <form id="quickPhotoUploadForm" method="POST" action="{{ route('seller.updateProfile') }}" enctype="multipart/form-data" style="display: none;">
+                    @csrf
+                    <input type="file" name="profile_photo" id="quickProfilePhotoInput" accept="image/jpeg,image/jpg,image/png,image/gif" onchange="handleQuickPhotoUpload(this)">
+                  </form>
+                @endif
+              @endauth
+            </div>
+            
             <h4 class="mt-3">{{ $seller->name }}</h4>
             <p class="text-muted">📍 {{ $seller->city }}, {{ $seller->state }}</p>
             <div class="mt-3">
@@ -325,7 +445,143 @@
       sidebar.classList.toggle("show");
     });
 
-    // Profile Photo Preview
+    // Quick Photo Upload (WhatsApp/Instagram Style)
+    function handleQuickPhotoUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // Validate file size (2MB max)
+      if (file.size > 2097152) {
+        alert('❌ File size must be less than 2MB');
+        input.value = '';
+        return;
+      }
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        alert('❌ Please select a valid image file (JPEG, JPG, PNG, or GIF)');
+        input.value = '';
+        return;
+      }
+
+      // Show preview in modal
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        showPhotoPreviewModal(e.target.result, file);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Show Photo Preview Modal (Instagram Style)
+    function showPhotoPreviewModal(imageData, file) {
+      // Create modal overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'photo-upload-overlay active';
+      overlay.innerHTML = `
+        <div class="photo-upload-modal">
+          <div class="text-center">
+            <h5 class="mb-3"><i class="bi bi-image"></i> Update Profile Photo</h5>
+            <div class="preview-photo-container">
+              <img src="${imageData}" alt="Preview">
+            </div>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-info-circle"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)
+            </p>
+            <div class="d-flex gap-2 justify-content-center">
+              <button type="button" class="btn btn-secondary" onclick="closePhotoModal()">
+                <i class="bi bi-x-circle"></i> Cancel
+              </button>
+              <button type="button" class="btn btn-primary" onclick="submitQuickPhoto()">
+                <i class="bi bi-check-circle"></i> Update Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Close on overlay click
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          closePhotoModal();
+        }
+      });
+    }
+
+    // Close photo modal
+    function closePhotoModal() {
+      const overlay = document.querySelector('.photo-upload-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.remove(), 300);
+      }
+      // Reset file input
+      document.getElementById('quickProfilePhotoInput').value = '';
+    }
+
+    // Submit photo via AJAX
+    function submitQuickPhoto() {
+      const form = document.getElementById('quickPhotoUploadForm');
+      const formData = new FormData(form);
+      
+      // Show loading state
+      const modal = document.querySelector('.photo-upload-modal');
+      modal.innerHTML = `
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Uploading...</span>
+          </div>
+          <h5>Uploading your photo...</h5>
+          <p class="text-muted">Please wait</p>
+        </div>
+      `;
+
+      // Submit form
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update profile photo
+          document.getElementById('profileAvatarImg').src = data.photo_url;
+          
+          // Show success message
+          modal.innerHTML = `
+            <div class="text-center py-4">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+              <h5 class="mt-3 text-success">Success!</h5>
+              <p class="text-muted">Profile photo updated successfully</p>
+            </div>
+          `;
+          
+          setTimeout(() => {
+            closePhotoModal();
+            location.reload(); // Refresh to show new photo everywhere
+          }, 1500);
+        } else {
+          throw new Error(data.message || 'Upload failed');
+        }
+      })
+      .catch(error => {
+        modal.innerHTML = `
+          <div class="text-center py-4">
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-danger">Upload Failed</h5>
+            <p class="text-muted">${error.message || 'An error occurred. Please try again.'}</p>
+            <button class="btn btn-secondary mt-3" onclick="closePhotoModal()">Close</button>
+          </div>
+        `;
+      });
+    }
+
+    // Profile Photo Preview (for form upload)
     const photoInput = document.getElementById('profilePhotoInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
