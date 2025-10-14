@@ -382,12 +382,16 @@ class SellerController extends Controller {
                         }
                     }
                     
-                    // Update user's profile picture
+                    // Update user's profile picture in database
                     \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
+                    
+                    // Reload user from database to get fresh data
+                    $user = \App\Models\User::find($user->id);
                     
                     Log::info('Profile photo updated successfully', [
                         'user_id' => $user->id,
-                        'filename' => $filename
+                        'filename' => $filename,
+                        'photo_url' => $photoUrl
                     ]);
                     
                     // Check if AJAX request (for WhatsApp-style upload)

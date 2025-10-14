@@ -537,6 +537,8 @@
         </div>
       `;
 
+      console.log('Uploading photo...');
+
       // Submit form
       fetch(form.action, {
         method: 'POST',
@@ -546,11 +548,18 @@
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
-          // Update profile photo
-          document.getElementById('profileAvatarImg').src = data.photo_url;
+          // Update profile photo with cache-busting timestamp
+          const cacheBuster = '?t=' + new Date().getTime();
+          const newPhotoUrl = data.photo_url + cacheBuster;
+          console.log('New photo URL:', newPhotoUrl);
+          document.getElementById('profileAvatarImg').src = newPhotoUrl;
           
           // Show success message
           modal.innerHTML = `
@@ -563,13 +572,15 @@
           
           setTimeout(() => {
             closePhotoModal();
-            location.reload(); // Refresh to show new photo everywhere
+            // Force reload to show new photo everywhere (header, sidebar, etc.)
+            window.location.reload(true);
           }, 1500);
         } else {
           throw new Error(data.message || 'Upload failed');
         }
       })
       .catch(error => {
+        console.error('Upload error:', error);
         modal.innerHTML = `
           <div class="text-center py-4">
             <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
