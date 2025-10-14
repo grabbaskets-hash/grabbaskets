@@ -247,6 +247,7 @@
                             <li><strong>Updates existing products:</strong> Matches by Product ID or Name</li>
                             <li><strong>Creates new products:</strong> Automatically adds products that don't exist</li>
                             <li><strong>Auto-creates categories:</strong> Categories/subcategories created if missing</li>
+                            <li><strong>Default category:</strong> Products without category → "Uncategorized" (edit later)</li>
                             <li><strong>Leaves blank fields alone:</strong> Empty cells won't overwrite existing data</li>
                             <li><strong>📸 Image Import:</strong> Supports image URLs (comma-separated for multiple)</li>
                         </ol>
@@ -259,9 +260,10 @@
                             <ul class="mb-0 mt-2 small">
                                 <li><strong>Minimum Required:</strong> Just "Name" and "Price" are enough!</li>
                                 <li><strong>Add Whatever You Have:</strong> Category, Stock, SKU, Brand, etc. - all optional</li>
+                                <li><strong>No Category? No Problem:</strong> Products without category go to "Uncategorized"</li>
                                 <li><strong>Any Format Works:</strong> "Product Name" or "Name" or "Title" - all recognized</li>
                                 <li><strong>Blank = Skip:</strong> Empty cells won't update existing product data</li>
-                                <li><strong>Example:</strong> Import just names and prices, add images later!</li>
+                                <li><strong>Example:</strong> Import just names and prices, add categories/images later!</li>
                             </ul>
                         </div>
                     </div>

@@ -610,6 +610,22 @@ class ProductImportExportController extends Controller
                 }
             }
         }
+        
+        // If no category provided, use or create "Uncategorized" default category
+        if (!isset($productData['category_id'])) {
+            try {
+                $defaultCategory = Category::firstOrCreate(
+                    ['name' => 'Uncategorized'],
+                    ['slug' => 'uncategorized']
+                );
+                $productData['category_id'] = $defaultCategory->id;
+                Log::info('Using default Uncategorized category for product without category');
+            } catch (\Exception $e) {
+                // If default category creation fails, this will cause the import to fail
+                // which is appropriate since category_id is required
+                throw new \Exception('Product requires a category but default category could not be created: ' . $e->getMessage());
+            }
+        }
 
         // Subcategory - OPTIONAL (find or create if provided)
         if (isset($headerMap['subcategory']) && !empty($row[$headerMap['subcategory']]) && !empty($productData['category_id'])) {
