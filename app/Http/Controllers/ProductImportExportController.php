@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -265,32 +266,78 @@ class ProductImportExportController extends Controller
      */
     public function import(Request $request)
     {
-        $request->validate([
+        // Enhanced validation with custom messages
+        $validator = Validator::make($request->all(), [
             'file' => 'required|file|mimes:xlsx,xls,csv|max:10240'
+        ], [
+            'file.required' => 'Please select a file to import.',
+            'file.file' => 'The uploaded file is invalid.',
+            'file.mimes' => 'File must be in Excel (.xlsx, .xls) or CSV (.csv) format.',
+            'file.max' => 'File size must not exceed 10MB.'
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Please fix the validation errors and try again.');
+        }
 
         try {
             $seller = Auth::user();
             $file = $request->file('file');
             
+            // Check file extension manually as extra validation
+            $extension = strtolower($file->getClientOriginalExtension());
+            if (!in_array($extension, ['xlsx', 'xls', 'csv'])) {
+                return back()->with('error', 'Invalid file format. Only Excel (.xlsx, .xls) and CSV (.csv) files are allowed.');
+            }
+            
+            // Log import attempt
+            Log::info('Import attempt', [
+                'seller_id' => $seller->id,
+                'filename' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'extension' => $extension
+            ]);
+            
             // Load spreadsheet
-            $spreadsheet = IOFactory::load($file->getPathname());
+            try {
+                $spreadsheet = IOFactory::load($file->getPathname());
+            } catch (\Exception $e) {
+                Log::error('Failed to load spreadsheet', ['error' => $e->getMessage()]);
+                return back()->with('error', 'Failed to read file. Please ensure it is a valid Excel or CSV file and not corrupted.');
+            }
+            
             $sheet = $spreadsheet->getActiveSheet();
             $data = $sheet->toArray();
 
             if (empty($data)) {
-                return back()->with('error', 'File is empty or invalid.');
+                return back()->with('error', 'File is empty. Please add data to your spreadsheet and try again.');
+            }
+            
+            if (count($data) < 2) {
+                return back()->with('error', 'File must contain at least one data row (in addition to headers).');
             }
 
             // Detect and map headers
             $headerRow = $data[0];
             $headerMap = $this->detectHeaderMapping($headerRow);
 
-            Log::info('Header mapping detected', ['map' => $headerMap]);
+            Log::info('Header mapping detected', [
+                'headers' => $headerRow,
+                'map' => $headerMap
+            ]);
+            
+            // Check if we have at least one mapped field
+            if (empty($headerMap)) {
+                return back()->with('error', 'Could not detect any valid columns. Please ensure your file has at least column headers like "Name", "Product Name", "Price", etc.');
+            }
 
             $imported = 0;
             $updated = 0;
             $errors = [];
+            $skipped = 0;
 
             // Process data rows
             for ($i = 1; $i < count($data); $i++) {
@@ -343,23 +390,46 @@ class ProductImportExportController extends Controller
 
                 } catch (\Exception $e) {
                     $errors[] = "Row " . ($i + 1) . ": " . $e->getMessage();
-                    Log::error("Import error on row " . ($i + 1), ['error' => $e->getMessage()]);
+                    Log::error("Import error on row " . ($i + 1), [
+                        'error' => $e->getMessage(),
+                        'row_data' => $row
+                    ]);
+                    $skipped++;
                 }
             }
 
-            $message = "Import completed! ";
-            $message .= "New: {$imported}, Updated: {$updated}";
+            // Build success message
+            $message = "✅ Import completed successfully! ";
+            $message .= "Created: {$imported}, Updated: {$updated}";
+            
+            if ($skipped > 0) {
+                $message .= ", Skipped: {$skipped}";
+            }
             
             if (!empty($errors)) {
-                $message .= ". Errors: " . count($errors);
-                Log::warning('Import errors', ['errors' => $errors]);
+                Log::warning('Import completed with errors', [
+                    'total_errors' => count($errors),
+                    'errors' => array_slice($errors, 0, 10) // Log first 10 errors
+                ]);
+                
+                // Show detailed error message
+                $errorMessage = $message . " | ⚠️ " . count($errors) . " rows had errors. ";
+                if (count($errors) <= 5) {
+                    $errorMessage .= "Errors: " . implode('; ', $errors);
+                } else {
+                    $errorMessage .= "First 3 errors: " . implode('; ', array_slice($errors, 0, 3)) . "... (check logs for more)";
+                }
+                return back()->with('warning', $errorMessage);
             }
 
             return back()->with('success', $message);
 
         } catch (\Exception $e) {
-            Log::error('Import Error: ' . $e->getMessage());
-            return back()->with('error', 'Failed to import products: ' . $e->getMessage());
+            Log::error('Import Fatal Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', '❌ Failed to import: ' . $e->getMessage() . '. Please check your file format and try again.');
         }
     }
 
