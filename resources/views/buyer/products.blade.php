@@ -566,7 +566,6 @@
                             </div>
                         </div>
                     </div>
-                    </div>
                 @empty
                     <div class="col-12">
                         <div class="alert alert-warning">No products found.</div>
