@@ -130,16 +130,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 8%;">ID</th>
-                <th style="width: 22%;">Product Name</th>
-                <th style="width: 12%;">Category</th>
-                <th style="width: 10%;">Price</th>
+                <th style="width: 10%;">ID</th>
+                <th style="width: 30%;">Product Name</th>
+                <th style="width: 15%;">Category</th>
+                <th style="width: 12%;">Price</th>
                 <th style="width: 10%;">Discount</th>
-                <th style="width: 6%;">Stock</th>
-                <th style="width: 10%;">SKU</th>
-                <th style="width: 10%;">Brand</th>
-                <th style="width: 6%;">Status</th>
-                <th style="width: 6%;">Date</th>
+                <th style="width: 8%;">Stock</th>
+                <th style="width: 8%;">Status</th>
+                <th style="width: 7%;">Date</th>
             </tr>
         </thead>
         <tbody>
@@ -169,8 +167,6 @@
                 <td class="{{ $product->stock > 10 ? 'stock-high' : 'stock-low' }}">
                     {{ $product->stock }}
                 </td>
-                <td>{{ $product->sku ?? '-' }}</td>
-                <td>{{ $product->brand ?? '-' }}</td>
                 <td class="status-{{ $product->status ?? 'active' }}">
                     {{ ucfirst($product->status ?? 'active') }}
                 </td>
@@ -184,16 +180,14 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 8%;">ID</th>
-                    <th style="width: 22%;">Product Name</th>
-                    <th style="width: 12%;">Category</th>
-                    <th style="width: 10%;">Price</th>
+                    <th style="width: 10%;">ID</th>
+                    <th style="width: 30%;">Product Name</th>
+                    <th style="width: 15%;">Category</th>
+                    <th style="width: 12%;">Price</th>
                     <th style="width: 10%;">Discount</th>
-                    <th style="width: 6%;">Stock</th>
-                    <th style="width: 10%;">SKU</th>
-                    <th style="width: 10%;">Brand</th>
-                    <th style="width: 6%;">Status</th>
-                    <th style="width: 6%;">Date</th>
+                    <th style="width: 8%;">Stock</th>
+                    <th style="width: 8%;">Status</th>
+                    <th style="width: 7%;">Date</th>
                 </tr>
             </thead>
             <tbody>
