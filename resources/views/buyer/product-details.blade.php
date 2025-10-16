@@ -435,14 +435,19 @@
       <p>{{ $product->description ?? 'No description available.' }}</p>
     </div>
     <div class="tab-pane fade" id="store-info">
-      @if($seller)
+      @if($seller && $seller->id)
         <h4>{{ $seller->store_name ?? 'N/A' }}</h4>
-        <p><strong>Shop_Name:</strong> {{ $seller->store_name ?? 'N/A' }}</p>
+        <p><strong>Shop Name:</strong> {{ $seller->store_name ?? 'N/A' }}</p>
         <p><strong>Address:</strong> {{ $seller->store_address ?? 'N/A' }}</p>
         <p><strong>Contact:</strong> {{ $seller->store_contact ?? 'N/A' }}</p>
-        <a href="{{ route('store.products', $seller->id) }}" class="btn btn-outline-dark">View Store Products</a>
+        @if($seller->id > 0)
+          <a href="{{ route('store.products', $seller->id) }}" class="btn btn-outline-dark">View Store Products</a>
+        @endif
       @else
-        <div class="alert alert-warning mb-0">Seller information not available.</div>
+        <div class="alert alert-warning mb-0">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Seller information is currently not available for this product.
+        </div>
       @endif
     </div>
     <div class="tab-pane fade" id="reviews">

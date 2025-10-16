@@ -11,18 +11,46 @@ class ProductController extends Controller
 {
     public function show($id)
     {
-        $product = Product::with(['category','subcategory'])->findOrFail($id);
-        $seller = Seller::where('id', $product->seller_id)->first();
-        $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
-        $otherProducts = Product::where('seller_id', $product->seller_id)
-            ->where('id', '!=', $product->id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->latest()->take(8)->get();
-        return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
+        try {
+            $product = Product::with(['category','subcategory'])->findOrFail($id);
+            
+            // Ensure seller exists, if not use default values
+            $seller = Seller::where('id', $product->seller_id)->first();
+            
+            // If seller not found, create a dummy seller object to prevent errors
+            if (!$seller) {
+                $seller = new Seller();
+                $seller->id = 0;
+                $seller->store_name = 'Store Not Available';
+                $seller->store_address = 'N/A';
+                $seller->store_contact = 'N/A';
+                
+                Log::warning("Product {$id} has no valid seller (seller_id: {$product->seller_id})");
+            }
+            
+            $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
+            
+            $otherProducts = Product::where('seller_id', $product->seller_id)
+                ->where('id', '!=', $product->id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->latest()->take(8)->get();
+            
+            return view('buyer.product-details', compact('product', 'seller', 'reviews', 'otherProducts'));
+            
+        } catch (\Exception $e) {
+            Log::error("Error loading product {$id}: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Return user-friendly error page
+            return response()->view('errors.500', [
+                'message' => 'Unable to load product details. The product may not exist or there was a server error.'
+            ], 500);
+        }
     }
     public function addReview(Request $request, $id)
     {
