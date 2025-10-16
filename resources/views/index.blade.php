@@ -819,6 +819,46 @@
       color: #ff9900;
     }
 
+    /* Wishlist Heart Button */
+    .wishlist-heart-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .wishlist-heart-btn:hover {
+      background: #fff;
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .wishlist-icon {
+      color: #ccc;
+      font-size: 1.25rem;
+      transition: all 0.2s;
+    }
+
+    .wishlist-heart-btn:hover .wishlist-icon {
+      color: #e74c3c !important;
+      transform: scale(1.1);
+    }
+
+    .wishlist-icon.bi-heart-fill {
+      color: #e74c3c !important;
+    }
+
     footer {
       background: #232f3e;
       color: #fff;
@@ -2240,6 +2280,15 @@ li a{
                 @if($product->discount > 0)
                   <span class="position-absolute top-0 start-0 badge bg-danger fs-6" style="z-index:2;border-radius:0 0 12px 0;">-{{ (int)($product->discount ?? 0) }}%</span>
                 @endif
+                <!-- Wishlist Heart Button -->
+                @auth
+                <button class="btn btn-link p-1 wishlist-heart-btn" 
+                        data-product-id="{{ $product->id }}" 
+                        title="Add to Wishlist"
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
+                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                </button>
+                @endauth
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
@@ -2291,6 +2340,15 @@ li a{
                 @if($product->discount > 0)
                   <span class="position-absolute top-0 start-0 badge bg-warning text-dark fs-6" style="z-index:2;border-radius:0 0 12px 0;">-{{ (int)($product->discount ?? 0) }}%</span>
                 @endif
+                <!-- Wishlist Heart Button -->
+                @auth
+                <button class="btn btn-link p-1 wishlist-heart-btn" 
+                        data-product-id="{{ $product->id }}" 
+                        title="Add to Wishlist"
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
+                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                </button>
+                @endauth
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
@@ -2334,7 +2392,16 @@ li a{
           <div id="shelf-trend" class="shelf-track">
             @foreach($trending as $product)
             <div class="shelf-item">
-              <div class="card product-card h-100">
+              <div class="card product-card h-100 position-relative">
+                <!-- Wishlist Heart Button -->
+                @auth
+                <button class="btn btn-link p-1 wishlist-heart-btn" 
+                        data-product-id="{{ $product->id }}" 
+                        title="Add to Wishlist"
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
+                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                </button>
+                @endauth
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
@@ -2378,7 +2445,16 @@ li a{
           <div id="shelf-free" class="shelf-track">
             @forelse($freeDelivery as $product)
             <div class="shelf-item">
-              <div class="card product-card h-100">
+              <div class="card product-card h-100 position-relative">
+                <!-- Wishlist Heart Button -->
+                @auth
+                <button class="btn btn-link p-1 wishlist-heart-btn" 
+                        data-product-id="{{ $product->id }}" 
+                        title="Add to Wishlist"
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
+                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                </button>
+                @endauth
                 <img
                   src="{{ $product->image_url }}"
                   class="card-img-top" alt="{{ $product->name }}"
@@ -2763,7 +2839,16 @@ li a{
             <div class="row g-4">
               @foreach($products as $product)
               <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                <div class="card h-100 festive-product-card" style="border: 2px solid rgba(255, 107, 0, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%); box-shadow: 0 8px 25px rgba(255, 107, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.1); transition: all 0.4s ease;">
+                <div class="card h-100 festive-product-card position-relative" style="border: 2px solid rgba(255, 107, 0, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%); box-shadow: 0 8px 25px rgba(255, 107, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.1); transition: all 0.4s ease;">
+                  <!-- Wishlist Heart Button -->
+                  @auth
+                  <button class="btn btn-link p-1 wishlist-heart-btn" 
+                          data-product-id="{{ $product->id }}" 
+                          title="Add to Wishlist"
+                          style="position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
+                      <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                  </button>
+                  @endauth
                   <div style="position: relative; overflow: hidden;">
                     @php
                       $fallbackUrl = 'https://picsum.photos/300/250?grayscale&text=' . urlencode(str_replace(['&', '+'], ['and', 'plus'], $categoryName));
@@ -3483,6 +3568,147 @@ li a{
     });
   </script>
   @endif
+
+  <!-- Wishlist Functionality -->
+  <script>
+    // Setup CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Initialize wishlist hearts
+    function initWishlistHearts() {
+        document.querySelectorAll('.wishlist-heart-btn').forEach(button => {
+            const productId = button.getAttribute('data-product-id');
+            
+            // Check if product is in wishlist
+            checkWishlistStatus(productId, button);
+            
+            // Add click event
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleWishlist(productId, button);
+            });
+        });
+    }
+    
+    // Check wishlist status
+    function checkWishlistStatus(productId, button) {
+        fetch(`/wishlist/check/${productId}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateHeartIcon(button, data.in_wishlist);
+        })
+        .catch(error => console.error('Error checking wishlist status:', error));
+    }
+    
+    // Toggle wishlist
+    function toggleWishlist(productId, button) {
+        fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateHeartIcon(button, data.in_wishlist);
+                
+                // Show success message
+                showWishlistToast(data.message);
+            } else {
+                alert(data.message || 'Failed to update wishlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Please login to add items to wishlist');
+        });
+    }
+    
+    // Update heart icon
+    function updateHeartIcon(button, inWishlist) {
+        const icon = button.querySelector('.wishlist-icon');
+        if (inWishlist) {
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            icon.style.color = '#e74c3c';
+            button.setAttribute('title', 'Remove from Wishlist');
+        } else {
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            icon.style.color = '#ccc';
+            button.setAttribute('title', 'Add to Wishlist');
+        }
+    }
+    
+    // Show toast notification
+    function showWishlistToast(message) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'wishlist-toast';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #FF6B00, #FFD700);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // Add animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initWishlistHearts);
+  </script>
 
 </body>
 </html>
