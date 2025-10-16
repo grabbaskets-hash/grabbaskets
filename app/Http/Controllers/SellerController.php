@@ -6,6 +6,7 @@ use App\Models\Subcategory;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Order;
+use App\Models\User;
 use App\Imports\ProductsImport;
 use App\Services\GitHubImageService;
 use Illuminate\Http\Request;
@@ -307,9 +308,24 @@ class SellerController extends Controller {
     }
     public function storeProducts(\App\Models\Seller $seller)
     {
+        // Get the User ID from the seller's email (products.seller_id references users.id, not sellers.id)
+        $user = User::where('email', $seller->email)->first();
+        
+        if (!$user) {
+            // If no matching user found, return empty products
+            $products = Product::with(['category', 'subcategory'])
+                ->whereNull('id') // Force empty result
+                ->paginate(12);
+            return view('seller.store-products', compact('seller', 'products'));
+        }
+        
+        // Find products by the user ID
         $products = Product::with(['category', 'subcategory'])
-            ->where('seller_id', $seller->id)
-            ->latest()->paginate(12);
+            ->where('seller_id', $user->id)
+            ->whereNotNull('image') // Only show products with images
+            ->latest()
+            ->paginate(12);
+            
         return view('seller.store-products', compact('seller', 'products'));
     }
     public function updateProfile(Request $request)
