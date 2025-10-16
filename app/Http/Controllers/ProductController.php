@@ -12,10 +12,11 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product = Product::with(['category','subcategory'])->findOrFail($id);
+            // Load product with relationships including seller
+            $product = Product::with(['category', 'subcategory', 'seller'])->findOrFail($id);
             
-            // Ensure seller exists, if not use default values
-            $seller = Seller::where('id', $product->seller_id)->first();
+            // Get seller from relationship
+            $seller = $product->seller;
             
             // If seller not found, create a dummy seller object to prevent errors
             if (!$seller) {

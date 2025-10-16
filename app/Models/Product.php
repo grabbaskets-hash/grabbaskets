@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User; // 👈 Add this import
 
 class Product extends Model
 {
@@ -27,10 +26,10 @@ class Product extends Model
         'stock',
     ];
 
-    // ✅ Add this relationship
+    // ✅ Fixed: Now points to Seller model instead of User
     public function seller()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->belongsTo(Seller::class, 'seller_id');
     }
 
     public function category()
