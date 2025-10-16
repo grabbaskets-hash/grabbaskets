@@ -120,7 +120,6 @@ public function search(Request $request)
         $searchQuery = $request->input('q', '');
         
         $query = Product::with(['category', 'subcategory'])
-            ->where('is_active', true)
             ->whereNotNull('image')
             ->where('image', '!=', '')
             ->where('image', 'NOT LIKE', '%unsplash%')
