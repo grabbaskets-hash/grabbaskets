@@ -116,94 +116,114 @@ $blogProducts = Product::whereNotNull('image')
 
 public function search(Request $request)
 {
-    $searchQuery = $request->input('q', '');
-    
-    $query = Product::with(['category', 'subcategory', 'seller'])
-        ->where('is_active', true)
-        ->whereNotNull('image')
-        ->where('image', '!=', '')
-        ->where('image', 'NOT LIKE', '%unsplash%')
-        ->where('image', 'NOT LIKE', '%placeholder%')
-        ->where('image', 'NOT LIKE', '%via.placeholder%');
-
-    if ($request->filled('q')) {
-        $search = trim($searchQuery);
+    try {
+        $searchQuery = $request->input('q', '');
         
-        $query->where(function ($q) use ($search) {
-            // Search in product fields
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%")
-              ->orWhere('brand', 'like', "%{$search}%")
-              ->orWhere('model', 'like', "%{$search}%")
-              ->orWhere('tags', 'like', "%{$search}%")
-              ->orWhere('sku', 'like', "%{$search}%")
-              ->orWhere('unique_id', 'like', "%{$search}%")
-              // Search in category
-              ->orWhereHas('category', function($query) use ($search) {
-                  $query->where('name', 'like', "%{$search}%");
-              })
-              // Search in subcategory
-              ->orWhereHas('subcategory', function($query) use ($search) {
-                  $query->where('name', 'like', "%{$search}%");
-              })
-              // Search in seller/store
-              ->orWhereHas('seller', function($query) use ($search) {
-                  $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('business_name', 'like', "%{$search}%")
-                        ->orWhere('store_name', 'like', "%{$search}%");
-              });
-        });
-    }
+        $query = Product::with(['category', 'subcategory'])
+            ->where('is_active', true)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
 
-    // Add sorting
-    $sort = $request->input('sort', 'relevance');
-    switch ($sort) {
-        case 'price_asc':
-            $query->orderBy('price', 'asc');
-            break;
-        case 'price_desc':
-            $query->orderBy('price', 'desc');
-            break;
-        case 'newest':
-            $query->orderBy('created_at', 'desc');
-            break;
-        case 'popular':
-            $query->orderBy('view_count', 'desc');
-            break;
-        case 'discount':
-            $query->orderBy('discount', 'desc');
-            break;
-        default: // relevance
-            if ($request->filled('q')) {
-                // When searching, prioritize exact matches
-                $query->orderByRaw("CASE 
-                    WHEN name LIKE ? THEN 1
-                    WHEN brand LIKE ? THEN 2
-                    WHEN description LIKE ? THEN 3
-                    ELSE 4
-                END", ["%{$search}%", "%{$search}%", "%{$search}%"])
-                ->orderBy('created_at', 'desc');
-            } else {
-                $query->latest();
-            }
-    }
+        if ($request->filled('q')) {
+            $search = trim($searchQuery);
+            
+            $query->where(function ($q) use ($search) {
+                // Search in product fields
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%")
+                  ->orWhere('model', 'like', "%{$search}%")
+                  ->orWhere('tags', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%")
+                  ->orWhere('unique_id', 'like', "%{$search}%")
+                  // Search in category
+                  ->orWhereHas('category', function($query) use ($search) {
+                      $query->where('name', 'like', "%{$search}%");
+                  })
+                  // Search in subcategory
+                  ->orWhereHas('subcategory', function($query) use ($search) {
+                      $query->where('name', 'like', "%{$search}%");
+                  });
+                  
+                // Search in sellers table (using seller_id to match)
+                $sellerIds = \App\Models\Seller::where('name', 'like', "%{$search}%")
+                    ->orWhere('store_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->pluck('id');
+                    
+                if ($sellerIds->isNotEmpty()) {
+                    $q->orWhereIn('seller_id', $sellerIds);
+                }
+            });
+        }
 
-    $products = $query->paginate(24)->appends($request->query());
-    
-    // Get search statistics
-    $totalResults = $products->total();
-    
-    // Log search query for analytics
-    if ($request->filled('q')) {
-        \Illuminate\Support\Facades\Log::info('Search Query', [
-            'query' => $searchQuery,
-            'results' => $totalResults,
-            'user_id' => auth()->id(),
-            'ip' => $request->ip()
+        // Add sorting
+        $sort = $request->input('sort', 'relevance');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('view_count', 'desc');
+                break;
+            case 'discount':
+                $query->orderBy('discount', 'desc');
+                break;
+            default: // relevance
+                if ($request->filled('q')) {
+                    // When searching, prioritize exact matches
+                    $query->orderByRaw("CASE 
+                        WHEN name LIKE ? THEN 1
+                        WHEN brand LIKE ? THEN 2
+                        WHEN description LIKE ? THEN 3
+                        ELSE 4
+                    END", ["%{$search}%", "%{$search}%", "%{$search}%"])
+                    ->orderBy('created_at', 'desc');
+                } else {
+                    $query->latest();
+                }
+        }
+
+        $products = $query->paginate(24)->appends($request->query());
+        
+        // Get search statistics
+        $totalResults = $products->total();
+        
+        // Log search query for analytics
+        if ($request->filled('q')) {
+            \Illuminate\Support\Facades\Log::info('Search Query', [
+                'query' => $searchQuery,
+                'results' => $totalResults,
+                'user_id' => auth()->id(),
+                'ip' => $request->ip()
+            ]);
+        }
+
+        return view('buyer.products', compact('products', 'searchQuery', 'totalResults'));
+        
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Search Error', [
+            'query' => $request->input('q'),
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return view('buyer.products', [
+            'products' => collect([]),
+            'searchQuery' => $request->input('q', ''),
+            'totalResults' => 0,
+            'error' => 'An error occurred while searching. Please try again.'
         ]);
     }
-
-    return view('buyer.products', compact('products', 'searchQuery', 'totalResults'));
 }
 
 
