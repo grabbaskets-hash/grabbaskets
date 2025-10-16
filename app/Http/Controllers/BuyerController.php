@@ -148,14 +148,17 @@ public function search(Request $request)
                       $query->where('name', 'like', "%{$search}%");
                   });
                   
-                // Search in sellers table (using seller_id to match)
-                $sellerIds = \App\Models\Seller::where('name', 'like', "%{$search}%")
+                // Search in sellers table (match seller emails to user emails, then to product seller_id)
+                $sellerEmails = \App\Models\Seller::where('name', 'like', "%{$search}%")
                     ->orWhere('store_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->pluck('id');
+                    ->pluck('email');
                     
-                if ($sellerIds->isNotEmpty()) {
-                    $q->orWhereIn('seller_id', $sellerIds);
+                if ($sellerEmails->isNotEmpty()) {
+                    // Get user IDs that match these seller emails
+                    $userIds = \App\Models\User::whereIn('email', $sellerEmails)->pluck('id');
+                    if ($userIds->isNotEmpty()) {
+                        $q->orWhereIn('seller_id', $userIds);
+                    }
                 }
             });
         }
