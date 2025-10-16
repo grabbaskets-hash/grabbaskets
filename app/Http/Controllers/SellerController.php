@@ -863,29 +863,45 @@ public function storeCategorySubcategory(Request $request)
     // New method for cloud-compatible image storage
     private function storeProductWithDatabaseImage(Request $request)
     {
-        $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
-        
-        // Create the product first
-        $product = Product::create([
-            'name' => $request->name,
-            'unique_id' => $unique_id,
-            'category_id' => $request->category_id,
-            'subcategory_id' => $request->subcategory_id,
-            'seller_id' => Auth::id(),
-            'description' => $request->description,
-            'price' => $request->price,
-            'discount' => $request->discount ?? 0,
-            'delivery_charge' => $request->delivery_charge ?? 0,
-            'gift_option' => $request->gift_option,
-            'stock' => $request->stock,
-        ]);
-        
-        Log::info('Product created, checking for image', [
-            'product_id' => $product->id,
-            'hasFile' => $request->hasFile('image'),
-            'storage_path' => storage_path('app/public'),
-            'storage_writable' => is_writable(storage_path('app/public'))
-        ]);
+        try {
+            $seller = Auth::user();
+            
+            // Ensure seller_id is valid
+            if (!$seller || !$seller->id) {
+                Log::error('Product creation failed: Invalid seller', [
+                    'auth_id' => Auth::id(),
+                    'seller' => $seller
+                ]);
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Authentication error. Please logout and login again.');
+            }
+            
+            $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
+            
+            // Create the product with all required fields
+            $product = Product::create([
+                'name' => $request->name,
+                'unique_id' => $unique_id,
+                'category_id' => $request->category_id,
+                'subcategory_id' => $request->subcategory_id,
+                'seller_id' => $seller->id, // Use seller object ID
+                'description' => $request->description,
+                'price' => $request->price,
+                'discount' => $request->discount ?? 0,
+                'delivery_charge' => $request->delivery_charge ?? 0,
+                'gift_option' => $request->gift_option,
+                'stock' => $request->stock,
+                'status' => 'active', // Ensure product is active
+                'is_active' => true, // Ensure product is visible
+            ]);
+            
+            Log::info('Product created successfully', [
+                'product_id' => $product->id,
+                'seller_id' => $product->seller_id,
+                'name' => $product->name,
+                'hasFile' => $request->hasFile('image')
+            ]);
         
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -1055,6 +1071,18 @@ public function storeCategorySubcategory(Request $request)
         
         $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
         return redirect()->route('seller.dashboard')->with('success', $successMessage);
+        
+        } catch (\Exception $e) {
+            Log::error('Product creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->except(['image'])
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create product: ' . $e->getMessage());
+        }
     }
 
     public function editProduct(Product $product)
