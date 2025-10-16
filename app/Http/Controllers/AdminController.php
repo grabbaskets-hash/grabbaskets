@@ -197,6 +197,57 @@ class AdminController extends Controller
         }
     }
 
+    // Show products grouped by sellers
+    public function productsBySeller(Request $request)
+    {
+        try {
+            $search = $request->input('search');
+            $selectedSeller = $request->input('seller_id');
+
+            // Get all sellers with product counts using the correct relationship
+            $sellersQuery = User::where('role', 'seller')
+                ->withCount(['products' => function($query) {
+                    $query->whereNotNull('image'); // Only count products with images
+                }]);
+
+            // Apply search filter
+            if ($search) {
+                $sellersQuery->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            $sellers = $sellersQuery->orderBy('products_count', 'desc')->get();
+
+            // Get products for selected seller
+            $products = null;
+            $selectedSellerInfo = null;
+            
+            if ($selectedSeller) {
+                $selectedSellerInfo = User::find($selectedSeller);
+                if ($selectedSellerInfo) {
+                    $products = Product::with(['category', 'subcategory'])
+                        ->where('seller_id', $selectedSeller)
+                        ->whereNotNull('image')
+                        ->latest()
+                        ->paginate(12)
+                        ->appends(['seller_id' => $selectedSeller, 'search' => $search]);
+                }
+            }
+
+            return view('admin.products-by-seller', compact('sellers', 'products', 'selectedSellerInfo', 'search', 'selectedSeller'));
+        } catch (\Throwable $e) {
+            Log::error('Admin products by seller page failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Admin products by seller error');
+        }
+    }
+
     // ✅ Enhanced users() with search, role, and status filters
     public function users(Request $request)
     {

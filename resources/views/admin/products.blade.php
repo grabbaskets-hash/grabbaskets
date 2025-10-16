@@ -142,10 +142,12 @@
         </div>
 
         <ul class="nav nav-pills flex-column">
-            <li><a class="nav-link active" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
+            <li><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
                     Dashboard</a></li>
-            <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
-                    Products</a></li>
+            <li><a class="nav-link active" href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
+                    All Products</a></li>
+            <li><a class="nav-link" href="{{ route('admin.products.bySeller') }}"><i class="bi bi-shop"></i>
+                    Products by Seller</a></li>
             <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
             <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
             <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk

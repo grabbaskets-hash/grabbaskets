@@ -654,6 +654,13 @@ Route::get('/admin/products', function () {
     return app(AdminController::class)->products(request());
 })->name('admin.products');
 
+Route::get('/admin/products-by-seller', function (Request $request) {
+    if (!session('is_admin')) {
+        return redirect()->route('admin.login');
+    }
+    return app(AdminController::class)->productsBySeller($request);
+})->name('admin.products.bySeller');
+
 Route::get('/admin/bulk-product-upload', function () {
     if (!session('is_admin')) {
         return redirect()->route('admin.login');
