@@ -1,113 +1,147 @@
-# Seller Information Display Fix
+# Seller Information Display Fix - UPDATED
 
 ## Issue
-Seller information (store name, address, contact) was not showing to buyers on product detail pages.
+Seller information (store name, address, contact) was not showing to buyers on product detail pages, displaying "Seller information is currently not available for this product" instead.
 
-## Root Cause
-The `Product` model had an incorrect relationship definition:
+## Root Cause Discovery
 
+### Initial Investigation
+The `Product` model had what appeared to be an incorrect relationship:
 ```php
-// ❌ WRONG - Was pointing to User model
-public function seller()
-{
+public function seller() {
     return $this->belongsTo(User::class, 'seller_id');
 }
 ```
 
-However, the application has:
-- A separate `sellers` table with store information (store_name, store_address, store_contact, etc.)
-- The `products.seller_id` column references the `sellers.id`, not `users.id`
+### The Real Problem
+After deeper investigation, discovered the database schema has:
+- **Foreign Key Constraint**: `products.seller_id` → `users.id` (NOT `sellers.id`)
+- **Two Tables**: 
+  - `users` table: Contains authentication data (id, name, email, password, role)
+  - `sellers` table: Contains business data (id, store_name, store_address, store_contact, email)
+- **Different IDs**: Same seller has different IDs in both tables (linked by email)
+
+Example:
+- User ID 13 (`samytheni79@gmail.com`) → Seller ID 3 in sellers table
+- User ID 2 (`swivel.training@gmail.com`) → Seller ID 1 in sellers table
 
 ## Solution
 
-### 1. Fixed Product Model Relationship
+### 1. Keep User Relationship in Product Model
 **File**: `app/Models/Product.php`
 
-Changed the seller relationship to point to the correct model:
-
 ```php
-// ✅ CORRECT - Now points to Seller model
+// Seller relationship - references users table (seller_id references users.id)
 public function seller()
 {
-    return $this->belongsTo(Seller::class, 'seller_id');
+    return $this->belongsTo(User::class, 'seller_id');
+}
+
+// Helper to get seller business info from sellers table
+public function getSellerInfoAttribute()
+{
+    if (!$this->seller) return null;
+    return \App\Models\Seller::where('email', $this->seller->email)->first();
 }
 ```
-
-Also removed the unused `use App\Models\User;` import since it's no longer needed.
 
 ### 2. Updated ProductController
 **File**: `app/Http/Controllers/ProductController.php`
 
-Updated the `show()` method to use eager loading with the seller relationship:
-
 ```php
-// Load product with relationships including seller
-$product = Product::with(['category', 'subcategory', 'seller'])->findOrFail($id);
-
-// Get seller from relationship
-$seller = $product->seller;
+public function show($id)
+{
+    try {
+        // Load product with User relationship
+        $product = Product::with(['category', 'subcategory', 'seller'])->findOrFail($id);
+        
+        // Get seller business info from sellers table via email match
+        $seller = null;
+        if ($product->seller && $product->seller->email) {
+            $seller = Seller::where('email', $product->seller->email)->first();
+        }
+        
+        // Fallback to dummy seller if not found
+        if (!$seller) {
+            $seller = new Seller();
+            $seller->id = 0;
+            $seller->store_name = 'Store Not Available';
+            $seller->store_address = 'N/A';
+            $seller->store_contact = 'N/A';
+        }
+        
+        // ... rest of code
+    }
+}
 ```
 
-This is more efficient than manually querying the Seller model.
+## Why This Approach?
+
+1. **Database Constraint**: Cannot change `products.seller_id` to reference `sellers.id` due to existing foreign key constraint to `users.id`
+2. **Authentication**: Sellers log in using `users` table (role='seller')
+3. **Business Data**: Store details are in `sellers` table
+4. **Link**: Both tables share the same email address
 
 ## Impact
 
 ### Before Fix:
-- Seller information would not display properly
-- Product detail page would show "Store Not Available" even for products with valid sellers
-- Any code using `$product->seller` would get User data instead of Seller data (wrong relationship)
+- ❌ All products showed "Seller information is currently not available"
+- ❌ Store Info tab was empty
+- ❌ "View Store Products" link didn't work
 
 ### After Fix:
 - ✅ Seller store name displays correctly
 - ✅ Seller address displays correctly  
 - ✅ Seller contact information displays correctly
-- ✅ "View Store Products" link works properly
-- ✅ Product relationships are now architecturally correct
+- ✅ "View Store Products" button works properly
+- ✅ Respects database foreign key constraints
 
-## Testing
-
-To verify the fix is working:
-
-1. Visit any product detail page: `https://grabbaskets.laravel.cloud/product/{id}`
-2. Click on the "Store Info" tab
-3. You should now see:
-   - Store Name
-   - Store Address
-   - Store Contact
-   - "View Store Products" button (if seller exists)
-
-## Related Files
-
-- `app/Models/Product.php` - Fixed seller relationship
-- `app/Http/Controllers/ProductController.php` - Updated to use relationship
-- `app/Models/Seller.php` - Seller model (unchanged)
-- `resources/views/buyer/product-details.blade.php` - View that displays seller info (unchanged)
-
-## Database Schema
+## Database Schema Understanding
 
 ```
-products table:
-- seller_id (references sellers.id)
-
-sellers table:
-- id
+users table (authentication):
+- id (primary key)
 - name
+- email
+- password
+- role (buyer/seller/admin)
+
+sellers table (business data):
+- id (primary key, auto-increment)
+- name
+- email (links to users.email)
 - store_name
 - store_address
 - store_contact
-- email
-- phone
 - gst_number
-- etc.
+
+products table:
+- id
+- seller_id → FOREIGN KEY REFERENCES users(id)
+- name
+- price
+- ...
 ```
+
+## Testing
+
+To verify the fix:
+1. Visit any product: `https://grabbaskets.laravel.cloud/product/{id}`
+2. Click "Store Info" tab
+3. Should now display:
+   - Store Name
+   - Store Address
+   - Store Contact
+   - Working "View Store Products" link
 
 ## Commits
 
-1. **Previous commit** (1d101fc9): Fixed search to query sellers table directly
-2. **This commit** (a0e530ee): Fixed Product->Seller relationship to point to correct model
+1. **a0e530ee**: Initial attempt (wrong - tried to change to Seller model)
+2. **c45ef3e7**: Correct fix (Use User relationship + Seller table lookup via email) ✅
 
 ## Notes
 
-- The search functionality was already working correctly because it queries the Seller model directly (fixed in previous commit)
-- This fix ensures ALL product-seller interactions use the correct relationship
-- No database migrations needed - only model relationship correction
+- The dual-table architecture separates authentication from business data
+- Email serves as the bridge between `users` and `sellers` tables
+- Future: Consider adding `user_id` column to `sellers` table for direct relationship
+- Current solution works without requiring database migrations or constraint changes
