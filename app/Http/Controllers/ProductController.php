@@ -21,15 +21,14 @@ class ProductController extends Controller
                 $seller = Seller::where('email', $product->seller->email)->first();
             }
             
-            // If seller not found, create a dummy seller object to prevent errors
+            // If seller not found, set to null (view will handle the fallback message)
             if (!$seller) {
-                $seller = new Seller();
-                $seller->id = 0;
-                $seller->store_name = 'Store Not Available';
-                $seller->store_address = 'N/A';
-                $seller->store_contact = 'N/A';
-                
-                Log::warning("Product {$id} has no valid seller info (seller_id: {$product->seller_id})");
+                $seller = null;
+                Log::warning("Product {$id} has no valid seller info", [
+                    'seller_id' => $product->seller_id,
+                    'user_exists' => $product->seller ? 'yes' : 'no',
+                    'user_email' => $product->seller ? $product->seller->email : 'N/A'
+                ]);
             }
             
             $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();
