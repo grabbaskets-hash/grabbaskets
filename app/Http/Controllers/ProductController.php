@@ -12,11 +12,14 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            // Load product with relationships including seller
+            // Load product with relationships including seller (User)
             $product = Product::with(['category', 'subcategory', 'seller'])->findOrFail($id);
             
-            // Get seller from relationship
-            $seller = $product->seller;
+            // Get seller info from sellers table via email match
+            $seller = null;
+            if ($product->seller && $product->seller->email) {
+                $seller = Seller::where('email', $product->seller->email)->first();
+            }
             
             // If seller not found, create a dummy seller object to prevent errors
             if (!$seller) {
@@ -26,7 +29,7 @@ class ProductController extends Controller
                 $seller->store_address = 'N/A';
                 $seller->store_contact = 'N/A';
                 
-                Log::warning("Product {$id} has no valid seller (seller_id: {$product->seller_id})");
+                Log::warning("Product {$id} has no valid seller info (seller_id: {$product->seller_id})");
             }
             
             $reviews = Review::where('product_id', $product->id)->with('user')->latest()->get();

@@ -26,10 +26,17 @@ class Product extends Model
         'stock',
     ];
 
-    // ✅ Fixed: Now points to Seller model instead of User
+    // Seller relationship - references users table (seller_id references users.id)
     public function seller()
     {
-        return $this->belongsTo(Seller::class, 'seller_id');
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+    
+    // Get seller info from sellers table via email match
+    public function getSellerInfoAttribute()
+    {
+        if (!$this->seller) return null;
+        return \App\Models\Seller::where('email', $this->seller->email)->first();
     }
 
     public function category()
