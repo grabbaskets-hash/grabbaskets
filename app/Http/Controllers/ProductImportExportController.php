@@ -615,134 +615,166 @@ class ProductImportExportController extends Controller
     /**
      * Intelligent header detection and mapping
      * Supports various header formats from different sellers
+     * Enhanced to match ANY reasonable variation of headers
      */
     private function detectHeaderMapping($headerRow)
     {
         $map = [];
 
         foreach ($headerRow as $index => $header) {
+            // Clean and normalize header
             $header = strtolower(trim($header));
+            $header = preg_replace('/[^a-z0-9\s]/', '', $header); // Remove special chars
+            $header = preg_replace('/\s+/', ' ', $header); // Normalize spaces
             
-            // Product ID variations
-            if (preg_match('/product.*id|id|sku|item.*code|product.*code/', $header)) {
-                $map['unique_id'] = $index;
+            // Product ID variations (most comprehensive)
+            if (!isset($map['unique_id']) && preg_match('/\b(product.*id|productid|prod.*id|item.*id|itemid|id|unique.*id|code|sku|item.*code|product.*code|article.*code|artikel|item.*no|product.*no|item.*number|product.*number)\b/', $header)) {
+                // Avoid matching "original price" as ID
+                if (!preg_match('/price|original|discount/', $header)) {
+                    $map['unique_id'] = $index;
+                }
             }
             
-            // Product Name variations
-            if (preg_match('/product.*name|name|title|item.*name|product/', $header) && !isset($map['name'])) {
-                $map['name'] = $index;
+            // Product Name variations (most comprehensive)
+            if (!isset($map['name']) && preg_match('/\b(product.*name|productname|prod.*name|item.*name|itemname|^name$|title|product.*title|item.*title|artikel.*name|bezeichnung|description.*short)\b/', $header)) {
+                // Avoid matching meta title or long description
+                if (!preg_match('/meta|seo|long|full|category|sub/', $header)) {
+                    $map['name'] = $index;
+                }
             }
             
-            // Description
-            if (preg_match('/description|desc|details|about/', $header)) {
+            // Description variations
+            if (!isset($map['description']) && preg_match('/\b(description|desc|detail|details|about|product.*desc|item.*desc|long.*desc|full.*desc|info|information|beschreibung)\b/', $header)) {
                 $map['description'] = $index;
             }
             
-            // Category
-            if (preg_match('/category|cat|product.*category/', $header) && !preg_match('/sub/', $header)) {
-                $map['category'] = $index;
+            // Category variations
+            if (!isset($map['category']) && preg_match('/\b(category|cat|kategorie|product.*category|item.*category|main.*category|parent.*category|group|product.*group)\b/', $header)) {
+                if (!preg_match('/sub|child/', $header)) {
+                    $map['category'] = $index;
+                }
             }
             
-            // Subcategory
-            if (preg_match('/subcategory|sub.*category|sub.*cat/', $header)) {
+            // Subcategory variations
+            if (!isset($map['subcategory']) && preg_match('/\b(subcategory|sub.*category|subcat|sub.*cat|child.*category|unterkategorie|secondary.*category)\b/', $header)) {
                 $map['subcategory'] = $index;
             }
             
-            // Price
-            if (preg_match('/^price|selling.*price|sale.*price|mrp/', $header) && !preg_match('/original|old/', $header)) {
-                $map['price'] = $index;
+            // Price variations (selling/current price)
+            if (!isset($map['price']) && preg_match('/\b(^price$|selling.*price|sale.*price|current.*price|mrp|retail.*price|unit.*price|preis|verkaufspreis|final.*price|actual.*price)\b/', $header)) {
+                if (!preg_match('/original|old|list|regular|compare|before/', $header)) {
+                    $map['price'] = $index;
+                }
             }
             
-            // Original Price
-            if (preg_match('/original.*price|old.*price|list.*price|regular.*price/', $header)) {
+            // Original Price variations
+            if (!isset($map['original_price']) && preg_match('/\b(original.*price|old.*price|list.*price|regular.*price|compare.*price|before.*price|was.*price|msrp|ursprungspreis|uvp)\b/', $header)) {
                 $map['original_price'] = $index;
             }
             
-            // Discount
-            if (preg_match('/discount|off/', $header)) {
+            // Discount variations
+            if (!isset($map['discount']) && preg_match('/\b(discount|off|rabatt|savings|sale|reduction|prozent|percent|%)\b/', $header)) {
                 $map['discount'] = $index;
             }
             
-            // Stock
-            if (preg_match('/stock|quantity|qty|inventory|available/', $header)) {
+            // Stock variations
+            if (!isset($map['stock']) && preg_match('/\b(stock|quantity|qty|inventory|available|availability|units|lager|bestand|vorrat|on.*hand|in.*stock)\b/', $header)) {
                 $map['stock'] = $index;
             }
             
-            // SKU
-            if (preg_match('/^sku|item.*code/', $header)) {
+            // SKU variations
+            if (!isset($map['sku']) && preg_match('/\b(^sku$|sku.*code|stock.*keeping|article.*number|art.*nr|artikelnummer)\b/', $header)) {
                 $map['sku'] = $index;
             }
             
-            // Barcode
-            if (preg_match('/barcode|ean|upc|isbn/', $header)) {
+            // Barcode variations
+            if (!isset($map['barcode']) && preg_match('/\b(barcode|bar.*code|ean|upc|isbn|gtin|jan|strichcode)\b/', $header)) {
                 $map['barcode'] = $index;
             }
             
-            // Weight
-            if (preg_match('/weight|wt/', $header)) {
+            // Weight variations
+            if (!isset($map['weight']) && preg_match('/\b(weight|wt|gewicht|mass|kg|grams?|pounds?|lbs?)\b/', $header)) {
                 $map['weight'] = $index;
             }
             
-            // Dimensions
-            if (preg_match('/dimension|size.*cm|measurements/', $header)) {
+            // Dimensions variations
+            if (!isset($map['dimensions']) && preg_match('/\b(dimension|dimensions|size.*cm|measurements|abmessungen|masse|length.*width.*height|lxwxh|lwh)\b/', $header)) {
                 $map['dimensions'] = $index;
             }
             
-            // Brand
-            if (preg_match('/brand|manufacturer|make/', $header)) {
+            // Brand variations
+            if (!isset($map['brand']) && preg_match('/\b(brand|manufacturer|make|maker|marke|hersteller|company|vendor)\b/', $header)) {
                 $map['brand'] = $index;
             }
             
-            // Model
-            if (preg_match('/model|model.*no/', $header)) {
+            // Model variations
+            if (!isset($map['model']) && preg_match('/\b(model|model.*no|model.*number|modell|version|variant)\b/', $header)) {
                 $map['model'] = $index;
             }
             
-            // Color
-            if (preg_match('/color|colour/', $header)) {
+            // Color variations
+            if (!isset($map['color']) && preg_match('/\b(colou?r|color|colour|farbe|shade|tint)\b/', $header)) {
                 $map['color'] = $index;
             }
             
-            // Size
-            if (preg_match('/^size|product.*size/', $header) && !preg_match('/dimension/', $header)) {
-                $map['size'] = $index;
+            // Size variations
+            if (!isset($map['size']) && preg_match('/\b(^size$|product.*size|item.*size|grosse|groesse)\b/', $header)) {
+                if (!preg_match('/dimension|file|page/', $header)) {
+                    $map['size'] = $index;
+                }
             }
             
-            // Material
-            if (preg_match('/material|fabric|composition/', $header)) {
+            // Material variations
+            if (!isset($map['material']) && preg_match('/\b(material|fabric|composition|made.*of|stoff|gewebe|textile)\b/', $header)) {
                 $map['material'] = $index;
             }
             
-            // Status
-            if (preg_match('/status|active|enabled/', $header)) {
+            // Status variations
+            if (!isset($map['status']) && preg_match('/\b(status|state|active|enabled|published|visibility|sichtbar)\b/', $header)) {
                 $map['status'] = $index;
             }
             
-            // Featured
-            if (preg_match('/featured|highlight|special/', $header)) {
+            // Featured variations
+            if (!isset($map['featured']) && preg_match('/\b(featured|highlight|special|spotlight|promoted|hervorgehoben|top.*product)\b/', $header)) {
                 $map['featured'] = $index;
             }
             
-            // Tags
-            if (preg_match('/tags|keywords/', $header)) {
+            // Tags variations
+            if (!isset($map['tags']) && preg_match('/\b(tags|keywords|labels|schlagworter|search.*terms)\b/', $header)) {
                 $map['tags'] = $index;
             }
             
-            // Meta Title
-            if (preg_match('/meta.*title|seo.*title/', $header)) {
+            // Meta Title variations
+            if (!isset($map['meta_title']) && preg_match('/\b(meta.*title|seo.*title|page.*title|html.*title)\b/', $header)) {
                 $map['meta_title'] = $index;
             }
             
-            // Meta Description
-            if (preg_match('/meta.*desc|seo.*desc/', $header)) {
+            // Meta Description variations
+            if (!isset($map['meta_description']) && preg_match('/\b(meta.*desc|meta.*description|seo.*desc|seo.*description|page.*desc)\b/', $header)) {
                 $map['meta_description'] = $index;
             }
             
-            // Image URL
-            if (preg_match('/image|photo|picture|img/', $header)) {
+            // Image URL variations
+            if (!isset($map['image']) && preg_match('/\b(image|photo|picture|img|pic|bild|foto|thumbnail|main.*image|product.*image|image.*url|photo.*url|picture.*url)\b/', $header)) {
                 $map['image'] = $index;
             }
+            
+            // Delivery Charge variations
+            if (!isset($map['delivery_charge']) && preg_match('/\b(delivery.*charge|delivery.*cost|shipping.*cost|shipping.*charge|shipping.*fee|delivery.*fee|versandkosten)\b/', $header)) {
+                $map['delivery_charge'] = $index;
+            }
+            
+            // Gift Option variations
+            if (!isset($map['gift_option']) && preg_match('/\b(gift.*option|gift.*wrap|gift.*available|geschenkverpackung)\b/', $header)) {
+                $map['gift_option'] = $index;
+            }
         }
+
+        // Log detected mappings for debugging
+        Log::info('Header mapping detected', [
+            'original_headers' => $headerRow,
+            'detected_mappings' => $map
+        ]);
 
         return $map;
     }
