@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
 use App\Models\Blog;
+use App\Models\Seller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class BuyerController extends Controller
@@ -130,13 +132,9 @@ public function search(Request $request)
             $search = trim($searchQuery);
             
             $query->where(function ($q) use ($search) {
-                // Search in product fields
+                // Search in product fields that actually exist in database
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('brand', 'like', "%{$search}%")
-                  ->orWhere('model', 'like', "%{$search}%")
-                  ->orWhere('tags', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
                   ->orWhere('unique_id', 'like', "%{$search}%")
                   // Search in category
                   ->orWhereHas('category', function($query) use ($search) {
@@ -148,13 +146,13 @@ public function search(Request $request)
                   });
                   
                 // Search in sellers table (match seller emails to user emails, then to product seller_id)
-                $sellerEmails = \App\Models\Seller::where('name', 'like', "%{$search}%")
+                $sellerEmails = Seller::where('name', 'like', "%{$search}%")
                     ->orWhere('store_name', 'like', "%{$search}%")
                     ->pluck('email');
                     
                 if ($sellerEmails->isNotEmpty()) {
                     // Get user IDs that match these seller emails
-                    $userIds = \App\Models\User::whereIn('email', $sellerEmails)->pluck('id');
+                    $userIds = User::whereIn('email', $sellerEmails)->pluck('id');
                     if ($userIds->isNotEmpty()) {
                         $q->orWhereIn('seller_id', $userIds);
                     }
@@ -182,13 +180,12 @@ public function search(Request $request)
                 break;
             default: // relevance
                 if ($request->filled('q')) {
-                    // When searching, prioritize exact matches
+                    // When searching, prioritize exact matches in existing columns
                     $query->orderByRaw("CASE 
                         WHEN name LIKE ? THEN 1
-                        WHEN brand LIKE ? THEN 2
-                        WHEN description LIKE ? THEN 3
-                        ELSE 4
-                    END", ["%{$search}%", "%{$search}%", "%{$search}%"])
+                        WHEN description LIKE ? THEN 2
+                        ELSE 3
+                    END", ["%{$search}%", "%{$search}%"])
                     ->orderBy('created_at', 'desc');
                 } else {
                     $query->latest();
