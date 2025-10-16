@@ -190,10 +190,10 @@
             <a href="{{ route('admin.banners.index') }}" class="nav-link">
                 <i class="bi bi-images"></i> Banner Management
             </a>
-            <a href="{{ route('admin.index-editor') }}" class="nav-link">
+            <a href="{{ route('admin.index-editor.index') }}" class="nav-link">
                 <i class="bi bi-pencil-square"></i> Index Editor
             </a>
-            <a href="{{ route('admin.category-emojis') }}" class="nav-link">
+            <a href="{{ route('admin.category-emojis.index') }}" class="nav-link">
                 <i class="bi bi-emoji-smile"></i> Category Emojis
             </a>
             <a href="{{ route('admin.logout') }}" class="nav-link text-danger">
