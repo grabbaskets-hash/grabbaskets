@@ -163,16 +163,6 @@
                                 <small class="d-block mt-1 opacity-75">Table format, no images</small>
                             </button>
                         </form>
-
-                        <!-- Export to PDF with Images -->
-                        <form action="{{ route('seller.products.export.pdfWithImages') }}" method="POST" class="export-form">
-                            @csrf
-                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                <i class="fas fa-file-image me-2"></i>
-                                Export Catalog PDF with Images
-                                <small class="d-block mt-1 opacity-75">Professional catalog with photos, organized by category</small>
-                            </button>
-                        </form>
                     </div>
 
                     <div class="mt-4">
