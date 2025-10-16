@@ -336,6 +336,31 @@
             <!-- Product Listing -->
             <div class="col-lg-9">
 
+                <!-- Search Results Header -->
+                @if(request('search'))
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
+                        <div>
+                            <h4 class="fw-bold mb-1">
+                                <i class="bi bi-search"></i> Search Results
+                            </h4>
+                            <p class="text-muted mb-0">
+                                Found <strong>{{ $products->total() }}</strong> result{{ $products->total() !== 1 ? 's' : '' }} for "<strong>{{ request('search') }}</strong>"
+                            </p>
+                        </div>
+                        <div>
+                            <select class="form-select" onchange="window.location.href = this.value;">
+                                <option value="">Sort by Relevance</option>
+                                <option value="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                                <option value="{{ request()->fullUrlWithQuery(['sort' => 'discount']) }}" {{ request('sort') === 'discount' ? 'selected' : '' }}>Highest Discount</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Gender-Based Product Suggestions -->
                 @php
                     $user = Auth::user();

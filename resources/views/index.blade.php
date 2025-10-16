@@ -1769,7 +1769,7 @@ li a{
       <div class="collapse navbar-collapse" id="navbarNav">
         <!-- Desktop Search -->
         <form action="{{ route('products.index') }}" method="GET" class="d-none d-lg-flex search-form mx-auto">
-          <input type="text" name="q" placeholder="🔍 Search for products..." class="form-control"
+          <input type="text" name="q" placeholder="🔍 Search products, brands, stores..." class="form-control"
             value="{{ request('q') }}" />
           <button class="btn" type="submit">
             <i class="bi bi-search me-1"></i> Search
@@ -1911,7 +1911,7 @@ li a{
       <!-- Mobile Search Bar -->
       <div class="collapse w-100 mt-2 d-lg-none" id="mobileSearch">
         <form action="{{ route('products.index') }}" method="GET" class="search-form">
-          <input type="text" name="q" placeholder="🔍 Search for products..." class="form-control"
+          <input type="text" name="q" placeholder="🔍 Search products, brands, stores..." class="form-control"
             value="{{ request('q') }}" />
           <button class="btn" type="submit">
             <i class="bi bi-search"></i>
