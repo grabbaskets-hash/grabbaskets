@@ -284,7 +284,11 @@
     <div class="d-flex align-items-center gap-2">
 
       <!-- Hello User -->
+      @auth
       <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
+      @else
+      <span class="d-none d-lg-inline" style="color:beige;">Hello, Guest</span>
+      @endauth
 
       <!-- My Account Dropdown -->
       <div class="dropdown">
@@ -293,11 +297,19 @@
           <i class="bi bi-person-circle"></i> My Account
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
+          @auth
           <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
           <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
           <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
           <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
           <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
+          @else
+          <li><a class="dropdown-item" href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+          <li><a class="dropdown-item" href="{{ route('register') }}"><i class="bi bi-person-plus"></i> Register</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Browse Products</a></li>
+          <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
+          @endauth
         </ul>
       </div>
 
@@ -392,6 +404,7 @@
         </div>
 
         <!-- Add to Cart -->
+        @auth
         <form method="POST" action="{{ route('cart.add') }}">
           @csrf
           <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -415,6 +428,23 @@
             Wishlist
           </button>
         </form>
+        @else
+        <!-- Guest User - Show Login Prompts -->
+        <div class="d-flex align-items-center mb-3">
+          <button type="button" class="btn btn-dark rounded-circle" disabled>-</button>
+          <input type="number" value="1" min="1" class="form-control mx-2 text-center rounded-pill" style="max-width:80px;" disabled>
+          <button type="button" class="btn btn-dark rounded-circle" disabled>+</button>
+        </div>
+
+        <div class="d-flex gap-2">
+          <a href="{{ route('login') }}" class="btn btn-gold flex-fill">
+            <i class="bi bi-cart-fill"></i> Login to Add to Cart
+          </a>
+          <a href="{{ route('login') }}" class="btn btn-outline-dark flex-fill">
+            <i class="bi bi-heart"></i> Login to Wishlist
+          </a>
+        </div>
+        @endauth
       </div>
 
     </div>

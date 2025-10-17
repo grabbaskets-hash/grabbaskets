@@ -550,11 +550,6 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
 
     // Chatbot
     Route::post('/chatbot/support', [SupportController::class, 'chatbotSupport'])->name('chatbot.support');
-
-    // Buyer dashboard & browsing
-    Route::get('/buyer/dashboard', [BuyerController::class, 'index'])->name('buyer.dashboard');
-    Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
-    Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
     
     // Courier Tracking (Authenticated users)
     Route::get('/tracking/order/{order}', [CourierTrackingController::class, 'trackOrder'])->name('tracking.order');
@@ -565,13 +560,19 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
 Route::post('/otp/send', [OtpController::class, 'send'])->name('otp.send');
 Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify');
 
-// Product details & reviews
+// ===== PUBLIC BUYER ROUTES (Guest + Authenticated users can access) =====
+// Buyer dashboard & browsing - Anyone can view products
+Route::get('/buyer/dashboard', [BuyerController::class, 'index'])->name('buyer.dashboard');
+Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
+Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
+
+// Product details & reviews - Anyone can view
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
 Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Public product search
+// Public product search - Anyone can search
 Route::get('/products', [BuyerController::class, 'search'])->name('products.index');
 
 // Courier Tracking (Public access)
