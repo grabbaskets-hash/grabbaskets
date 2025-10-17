@@ -17,113 +17,128 @@
   @endif
   <!-- Festive Diwali Theme -->
   <style>
-    /* Trending Section - Ultra Modern Design */
-    .trending-section-modern {
+    /* Trending Section - Sleek Dark Neon Design */
+    .trending-neon-section {
       position: relative;
-      min-height: 600px;
+      min-height: 700px;
     }
 
-    .trending-bg-pattern {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
-      animation: pattern-float 20s ease-in-out infinite;
+    @keyframes float-particle {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+      50% { transform: translateY(-30px) translateX(20px); opacity: 1; }
     }
 
-    @keyframes pattern-float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(2deg); }
+    @keyframes neon-pulse {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);
+        border-color: #00ffff;
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.8), inset 0 0 30px rgba(0, 255, 255, 0.2);
+        border-color: #00dddd;
+      }
     }
 
-    @keyframes pulse-fire {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .trending-card-modern {
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    @keyframes rank-glow {
+      0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.8); }
+      50% { box-shadow: 0 0 50px rgba(0, 255, 255, 0.8); }
     }
 
-    .trending-card-modern:hover {
-      transform: translateY(-10px);
+    @keyframes discount-blink {
+      0%, 100% { opacity: 1; box-shadow: 0 0 25px rgba(0, 255, 0, 0.6); }
+      50% { opacity: 0.7; box-shadow: 0 0 40px rgba(0, 255, 0, 0.9); }
     }
 
-    .trending-card-modern .card {
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+
+    .neon-card {
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .trending-card-modern:hover .card {
-      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3) !important;
-      transform: scale(1.02);
+    .neon-card:hover {
+      transform: translateY(-15px) scale(1.02);
     }
 
-    .trending-img-zoom {
-      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .neon-card:hover .card {
+      box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.3) !important;
+      border-color: rgba(0, 255, 255, 0.5) !important;
     }
 
-    .trending-card-modern:hover .trending-img-zoom {
+    .neon-card:hover .neon-product-img {
       transform: scale(1.15);
+      filter: brightness(1.1);
     }
 
-    .trending-hover-overlay {
-      transition: opacity 0.4s ease;
-    }
-
-    .trending-card-modern:hover .trending-hover-overlay {
+    .neon-card:hover .neon-overlay {
       opacity: 1 !important;
     }
 
-    .trending-wishlist-btn {
-      transition: all 0.3s ease;
+    .neon-wishlist:hover {
+      background: rgba(255, 0, 255, 0.4) !important;
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.8) !important;
     }
 
-    .trending-wishlist-btn:hover {
-      transform: scale(1.15);
-      box-shadow: 0 6px 25px rgba(233, 30, 99, 0.4) !important;
-    }
-
-    .trending-rank-badge {
-      animation: badge-glow 2s ease-in-out infinite;
-    }
-
-    @keyframes badge-glow {
-      0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
-      50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7); }
-    }
-
-    .discount-explosion {
-      animation: discount-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes discount-pop {
-      0% { transform: scale(0) rotate(-5deg); opacity: 0; }
-      60% { transform: scale(1.2) rotate(-5deg); }
-      100% { transform: scale(1) rotate(-5deg); opacity: 1; }
-    }
-
-    .trending-card-modern .btn:hover {
+    .neon-btn-primary:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(255, 0, 255, 0.4)) !important;
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.6) !important;
+    }
+
+    .neon-btn-secondary:hover {
+      background: rgba(255, 0, 255, 0.4) !important;
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.6) !important;
+    }
+
+    .neon-btn-cta:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(255, 0, 255, 0.4)) !important;
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 0 60px rgba(0, 255, 255, 0.8), 0 0 80px rgba(255, 0, 255, 0.6) !important;
+    }
+
+    .slider-nav:hover {
+      background: rgba(0, 255, 255, 0.3) !important;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.6) !important;
+    }
+
+    .dropdown-menu {
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown-item:hover {
+      background: rgba(0, 255, 255, 0.1) !important;
+    }
+
+    @media (max-width: 1200px) {
+      .slider-nav {
+        display: none !important;
+      }
     }
 
     @media (max-width: 768px) {
-      .trending-section-modern h2 {
+      .trending-neon-section h2 {
         font-size: 2rem !important;
       }
       
-      .trending-rank-badge {
-        font-size: 0.75rem !important;
-        padding: 6px 12px !important;
+      .neon-img-container {
+        height: 240px !important;
       }
-      
-      .trending-img-wrapper {
-        height: 220px !important;
+
+      .rank-neon {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1rem !important;
       }
     }
     /* 🪔 Diwali Festive Theme Colors */
@@ -3369,8 +3384,8 @@ li a{
           🪔 Featured Products 🪔
         </h2>
         <div style="width: 100px; height: 4px; background: linear-gradient(90deg, transparent, #FF6B00, #FFD700, #FF6B00, transparent); margin: 0 auto 20px; border-radius: 2px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"></div>
-        <p class="text-muted mb-2" style="color: #FF4444 !important; font-size: 1.1rem;">✨ Handpicked items from our best categories ✨</p>
-        <p class="text-muted" style="color: #FF6B00 !important; font-size: 0.95rem;">🎁 Special festive deals on trending products! 🎁</p>
+        <p class="text-muted mb-2" style="color: #ff44441b !important; font-size: 1.1rem;">✨ Handpicked items from our best categories ✨</p>
+        <p class="text-muted" style="color: #eacebaff !important; font-size: 0.95rem;">🎁 Special festive deals on trending products! 🎁</p>
       </div>
       @if(isset($categoryProducts) && !empty($categoryProducts))
         @foreach($categoryProducts as $categoryName => $products)
@@ -3506,171 +3521,201 @@ li a{
     </div>
   </section>
 
-  <!-- Trending Now Section - Ultra Modern Design -->
-  <section class="trending-section-modern position-relative py-5 my-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); overflow: hidden;">
-    <!-- Animated Background Pattern -->
-    <div class="trending-bg-pattern"></div>
+  <!-- Trending Now Section - Sleek Dark Neon Design -->
+  <section class="trending-neon-section position-relative py-5 my-5" style="background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%); overflow: hidden;">
+    <!-- Neon Grid Background -->
+    <div class="neon-grid-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0, 255, 255, 0.03) 50px, rgba(0, 255, 255, 0.03) 51px),
+      repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255, 0, 255, 0.03) 50px, rgba(255, 0, 255, 0.03) 51px);
+      opacity: 0.4;"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;">
+      <div class="particle" style="position: absolute; width: 4px; height: 4px; background: #00ffff; border-radius: 50%; top: 20%; left: 10%; animation: float-particle 6s infinite;"></div>
+      <div class="particle" style="position: absolute; width: 3px; height: 3px; background: #ff00ff; border-radius: 50%; top: 60%; left: 80%; animation: float-particle 8s infinite 2s;"></div>
+      <div class="particle" style="position: absolute; width: 5px; height: 5px; background: #00ff00; border-radius: 50%; top: 40%; left: 50%; animation: float-particle 7s infinite 1s;"></div>
+    </div>
     
     <div class="container position-relative" style="z-index: 2;">
       <!-- Section Header -->
-      <div class="text-center mb-5" data-aos="fade-up">
-        <div class="d-inline-flex align-items-center gap-3 mb-3 px-4 py-2" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50px; border: 2px solid rgba(255,255,255,0.3);">
-          <span class="trending-fire-icon" style="font-size: 1.8rem; animation: pulse-fire 1.5s ease-in-out infinite;">🔥</span>
-          <span class="fw-bold text-white" style="font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase;">Trending Now</span>
-          <span class="trending-fire-icon" style="font-size: 1.8rem; animation: pulse-fire 1.5s ease-in-out infinite; animation-delay: 0.3s;">🔥</span>
+      <div class="text-center mb-5">
+        <!-- Neon Title -->
+        <div class="mb-4">
+          <span class="neon-badge d-inline-block px-4 py-2 mb-3" style="background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; border-radius: 30px; color: #00ffff; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 0.9rem; box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1); animation: neon-pulse 2s ease-in-out infinite;">
+            <i class="bi bi-lightning-charge-fill me-2"></i>TRENDING NOW<i class="bi bi-lightning-charge-fill ms-2"></i>
+          </span>
         </div>
-        <h2 class="display-3 fw-bold text-white mb-3" style="text-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: clamp(2rem, 5vw, 3.5rem);">
-          What's Hot Right Now
+        
+        <h2 class="neon-title mb-3" style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 30px rgba(0, 255, 255, 0.5); filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.5)); animation: gradient-shift 3s ease infinite; background-size: 200% 200%;">
+          🔥 HOTTEST PICKS 🔥
         </h2>
-        <p class="lead text-white mb-0" style="opacity: 0.95; font-size: 1.2rem;">
-          ⚡ The most loved products flying off our shelves ⚡
+        
+        <p class="lead mb-0" style="color: #a0a0ff; font-size: 1.1rem; font-weight: 500;">
+          ⚡ Products everyone is buying right now ⚡
         </p>
       </div>
 
-      <!-- Products Grid -->
-      <div class="row g-4">
-        @foreach($trending as $product)
-          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-            <div class="trending-card-modern position-relative">
-              <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none d-block h-100">
-                <div class="card border-0 h-100 shadow-lg" style="border-radius: 20px; overflow: hidden; background: white; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-                  
-                  <!-- Trending Badge -->
-                  <div class="trending-rank-badge" style="position: absolute; top: 15px; left: 15px; z-index: 10; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); border: 2px solid rgba(255,255,255,0.5);">
-                    <i class="bi bi-lightning-charge-fill"></i> #{{ $loop->iteration }}
-                  </div>
+      <!-- Products Slider -->
+      <div class="trending-slider-wrapper position-relative">
+        <!-- Previous Button -->
+        <button class="slider-nav slider-prev" onclick="slideTrending(-1)" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+          <i class="bi bi-chevron-left" style="font-size: 1.5rem;"></i>
+        </button>
 
-                  <!-- Wishlist Button -->
-                  @auth
-                  <button class="btn btn-light wishlist-heart-btn trending-wishlist-btn" 
-                          data-product-id="{{ $product->id }}"
-                          title="Add to wishlist"
-                          onclick="event.preventDefault(); event.stopPropagation();"
-                          style="position: absolute; top: 15px; right: 15px; z-index: 10; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.8);">
-                    <i class="bi bi-heart wishlist-icon" style="font-size: 1.2rem; color: #e91e63;"></i>
-                  </button>
-                  @endauth
-
-                  <!-- Discount Badge -->
-                  @if($product->discount > 0)
-                    <div class="discount-explosion" style="position: absolute; top: 15px; right: 70px; z-index: 10; background: linear-gradient(135deg, #ff3366, #ff6b6b); color: white; padding: 10px 15px; border-radius: 15px; font-weight: 900; font-size: 0.95rem; box-shadow: 0 6px 20px rgba(255, 51, 102, 0.5); transform: rotate(-5deg); border: 3px solid white;">
-                      <span style="display: block; line-height: 1;">-{{ $product->discount }}%</span>
-                    </div>
-                  @endif
-
-                  <!-- Product Image -->
-                  <div class="trending-img-wrapper position-relative" style="overflow: hidden; height: 280px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
-                    <img src="{{ $product->image_url }}"
-                         alt="{{ $product->name }}"
-                         class="trending-img-zoom w-100 h-100"
-                         loading="lazy"
-                         data-fallback="{{ asset('images/no-image.png') }}"
-                         onerror="this.onerror=null; this.src=this.dataset.fallback;"
-                         style="object-fit: cover; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <!-- Products Grid -->
+        <div class="row g-4" id="trendingGrid">
+          @foreach($trending as $product)
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 trending-item">
+              <div class="neon-card position-relative h-100" style="transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none d-block h-100">
+                  <div class="card border-0 h-100" style="background: linear-gradient(145deg, #1a1a3e, #0f0f23); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 255, 255, 0.2);">
                     
-                    <!-- Hover Overlay -->
-                    <div class="trending-hover-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)); opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center;">
-                      <div class="text-center text-white">
-                        <i class="bi bi-eye-fill" style="font-size: 3rem; margin-bottom: 10px; display: block;"></i>
-                        <span class="fw-bold" style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Quick View</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Card Body -->
-                  <div class="card-body p-4">
-                    <!-- Product Title -->
-                    <h6 class="trending-title fw-bold mb-2" style="color: #2d3748; font-size: 1rem; line-height: 1.4; min-height: 42px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                      {{ $product->name }}
-                    </h6>
-
-                    <!-- Rating -->
-                    <div class="d-flex align-items-center mb-3">
-                      @php 
-                        $stars = rand(4, 5);
-                        $reviews = rand(50, 300);
-                      @endphp
-                      <div class="trending-stars me-2">
-                        @for($i = 1; $i <= 5; $i++)
-                          <i class="bi bi-star-fill" style="font-size: 0.85rem; color: {{ $i <= $stars ? '#FFD700' : '#e0e0e0' }};"></i>
-                        @endfor
-                      </div>
-                      <small class="text-muted fw-semibold">({{ $reviews }})</small>
+                    <!-- Rank Badge -->
+                    <div class="rank-neon" style="position: absolute; top: 15px; left: 15px; z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #ff00ff, #00ffff); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; color: #000; box-shadow: 0 0 30px rgba(255, 0, 255, 0.8); animation: rank-glow 2s ease-in-out infinite;">
+                      {{ $loop->iteration }}
                     </div>
 
-                    <!-- Price Section -->
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                      <div>
+                    <!-- Wishlist -->
+                    @auth
+                    <button class="btn wishlist-heart-btn neon-wishlist" 
+                            data-product-id="{{ $product->id }}"
+                            onclick="event.preventDefault(); event.stopPropagation();"
+                            style="position: absolute; top: 15px; right: 15px; z-index: 10; width: 45px; height: 45px; border-radius: 50%; background: rgba(255, 0, 255, 0.2); border: 2px solid #ff00ff; color: #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);">
+                      <i class="bi bi-heart-fill wishlist-icon" style="font-size: 1.1rem;"></i>
+                    </button>
+                    @endauth
+
+                    <!-- Discount Neon -->
+                    @if($product->discount > 0)
+                      <div class="discount-neon" style="position: absolute; top: 75px; left: 15px; z-index: 10; background: rgba(0, 255, 0, 0.2); border: 2px solid #00ff00; padding: 8px 16px; border-radius: 20px; color: #00ff00; font-weight: 900; font-size: 0.95rem; box-shadow: 0 0 25px rgba(0, 255, 0, 0.6); animation: discount-blink 1.5s ease-in-out infinite;">
+                        -{{ $product->discount }}%
+                      </div>
+                    @endif
+
+                    <!-- Product Image -->
+                    <div class="neon-img-container position-relative" style="height: 300px; overflow: hidden; border-bottom: 2px solid rgba(0, 255, 255, 0.2);">
+                      <img src="{{ $product->image_url }}"
+                           alt="{{ $product->name }}"
+                           class="neon-product-img w-100 h-100"
+                           loading="lazy"
+                           data-fallback="{{ asset('images/no-image.png') }}"
+                           onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                           style="object-fit: cover; transition: all 0.5s ease; filter: brightness(0.9);">
+                      
+                      <!-- Scan Line Effect -->
+                      <div class="scan-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #00ffff, transparent); animation: scan 3s linear infinite;"></div>
+                      
+                      <!-- Hover Overlay -->
+                      <div class="neon-overlay" style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0, 255, 255, 0.95), rgba(255, 0, 255, 0.95)); opacity: 0; transition: opacity 0.4s; display: flex; flex-column; align-items: center; justify-content: center; gap: 15px;">
+                        <i class="bi bi-eye-fill" style="font-size: 3.5rem; color: white; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));"></i>
+                        <span style="color: white; font-weight: 800; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase;">QUICK VIEW</span>
+                      </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-4" style="background: linear-gradient(145deg, #1f1f3f, #151530);">
+                      <!-- Title -->
+                      <h6 class="neon-product-title mb-3" style="color: #ffffff; font-size: 1rem; font-weight: 700; line-height: 1.4; min-height: 44px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);">
+                        {{ $product->name }}
+                      </h6>
+
+                      <!-- Rating -->
+                      <div class="d-flex align-items-center mb-3">
+                        @php 
+                          $stars = rand(4, 5);
+                          $reviews = rand(100, 500);
+                        @endphp
+                        <div class="neon-stars me-2">
+                          @for($i = 1; $i <= 5; $i++)
+                            <i class="bi bi-star-fill" style="font-size: 0.9rem; color: {{ $i <= $stars ? '#FFD700' : '#4a4a6a' }}; filter: drop-shadow(0 0 3px {{ $i <= $stars ? 'rgba(255, 215, 0, 0.8)' : 'transparent' }});"></i>
+                          @endfor
+                        </div>
+                        <small style="color: #a0a0ff; font-weight: 600;">({{ $reviews }})</small>
+                      </div>
+
+                      <!-- Price -->
+                      <div class="mb-3">
                         @if($product->discount > 0)
-                          <div class="d-flex align-items-baseline gap-2">
-                            <span class="fw-bold" style="font-size: 1.5rem; color: #667eea;">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                            <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                          <div class="d-flex align-items-baseline gap-2 mb-1">
+                            <span class="neon-price" style="font-size: 1.6rem; font-weight: 900; background: linear-gradient(90deg, #00ffff, #00ff00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));">
+                              ₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}
+                            </span>
+                            <small class="text-decoration-line-through" style="color: #6a6a8a;">₹{{ number_format($product->price, 2) }}</small>
                           </div>
-                          <small class="text-success fw-semibold">
+                          <small style="color: #00ff00; font-weight: 700; text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);">
                             <i class="bi bi-tag-fill"></i> Save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}
                           </small>
                         @else
-                          <span class="fw-bold" style="font-size: 1.5rem; color: #667eea;">₹{{ number_format($product->price, 2) }}</span>
+                          <span class="neon-price" style="font-size: 1.6rem; font-weight: 900; background: linear-gradient(90deg, #00ffff, #00ff00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));">
+                            ₹{{ number_format($product->price, 2) }}
+                          </span>
                         @endif
                       </div>
-                      
-                      <!-- Stock Badge -->
-                      @if($product->stock > 0)
-                        <span class="badge" style="background: linear-gradient(135deg, #06D6A0, #00B88F); padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
-                          <i class="bi bi-check-circle-fill"></i> In Stock
-                        </span>
-                      @else
-                        <span class="badge bg-secondary" style="padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
-                          <i class="bi bi-x-circle-fill"></i> Out
-                        </span>
-                      @endif
-                    </div>
 
-                    <!-- Quick Action Buttons -->
-                    <div class="d-flex gap-2">
-                      @auth
+                      <!-- Stock & Actions -->
+                      <div class="d-flex align-items-center gap-2 mb-3">
                         @if($product->stock > 0)
-                          <button class="btn btn-sm flex-grow-1" 
-                                  onclick="event.preventDefault(); event.stopPropagation(); addToCartQuick({{ $product->id }});"
-                                  style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;">
-                            <i class="bi bi-cart-plus-fill"></i> Add
-                          </button>
+                          <span class="badge flex-grow-0" style="background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid #00ff00; padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);">
+                            <i class="bi bi-check-circle-fill"></i> IN STOCK
+                          </span>
+                        @else
+                          <span class="badge flex-grow-0" style="background: rgba(255, 0, 0, 0.2); color: #ff0000; border: 1px solid #ff0000; padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">
+                            OUT
+                          </span>
                         @endif
-                      @else
-                        <a href="{{ route('login') }}" 
-                           onclick="event.preventDefault(); event.stopPropagation(); window.location.href='{{ route('login') }}';"
-                           class="btn btn-sm flex-grow-1" 
-                           style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700;">
-                          <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                      @endauth
-                      
-                      <!-- Share Button -->
-                      <div class="dropdown" onclick="event.stopPropagation();">
-                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="padding: 10px 15px; border-radius: 12px; border: 2px solid #e0e0e0;">
-                          <i class="bi bi-share-fill"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border-radius: 12px; border: none;">
-                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
-                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
-                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
-                          <li><hr class="dropdown-divider"></li>
-                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
-                        </ul>
+                      </div>
+
+                      <!-- Action Buttons -->
+                      <div class="d-flex gap-2">
+                        @auth
+                          @if($product->stock > 0)
+                            <button class="btn btn-sm flex-grow-1 neon-btn-primary" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); addToCartQuick({{ $product->id }});"
+                                    style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 2px solid #00ffff; color: #00ffff; padding: 10px; border-radius: 12px; font-weight: 800; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+                              <i class="bi bi-cart-plus-fill"></i> ADD TO CART
+                            </button>
+                          @endif
+                        @else
+                          <a href="{{ route('login') }}" 
+                             onclick="event.preventDefault(); event.stopPropagation(); window.location.href='{{ route('login') }}';"
+                             class="btn btn-sm flex-grow-1 neon-btn-primary" 
+                             style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 2px solid #00ffff; color: #00ffff; padding: 10px; border-radius: 12px; font-weight: 800; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+                            <i class="bi bi-box-arrow-in-right"></i> LOGIN
+                          </a>
+                        @endauth
+                        
+                        <!-- Share -->
+                        <div class="dropdown" onclick="event.stopPropagation();">
+                          <button class="btn btn-sm neon-btn-secondary" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="background: rgba(255, 0, 255, 0.2); border: 2px solid #ff00ff; color: #ff00ff; padding: 10px 15px; border-radius: 12px; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);">
+                            <i class="bi bi-share-fill"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background: #1a1a3e; border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px;">
+                            <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();" style="color: #00ff00;"><i class="bi bi-whatsapp me-2"></i> WhatsApp</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();" style="color: #00ffff;"><i class="bi bi-facebook me-2"></i> Facebook</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();" style="color: #ff00ff;"><i class="bi bi-twitter me-2"></i> Twitter</a></li>
+                            <li><hr class="dropdown-divider" style="border-color: rgba(0, 255, 255, 0.2);"></li>
+                            <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();" style="color: #ffffff;"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </a>
+                </a>
+              </div>
             </div>
-          </div>
-        @endforeach
+          @endforeach
+        </div>
+
+        <!-- Next Button -->
+        <button class="slider-nav slider-next" onclick="slideTrending(1)" style="position: absolute; right: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+          <i class="bi bi-chevron-right" style="font-size: 1.5rem;"></i>
+        </button>
       </div>
 
       <!-- View All Button -->
-      <div class="text-center mt-5" data-aos="fade-up">
-        <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg px-5 py-3" style="background: white; color: #667eea; border-radius: 50px; font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 3px solid rgba(255,255,255,0.5); transition: all 0.3s ease;">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i> View All Trending Products
+      <div class="text-center mt-5">
+        <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg px-5 py-3 neon-btn-cta" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 3px solid #00ffff; color: #00ffff; border-radius: 50px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 40px rgba(0, 255, 255, 0.5); transition: all 0.4s;">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i> EXPLORE ALL TRENDING
           <i class="bi bi-arrow-right ms-2"></i>
         </a>
       </div>
@@ -3904,7 +3949,17 @@ li a{
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-
+    // Trending Slider Navigation
+    function slideTrending(direction) {
+      const grid = document.getElementById('trendingGrid');
+      if (!grid) return;
+      
+      const scrollAmount = 400;
+      grid.scrollBy({
+        left: scrollAmount * direction,
+        behavior: 'smooth'
+      });
+    }
   </script>
   <script>
     function scrollShelf(key, dir) {
