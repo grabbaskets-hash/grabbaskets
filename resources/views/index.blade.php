@@ -17,6 +17,38 @@
   @endif
   <!-- Festive Diwali Theme -->
   <style>
+    /* Trending cards modern style */
+    .trending-product-card {
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      border: none;
+      background: #fff;
+      box-shadow: 0 6px 18px rgba(35,47,62,0.06);
+    }
+    .trending-product-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 18px 40px rgba(35,47,62,0.12);
+      text-decoration: none !important;
+    }
+    .trending-product-image {
+      transition: transform 0.35s ease;
+      border-top-left-radius: .5rem;
+      border-top-right-radius: .5rem;
+      display:block;
+    }
+    .trending-product-card:hover .trending-product-image {
+      transform: scale(1.06);
+    }
+    .wishlist-btn-trending { padding:0.25rem; }
+    .wishlist-icon-trending.bi-heart { color: #ff6b6b; }
+    .discount-badge-trending { font-size:0.85rem; }
+    .trending-product-title { font-size:0.95rem; font-weight:700; color:#232f3e; }
+    .trending-price-section .current-price { font-size:1rem; font-weight:800; }
+    .trending-quick-actions { pointer-events:none; }
+
+    @media (max-width: 767.98px) {
+      .trending-product-image { height:180px !important; }
+      .trending-product-card { margin-bottom:12px; }
+    }
     /* 🪔 Diwali Festive Theme Colors */
     :root {
       --diwali-gold: #FFD700;
@@ -3413,98 +3445,93 @@ li a{
       <div class="row g-4">
         @foreach($trending as $product)
           <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-            <div class="trending-product-card" onclick="window.location.href='{{ route('product.details', $product->id) }}'" style="cursor: pointer;">
-              <!-- Wishlist Button -->
-              <button class="wishlist-btn-trending" 
-                      data-product-id="{{ $product->id }}"
-                      onclick="event.stopPropagation(); toggleWishlist({{ $product->id }}, this)">
-                <i class="bi bi-heart wishlist-icon-trending"></i>
-              </button>
+            <a href="{{ route('product.details', $product->id) }}" class="trending-product-card card rounded-4 text-decoration-none text-dark" style="overflow:hidden;display:block;">
 
-              <!-- Discount Badge -->
-              @if($product->discount > 0)
-                <div class="discount-badge-trending">
-                  <span>{{ $product->discount }}%</span>
-                  <small>OFF</small>
+              <!-- Image + overlay -->
+              <div class="position-relative">
+                <img src="{{ $product->image_url }}"
+                     alt="{{ $product->name }}"
+                     class="trending-product-image w-100"
+                     loading="lazy"
+                     data-fallback="{{ asset('images/no-image.png') }}"
+                     onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');"
+                     style="height:240px;object-fit:cover;display:block;">
+
+                <!-- Wishlist Button (stop propagation to prevent link navigation) -->
+                @auth
+                <button class="btn btn-sm btn-light wishlist-heart-btn" 
+                        data-product-id="{{ $product->id }}"
+                        title="Add to wishlist"
+                        style="position:absolute;top:10px;right:10px;z-index:15;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
+                  <i class="bi bi-heart wishlist-icon wishlist-icon-trending" style="font-size:1.1rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3);"></i>
+                </button>
+                @endauth
+
+                <!-- Discount Badge -->
+                @if($product->discount > 0)
+                  <div class="discount-badge-trending position-absolute" style="top:10px;left:10px;z-index:14;background:linear-gradient(135deg,#ff5a00,#ff9900);color:white;padding:6px 10px;border-radius:12px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,0.12);">
+                    <span>{{ $product->discount }}% OFF</span>
+                  </div>
+                @endif
+
+                <!-- Share Dropdown -->
+                <div class="position-absolute" style="top:10px;left:unset;right:60px;z-index:14;">
+                  <div class="dropdown" onclick="event.stopPropagation()">
+                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="width:40px;height:40px;border-radius:50%;">
+                      <i class="bi bi-share-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg">
+                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
+                    </ul>
+                  </div>
                 </div>
-              @endif
 
-              <!-- Share Button -->
-              <div class="share-btn-trending" onclick="event.stopPropagation()">
-                <div class="dropdown">
-                  <button class="share-dropdown-btn" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation()">
-                    <i class="bi bi-share-fill"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
-                  </ul>
+                <!-- Quick View overlay -->
+                <div class="trending-quick-actions position-absolute" style="bottom:0;left:0;right:0;padding:12px;background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);color:white;">
+                  <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
                 </div>
               </div>
 
-              <!-- Product Image with Fixed Aspect Ratio -->
-              <div class="trending-image-container">
-                <div class="trending-image-wrapper">
-                  <img src="{{ $product->image_url }}"
-                    alt="{{ $product->name }}"
-                    class="trending-product-image"
-                    loading="lazy"
-                    data-fallback="{{ asset('images/no-image.png') }}"
-                    onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');">
-                </div>
-              </div>
+              <!-- Card body -->
+              <div class="card-body p-3">
+                <h6 class="trending-product-title mb-1">{{ \Illuminate\Support\Str::limit($product->name, 60) }}</h6>
 
-              <!-- Product Info -->
-              <div class="trending-product-info">
-                <h6 class="trending-product-title">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</h6>
-
-                <!-- Rating -->
-                <div class="trending-rating mb-2">
+                <div class="d-flex align-items-center mb-2">
                   @php 
                     $stars = rand(3, 5);
                     $reviews = rand(10, 150);
                   @endphp
-                  <span class="stars-trending">
+                  <div class="me-2 text-warning small">
                     @for($i = 1; $i <= 5; $i++)
                       <i class="bi bi-star-fill {{ $i <= $stars ? 'star-filled' : 'star-empty' }}"></i>
                     @endfor
-                  </span>
-                  <span class="review-count">({{ $reviews }})</span>
+                  </div>
+                  <small class="text-muted">({{ $reviews }} reviews)</small>
                 </div>
 
-                <!-- Price Section -->
-                @if($product->discount > 0)
-                  <div class="trending-price-section">
-                    <div class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
-                    <div class="original-price">₹{{ number_format($product->price, 2) }}</div>
+                <div class="d-flex align-items-baseline justify-content-between">
+                  <div>
+                    @if($product->discount > 0)
+                      <div class="current-price fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
+                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                    @else
+                      <div class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</div>
+                    @endif
                   </div>
-                  <div class="savings-text">You save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</div>
-                @else
-                  <div class="trending-price-section">
-                    <div class="current-price">₹{{ number_format($product->price, 2) }}</div>
+                  <div>
+                    @if($product->stock > 0)
+                      <small class="badge bg-success">In Stock</small>
+                    @else
+                      <small class="badge bg-secondary">Out of Stock</small>
+                    @endif
                   </div>
-                @endif
-
-                <!-- Stock Status -->
-                @if($product->stock > 0)
-                  <div class="stock-status in-stock">
-                    <i class="bi bi-check-circle-fill"></i> In Stock
-                  </div>
-                @else
-                  <div class="stock-status out-of-stock">
-                    <i class="bi bi-x-circle-fill"></i> Out of Stock
-                  </div>
-                @endif
+                </div>
               </div>
-
-              <!-- Quick View on Hover -->
-              <div class="trending-quick-actions">
-                <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
-              </div>
-            </div>
+            </a>
           </div>
         @endforeach
       </div>
