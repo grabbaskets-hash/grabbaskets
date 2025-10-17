@@ -108,10 +108,40 @@ $blogProducts = Product::whereNotNull('image')
         ->inRandomOrder()
         ->take(3)
         ->get();
-    // ✅ Deals of the day (all products or special filtered ones)
-    // $deals = Product::latest()->take(10)->get();
+    // ✅ Deals of the day - products with discounts
+    $deals = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('discount', '>', 0)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
+    
+    // 🔥 Flash Sale - products with high discounts (>20%)
+    $flashSale = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('discount', '>', 20)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
+    
+    // 🚚 Free Delivery - products with no delivery charge
+    $freeDelivery = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('delivery_charge', 0)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
 
-    return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts',));
+    return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts','deals','flashSale','freeDelivery'));
 }
 
 
