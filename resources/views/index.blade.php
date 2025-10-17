@@ -3375,11 +3375,11 @@ li a{
       <div class="row g-4">
         @foreach($trending as $product)
           <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-            <div class="trending-product-card">
+            <div class="trending-product-card" onclick="window.location.href='{{ route('product.details', $product->id) }}'" style="cursor: pointer;">
               <!-- Wishlist Button -->
               <button class="wishlist-btn-trending" 
                       data-product-id="{{ $product->id }}"
-                      onclick="toggleWishlist({{ $product->id }}, this)">
+                      onclick="event.stopPropagation(); toggleWishlist({{ $product->id }}, this)">
                 <i class="bi bi-heart wishlist-icon-trending"></i>
               </button>
 
@@ -3392,82 +3392,80 @@ li a{
               @endif
 
               <!-- Share Button -->
-              <div class="share-btn-trending">
+              <div class="share-btn-trending" onclick="event.stopPropagation()">
                 <div class="dropdown">
-                  <button class="share-dropdown-btn" type="button" data-bs-toggle="dropdown">
+                  <button class="share-dropdown-btn" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation()">
                     <i class="bi bi-share-fill"></i>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
                   </ul>
                 </div>
               </div>
 
-              <a href="{{ route('product.details', $product->id) }}" class="product-link-trending">
-                <!-- Product Image with Fixed Aspect Ratio -->
-                <div class="trending-image-container">
-                  <div class="trending-image-wrapper">
-                    <img src="{{ $product->image_url }}"
-                      alt="{{ $product->name }}"
-                      class="trending-product-image"
-                      loading="lazy"
-                      data-fallback="{{ asset('images/no-image.png') }}"
-                      onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');">
+              <!-- Product Image with Fixed Aspect Ratio -->
+              <div class="trending-image-container">
+                <div class="trending-image-wrapper">
+                  <img src="{{ $product->image_url }}"
+                    alt="{{ $product->name }}"
+                    class="trending-product-image"
+                    loading="lazy"
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');">
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="trending-product-info">
+                <h6 class="trending-product-title">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</h6>
+
+                <!-- Rating -->
+                <div class="trending-rating mb-2">
+                  @php 
+                    $stars = rand(3, 5);
+                    $reviews = rand(10, 150);
+                  @endphp
+                  <span class="stars-trending">
+                    @for($i = 1; $i <= 5; $i++)
+                      <i class="bi bi-star-fill {{ $i <= $stars ? 'star-filled' : 'star-empty' }}"></i>
+                    @endfor
+                  </span>
+                  <span class="review-count">({{ $reviews }})</span>
+                </div>
+
+                <!-- Price Section -->
+                @if($product->discount > 0)
+                  <div class="trending-price-section">
+                    <div class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
+                    <div class="original-price">₹{{ number_format($product->price, 2) }}</div>
                   </div>
-                </div>
-
-                <!-- Product Info -->
-                <div class="trending-product-info">
-                  <h6 class="trending-product-title">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</h6>
-
-                  <!-- Rating -->
-                  <div class="trending-rating mb-2">
-                    @php 
-                      $stars = rand(3, 5);
-                      $reviews = rand(10, 150);
-                    @endphp
-                    <span class="stars-trending">
-                      @for($i = 1; $i <= 5; $i++)
-                        <i class="bi bi-star-fill {{ $i <= $stars ? 'star-filled' : 'star-empty' }}"></i>
-                      @endfor
-                    </span>
-                    <span class="review-count">({{ $reviews }})</span>
+                  <div class="savings-text">You save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</div>
+                @else
+                  <div class="trending-price-section">
+                    <div class="current-price">₹{{ number_format($product->price, 2) }}</div>
                   </div>
+                @endif
 
-                  <!-- Price Section -->
-                  @if($product->discount > 0)
-                    <div class="trending-price-section">
-                      <div class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
-                      <div class="original-price">₹{{ number_format($product->price, 2) }}</div>
-                    </div>
-                    <div class="savings-text">You save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</div>
-                  @else
-                    <div class="trending-price-section">
-                      <div class="current-price">₹{{ number_format($product->price, 2) }}</div>
-                    </div>
-                  @endif
+                <!-- Stock Status -->
+                @if($product->stock > 0)
+                  <div class="stock-status in-stock">
+                    <i class="bi bi-check-circle-fill"></i> In Stock
+                  </div>
+                @else
+                  <div class="stock-status out-of-stock">
+                    <i class="bi bi-x-circle-fill"></i> Out of Stock
+                  </div>
+                @endif
+              </div>
 
-                  <!-- Stock Status -->
-                  @if($product->stock > 0)
-                    <div class="stock-status in-stock">
-                      <i class="bi bi-check-circle-fill"></i> In Stock
-                    </div>
-                  @else
-                    <div class="stock-status out-of-stock">
-                      <i class="bi bi-x-circle-fill"></i> Out of Stock
-                    </div>
-                  @endif
-                </div>
-
-                <!-- Quick View on Hover -->
-                <div class="trending-quick-actions">
-                  <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
-                </div>
-              </a>
+              <!-- Quick View on Hover -->
+              <div class="trending-quick-actions">
+                <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
+              </div>
             </div>
           </div>
         @endforeach
