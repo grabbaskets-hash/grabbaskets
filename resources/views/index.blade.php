@@ -716,6 +716,407 @@
       box-shadow: 0 2px 8px rgba(35, 47, 62, 0.08);
     }
 
+    /* ========================================
+       TRENDING SECTION - NEW DESIGN
+    ======================================== */
+    .trending-section {
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .trending-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(135deg, rgba(255, 107, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+      z-index: 0;
+    }
+
+    .trending-section .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Trending Badge Animation */
+    .trending-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #ff6b00 0%, #ff9900 100%);
+      padding: 12px 30px;
+      border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+      animation: pulse-trending 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-trending {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 30px rgba(255, 107, 0, 0.5);
+      }
+    }
+
+    .fire-icon {
+      font-size: 1.5rem;
+      animation: flicker 1.5s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .trending-text {
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+
+    /* Trending Product Card */
+    .trending-product-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .trending-product-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 12px 40px rgba(255, 107, 0, 0.25);
+    }
+
+    .trending-product-card:hover .trending-quick-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .trending-product-card:hover .trending-product-image {
+      transform: scale(1.1);
+    }
+
+    /* Wishlist Button */
+    .wishlist-btn-trending {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .wishlist-btn-trending:hover {
+      background: #ff6b00;
+      transform: scale(1.15) rotate(10deg);
+    }
+
+    .wishlist-btn-trending:hover .wishlist-icon-trending {
+      color: white;
+    }
+
+    .wishlist-icon-trending {
+      font-size: 1.2rem;
+      color: #ff6b00;
+      transition: all 0.3s ease;
+    }
+
+    .wishlist-icon-trending.filled {
+      color: #e74c3c;
+    }
+
+    /* Discount Badge */
+    .discount-badge-trending {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 10;
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .discount-badge-trending span {
+      font-size: 1.1rem;
+    }
+
+    .discount-badge-trending small {
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+
+    /* Share Button */
+    .share-btn-trending {
+      position: absolute;
+      top: 65px;
+      left: 15px;
+      z-index: 10;
+    }
+
+    .share-dropdown-btn {
+      background: rgba(255, 255, 255, 0.95);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      color: #555;
+    }
+
+    .share-dropdown-btn:hover {
+      background: #232f3e;
+      color: white;
+      transform: rotate(360deg) scale(1.1);
+    }
+
+    /* Image Container with Fixed Aspect Ratio */
+    .trending-image-container {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      overflow: hidden;
+    }
+
+    .trending-image-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%; /* 1:1 Aspect Ratio - Perfect Square */
+      overflow: hidden;
+    }
+
+    .trending-product-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Changed from cover to contain for better image display */
+      object-position: center;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      padding: 15px; /* Add padding so images don't touch edges */
+    }
+
+    .trending-product-image.fallback-image {
+      object-fit: contain;
+      opacity: 0.5;
+    }
+
+    /* Product Link */
+    .product-link-trending {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .product-link-trending:hover {
+      color: inherit;
+    }
+
+    /* Product Info */
+    .trending-product-info {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .trending-product-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #232f3e;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      min-height: 44px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Rating */
+    .trending-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stars-trending {
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    .star-filled {
+      color: #ffa500;
+      font-size: 0.9rem;
+    }
+
+    .star-empty {
+      color: #ddd;
+      font-size: 0.9rem;
+    }
+
+    .review-count {
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    /* Price Section */
+    .trending-price-section {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: auto;
+      margin-bottom: 8px;
+    }
+
+    .current-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #27ae60;
+    }
+
+    .original-price {
+      font-size: 1rem;
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    .savings-text {
+      font-size: 0.85rem;
+      color: #e74c3c;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* Stock Status */
+    .stock-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+
+    .stock-status.in-stock {
+      background: rgba(39, 174, 96, 0.1);
+      color: #27ae60;
+    }
+
+    .stock-status.out-of-stock {
+      background: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+    }
+
+    /* Quick Actions on Hover */
+    .trending-quick-actions {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #ff6b00 0%, #ff9900 100%);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: all 0.3s ease;
+    }
+
+    .quick-view-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .trending-product-title {
+        font-size: 0.95rem;
+        min-height: 40px;
+      }
+
+      .current-price {
+        font-size: 1.3rem;
+      }
+
+      .trending-badge {
+        padding: 10px 20px;
+      }
+
+      .trending-text {
+        font-size: 0.85rem;
+      }
+
+      .fire-icon {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .trending-image-wrapper {
+        padding-bottom: 100%; /* Keep square on mobile */
+      }
+
+      .wishlist-btn-trending,
+      .share-dropdown-btn {
+        width: 36px;
+        height: 36px;
+      }
+
+      .discount-badge-trending {
+        padding: 6px 10px;
+      }
+
+      .discount-badge-trending span {
+        font-size: 1rem;
+      }
+    }
+
+    /* ========================================
+       END TRENDING SECTION
+    ======================================== */
+
     .categories-section {
       background: #fff;
       padding: 40px 0;
@@ -2958,60 +3359,113 @@ li a{
     </div>
   </section>
 
-  <section class="trending my-5">
+  <section class="trending-section my-5 py-5">
     <div class="container">
+      <!-- Section Header -->
       <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold mb-3">🔥 Trending Items</h2>
-        <p class="lead text-muted">Most popular products loved by our customers</p>
+        <div class="trending-badge mb-3">
+          <span class="fire-icon">🔥</span>
+          <span class="trending-text">TRENDING NOW</span>
+        </div>
+        <h2 class="display-4 fw-bold mb-3" style="color: #232f3e;">Hot Products Everyone's Buying</h2>
+        <p class="lead text-muted">Discover what's popular this week</p>
       </div>
+
+      <!-- Products Grid -->
       <div class="row g-4">
         @foreach($trending as $product)
           <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-            <div class="item card shadow-sm h-100 position-relative">
+            <div class="trending-product-card">
+              <!-- Wishlist Button -->
+              <button class="wishlist-btn-trending" 
+                      data-product-id="{{ $product->id }}"
+                      onclick="toggleWishlist({{ $product->id }}, this)">
+                <i class="bi bi-heart wishlist-icon-trending"></i>
+              </button>
+
+              <!-- Discount Badge -->
+              @if($product->discount > 0)
+                <div class="discount-badge-trending">
+                  <span>{{ $product->discount }}%</span>
+                  <small>OFF</small>
+                </div>
+              @endif
+
               <!-- Share Button -->
-              <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+              <div class="share-btn-trending">
                 <div class="dropdown">
-                  <button class="btn btn-sm btn-outline-secondary rounded-circle" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-share"></i>
+                  <button class="share-dropdown-btn" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-share-fill"></i>
                   </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success"></i> WhatsApp</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary"></i> Facebook</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault;"><i class="bi bi-twitter text-info"></i> Twitter</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg"></i> Copy Link</a></li>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-lg">
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
                   </ul>
                 </div>
               </div>
 
-              <a href="{{ route('product.details', $product->id) }}" style="text-decoration: none" class="text-dark">
-                <div class="image-box p-3">
-                  <img src="{{ $product->image_url }}"
-                    alt="{{ $product->name }}"
-                    class="img-fluid rounded"
-                    style="height: 200px; width: 100%; object-fit: cover;"
-                    data-fallback="{{ asset('images/no-image.png') }}"
-                    onerror="this.src=this.dataset.fallback">
+              <a href="{{ route('product.details', $product->id) }}" class="product-link-trending">
+                <!-- Product Image with Fixed Aspect Ratio -->
+                <div class="trending-image-container">
+                  <div class="trending-image-wrapper">
+                    <img src="{{ $product->image_url }}"
+                      alt="{{ $product->name }}"
+                      class="trending-product-image"
+                      loading="lazy"
+                      data-fallback="{{ asset('images/no-image.png') }}"
+                      onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');">
+                  </div>
                 </div>
 
-                <div class="card-body text-center">
-                  <h6 class="card-title fw-bold">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+                <!-- Product Info -->
+                <div class="trending-product-info">
+                  <h6 class="trending-product-title">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</h6>
 
-                  <div class="stars mb-2">
-                    @php $stars = rand(3, 5); @endphp
-                    <span class="text-warning">
-                      {!! str_repeat('★', $stars) !!}{!! str_repeat('☆', 5 - $stars) !!}
+                  <!-- Rating -->
+                  <div class="trending-rating mb-2">
+                    @php 
+                      $stars = rand(3, 5);
+                      $reviews = rand(10, 150);
+                    @endphp
+                    <span class="stars-trending">
+                      @for($i = 1; $i <= 5; $i++)
+                        <i class="bi bi-star-fill {{ $i <= $stars ? 'star-filled' : 'star-empty' }}"></i>
+                      @endfor
                     </span>
+                    <span class="review-count">({{ $reviews }})</span>
                   </div>
 
+                  <!-- Price Section -->
                   @if($product->discount > 0)
-                    <div class="price-section">
-                      <p class="price fw-bold text-success mb-1">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</p>
-                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-                      <small class="badge bg-danger ms-1">{{ $product->discount }}% OFF</small>
+                    <div class="trending-price-section">
+                      <div class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
+                      <div class="original-price">₹{{ number_format($product->price, 2) }}</div>
+                    </div>
+                    <div class="savings-text">You save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</div>
+                  @else
+                    <div class="trending-price-section">
+                      <div class="current-price">₹{{ number_format($product->price, 2) }}</div>
+                    </div>
+                  @endif
+
+                  <!-- Stock Status -->
+                  @if($product->stock > 0)
+                    <div class="stock-status in-stock">
+                      <i class="bi bi-check-circle-fill"></i> In Stock
                     </div>
                   @else
-                    <p class="price fw-bold text-success">₹{{ number_format($product->price, 2) }}</p>
+                    <div class="stock-status out-of-stock">
+                      <i class="bi bi-x-circle-fill"></i> Out of Stock
+                    </div>
                   @endif
+                </div>
+
+                <!-- Quick View on Hover -->
+                <div class="trending-quick-actions">
+                  <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
                 </div>
               </a>
             </div>
