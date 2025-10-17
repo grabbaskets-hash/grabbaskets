@@ -17,37 +17,114 @@
   @endif
   <!-- Festive Diwali Theme -->
   <style>
-    /* Trending cards modern style */
-    .trending-product-card {
-      transition: transform 0.28s ease, box-shadow 0.28s ease;
-      border: none;
-      background: #fff;
-      box-shadow: 0 6px 18px rgba(35,47,62,0.06);
+    /* Trending Section - Ultra Modern Design */
+    .trending-section-modern {
+      position: relative;
+      min-height: 600px;
     }
-    .trending-product-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 18px 40px rgba(35,47,62,0.12);
-      text-decoration: none !important;
-    }
-    .trending-product-image {
-      transition: transform 0.35s ease;
-      border-top-left-radius: .5rem;
-      border-top-right-radius: .5rem;
-      display:block;
-    }
-    .trending-product-card:hover .trending-product-image {
-      transform: scale(1.06);
-    }
-    .wishlist-btn-trending { padding:0.25rem; }
-    .wishlist-icon-trending.bi-heart { color: #ff6b6b; }
-    .discount-badge-trending { font-size:0.85rem; }
-    .trending-product-title { font-size:0.95rem; font-weight:700; color:#232f3e; }
-    .trending-price-section .current-price { font-size:1rem; font-weight:800; }
-    .trending-quick-actions { pointer-events:none; }
 
-    @media (max-width: 767.98px) {
-      .trending-product-image { height:180px !important; }
-      .trending-product-card { margin-bottom:12px; }
+    .trending-bg-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+      animation: pattern-float 20s ease-in-out infinite;
+    }
+
+    @keyframes pattern-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+
+    @keyframes pulse-fire {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .trending-card-modern {
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .trending-card-modern:hover {
+      transform: translateY(-10px);
+    }
+
+    .trending-card-modern .card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .trending-card-modern:hover .card {
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3) !important;
+      transform: scale(1.02);
+    }
+
+    .trending-img-zoom {
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .trending-card-modern:hover .trending-img-zoom {
+      transform: scale(1.15);
+    }
+
+    .trending-hover-overlay {
+      transition: opacity 0.4s ease;
+    }
+
+    .trending-card-modern:hover .trending-hover-overlay {
+      opacity: 1 !important;
+    }
+
+    .trending-wishlist-btn {
+      transition: all 0.3s ease;
+    }
+
+    .trending-wishlist-btn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 6px 25px rgba(233, 30, 99, 0.4) !important;
+    }
+
+    .trending-rank-badge {
+      animation: badge-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes badge-glow {
+      0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+      50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7); }
+    }
+
+    .discount-explosion {
+      animation: discount-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes discount-pop {
+      0% { transform: scale(0) rotate(-5deg); opacity: 0; }
+      60% { transform: scale(1.2) rotate(-5deg); }
+      100% { transform: scale(1) rotate(-5deg); opacity: 1; }
+    }
+
+    .trending-card-modern .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .trending-section-modern h2 {
+        font-size: 2rem !important;
+      }
+      
+      .trending-rank-badge {
+        font-size: 0.75rem !important;
+        padding: 6px 12px !important;
+      }
+      
+      .trending-img-wrapper {
+        height: 220px !important;
+      }
     }
     /* 🪔 Diwali Festive Theme Colors */
     :root {
@@ -3429,111 +3506,173 @@ li a{
     </div>
   </section>
 
-  <section class="trending-section my-5 py-5">
-    <div class="container">
+  <!-- Trending Now Section - Ultra Modern Design -->
+  <section class="trending-section-modern position-relative py-5 my-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); overflow: hidden;">
+    <!-- Animated Background Pattern -->
+    <div class="trending-bg-pattern"></div>
+    
+    <div class="container position-relative" style="z-index: 2;">
       <!-- Section Header -->
-      <div class="text-center mb-5">
-        <div class="trending-badge mb-3">
-          <span class="fire-icon">🔥</span>
-          <span class="trending-text">TRENDING NOW</span>
+      <div class="text-center mb-5" data-aos="fade-up">
+        <div class="d-inline-flex align-items-center gap-3 mb-3 px-4 py-2" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50px; border: 2px solid rgba(255,255,255,0.3);">
+          <span class="trending-fire-icon" style="font-size: 1.8rem; animation: pulse-fire 1.5s ease-in-out infinite;">🔥</span>
+          <span class="fw-bold text-white" style="font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase;">Trending Now</span>
+          <span class="trending-fire-icon" style="font-size: 1.8rem; animation: pulse-fire 1.5s ease-in-out infinite; animation-delay: 0.3s;">🔥</span>
         </div>
-        <h2 class="display-4 fw-bold mb-3" style="color: #232f3e;">Hot Products Everyone's Buying</h2>
-        <p class="lead text-muted">Discover what's popular this week</p>
+        <h2 class="display-3 fw-bold text-white mb-3" style="text-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: clamp(2rem, 5vw, 3.5rem);">
+          What's Hot Right Now
+        </h2>
+        <p class="lead text-white mb-0" style="opacity: 0.95; font-size: 1.2rem;">
+          ⚡ The most loved products flying off our shelves ⚡
+        </p>
       </div>
 
       <!-- Products Grid -->
       <div class="row g-4">
         @foreach($trending as $product)
-          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-            <a href="{{ route('product.details', $product->id) }}" class="trending-product-card card rounded-4 text-decoration-none text-dark" style="overflow:hidden;display:block;">
-
-              <!-- Image + overlay -->
-              <div class="position-relative">
-                <img src="{{ $product->image_url }}"
-                     alt="{{ $product->name }}"
-                     class="trending-product-image w-100"
-                     loading="lazy"
-                     data-fallback="{{ asset('images/no-image.png') }}"
-                     onerror="this.onerror=null; this.src=this.dataset.fallback; this.classList.add('fallback-image');"
-                     style="height:240px;object-fit:cover;display:block;">
-
-                <!-- Wishlist Button (stop propagation to prevent link navigation) -->
-                @auth
-                <button class="btn btn-sm btn-light wishlist-heart-btn" 
-                        data-product-id="{{ $product->id }}"
-                        title="Add to wishlist"
-                        style="position:absolute;top:10px;right:10px;z-index:15;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
-                  <i class="bi bi-heart wishlist-icon wishlist-icon-trending" style="font-size:1.1rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3);"></i>
-                </button>
-                @endauth
-
-                <!-- Discount Badge -->
-                @if($product->discount > 0)
-                  <div class="discount-badge-trending position-absolute" style="top:10px;left:10px;z-index:14;background:linear-gradient(135deg,#ff5a00,#ff9900);color:white;padding:6px 10px;border-radius:12px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,0.12);">
-                    <span>{{ $product->discount }}% OFF</span>
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+            <div class="trending-card-modern position-relative">
+              <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none d-block h-100">
+                <div class="card border-0 h-100 shadow-lg" style="border-radius: 20px; overflow: hidden; background: white; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                  
+                  <!-- Trending Badge -->
+                  <div class="trending-rank-badge" style="position: absolute; top: 15px; left: 15px; z-index: 10; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); border: 2px solid rgba(255,255,255,0.5);">
+                    <i class="bi bi-lightning-charge-fill"></i> #{{ $loop->iteration }}
                   </div>
-                @endif
 
-                <!-- Share Dropdown -->
-                <div class="position-absolute" style="top:10px;left:unset;right:60px;z-index:14;">
-                  <div class="dropdown" onclick="event.stopPropagation()">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="width:40px;height:40px;border-radius:50%;">
-                      <i class="bi bi-share-fill"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
-                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
-                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
-                    </ul>
+                  <!-- Wishlist Button -->
+                  @auth
+                  <button class="btn btn-light wishlist-heart-btn trending-wishlist-btn" 
+                          data-product-id="{{ $product->id }}"
+                          title="Add to wishlist"
+                          onclick="event.preventDefault(); event.stopPropagation();"
+                          style="position: absolute; top: 15px; right: 15px; z-index: 10; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.8);">
+                    <i class="bi bi-heart wishlist-icon" style="font-size: 1.2rem; color: #e91e63;"></i>
+                  </button>
+                  @endauth
+
+                  <!-- Discount Badge -->
+                  @if($product->discount > 0)
+                    <div class="discount-explosion" style="position: absolute; top: 15px; right: 70px; z-index: 10; background: linear-gradient(135deg, #ff3366, #ff6b6b); color: white; padding: 10px 15px; border-radius: 15px; font-weight: 900; font-size: 0.95rem; box-shadow: 0 6px 20px rgba(255, 51, 102, 0.5); transform: rotate(-5deg); border: 3px solid white;">
+                      <span style="display: block; line-height: 1;">-{{ $product->discount }}%</span>
+                    </div>
+                  @endif
+
+                  <!-- Product Image -->
+                  <div class="trending-img-wrapper position-relative" style="overflow: hidden; height: 280px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                    <img src="{{ $product->image_url }}"
+                         alt="{{ $product->name }}"
+                         class="trending-img-zoom w-100 h-100"
+                         loading="lazy"
+                         data-fallback="{{ asset('images/no-image.png') }}"
+                         onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                         style="object-fit: cover; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                    
+                    <!-- Hover Overlay -->
+                    <div class="trending-hover-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)); opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center;">
+                      <div class="text-center text-white">
+                        <i class="bi bi-eye-fill" style="font-size: 3rem; margin-bottom: 10px; display: block;"></i>
+                        <span class="fw-bold" style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Quick View</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card Body -->
+                  <div class="card-body p-4">
+                    <!-- Product Title -->
+                    <h6 class="trending-title fw-bold mb-2" style="color: #2d3748; font-size: 1rem; line-height: 1.4; min-height: 42px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                      {{ $product->name }}
+                    </h6>
+
+                    <!-- Rating -->
+                    <div class="d-flex align-items-center mb-3">
+                      @php 
+                        $stars = rand(4, 5);
+                        $reviews = rand(50, 300);
+                      @endphp
+                      <div class="trending-stars me-2">
+                        @for($i = 1; $i <= 5; $i++)
+                          <i class="bi bi-star-fill" style="font-size: 0.85rem; color: {{ $i <= $stars ? '#FFD700' : '#e0e0e0' }};"></i>
+                        @endfor
+                      </div>
+                      <small class="text-muted fw-semibold">({{ $reviews }})</small>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                      <div>
+                        @if($product->discount > 0)
+                          <div class="d-flex align-items-baseline gap-2">
+                            <span class="fw-bold" style="font-size: 1.5rem; color: #667eea;">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                            <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                          </div>
+                          <small class="text-success fw-semibold">
+                            <i class="bi bi-tag-fill"></i> Save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}
+                          </small>
+                        @else
+                          <span class="fw-bold" style="font-size: 1.5rem; color: #667eea;">₹{{ number_format($product->price, 2) }}</span>
+                        @endif
+                      </div>
+                      
+                      <!-- Stock Badge -->
+                      @if($product->stock > 0)
+                        <span class="badge" style="background: linear-gradient(135deg, #06D6A0, #00B88F); padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                          <i class="bi bi-check-circle-fill"></i> In Stock
+                        </span>
+                      @else
+                        <span class="badge bg-secondary" style="padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                          <i class="bi bi-x-circle-fill"></i> Out
+                        </span>
+                      @endif
+                    </div>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="d-flex gap-2">
+                      @auth
+                        @if($product->stock > 0)
+                          <button class="btn btn-sm flex-grow-1" 
+                                  onclick="event.preventDefault(); event.stopPropagation(); addToCartQuick({{ $product->id }});"
+                                  style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;">
+                            <i class="bi bi-cart-plus-fill"></i> Add
+                          </button>
+                        @endif
+                      @else
+                        <a href="{{ route('login') }}" 
+                           onclick="event.preventDefault(); event.stopPropagation(); window.location.href='{{ route('login') }}';"
+                           class="btn btn-sm flex-grow-1" 
+                           style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700;">
+                          <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                      @endauth
+                      
+                      <!-- Share Button -->
+                      <div class="dropdown" onclick="event.stopPropagation();">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="padding: 10px 15px; border-radius: 12px; border: 2px solid #e0e0e0;">
+                          <i class="bi bi-share-fill"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border-radius: 12px; border: none;">
+                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'whatsapp', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp</a></li>
+                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'facebook', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-facebook text-primary me-2"></i> Facebook</a></li>
+                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'twitter', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-twitter text-info me-2"></i> Twitter</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#" onclick="event.stopPropagation(); shareProductFromHome('{{ $product->id }}', 'copy', '{{ $product->name }}', '{{ $product->price }}'); event.preventDefault();"><i class="bi bi-link-45deg me-2"></i> Copy Link</a></li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <!-- Quick View overlay -->
-                <div class="trending-quick-actions position-absolute" style="bottom:0;left:0;right:0;padding:12px;background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);color:white;">
-                  <span class="quick-view-text">Quick View <i class="bi bi-arrow-right"></i></span>
-                </div>
-              </div>
-
-              <!-- Card body -->
-              <div class="card-body p-3">
-                <h6 class="trending-product-title mb-1">{{ \Illuminate\Support\Str::limit($product->name, 60) }}</h6>
-
-                <div class="d-flex align-items-center mb-2">
-                  @php 
-                    $stars = rand(3, 5);
-                    $reviews = rand(10, 150);
-                  @endphp
-                  <div class="me-2 text-warning small">
-                    @for($i = 1; $i <= 5; $i++)
-                      <i class="bi bi-star-fill {{ $i <= $stars ? 'star-filled' : 'star-empty' }}"></i>
-                    @endfor
-                  </div>
-                  <small class="text-muted">({{ $reviews }} reviews)</small>
-                </div>
-
-                <div class="d-flex align-items-baseline justify-content-between">
-                  <div>
-                    @if($product->discount > 0)
-                      <div class="current-price fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</div>
-                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-                    @else
-                      <div class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</div>
-                    @endif
-                  </div>
-                  <div>
-                    @if($product->stock > 0)
-                      <small class="badge bg-success">In Stock</small>
-                    @else
-                      <small class="badge bg-secondary">Out of Stock</small>
-                    @endif
-                  </div>
-                </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         @endforeach
+      </div>
+
+      <!-- View All Button -->
+      <div class="text-center mt-5" data-aos="fade-up">
+        <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg px-5 py-3" style="background: white; color: #667eea; border-radius: 50px; font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 3px solid rgba(255,255,255,0.5); transition: all 0.3s ease;">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i> View All Trending Products
+          <i class="bi bi-arrow-right ms-2"></i>
+        </a>
       </div>
     </div>
   </section>
@@ -4090,6 +4229,89 @@ li a{
   <script>
     // Setup CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Quick Add to Cart Function
+    function addToCartQuick(productId) {
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                product_id: productId,
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showQuickToast('✅ Added to cart!', 'success');
+            } else {
+                showQuickToast('❌ ' + (data.message || 'Failed to add'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showQuickToast('❌ Please try again', 'error');
+        });
+    }
+
+    // Quick Toast Notification
+    function showQuickToast(message, type) {
+        const toast = document.createElement('div');
+        const bgColor = type === 'success' ? 'linear-gradient(135deg, #06D6A0, #00B88F)' : 'linear-gradient(135deg, #ff3366, #ff6b6b)';
+        toast.className = 'quick-toast';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: ${bgColor};
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 99999;
+            animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 700;
+            font-size: 1rem;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOutToast 0.4s ease';
+            setTimeout(() => toast.remove(), 400);
+        }, 2500);
+    }
+
+    // Add animation styles
+    const toastStyle = document.createElement('style');
+    toastStyle.textContent = `
+        @keyframes slideInToast {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOutToast {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(toastStyle);
     
     // Initialize wishlist hearts
     function initWishlistHearts() {
