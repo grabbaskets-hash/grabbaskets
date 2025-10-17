@@ -2686,19 +2686,28 @@ li a{
                 <button class="btn btn-link p-1 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
+                        onclick="event.stopPropagation();"
                         style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
                     <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
                 </button>
                 @endauth
-                <img
-                  src="{{ $product->image_url }}"
-                  class="card-img-top" alt="{{ $product->name }}"
-                  data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback"
-                  style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff003322;">
+                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ $product->image_url }}"
+                    class="card-img-top" alt="{{ $product->name }}"
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.src=this.dataset.fallback"
+                    style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff003322;cursor:pointer;transition:transform 0.3s ease;"
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                </a>
                 <div class="card-body d-flex flex-column">
                   <div class="small text-danger fw-bold mb-1"><i class="bi bi-lightning-charge-fill"></i> Flash Sale!</div>
-                  <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+                  <h6 class="card-title mt-1">
+                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
+                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
+                    </a>
+                  </h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
                       <span class="fw-bold text-danger fs-5">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
@@ -2746,19 +2755,28 @@ li a{
                 <button class="btn btn-link p-1 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
+                        onclick="event.stopPropagation();"
                         style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
                     <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
                 </button>
                 @endauth
-                <img
-                  src="{{ $product->image_url }}"
-                  class="card-img-top" alt="{{ $product->name }}"
-                  data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback"
-                  style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff990022;">
+                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ $product->image_url }}"
+                    class="card-img-top" alt="{{ $product->name }}"
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.src=this.dataset.fallback"
+                    style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff990022;cursor:pointer;transition:transform 0.3s ease;"
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                </a>
                 <div class="card-body d-flex flex-column">
                   <div class="small text-warning fw-bold mb-1"><i class="bi bi-stars"></i> Deal of the Day</div>
-                  <h6 class="card-title mt-1">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+                  <h6 class="card-title mt-1">
+                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
+                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
+                    </a>
+                  </h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
                       <span class="fw-bold text-success fs-5">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
@@ -2799,17 +2817,27 @@ li a{
                 <button class="btn btn-link p-1 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
+                        onclick="event.stopPropagation();"
                         style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
                     <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
                 </button>
                 @endauth
-                <img
-                  src="{{ $product->image_url }}"
-                  class="card-img-top" alt="{{ $product->name }}"
-                  data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback">
+                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ $product->image_url }}"
+                    class="card-img-top" alt="{{ $product->name }}"
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.src=this.dataset.fallback"
+                    style="cursor:pointer;transition:transform 0.3s ease;"
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                </a>
                 <div class="card-body d-flex flex-column">
-                  <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+                  <h6 class="card-title">
+                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
+                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
+                    </a>
+                  </h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
                       <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
@@ -2852,18 +2880,28 @@ li a{
                 <button class="btn btn-link p-1 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
+                        onclick="event.stopPropagation();"
                         style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
                     <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
                 </button>
                 @endauth
-                <img
-                  src="{{ $product->image_url }}"
-                  class="card-img-top" alt="{{ $product->name }}"
-                  data-fallback="{{ asset('images/no-image.png') }}"
-                  onerror="this.src=this.dataset.fallback">
+                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ $product->image_url }}"
+                    class="card-img-top" alt="{{ $product->name }}"
+                    data-fallback="{{ asset('images/no-image.png') }}"
+                    onerror="this.src=this.dataset.fallback"
+                    style="cursor:pointer;transition:transform 0.3s ease;"
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                </a>
                 <div class="card-body d-flex flex-column">
                   <div class="small text-success">Free Delivery</div>
-                  <h6 class="card-title">{{ \Illuminate\Support\Str::limit($product->name, 40) }}</h6>
+                  <h6 class="card-title">
+                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
+                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
+                    </a>
+                  </h6>
                   <div class="mt-auto">
                     @if($product->discount > 0)
                       <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
