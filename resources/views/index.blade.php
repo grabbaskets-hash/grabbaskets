@@ -1386,7 +1386,7 @@
 
     footer {
       background: #232f3e;
-      color: #fff;
+      color: red;
       padding: 40px 0 20px 0;
       border-radius: 16px 16px 0 0;
       box-shadow: 0 -2px 8px rgba(35, 47, 62, 0.10);
