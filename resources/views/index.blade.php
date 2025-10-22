@@ -3366,10 +3366,16 @@ li a{
     </div>
   </section>
 
-    <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive -->
-    <div class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;">
-      <button class="fab-main" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        <span class="fab-icon" style="font-size:1.8rem;"></span>🛍️</span>
+    <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive with Hide/Show -->
+    <div id="floatingActionsContainer" class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;transition:transform 0.3s ease, opacity 0.3s ease;">
+      <!-- Main FAB Button -->
+      <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
+      </button>
+      
+      <!-- Hide Button (appears on long press or swipe) -->
+      <button class="fab-hide-btn" id="fabHideBtn" onclick="hideFloatingButton()" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:8px;box-shadow:0 4px 12px rgba(220,53,69,0.3);font-size:1.2rem;position:absolute;top:-45px;right:0;width:40px;height:40px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <span>✕</span>
       </button>
       
       <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
@@ -3406,7 +3412,36 @@ li a{
         </div>
       </div>
     </div>
+
+    <!-- Show FAB Button (appears when FAB is hidden) -->
+    <button id="showFabBtn" onclick="showFloatingButton()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1199;background:linear-gradient(135deg,#28a745,#20c997);color:#fff;border:none;border-radius:50%;padding:10px;box-shadow:0 4px 15px rgba(40,167,69,0.3);font-size:1.3rem;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;animation:pulse 2s infinite;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      <span>👁️</span>
+    </button>
   </section>
+  
+  <style>
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(40,167,69,0.5);
+      }
+    }
+
+    /* Mobile specific styles for floating button */
+    @media (max-width: 768px) {
+      #floatingActionsContainer {
+        bottom: 90px !important; /* Above mobile bottom nav */
+      }
+      
+      #showFabBtn {
+        bottom: 90px !important; /* Above mobile bottom nav */
+      }
+    }
+  </style>
   
   <script>
     function scrollZeptoCats(dir) {
@@ -4937,6 +4972,51 @@ li a{
 
   <!-- Floating Menu JavaScript -->
   <script>
+    // Initialize FAB visibility state from localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+      const fabHidden = localStorage.getItem('fabHidden') === 'true';
+      if (fabHidden && window.innerWidth <= 768) {
+        hideFloatingButton(false); // Don't save again, just apply state
+      }
+      
+      // Add click events to floating category cards
+      const floatingCategoryCards = document.querySelectorAll('.floating-category-card');
+      floatingCategoryCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const categoryId = this.getAttribute('data-category-id');
+          const categoryName = this.getAttribute('data-category-name');
+          showCategorySubcategories(categoryId, categoryName);
+        });
+      });
+
+      // Show hide button on hover (desktop) or touch (mobile)
+      const fabContainer = document.getElementById('floatingActionsContainer');
+      const fabHideBtn = document.getElementById('fabHideBtn');
+      
+      if (window.innerWidth <= 768) {
+        // Mobile: show hide button with long press
+        let pressTimer;
+        fabContainer.addEventListener('touchstart', () => {
+          pressTimer = setTimeout(() => {
+            fabHideBtn.style.display = 'flex';
+          }, 500); // Long press 500ms
+        });
+        
+        fabContainer.addEventListener('touchend', () => {
+          clearTimeout(pressTimer);
+        });
+      } else {
+        // Desktop: show hide button on hover
+        fabContainer.addEventListener('mouseenter', () => {
+          fabHideBtn.style.display = 'flex';
+        });
+        
+        fabContainer.addEventListener('mouseleave', () => {
+          fabHideBtn.style.display = 'none';
+        });
+      }
+    });
+
     function toggleFloatingMenu() {
       const menu = document.getElementById('floatingMenu');
       const subcategoryArea = document.getElementById('subcategoryArea');
@@ -4948,17 +5028,49 @@ li a{
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add click events to floating category cards
-      const floatingCategoryCards = document.querySelectorAll('.floating-category-card');
-      floatingCategoryCards.forEach(card => {
-        card.addEventListener('click', function() {
-          const categoryId = this.getAttribute('data-category-id');
-          const categoryName = this.getAttribute('data-category-name');
-          showCategorySubcategories(categoryId, categoryName);
-        });
-      });
-    });
+    function hideFloatingButton(saveState = true) {
+      const fabContainer = document.getElementById('floatingActionsContainer');
+      const showBtn = document.getElementById('showFabBtn');
+      const floatingMenu = document.getElementById('floatingMenu');
+      
+      // Close popup if open
+      floatingMenu.style.display = 'none';
+      
+      // Hide FAB
+      fabContainer.style.transform = 'translateX(150px)';
+      fabContainer.style.opacity = '0';
+      
+      // Show the show button
+      setTimeout(() => {
+        fabContainer.style.display = 'none';
+        showBtn.style.display = 'flex';
+      }, 300);
+      
+      // Save state to localStorage (mobile only)
+      if (saveState && window.innerWidth <= 768) {
+        localStorage.setItem('fabHidden', 'true');
+      }
+    }
+
+    function showFloatingButton() {
+      const fabContainer = document.getElementById('floatingActionsContainer');
+      const showBtn = document.getElementById('showFabBtn');
+      
+      // Hide show button
+      showBtn.style.display = 'none';
+      
+      // Show FAB with animation
+      fabContainer.style.display = 'block';
+      setTimeout(() => {
+        fabContainer.style.transform = 'translateX(0)';
+        fabContainer.style.opacity = '1';
+      }, 10);
+      
+      // Save state to localStorage (mobile only)
+      if (window.innerWidth <= 768) {
+        localStorage.setItem('fabHidden', 'false');
+      }
+    }
 
     function showCategorySubcategories(categoryId, categoryName) {
       // Show subcategory area
