@@ -728,11 +728,33 @@
             <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
               @foreach($items as $item)
                 <div class="summary-item">
-                  @if($item->product->image)
-                    <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="item-image">
+                  @php
+                    $imageUrl = null;
+                    // Check multiple image sources
+                    if (!empty($item->product->image)) {
+                      $imageUrl = $item->product->image;
+                    } elseif (!empty($item->product->images) && is_array(json_decode($item->product->images, true))) {
+                      $images = json_decode($item->product->images, true);
+                      $imageUrl = !empty($images) ? $images[0] : null;
+                    } elseif (!empty($item->product->main_image)) {
+                      $imageUrl = $item->product->main_image;
+                    }
+                    
+                    // Ensure proper URL format
+                    if ($imageUrl && !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                      $imageUrl = asset('storage/' . $imageUrl);
+                    }
+                  @endphp
+                  
+                  @if($imageUrl)
+                    <img src="{{ $imageUrl }}" alt="{{ $item->product->name }}" class="item-image" 
+                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="item-image" style="background: linear-gradient(135deg, #667eea, #764ba2); display: none; align-items: center; justify-content: center;">
+                      <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
                   @else
-                    <div class="item-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
-                      <i class="bi bi-image" style="font-size: 1.5rem; color: #999;"></i>
+                    <div class="item-image" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
                     </div>
                   @endif
                   <div class="item-info">
@@ -796,131 +818,227 @@
     let map;
     let marker;
     let selectedAddressIndex = null;
+    let googleMapsLoaded = false;
+
+    // Wait for Google Maps to load
+    function initGoogleMaps() {
+      if (typeof google !== 'undefined' && google.maps) {
+        googleMapsLoaded = true;
+        console.log('Google Maps loaded successfully');
+      } else {
+        console.log('Waiting for Google Maps to load...');
+        setTimeout(initGoogleMaps, 200);
+      }
+    }
 
     // Auto-detect location on page load
     window.addEventListener('load', function() {
+      console.log('Page loaded, starting location detection');
       detectLocationAuto();
-      if (typeof google !== 'undefined') {
-        initMap();
-      }
+      initGoogleMaps();
     });
 
     // Initialize Google Map
     function initMap() {
-      const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // Bangalore
-      
-      map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
-        center: defaultLocation,
-        styles: [
-          { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-        ]
-      });
+      // Check if Google Maps is loaded
+      if (typeof google === 'undefined' || !google.maps) {
+        console.error('Google Maps not loaded yet');
+        setTimeout(initMap, 500);
+        return;
+      }
 
-      marker = new google.maps.Marker({
-        position: defaultLocation,
-        map: map,
-        draggable: true,
-        animation: google.maps.Animation.DROP,
-        title: 'Your Delivery Location'
-      });
+      const mapElement = document.getElementById('map');
+      if (!mapElement) {
+        console.error('Map element not found');
+        return;
+      }
 
-      marker.addListener('dragend', function() {
-        const position = marker.getPosition();
-        document.getElementById('latitude').value = position.lat();
-        document.getElementById('longitude').value = position.lng();
-        geocodeLocation(position.lat(), position.lng());
-      });
-
-      // Try to get current location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          map.setCenter(pos);
-          marker.setPosition(pos);
-          document.getElementById('latitude').value = pos.lat;
-          document.getElementById('longitude').value = pos.lng;
-          geocodeLocation(pos.lat, pos.lng);
+      try {
+        const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // Bangalore
+        
+        map = new google.maps.Map(mapElement, {
+          zoom: 14,
+          center: defaultLocation,
+          styles: [
+            { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+          ],
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: true
         });
+
+        marker = new google.maps.Marker({
+          position: defaultLocation,
+          map: map,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+          title: 'Your Delivery Location'
+        });
+
+        marker.addListener('dragend', function() {
+          const position = marker.getPosition();
+          document.getElementById('latitude').value = position.lat();
+          document.getElementById('longitude').value = position.lng();
+          geocodeLocation(position.lat(), position.lng());
+        });
+
+        console.log('Map initialized successfully');
+
+        // Try to get current location for map
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              map.setCenter(pos);
+              marker.setPosition(pos);
+              marker.setAnimation(google.maps.Animation.BOUNCE);
+              setTimeout(() => marker.setAnimation(null), 1500);
+              
+              document.getElementById('latitude').value = pos.lat;
+              document.getElementById('longitude').value = pos.lng;
+              geocodeLocation(pos.lat, pos.lng);
+              console.log('Map centered to current location:', pos);
+            },
+            (error) => {
+              console.error('Geolocation error for map:', error);
+            }
+          );
+        }
+      } catch (error) {
+        console.error('Error initializing map:', error);
       }
     }
 
     // Auto-detect location for location bar
     function detectLocationAuto() {
-      if (navigator.geolocation) {
-        document.getElementById('current-location').innerHTML = '<i class="bi bi-hourglass-split"></i> Detecting...';
-        
-        navigator.geolocation.getCurrentPosition(
-          function(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            
-            // Use Google Geocoding API
-            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key={{ config('services.google.maps_api_key') }}`)
-              .then(res => res.json())
-              .then(data => {
-                if (data.results && data.results[0]) {
-                  const address = data.results[0].formatted_address;
-                  document.getElementById('current-location').innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${address}`;
-                  
-                  // Also update form fields
-                  const components = data.results[0].address_components;
-                  components.forEach(comp => {
-                    if (comp.types.includes('locality')) {
-                      document.getElementById('city').value = comp.long_name;
-                    }
-                    if (comp.types.includes('administrative_area_level_1')) {
-                      document.getElementById('state').value = comp.long_name;
-                    }
-                    if (comp.types.includes('postal_code')) {
-                      document.getElementById('pincode').value = comp.long_name;
-                    }
-                  });
-                } else {
-                  document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
-                }
-              })
-              .catch(() => {
-                document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
-              });
-          },
-          function() {
-            document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Click to detect location';
-          }
-        );
-      } else {
-        document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Geolocation not supported';
+      const locationElement = document.getElementById('current-location');
+      
+      if (!navigator.geolocation) {
+        locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Geolocation not supported';
+        return;
       }
+
+      locationElement.innerHTML = '<i class="bi bi-hourglass-split"></i> Detecting your location...';
+      console.log('Starting location detection');
+      
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log('Location detected:', lat, lng);
+          
+          // Use Google Geocoding API
+          const apiKey = '{{ config("services.google.maps_api_key") }}';
+          const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+          
+          fetch(geocodeUrl)
+            .then(res => {
+              if (!res.ok) {
+                throw new Error('Geocoding API request failed');
+              }
+              return res.json();
+            })
+            .then(data => {
+              console.log('Geocoding response:', data);
+              
+              if (data.status === 'OK' && data.results && data.results[0]) {
+                const address = data.results[0].formatted_address;
+                locationElement.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${address}`;
+                
+                // Update form fields
+                const components = data.results[0].address_components;
+                components.forEach(comp => {
+                  if (comp.types.includes('locality')) {
+                    document.getElementById('city').value = comp.long_name;
+                  }
+                  if (comp.types.includes('administrative_area_level_1')) {
+                    document.getElementById('state').value = comp.long_name;
+                  }
+                  if (comp.types.includes('postal_code')) {
+                    document.getElementById('pincode').value = comp.long_name;
+                  }
+                });
+                
+                console.log('Location detected successfully:', address);
+              } else {
+                console.error('Geocoding failed:', data.status);
+                locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
+              }
+            })
+            .catch((error) => {
+              console.error('Geocoding error:', error);
+              locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
+            });
+        },
+        function(error) {
+          console.error('Geolocation error:', error.message);
+          locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Click to detect location';
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
     }
 
     // Geocode location
     function geocodeLocation(lat, lng) {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key={{ config('services.google.maps_api_key') }}`)
-        .then(res => res.json())
+      console.log('Geocoding location:', lat, lng);
+      const apiKey = '{{ config("services.google.maps_api_key") }}';
+      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+      
+      fetch(geocodeUrl)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Geocoding API request failed');
+          }
+          return res.json();
+        })
         .then(data => {
-          if (data.results && data.results[0]) {
+          console.log('Geocoding response:', data);
+          
+          if (data.status === 'OK' && data.results && data.results[0]) {
             const addressComponents = data.results[0].address_components;
             
-            document.getElementById('new_address').value = data.results[0].formatted_address;
+            // Fill address field
+            const addressField = document.getElementById('new_address');
+            if (addressField) {
+              addressField.value = data.results[0].formatted_address;
+            }
             
+            // Fill city, state, pincode
             addressComponents.forEach(component => {
               if (component.types.includes('locality')) {
-                document.getElementById('city').value = component.long_name;
+                const cityField = document.getElementById('city');
+                if (cityField) cityField.value = component.long_name;
               }
               if (component.types.includes('administrative_area_level_1')) {
-                document.getElementById('state').value = component.long_name;
+                const stateField = document.getElementById('state');
+                if (stateField) stateField.value = component.long_name;
               }
               if (component.types.includes('postal_code')) {
-                document.getElementById('pincode').value = component.long_name;
+                const pincodeField = document.getElementById('pincode');
+                if (pincodeField) pincodeField.value = component.long_name;
               }
             });
 
             // Update location bar
-            document.getElementById('current-location').innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${data.results[0].formatted_address}`;
+            const locationElement = document.getElementById('current-location');
+            if (locationElement) {
+              locationElement.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${data.results[0].formatted_address}`;
+            }
+            
+            console.log('Address fields updated successfully');
+          } else {
+            console.error('Geocoding failed:', data.status);
           }
+        })
+        .catch((error) => {
+          console.error('Geocoding error:', error);
         });
     }
 
@@ -990,8 +1108,25 @@
       const form = document.getElementById('new-address-form');
       if (form.style.display === 'none') {
         form.style.display = 'block';
-        if (typeof google !== 'undefined' && !map) {
+        console.log('Address form opened, checking map initialization');
+        
+        // Initialize map when form is opened
+        if (typeof google !== 'undefined' && google.maps && !map) {
+          console.log('Initializing map for new address form');
           setTimeout(initMap, 100);
+        } else if (!map) {
+          console.log('Waiting for Google Maps to load before initializing map');
+          // Wait for Google Maps to be ready
+          const checkGoogleMaps = setInterval(() => {
+            if (typeof google !== 'undefined' && google.maps) {
+              clearInterval(checkGoogleMaps);
+              console.log('Google Maps ready, initializing map now');
+              initMap();
+            }
+          }, 200);
+          
+          // Clear interval after 5 seconds to prevent infinite loop
+          setTimeout(() => clearInterval(checkGoogleMaps), 5000);
         }
       } else {
         form.style.display = 'none';
