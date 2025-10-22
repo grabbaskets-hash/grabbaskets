@@ -3571,134 +3571,163 @@ li a{
       </div>
       @endif
 
+      <!-- Deals of the Day - Modern Blinkit/Zepto Style -->
       <div class="mb-4">
-        <div class="p-3 rounded-4 mb-3" style="background:linear-gradient(90deg,#ff9900 60%,#ff0033 100%);box-shadow:0 6px 32px #ff990044;display:flex;align-items:center;gap:16px;">
-          <span class="badge bg-danger text-white fs-5 px-3 py-2" style="border-radius:16px 0 16px 0;font-weight:700;"><i class="bi bi-stars"></i> DEALS OF THE DAY</span>
-          <span class="text-white fw-bold fs-5">Best prices, just for today!</span>
+        <div class="section-header-modern">
+          <h2>
+            <i class="bi bi-lightning-charge-fill" style="color: #FF6B00;"></i>
+            Deals of the Day
+            <span class="badge" style="background: linear-gradient(135deg, #FF6B00, #FF9800); color: white; font-size: 0.7rem; padding: 4px 12px; margin-left: 8px;">Limited Time</span>
+          </h2>
+          <a href="{{ route('products.index') }}" class="view-all">
+            View All <i class="bi bi-arrow-right"></i>
+          </a>
         </div>
-        <div class="shelf" style="border:2px solid #ff9900;box-shadow:0 4px 24px #ff990022;background:linear-gradient(90deg,#fffbe6 60%,#fff6f6 100%);">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('deals',-1)" style="background:#ff9900;color:#fff;"><i class="bi bi-chevron-left"></i></button>
-          <div id="shelf-deals" class="shelf-track">
-            @foreach($deals as $product)
-            <div class="shelf-item">
-              <div class="card product-card h-100 border-0 shadow-sm position-relative" style="overflow:visible;">
-                @if($product->discount > 0)
-                  <span class="position-absolute top-0 start-0 badge bg-warning text-dark fs-6" style="z-index:2;border-radius:0 0 12px 0;">-{{ (int)($product->discount ?? 0) }}%</span>
-                @endif
-                <!-- Wishlist Heart Button -->
-                @auth
-                <button class="btn btn-link p-1 wishlist-heart-btn" 
+        
+        <div class="products-grid-modern">
+          @foreach($deals as $product)
+            <div class="product-card-modern" onclick="window.location.href='{{ route('product.details', $product->id) }}'">
+              <!-- Discount Badge -->
+              @if($product->discount > 0)
+                <div class="product-discount-modern">
+                  {{ (int)$product->discount }}% OFF
+                </div>
+              @endif
+
+              <!-- Wishlist Button -->
+              @auth
+                <button class="btn btn-link p-0 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
                         onclick="event.stopPropagation();"
-                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
-                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                        style="position: absolute; top: 8px; left: 8px; z-index: 10; background: rgba(255, 255, 255, 0.95); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  <i class="bi bi-heart wishlist-icon" style="color: #FF6B00; font-size: 1rem;"></i>
                 </button>
-                @endauth
-                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
-                  <img
-                    src="{{ $product->image_url }}"
-                    class="card-img-top" alt="{{ $product->name }}"
-                    data-fallback="{{ asset('images/no-image.png') }}"
-                    onerror="this.src=this.dataset.fallback"
-                    style="height:170px;object-fit:cover;border-radius:18px 18px 0 0;box-shadow:0 8px 24px #ff990022;cursor:pointer;transition:transform 0.3s ease;"
-                    onmouseover="this.style.transform='scale(1.05)'"
-                    onmouseout="this.style.transform='scale(1)'">
-                </a>
-                <div class="card-body d-flex flex-column">
-                  <div class="small text-warning fw-bold mb-1"><i class="bi bi-stars"></i> Deal of the Day</div>
-                  <h6 class="card-title mt-1">
-                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
-                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
-                    </a>
-                  </h6>
-                  <div class="mt-auto">
-                    @if($product->discount > 0)
-                      <span class="fw-bold text-success fs-5">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                      <small class="text-muted text-decoration-line-through ms-2">₹{{ number_format($product->price, 2) }}</small>
-                    @else
-                      <span class="fw-bold fs-5">₹{{ number_format($product->price, 2) }}</span>
-                    @endif
-                    @auth
-                    <form method="POST" action="{{ route('cart.add') }}" class="mt-2 d-flex align-items-center">
-                      @csrf
-                      <input type="hidden" name="product_id" value="{{ $product->id }}">
-                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2" style="width:70px;" required>
-                      <button type="submit" class="btn flex-grow-1" style="background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;">Add</button>
-                    </form>
-                    @else
-                    <a href="{{ route('login') }}" class="btn w-100 mt-2" style="background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;">Login</a>
-                    @endauth
-                  </div>
+              @endauth
+
+              <!-- Product Image -->
+              <img
+                src="{{ $product->image_url }}"
+                alt="{{ $product->name }}"
+                class="product-image-modern"
+                data-fallback="{{ asset('images/no-image.png') }}"
+                onerror="this.src=this.dataset.fallback"
+                loading="lazy">
+
+              <!-- Product Info -->
+              <div style="flex: 1; display: flex; flex-direction: column;">
+                <div class="product-title-modern">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</div>
+                
+                <!-- Price Section -->
+                <div class="product-price-modern">
+                  @if($product->discount > 0)
+                    <span class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
+                  @else
+                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
+                  @endif
                 </div>
+
+                <!-- Add to Cart Button -->
+                @auth
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-{{ $product->id }}').submit();">
+                    <i class="bi bi-cart-plus"></i>
+                    Add to Cart
+                  </button>
+                  <form id="quick-add-{{ $product->id }}" method="POST" action="{{ route('cart.add') }}" style="display: none;">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="quantity" value="1">
+                  </form>
+                @else
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Login to Buy
+                  </button>
+                @endauth
               </div>
             </div>
-            @endforeach
-          </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('deals',1)" style="background:#ff9900;color:#fff;"><i class="bi bi-chevron-right"></i></button>
+          @endforeach
         </div>
       </div>
 
+      <!-- Trending Now - Modern Blinkit/Zepto Style -->
       <div class="mb-4">
-        <h2 class="mb-3">Trending Now</h2>
-        <div class="shelf">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('trend',-1)"><i class="bi bi-chevron-left"></i></button>
-          <div id="shelf-trend" class="shelf-track">
-            @foreach($trending as $product)
-            <div class="shelf-item">
-              <div class="card product-card h-100 position-relative">
-                <!-- Wishlist Heart Button -->
-                @auth
-                <button class="btn btn-link p-1 wishlist-heart-btn" 
+        <div class="section-header-modern">
+          <h2>
+            <i class="bi bi-fire" style="color: var(--primary-color);"></i>
+            Trending Now
+            <span class="badge" style="background: linear-gradient(135deg, var(--primary-color), #0A6917); color: white; font-size: 0.7rem; padding: 4px 12px; margin-left: 8px;">🔥 Hot</span>
+          </h2>
+          <a href="{{ route('products.index') }}" class="view-all">
+            View All <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="products-grid-modern">
+          @foreach($trending as $product)
+            <div class="product-card-modern" onclick="window.location.href='{{ route('product.details', $product->id) }}'">
+              <!-- Discount Badge -->
+              @if($product->discount > 0)
+                <div class="product-discount-modern">
+                  {{ (int)$product->discount }}% OFF
+                </div>
+              @endif
+
+              <!-- Wishlist Button -->
+              @auth
+                <button class="btn btn-link p-0 wishlist-heart-btn" 
                         data-product-id="{{ $product->id }}" 
                         title="Add to Wishlist"
                         onclick="event.stopPropagation();"
-                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px;">
-                    <i class="bi bi-heart wishlist-icon" style="color: #ccc; font-size: 1.25rem;"></i>
+                        style="position: absolute; top: 8px; left: 8px; z-index: 10; background: rgba(255, 255, 255, 0.95); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  <i class="bi bi-heart wishlist-icon" style="color: var(--primary-color); font-size: 1rem;"></i>
                 </button>
-                @endauth
-                <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">
-                  <img
-                    src="{{ $product->image_url }}"
-                    class="card-img-top" alt="{{ $product->name }}"
-                    data-fallback="{{ asset('images/no-image.png') }}"
-                    onerror="this.src=this.dataset.fallback"
-                    style="cursor:pointer;transition:transform 0.3s ease;"
-                    onmouseover="this.style.transform='scale(1.05)'"
-                    onmouseout="this.style.transform='scale(1)'">
-                </a>
-                <div class="card-body d-flex flex-column">
-                  <h6 class="card-title">
-                    <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark" style="cursor:pointer;">
-                      {{ \Illuminate\Support\Str::limit($product->name, 40) }}
-                    </a>
-                  </h6>
-                  <div class="mt-auto">
-                    @if($product->discount > 0)
-                      <span class="fw-bold text-success">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
-                      <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
-                      <small class="text-danger">({{ $product->discount }}% off)</small>
-                    @else
-                      <span class="fw-bold">₹{{ number_format($product->price, 2) }}</span>
-                    @endif
-                    @auth
-                    <form method="POST" action="{{ route('cart.add') }}" class="mt-2 d-flex align-items-center">
-                      @csrf
-                      <input type="hidden" name="product_id" value="{{ $product->id }}">
-                      <input type="number" name="quantity" min="1" value="1" class="form-control me-2"
-                        style="width:70px;" required>
-                      <button type="submit" class="btn btn-primary flex-grow-1">Add</button>
-                    </form>
-                    @else
-                    <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">Login</a>
-                    @endauth
-                  </div>
+              @endauth
+
+              <!-- Product Image -->
+              <img
+                src="{{ $product->image_url }}"
+                alt="{{ $product->name }}"
+                class="product-image-modern"
+                data-fallback="{{ asset('images/no-image.png') }}"
+                onerror="this.src=this.dataset.fallback"
+                loading="lazy">
+
+              <!-- Product Info -->
+              <div style="flex: 1; display: flex; flex-direction: column;">
+                <div class="product-title-modern">{{ \Illuminate\Support\Str::limit($product->name, 45) }}</div>
+                
+                <!-- Price Section -->
+                <div class="product-price-modern">
+                  @if($product->discount > 0)
+                    <span class="current-price">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
+                  @else
+                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
+                  @endif
                 </div>
+
+                <!-- Add to Cart Button -->
+                @auth
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-trend-{{ $product->id }}').submit();">
+                    <i class="bi bi-cart-plus"></i>
+                    Add to Cart
+                  </button>
+                  <form id="quick-add-trend-{{ $product->id }}" method="POST" action="{{ route('cart.add') }}" style="display: none;">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="quantity" value="1">
+                  </form>
+                @else
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Login to Buy
+                  </button>
+                @endauth
               </div>
             </div>
-            @endforeach
-          </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('trend',1)"><i class="bi bi-chevron-right"></i></button>
+          @endforeach
         </div>
       </div>
 
