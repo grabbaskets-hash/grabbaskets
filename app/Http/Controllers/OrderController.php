@@ -235,4 +235,125 @@ Grabbasket Team
 
         return back()->with('success', "Promotional notification sent to {$users->count()} users.");
     }
+
+    /**
+     * Show live tracking page for an order
+     */
+    public function liveTracking(Order $order)
+    {
+        // Verify buyer owns this order
+        if ($order->buyer_id !== Auth::id()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        return view('orders.live-tracking', compact('order'));
+    }
+
+    /**
+     * Check if quick delivery is available for given address
+     */
+    public function checkQuickDelivery(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string',
+            'city' => 'required|string',
+            'state' => 'required|string',
+            'pincode' => 'required|string',
+            'store_id' => 'required|integer'
+        ]);
+
+        // Get coordinates from address
+        $coordinates = \App\Services\QuickDeliveryService::getCoordinates(
+            $request->address,
+            $request->city,
+            $request->state,
+            $request->pincode
+        );
+
+        if (!$coordinates) {
+            return response()->json([
+                'eligible' => false,
+                'message' => 'Unable to verify address. Please check and try again.'
+            ], 400);
+        }
+
+        // Get store coordinates (mock data - replace with actual store data)
+        $storeLatitude = 12.9716; // Default Bangalore
+        $storeLongitude = 77.5946;
+
+        // Check eligibility
+        $eligibility = \App\Services\QuickDeliveryService::checkEligibility(
+            $coordinates['latitude'],
+            $coordinates['longitude'],
+            $storeLatitude,
+            $storeLongitude
+        );
+
+        return response()->json($eligibility);
+    }
+
+    /**
+     * Assign delivery partner to order
+     */
+    public function assignDelivery(Order $order)
+    {
+        // Only seller can assign delivery
+        if ($order->seller_id !== Auth::id()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $partner = \App\Services\QuickDeliveryService::assignDeliveryPartner($order);
+
+        // Update order status to shipped
+        $order->update(['status' => 'shipped']);
+
+        return back()->with('success', 'Delivery partner assigned: ' . $partner['name']);
+    }
+
+    /**
+     * API: Get current tracking data for order
+     */
+    public function apiTrackOrder(Order $order)
+    {
+        // In production, add proper authentication
+        
+        return response()->json([
+            'order_id' => $order->id,
+            'status' => $order->status,
+            'delivery_type' => $order->delivery_type,
+            'latitude' => $order->delivery_latitude,
+            'longitude' => $order->delivery_longitude,
+            'eta_minutes' => $order->eta_minutes,
+            'distance_km' => $order->distance_km,
+            'delivery_partner' => [
+                'name' => $order->delivery_partner_name,
+                'phone' => $order->delivery_partner_phone,
+                'vehicle' => $order->delivery_partner_vehicle,
+            ],
+            'location_updated_at' => $order->location_updated_at,
+        ]);
+    }
+
+    /**
+     * API: Update delivery partner location (called by delivery partner app)
+     */
+    public function apiUpdateLocation(Request $request, Order $order)
+    {
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric'
+        ]);
+
+        \App\Services\QuickDeliveryService::updateDeliveryLocation(
+            $order,
+            $request->latitude,
+            $request->longitude
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location updated successfully',
+            'eta_minutes' => $order->fresh()->eta_minutes
+        ]);
+    }
 }

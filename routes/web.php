@@ -519,6 +519,11 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/orders', [OrderController::class, 'sellerOrders'])->name('seller.orders');
     Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders/{order}/update-tracking', [OrderController::class, 'updateTracking'])->name('orders.updateTracking');
+    
+    // Quick Delivery & Live Tracking (Blinkit/Zepto Style)
+    Route::get('/orders/{order}/live-tracking', [OrderController::class, 'liveTracking'])->name('orders.liveTracking');
+    Route::post('/orders/check-quick-delivery', [OrderController::class, 'checkQuickDelivery'])->name('orders.checkQuickDelivery');
+    Route::post('/orders/{order}/assign-delivery', [OrderController::class, 'assignDelivery'])->name('orders.assignDelivery');
 
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
