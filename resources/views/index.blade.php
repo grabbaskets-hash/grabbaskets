@@ -15,21 +15,565 @@
     console.error('Database Error: {{ $database_error }}');
   </script>
   @endif
-  <!-- Modern Clean Theme - Light Blue & Cream -->
+  <!-- Blinkit/Zepto Inspired Modern Design -->
   <style>
-    /* Delivery Badge Pulse Animation */
-    @keyframes pulse {
-      0%, 100% { 
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+    /* ============================================
+       RESET & BASE STYLES (Blinkit/Zepto Style)
+       ============================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #0C831F;
+      --primary-hover: #0A6B19;
+      --secondary-color: #F8CB46;
+      --text-dark: #1C1C1C;
+      --text-light: #666;
+      --bg-light: #F7F7F7;
+      --bg-white: #FFFFFF;
+      --border-color: #E5E5E5;
+      --success-color: #0C831F;
+      --danger-color: #E74C3C;
+      --warning-color: #F39C12;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
       }
-      50% { 
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(255, 23, 68, 0);
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
-    /* Trending Section - Sleek Dark Neon Design */
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(12, 131, 31, 0.7);
+      }
+      50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(12, 131, 31, 0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    /* ============================================
+       NAVBAR (Blinkit/Zepto Style)
+       ============================================ */
+    .navbar-modern {
+      background: var(--bg-white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 12px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand-modern {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-bar-modern {
+      flex: 1;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-bar-modern input {
+      width: 100%;
+      padding: 12px 50px 12px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      background: var(--bg-light);
+    }
+
+    .search-bar-modern input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: white;
+      box-shadow: 0 4px 12px rgba(12, 131, 31, 0.1);
+    }
+
+    .search-bar-modern button {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--primary-color);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar-modern button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .nav-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-icon-btn {
+      position: relative;
+      background: var(--bg-light);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      text-decoration: none;
+    }
+
+    .nav-icon-btn:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .nav-icon-btn .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger-color);
+      color: white;
+      border-radius: 10px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* ============================================
+       DELIVERY BANNER (Prominent)
+       ============================================ */
+    .delivery-banner-modern {
+      background: linear-gradient(135deg, #0C831F 0%, #14A02E 100%);
+      padding: 16px 0;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(12, 131, 31, 0.2);
+    }
+
+    .delivery-banner-modern h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .delivery-banner-modern p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    /* ============================================
+       CATEGORY PILLS (Blinkit Style)
+       ============================================ */
+    .category-pills-modern {
+      background: white;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 72px;
+      z-index: 999;
+    }
+
+    .category-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 4px 0;
+    }
+
+    .category-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-pill {
+      flex-shrink: 0;
+      padding: 10px 20px;
+      background: var(--bg-light);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .category-pill:hover,
+    .category-pill.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(12, 131, 31, 0.2);
+    }
+
+    /* ============================================
+       PRODUCT GRID (Zepto Style)
+       ============================================ */
+    .products-grid-modern {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      padding: 20px 0;
+    }
+
+    @media (max-width: 768px) {
+      .products-grid-modern {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .products-grid-modern {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    .product-card-modern {
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .product-card-modern:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      border-color: var(--primary-color);
+    }
+
+    .product-image-modern {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: var(--bg-light);
+      padding: 8px;
+    }
+
+    .product-timer-modern {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--danger-color);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .product-discount-modern {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--success-color);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .product-title-modern {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-quantity-modern {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .product-price-modern {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      margin-top: auto;
+    }
+
+    .product-price-modern .current-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .product-price-modern .original-price {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+
+    .add-to-cart-modern {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .add-to-cart-modern:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(12, 131, 31, 0.3);
+    }
+
+    .add-to-cart-modern.in-cart {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* ============================================
+       SECTION HEADERS (Modern)
+       ============================================ */
+    .section-header-modern {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .section-header-modern h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .section-header-modern .view-all {
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .section-header-modern .view-all:hover {
+      gap: 8px;
+      color: var(--primary-hover);
+    }
+
+    /* ============================================
+       MOBILE BOTTOM NAV (Blinkit/Zepto Style)
+       ============================================ */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      padding: 8px 0;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      body {
+        padding-bottom: 70px;
+      }
+    }
+
+    .mobile-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .mobile-nav-item.active,
+    .mobile-nav-item:hover {
+      color: var(--primary-color);
+    }
+
+    .mobile-nav-item i {
+      font-size: 1.4rem;
+    }
+
+    .mobile-nav-item .badge {
+      position: absolute;
+      top: 4px;
+      right: 20%;
+      background: var(--danger-color);
+      color: white;
+      border-radius: 10px;
+      padding: 2px 5px;
+      font-size: 0.65rem;
+    }
+
+    /* ============================================
+       RESPONSIVE UTILITIES
+       ============================================ */
+    @media (max-width: 768px) {
+      .navbar-modern {
+        padding: 8px 0;
+      }
+
+      .search-bar-modern input {
+        padding: 10px 40px 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .product-card-modern {
+        padding: 10px;
+      }
+
+      .product-title-modern {
+        font-size: 0.85rem;
+      }
+
+      .section-header-modern h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-only {
+        display: none !important;
+      }
+    }
+
+    /* ============================================
+       LOADING SKELETON
+       ============================================ */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    .skeleton-text {
+      height: 12px;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-image {
+      width: 100%;
+      aspect-ratio: 1;
+      margin-bottom: 10px;
+    }
+
+    /* Legacy styles for compatibility */
     .trending-neon-section {
       position: relative;
       min-height: 700px;
@@ -2254,11 +2798,139 @@ li a{
   @endif --}}
   <!-- Modern Enhanced Navbar -->
 
-  <nav class="navbar navbar-expand-lg" id="mainNavbar">
+  <!-- Blinkit/Zepto Style Navigation -->
+  <nav class="navbar-modern">
+    <div class="container">
+      <div class="d-flex align-items-center gap-3 w-100">
+        <!-- Logo -->
+        <a href="{{ route('home') }}" class="navbar-brand-modern">
+          <i class="bi bi-bag-check-fill"></i>
+          <span class="desktop-only">GrabBaskets</span>
+          <span class="mobile-only">GB</span>
+        </a>
+
+        <!-- Delivery Location (Desktop) -->
+        <div class="desktop-only" style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px;">
+          <i class="bi bi-geo-alt-fill" style="color: var(--primary-color);"></i>
+          <div style="line-height: 1.2;">
+            <div style="font-size: 0.75rem; color: var(--text-light);">Delivery in 10 mins</div>
+            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">Select Location</div>
+          </div>
+          <i class="bi bi-chevron-down" style="color: var(--text-light); font-size: 0.8rem;"></i>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar-modern">
+          <form action="{{ route('products.index') }}" method="GET">
+            <input type="text" name="q" placeholder="Search for products..." value="{{ request('q') }}">
+            <button type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Nav Icons -->
+        <div class="nav-icons desktop-only">
+          @auth
+            <!-- Cart -->
+            <a href="{{ route('cart.index') }}" class="nav-icon-btn">
+              <i class="bi bi-cart3" style="font-size: 1.3rem;"></i>
+              <span>Cart</span>
+              @if(session('cart') && count(session('cart')) > 0)
+                <span class="badge">{{ count(session('cart')) }}</span>
+              @endif
+            </a>
+
+            <!-- Notifications -->
+            <button class="nav-icon-btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+              <i class="bi bi-bell" style="font-size: 1.3rem;"></i>
+            </button>
+
+            <!-- User -->
+            <div class="dropdown">
+              <button class="nav-icon-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle" style="font-size: 1.3rem;"></i>
+                <span>Account</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ route('profile.show') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-box-seam me-2"></i>My Orders</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-heart me-2"></i>Wishlist</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          @else
+            <a href="{{ route('login') }}" class="nav-icon-btn" style="background: var(--primary-color); color: white;">
+              <i class="bi bi-person-circle" style="font-size: 1.3rem;"></i>
+              <span>Login</span>
+            </a>
+          @endauth
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Delivery Banner -->
+  <div class="delivery-banner-modern">
+    <div class="container">
+      <h3>
+        <i class="bi bi-lightning-charge-fill"></i>
+        Get 10-Minute Delivery on Groceries & Essentials
+        <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.8rem; margin-left: 8px;">Within 5km</span>
+      </h3>
+      <p>Free delivery on orders above ₹499 • Same-day delivery available nationwide</p>
+    </div>
+  </div>
+
+  <!-- Category Pills -->
+  <div class="category-pills-modern">
+    <div class="container">
+      <div class="category-scroll">
+        <a href="{{ route('home') }}" class="category-pill active">
+          <i class="bi bi-house-fill me-1"></i> All
+        </a>
+        @if(!empty($categories) && $categories->count())
+          @foreach($categories->take(15) as $category)
+            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="category-pill">
+              {{ $category->emoji }} {{ $category->name }}
+            </a>
+          @endforeach
+        @endif
+        <a href="{{ route('buyer.dashboard') }}" class="category-pill">
+          <i class="bi bi-three-dots"></i> More
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Search (Collapsible) -->
+  <div class="collapse mobile-only" id="mobileSearch" style="background: white; padding: 12px; border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+      <form action="{{ route('products.index') }}" method="GET">
+        <div class="search-bar-modern">
+          <input type="text" name="q" placeholder="Search for products..." value="{{ request('q') }}">
+          <button type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Old navbar kept for reference but hidden -->
+  <nav class="navbar navbar-expand-lg d-none" id="mainNavbar">
     <div class="container">
       <!-- Logo -->
       <a href="{{ route('home') }}" class="navbar-brand d-flex align-items-center">
-        🛒 grabbasket
+        🛒 GrabBaskets
       </a>
 
       <!-- Mobile Search Toggle -->
@@ -4542,6 +5214,40 @@ li a{
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', initWishlistHearts);
   </script>
+
+  <!-- Mobile Bottom Navigation (Blinkit/Zepto Style) -->
+  <div class="mobile-bottom-nav">
+    <a href="{{ route('home') }}" class="mobile-nav-item active">
+      <i class="bi bi-house-fill"></i>
+      <span>Home</span>
+    </a>
+    <a href="{{ route('products.index') }}" class="mobile-nav-item">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <span>Categories</span>
+    </a>
+    <a href="{{ route('cart.index') }}" class="mobile-nav-item">
+      <i class="bi bi-cart3"></i>
+      <span>Cart</span>
+      @if(session('cart') && count(session('cart')) > 0)
+        <span class="badge">{{ count(session('cart')) }}</span>
+      @endif
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <i class="bi bi-heart"></i>
+      <span>Wishlist</span>
+    </a>
+    @auth
+      <a href="{{ route('profile.show') }}" class="mobile-nav-item">
+        <i class="bi bi-person-circle"></i>
+        <span>Account</span>
+      </a>
+    @else
+      <a href="{{ route('login') }}" class="mobile-nav-item">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+      </a>
+    @endauth
+  </div>
 
 </body>
 </html>
