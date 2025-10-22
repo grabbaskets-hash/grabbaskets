@@ -454,6 +454,156 @@
       box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
 
+    /* Delivery Options */
+    .delivery-options-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+
+    .delivery-option-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .delivery-option-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .delivery-option-card.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .delivery-option-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+
+    .fast-delivery-icon {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      color: white;
+    }
+
+    .standard-delivery-icon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+    }
+
+    .delivery-option-content {
+      flex: 1;
+    }
+
+    .delivery-option-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .delivery-option-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .delivery-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-fast {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      color: white;
+    }
+
+    .badge-standard {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+    }
+
+    .delivery-option-time {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .delivery-option-description {
+      font-size: 0.9rem;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .delivery-coverage {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff3cd;
+      color: #856404;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .delivery-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-top: 8px;
+    }
+
+    .delivery-radio {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 24px;
+      height: 24px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
+    .distance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .tab-item {
@@ -558,8 +708,13 @@
           <div class="tab-title">Delivery Address</div>
           <div class="tab-subtitle">Where should we deliver?</div>
         </div>
-        <div class="tab-item" data-tab="payment">
+        <div class="tab-item" data-tab="delivery">
           <div class="tab-number">2</div>
+          <div class="tab-title">Delivery Type</div>
+          <div class="tab-subtitle">Fast or Standard</div>
+        </div>
+        <div class="tab-item" data-tab="payment">
+          <div class="tab-number">3</div>
           <div class="tab-title">Payment Method</div>
           <div class="tab-subtitle">Complete your order</div>
         </div>
@@ -568,6 +723,9 @@
 
     <form id="checkout-form" method="POST" action="{{ route('cart.checkout') }}">
       @csrf
+      <input type="hidden" name="delivery_type" id="delivery_type" value="standard">
+      <input type="hidden" name="user_latitude" id="user_latitude">
+      <input type="hidden" name="user_longitude" id="user_longitude">
 
       <div class="row g-4">
         <!-- Left Column - Tab Content -->
@@ -670,13 +828,106 @@
 
             <!-- Navigation Buttons -->
             <div class="d-flex justify-content-end gap-3 mt-4">
+              <button type="button" class="btn-primary-custom" onclick="goToDelivery()">
+                Continue to Delivery Options <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Delivery Options Tab -->
+          <div class="tab-content-wrapper" id="delivery-tab">
+            <h4 class="mb-4 fw-bold">
+              <i class="bi bi-lightning-fill text-warning"></i> Choose Delivery Speed
+            </h4>
+
+            <div class="delivery-options-container">
+              <p class="text-muted mb-4">
+                <i class="bi bi-info-circle"></i> All products support both delivery types. Choose based on your urgency.
+              </p>
+
+              <!-- Fast Delivery Option -->
+              <div class="delivery-option-card" onclick="selectDeliveryType('fast')" id="fast-delivery-option">
+                <input type="radio" name="delivery_option" value="fast" class="delivery-radio" id="fast-delivery">
+                <div class="delivery-option-icon fast-delivery-icon">
+                  <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <div class="delivery-option-content">
+                  <div class="delivery-option-header">
+                    <div class="delivery-option-title">Express Delivery</div>
+                    <span class="delivery-badge badge-fast">⚡ FASTEST</span>
+                    <span class="distance-badge" id="fast-distance-badge" style="display: none;">
+                      <i class="bi bi-check-circle-fill"></i> Available
+                    </span>
+                  </div>
+                  <div class="delivery-option-time">
+                    <i class="bi bi-clock-fill"></i>
+                    <strong>Delivery in 10 minutes</strong>
+                  </div>
+                  <div class="delivery-option-description">
+                    Get your order delivered at lightning speed! Perfect for urgent needs.
+                  </div>
+                  <div class="delivery-coverage" id="fast-coverage-warning">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Available within 5km radius
+                  </div>
+                  <div class="delivery-price" id="fast-delivery-price">
+                    Delivery Fee: ₹49
+                  </div>
+                </div>
+              </div>
+
+              <!-- Standard Delivery Option -->
+              <div class="delivery-option-card selected" onclick="selectDeliveryType('standard')" id="standard-delivery-option">
+                <input type="radio" name="delivery_option" value="standard" class="delivery-radio" id="standard-delivery" checked>
+                <div class="delivery-option-icon standard-delivery-icon">
+                  <i class="bi bi-truck"></i>
+                </div>
+                <div class="delivery-option-content">
+                  <div class="delivery-option-header">
+                    <div class="delivery-option-title">Standard Delivery</div>
+                    <span class="delivery-badge badge-standard">📦 RELIABLE</span>
+                  </div>
+                  <div class="delivery-option-time">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <strong>Delivery in 1-2 days</strong>
+                  </div>
+                  <div class="delivery-option-description">
+                    Regular delivery with guaranteed freshness and quality.
+                  </div>
+                  <div class="delivery-coverage" style="background: #e3f2fd; color: #0d47a1;">
+                    <i class="bi bi-globe"></i>
+                    Available everywhere
+                  </div>
+                  <div class="delivery-price">
+                    Delivery Fee: FREE on orders above ₹299
+                  </div>
+                </div>
+              </div>
+
+              <!-- Distance Info -->
+              <div class="alert alert-info mt-3" id="distance-info" style="display: none;">
+                <i class="bi bi-info-circle-fill"></i>
+                <strong>Your location:</strong> <span id="user-distance-text"></span> from store
+              </div>
+
+              <div class="alert alert-warning mt-3" id="fast-unavailable-warning" style="display: none;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>Express Delivery Unavailable:</strong> You're outside the 5km coverage area. Standard delivery is available.
+              </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex gap-3 justify-content-between mt-4">
+              <button type="button" class="btn btn-outline-secondary btn-lg" onclick="goToAddress()">
+                <i class="bi bi-arrow-left"></i> Back to Address
+              </button>
               <button type="button" class="btn-primary-custom" onclick="goToPayment()">
                 Continue to Payment <i class="bi bi-arrow-right"></i>
               </button>
             </div>
           </div>
 
-          <!-- Step 2: Payment Tab -->
+          <!-- Step 3: Payment Tab -->
           <div class="tab-content-wrapper" id="payment-tab">
             <h4 class="mb-4 fw-bold">
               <i class="bi bi-credit-card-fill text-success"></i> Select Payment Method
@@ -1067,6 +1318,26 @@
     }
 
     function goToPayment() {
+      // Validate delivery type selection
+      const selectedDelivery = document.querySelector('input[name="delivery_option"]:checked');
+      
+      if (!selectedDelivery) {
+        alert('Please select a delivery option');
+        return;
+      }
+
+      // Mark delivery step as completed
+      document.querySelector('.tab-item[data-tab="delivery"]').classList.add('completed');
+      switchTab('payment');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToAddress() {
+      switchTab('address');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToDelivery() {
       // Validate address selection
       const selectedAddress = document.querySelector('input[name="address"]:checked');
       const newAddress = document.getElementById('new_address').value;
@@ -1078,13 +1349,107 @@
 
       // Mark address step as completed
       document.querySelector('.tab-item[data-tab="address"]').classList.add('completed');
-      switchTab('payment');
+      
+      // Calculate distance and check fast delivery availability
+      checkDeliveryAvailability();
+      
+      switchTab('delivery');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function goToAddress() {
-      switchTab('address');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Check delivery availability based on distance
+    function checkDeliveryAvailability() {
+      // Get user's latitude and longitude
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            // Store coordinates in hidden fields
+            document.getElementById('user_latitude').value = userLat;
+            document.getElementById('user_longitude').value = userLng;
+            
+            // Store location (example: Theni, Tamil Nadu - you can change this)
+            const storeLat = 10.0104;  // Example: Theni latitude
+            const storeLng = 77.4768;  // Example: Theni longitude
+            
+            // Calculate distance
+            const distance = calculateDistance(userLat, userLng, storeLat, storeLng);
+            console.log('Distance from store:', distance, 'km');
+            
+            // Update UI based on distance
+            document.getElementById('distance-info').style.display = 'block';
+            document.getElementById('user-distance-text').textContent = distance.toFixed(2) + ' km';
+            
+            if (distance <= 5) {
+              // Fast delivery available
+              document.getElementById('fast-distance-badge').style.display = 'inline-flex';
+              document.getElementById('fast-unavailable-warning').style.display = 'none';
+              document.getElementById('fast-delivery-option').style.opacity = '1';
+              document.getElementById('fast-delivery-option').style.pointerEvents = 'auto';
+              document.getElementById('fast-delivery').disabled = false;
+            } else {
+              // Fast delivery unavailable
+              document.getElementById('fast-distance-badge').style.display = 'none';
+              document.getElementById('fast-unavailable-warning').style.display = 'block';
+              document.getElementById('fast-delivery-option').style.opacity = '0.6';
+              document.getElementById('fast-delivery-option').style.pointerEvents = 'none';
+              document.getElementById('fast-delivery').disabled = true;
+              
+              // Auto-select standard delivery
+              selectDeliveryType('standard');
+            }
+          },
+          function(error) {
+            console.error('Geolocation error:', error);
+            // Default to standard delivery if location unavailable
+            document.getElementById('fast-unavailable-warning').style.display = 'block';
+            document.getElementById('fast-unavailable-warning').innerHTML = 
+              '<i class="bi bi-exclamation-triangle-fill"></i> <strong>Cannot detect location:</strong> Please enable location services. Standard delivery is available.';
+            selectDeliveryType('standard');
+          }
+        );
+      } else {
+        console.error('Geolocation not supported');
+        selectDeliveryType('standard');
+      }
+    }
+
+    // Calculate distance between two coordinates (Haversine formula)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radius of the Earth in kilometers
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      return distance;
+    }
+
+    // Select delivery type
+    function selectDeliveryType(type) {
+      console.log('Selected delivery type:', type);
+      
+      // Update hidden field
+      document.getElementById('delivery_type').value = type;
+      
+      // Remove selected class from all
+      document.querySelectorAll('.delivery-option-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to clicked option
+      if (type === 'fast') {
+        document.getElementById('fast-delivery-option').classList.add('selected');
+        document.getElementById('fast-delivery').checked = true;
+      } else {
+        document.getElementById('standard-delivery-option').classList.add('selected');
+        document.getElementById('standard-delivery').checked = true;
+      }
     }
 
     // Address Selection
