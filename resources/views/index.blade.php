@@ -3343,36 +3343,36 @@ li a{
     }
   </style>
 
-  <!-- Featured Products Section - Festive Diwali Theme -->
-  <section class="py-5" style="background: linear-gradient(135deg, rgba(255, 248, 231, 0.95) 0%, rgba(255, 235, 205, 0.95) 50%, rgba(255, 228, 181, 0.95) 100%); position: relative; overflow: hidden;">
-    <!-- Decorative Diya Pattern -->
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(255, 107, 0, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
+  <!-- Featured Products Section - Fresh Monsoon Theme -->
+  <section class="py-5" style="background: linear-gradient(135deg, rgba(230, 245, 255, 0.95) 0%, rgba(200, 230, 255, 0.95) 50%, rgba(180, 220, 255, 0.95) 100%); position: relative; overflow: hidden;">
+    <!-- Decorative Rain Pattern -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 10% 20%, rgba(100, 180, 255, 0.08) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(70, 150, 230, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
     
     <div class="container" style="position: relative; z-index: 1;">
       <div class="text-center mb-5">
-        <h2 class="h3 fw-bold mb-3" style="background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700, #FF6B00, #FF4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem; text-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);">
-          🪔 Featured Products 🪔
+        <h2 class="h3 fw-bold mb-3" style="background: linear-gradient(45deg, #4A90E2, #5BA3E8, #6CB5EE, #5BA3E8, #4A90E2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem; text-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);">
+          Featured Products
         </h2>
-        <div style="width: 100px; height: 4px; background: linear-gradient(90deg, transparent, #FF6B00, #FFD700, #FF6B00, transparent); margin: 0 auto 20px; border-radius: 2px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"></div>
-        <p class="text-muted mb-2" style="color: #ff44441b !important; font-size: 1.1rem;">✨ Handpicked items from our best categories ✨</p>
-        <p class="text-muted" style="color: #eacebaff !important; font-size: 0.95rem;">🎁 Special festive deals on trending products! 🎁</p>
+        <div style="width: 100px; height: 4px; background: linear-gradient(90deg, transparent, #4A90E2, #6CB5EE, #4A90E2, transparent); margin: 0 auto 20px; border-radius: 2px; box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);"></div>
+        <p class="text-muted mb-2" style="color: #4A90E2 !important; font-weight: 500; font-size: 1.1rem;">Handpicked items from our best categories</p>
+        <p class="text-muted" style="color: #6c757d !important; font-size: 0.95rem;">Fresh deals on trending products!</p>
       </div>
       @if(isset($categoryProducts) && !empty($categoryProducts))
         @foreach($categoryProducts as $categoryName => $products)
           @if($products->count() > 0)
           <div class="mb-5">
-            <div class="d-flex align-items-center justify-content-between mb-4" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 0, 0.05) 100%); padding: 15px 20px; border-radius: 15px; border: 2px solid rgba(255, 107, 0, 0.2); box-shadow: 0 4px 15px rgba(255, 107, 0, 0.1);">
-              <h3 class="h4 fw-bold mb-0" style="color: #FF4444; text-shadow: 0 2px 4px rgba(255, 68, 68, 0.2);">
-                ✨ {{ $categoryName }}
+            <div class="d-flex align-items-center justify-content-between mb-4" style="background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(100, 180, 255, 0.05) 100%); padding: 15px 20px; border-radius: 15px; border: 2px solid rgba(74, 144, 226, 0.2); box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1);">
+              <h3 class="h4 fw-bold mb-0" style="color: #4A90E2; text-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);">
+                {{ $categoryName }}
               </h3>
-              <span class="badge" style="background: linear-gradient(45deg, #FF6B00, #FFD700); color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);">
-                🎁 {{ $products->count() }} Products
+              <span class="badge" style="background: linear-gradient(45deg, #4A90E2, #6CB5EE); color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);">
+                {{ $products->count() }} Products
               </span>
             </div>
             <div class="row g-4">
               @foreach($products as $product)
               <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                <div class="card h-100 festive-product-card position-relative" style="border: 2px solid rgba(255, 107, 0, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%); box-shadow: 0 8px 25px rgba(255, 107, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.1); transition: all 0.4s ease;">
+                <div class="card h-100 festive-product-card position-relative" style="border: 2px solid rgba(74, 144, 226, 0.2); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #E8F4FD 100%); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.15), 0 0 30px rgba(100, 180, 255, 0.1); transition: all 0.4s ease;">
                   <!-- Wishlist Heart Button -->
                   @auth
                   <button class="btn btn-link p-1 wishlist-heart-btn" 
@@ -3394,40 +3394,40 @@ li a{
                          onerror="this.src=this.dataset.fallback"
                          onmouseover="this.style.transform='scale(1.1)'"
                          onmouseout="this.style.transform='scale(1)'">
-                    <!-- Festive Corner Badge -->
+                    <!-- Monsoon Fresh Discount Badge -->
                     @if($product->discount > 0)
-                    <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #FF4444, #FF6B00); color: white; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4); border: 2px solid rgba(255, 215, 0, 0.3);">
-                      🎉 {{ $product->discount }}% OFF
+                    <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #4A90E2, #5BA3E8); color: white; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4); border: 2px solid rgba(100, 180, 255, 0.3);">
+                      {{ $product->discount }}% OFF
                     </div>
                     @endif
                   </div>
                   <div class="card-body d-flex flex-column" style="padding: 20px;">
-                    <h6 class="card-title fw-bold mb-2" style="color: #FF4444; font-size: 1.05rem; line-height: 1.4;">
+                    <h6 class="card-title fw-bold mb-2" style="color: #4A90E2; font-size: 1.05rem; line-height: 1.4;">
                       {{ \Illuminate\Support\Str::limit($product->name, 60) }}
                     </h6>
                     <p class="card-text small mb-3" style="color: #666; line-height: 1.6;">
                       {{ \Illuminate\Support\Str::limit($product->description, 100) }}
                     </p>
                     <div class="mt-auto">
-                      <!-- Festive Price Section -->
+                      <!-- Monsoon Price Section -->
                       @if($product->discount > 0)
-                        <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 0, 0.1)); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 107, 0, 0.2);">
+                        <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(100, 180, 255, 0.1)); padding: 12px; border-radius: 12px; border: 1px solid rgba(74, 144, 226, 0.2);">
                           <div class="d-flex align-items-center justify-content-between">
                             <div>
-                              <span class="fw-bold d-block" style="color: #FF6B00; font-size: 1.4rem;">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
+                              <span class="fw-bold d-block" style="color: #4A90E2; font-size: 1.4rem;">₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}</span>
                               <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
                             </div>
                             <div class="text-end">
-                              <small class="badge" style="background: linear-gradient(45deg, #FF4444, #FFD700); color: white; padding: 6px 12px; border-radius: 15px;">Save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</small>
+                              <small class="badge" style="background: linear-gradient(45deg, #4A90E2, #6CB5EE); color: white; padding: 6px 12px; border-radius: 15px;">Save ₹{{ number_format($product->price * ($product->discount / 100), 2) }}</small>
                             </div>
                           </div>
                         </div>
                       @else
-                        <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 0, 0.1)); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 107, 0, 0.2);">
-                          <span class="fw-bold" style="color: #FF6B00; font-size: 1.4rem;">₹{{ number_format($product->price, 2) }}</span>
+                        <div class="price-section mb-3" style="background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(100, 180, 255, 0.1)); padding: 12px; border-radius: 12px; border: 1px solid rgba(74, 144, 226, 0.2);">
+                          <span class="fw-bold" style="color: #4A90E2; font-size: 1.4rem;">₹{{ number_format($product->price, 2) }}</span>
                         </div>
                       @endif
-                      <!-- Stock Status with Festive Style -->
+                      <!-- Stock Status with Fresh Style -->
                       @if($product->stock > 0)
                         <small class="d-block mb-3" style="color: #28a745; font-weight: 600;">
                           <i class="bi bi-check-circle-fill"></i> In Stock 
@@ -3438,13 +3438,13 @@ li a{
                           <i class="bi bi-x-circle-fill"></i> Out of Stock
                         </small>
                       @endif
-                      <!-- Festive Action Buttons -->
+                      <!-- Monsoon Fresh Action Buttons -->
                       <div class="d-grid gap-2">
                         <a href="{{ route('product.details', $product->id) }}" 
                            class="btn btn-sm" 
-                           style="background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 215, 0, 0.1)); color: #FF6B00; border: 2px solid rgba(255, 107, 0, 0.3); font-weight: 600; padding: 10px; border-radius: 12px; transition: all 0.3s ease;"
-                           onmouseover="this.style.background='linear-gradient(135deg, #FF6B00, #FFD700)'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.4)'"
-                           onmouseout="this.style.background='linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 215, 0, 0.1))'; this.style.color='#FF6B00'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                           style="background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(100, 180, 255, 0.1)); color: #4A90E2; border: 2px solid rgba(74, 144, 226, 0.3); font-weight: 600; padding: 10px; border-radius: 12px; transition: all 0.3s ease;"
+                           onmouseover="this.style.background='linear-gradient(135deg, #4A90E2, #6CB5EE)'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(74, 144, 226, 0.4)'"
+                           onmouseout="this.style.background='linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(100, 180, 255, 0.1))'; this.style.color='#4A90E2'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                           <i class="bi bi-eye"></i> View Details
                         </a>
                         @auth
@@ -3455,10 +3455,10 @@ li a{
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" 
                                     class="btn btn-sm w-100" 
-                                    style="background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700); color: white; border: none; font-weight: 700; padding: 12px; border-radius: 12px; box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3); transition: all 0.3s ease;"
-                                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 30px rgba(255, 107, 0, 0.5)'"
-                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.3)'">
-                              <i class="bi bi-cart-plus"></i> Add to Cart 🛒
+                                    style="background: linear-gradient(45deg, #4A90E2, #5BA3E8, #6CB5EE); color: white; border: none; font-weight: 700; padding: 12px; border-radius: 12px; box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3); transition: all 0.3s ease;"
+                                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 30px rgba(74, 144, 226, 0.5)'"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(74, 144, 226, 0.3)'">
+                              <i class="bi bi-cart-plus"></i> Add to Cart
                             </button>
                           </form>
                           @else
@@ -3471,9 +3471,9 @@ li a{
                         @else
                           <a href="{{ route('login') }}" 
                              class="btn btn-sm w-100" 
-                             style="background: linear-gradient(45deg, #FF6B00, #FFD700); color: white; border: none; font-weight: 700; padding: 12px; border-radius: 12px; box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3); transition: all 0.3s ease;"
-                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 30px rgba(255, 107, 0, 0.5)'"
-                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.3)'">
+                             style="background: linear-gradient(45deg, #4A90E2, #6CB5EE); color: white; border: none; font-weight: 700; padding: 12px; border-radius: 12px; box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3); transition: all 0.3s ease;"
+                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 30px rgba(74, 144, 226, 0.5)'"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(74, 144, 226, 0.3)'">
                             <i class="bi bi-box-arrow-in-right"></i> Login to Buy
                           </a>
                         @endauth
