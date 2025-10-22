@@ -3433,12 +3433,50 @@ li a{
 
     /* Mobile specific styles for floating button */
     @media (max-width: 768px) {
-      #floatingActionsContainer {
-        bottom: 90px !important; /* Above mobile bottom nav */
+      /* Hide ALL floating elements on mobile - Comprehensive */
+      #floatingActionsContainer,
+      #showFabBtn,
+      .floating-actions,
+      .fab-main,
+      .fab-hide-btn,
+      #fabMainBtn,
+      #fabHideBtn,
+      .floating-menu-popup,
+      #floatingMenu {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        z-index: -9999 !important;
       }
-      
-      #showFabBtn {
-        bottom: 90px !important; /* Above mobile bottom nav */
+
+      /* Hide chatbot widget on mobile */
+      .chatbot-widget,
+      [id*="chatbot"],
+      [id*="Chatbot"],
+      [class*="chatbot"],
+      [class*="chat-widget"],
+      .chat-bubble,
+      .support-chat {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      /* Hide any other fixed bottom elements that might interfere */
+      [style*="position: fixed"][style*="bottom:"],
+      [style*="position:fixed"][style*="bottom:"] {
+        position: static !important;
+      }
+
+      /* Ensure mobile bottom nav is visible if exists */
+      .mobile-bottom-nav,
+      .bottom-navigation {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 1000 !important;
       }
     }
   </style>

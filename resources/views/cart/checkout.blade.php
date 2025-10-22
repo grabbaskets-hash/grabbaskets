@@ -604,6 +604,438 @@
       margin-left: 8px;
     }
 
+    /* ============ BLINKIT-STYLE ENHANCEMENTS ============ */
+    
+    /* Real-time Delivery Tracker */
+    .delivery-tracker {
+      background: linear-gradient(135deg, #fff9e6 0%, #fff4d1 100%);
+      border: 2px dashed #ffa500;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .delivery-tracker::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .tracker-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .tracker-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tracker-step-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .tracker-step.active .tracker-step-icon {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      border-color: #ff6b6b;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    }
+
+    .tracker-step.completed .tracker-step-icon {
+      background: #4caf50;
+      border-color: #4caf50;
+      color: white;
+    }
+
+    .tracker-step-label {
+      font-size: 0.75rem;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .tracker-step.active .tracker-step-label {
+      color: #ff6b6b;
+      font-weight: 700;
+    }
+
+    .tracker-line {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #e0e0e0;
+      z-index: 0;
+    }
+
+    .tracker-line-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #ee5a6f);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* Guaranteed Time Badge */
+    .guaranteed-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .guaranteed-time-badge i {
+      font-size: 1.1rem;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Time Slot Picker */
+    .time-slot-picker {
+      margin-top: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .time-slot-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .time-slot {
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    .time-slot:hover {
+      border-color: #ff6b6b;
+      transform: scale(1.02);
+    }
+
+    .time-slot.selected {
+      border-color: #ff6b6b;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(238, 90, 111, 0.1));
+    }
+
+    .time-slot-time {
+      font-weight: 700;
+      color: #333;
+      font-size: 0.9rem;
+    }
+
+    .time-slot-label-text {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Live Delivery Person Info */
+    .delivery-person-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 2px solid #2196f3;
+    }
+
+    .delivery-person-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      flex-shrink: 0;
+      border: 3px solid white;
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    }
+
+    .delivery-person-details {
+      flex: 1;
+    }
+
+    .delivery-person-name {
+      font-weight: 700;
+      color: #1976d2;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .delivery-person-status {
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .delivery-person-eta {
+      background: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #ff6b6b;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    /* Product Freshness Indicators */
+    .freshness-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-radius: 10px;
+      border: 2px solid #4caf50;
+    }
+
+    .freshness-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #4caf50;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .freshness-text {
+      font-size: 0.9rem;
+      color: #2e7d32;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* Smart Pricing Display */
+    .smart-pricing {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      border: 2px dashed #ff9800;
+    }
+
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .pricing-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .pricing-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .pricing-value.discount {
+      color: #4caf50;
+    }
+
+    .pricing-total {
+      border-top: 2px solid #ff9800;
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .pricing-total .pricing-value {
+      font-size: 1.2rem;
+      color: #ff6b6b;
+    }
+
+    /* Delivery Partner Badge */
+    .partner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .partner-badge i {
+      font-size: 0.9rem;
+    }
+
+    /* Live GPS Tracking Indicator */
+    .gps-tracking {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      border-radius: 25px;
+      border: 2px solid #9c27b0;
+      margin-top: 12px;
+    }
+
+    .gps-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #9c27b0;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      animation: pulseGPS 1.5s infinite;
+    }
+
+    @keyframes pulseGPS {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .gps-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #7b1fa2;
+    }
+
+    /* Mobile-specific hiding */
+    @media (max-width: 768px) {
+      /* Hide all floating elements on mobile */
+      #floatingActionsContainer,
+      #showFabBtn,
+      .floating-actions,
+      .fab-main,
+      .chatbot-widget,
+      [id*="chatbot"],
+      [class*="chatbot"],
+      .floating-menu-popup {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      /* Adjust delivery cards for mobile */
+      .delivery-option-card {
+        flex-direction: column;
+        padding: 16px;
+      }
+
+      .delivery-option-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+      }
+
+      .tracker-steps {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+
+      .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .delivery-person-info {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .tab-item {
@@ -845,7 +1277,7 @@
                 <i class="bi bi-info-circle"></i> All products support both delivery types. Choose based on your urgency.
               </p>
 
-              <!-- Fast Delivery Option -->
+              <!-- Fast Delivery Option - Blinkit Style Enhanced -->
               <div class="delivery-option-card" onclick="selectDeliveryType('fast')" id="fast-delivery-option">
                 <input type="radio" name="delivery_option" value="fast" class="delivery-radio" id="fast-delivery">
                 <div class="delivery-option-icon fast-delivery-icon">
@@ -863,15 +1295,148 @@
                     <i class="bi bi-clock-fill"></i>
                     <strong>Delivery in 10 minutes</strong>
                   </div>
+                  
+                  <!-- Guaranteed Time Badge -->
+                  <div class="guaranteed-time-badge">
+                    <i class="bi bi-shield-check-fill"></i>
+                    <span>100% On-Time Guarantee or FREE</span>
+                  </div>
+
                   <div class="delivery-option-description">
                     Get your order delivered at lightning speed! Perfect for urgent needs.
                   </div>
+
+                  <!-- Real-time Delivery Tracker -->
+                  <div class="delivery-tracker" id="express-tracker" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                      <strong style="color: #ff6b6b; font-size: 0.95rem;">
+                        <i class="bi bi-truck"></i> Track Your Order
+                      </strong>
+                      <span style="font-size: 0.85rem; color: #666;">ETA: <strong id="delivery-eta">10 mins</strong></span>
+                    </div>
+                    <div class="tracker-steps">
+                      <div class="tracker-line">
+                        <div class="tracker-line-progress" id="tracker-progress"></div>
+                      </div>
+                      <div class="tracker-step active" id="step-1">
+                        <div class="tracker-step-icon">
+                          <i class="bi bi-check2"></i>
+                        </div>
+                        <div class="tracker-step-label">Order Placed</div>
+                      </div>
+                      <div class="tracker-step" id="step-2">
+                        <div class="tracker-step-icon">
+                          <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="tracker-step-label">Packing</div>
+                      </div>
+                      <div class="tracker-step" id="step-3">
+                        <div class="tracker-step-icon">
+                          <i class="bi bi-bicycle"></i>
+                        </div>
+                        <div class="tracker-step-label">On the Way</div>
+                      </div>
+                      <div class="tracker-step" id="step-4">
+                        <div class="tracker-step-icon">
+                          <i class="bi bi-house-door"></i>
+                        </div>
+                        <div class="tracker-step-label">Delivered</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Time Slot Picker -->
+                  <div class="time-slot-picker" id="express-time-slots" style="display: none;">
+                    <div class="time-slot-label">
+                      <i class="bi bi-clock-history"></i>
+                      <span>Choose your delivery slot:</span>
+                    </div>
+                    <div class="time-slots">
+                      <div class="time-slot selected" onclick="selectTimeSlot(this, 'now')">
+                        <div class="time-slot-time">Now</div>
+                        <div class="time-slot-label-text">Next 10 mins</div>
+                      </div>
+                      <div class="time-slot" onclick="selectTimeSlot(this, '10-20')">
+                        <div class="time-slot-time">10-20 mins</div>
+                        <div class="time-slot-label-text">Flexible timing</div>
+                      </div>
+                      <div class="time-slot" onclick="selectTimeSlot(this, '20-30')">
+                        <div class="time-slot-time">20-30 mins</div>
+                        <div class="time-slot-label-text">Later today</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Live Delivery Person Info -->
+                  <div class="delivery-person-info" id="express-delivery-person" style="display: none;">
+                    <div class="delivery-person-avatar">
+                      <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="delivery-person-details">
+                      <div class="delivery-person-name" id="delivery-person-name">Delivery Partner</div>
+                      <div class="delivery-person-status">
+                        <span class="status-dot"></span>
+                        <span id="delivery-person-status">Will be assigned soon</span>
+                      </div>
+                      <div class="delivery-person-eta">
+                        <i class="bi bi-clock-fill"></i> Arriving in <span id="live-eta">10</span> mins
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Product Freshness Indicator -->
+                  <div class="freshness-indicator">
+                    <div class="freshness-icon">
+                      <i class="bi bi-snow"></i>
+                    </div>
+                    <div class="freshness-text">
+                      <strong>Fresh Guarantee:</strong> Products packed & delivered with temperature control
+                    </div>
+                  </div>
+
+                  <!-- GPS Live Tracking -->
+                  <div class="gps-tracking" id="express-gps" style="display: none;">
+                    <div class="gps-icon">
+                      <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="gps-text">
+                      Live GPS tracking enabled - Follow your order in real-time
+                    </div>
+                  </div>
+
+                  <!-- Smart Pricing -->
+                  <div class="smart-pricing">
+                    <div class="pricing-row">
+                      <span class="pricing-label">Express Delivery Fee</span>
+                      <span class="pricing-value">₹49</span>
+                    </div>
+                    <div class="pricing-row" id="express-surge-pricing" style="display: none;">
+                      <span class="pricing-label">
+                        <i class="bi bi-info-circle-fill"></i> Peak Hour Surcharge
+                      </span>
+                      <span class="pricing-value">₹20</span>
+                    </div>
+                    <div class="pricing-row discount">
+                      <span class="pricing-label">
+                        <i class="bi bi-tag-fill"></i> First Order Discount
+                      </span>
+                      <span class="pricing-value discount">-₹25</span>
+                    </div>
+                    <div class="pricing-row pricing-total">
+                      <span class="pricing-label"><strong>Total Delivery Cost</strong></span>
+                      <span class="pricing-value">₹24</span>
+                    </div>
+                  </div>
+
+                  <!-- Partner Badge -->
+                  <div class="partner-badge">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>Verified Delivery Partner</span>
+                  </div>
+
                   <div class="delivery-coverage" id="fast-coverage-warning">
                     <i class="bi bi-geo-alt-fill"></i>
                     Available within 5km radius
-                  </div>
-                  <div class="delivery-price" id="fast-delivery-price">
-                    Delivery Fee: ₹49
                   </div>
                 </div>
               </div>
@@ -1446,11 +2011,211 @@
       if (type === 'fast') {
         document.getElementById('fast-delivery-option').classList.add('selected');
         document.getElementById('fast-delivery').checked = true;
+        
+        // Show Blinkit-style features for express delivery
+        showExpressDeliveryFeatures();
       } else {
         document.getElementById('standard-delivery-option').classList.add('selected');
         document.getElementById('standard-delivery').checked = true;
+        
+        // Hide express features
+        hideExpressDeliveryFeatures();
       }
     }
+
+    // ============ BLINKIT-STYLE FEATURE FUNCTIONS ============
+
+    // Show Express Delivery Features
+    function showExpressDeliveryFeatures() {
+      // Show time slot picker
+      const timeSlotsElement = document.getElementById('express-time-slots');
+      if (timeSlotsElement) {
+        timeSlotsElement.style.display = 'block';
+      }
+
+      // Show delivery person info
+      setTimeout(() => {
+        const deliveryPersonElement = document.getElementById('express-delivery-person');
+        if (deliveryPersonElement) {
+          deliveryPersonElement.style.display = 'flex';
+          simulateDeliveryPersonAssignment();
+        }
+      }, 1000);
+
+      // Show GPS tracking
+      setTimeout(() => {
+        const gpsElement = document.getElementById('express-gps');
+        if (gpsElement) {
+          gpsElement.style.display = 'flex';
+        }
+      }, 1500);
+
+      // Simulate delivery tracker after order
+      // (Will be fully functional after actual order placement)
+    }
+
+    // Hide Express Delivery Features
+    function hideExpressDeliveryFeatures() {
+      const elementsToHide = [
+        'express-time-slots',
+        'express-delivery-person',
+        'express-gps',
+        'express-tracker'
+      ];
+
+      elementsToHide.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.style.display = 'none';
+        }
+      });
+    }
+
+    // Time Slot Selection
+    function selectTimeSlot(element, slot) {
+      // Remove selected from all slots
+      document.querySelectorAll('.time-slot').forEach(slot => {
+        slot.classList.remove('selected');
+      });
+
+      // Add selected to clicked slot
+      element.classList.add('selected');
+
+      console.log('Selected time slot:', slot);
+      
+      // You can store the selected slot in a hidden field if needed
+      // document.getElementById('selected_time_slot').value = slot;
+    }
+
+    // Simulate Delivery Person Assignment
+    function simulateDeliveryPersonAssignment() {
+      const names = ['Rajesh Kumar', 'Amit Singh', 'Priya Sharma', 'Vikram Patel', 'Sneha Reddy'];
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      
+      const nameElement = document.getElementById('delivery-person-name');
+      const statusElement = document.getElementById('delivery-person-status');
+
+      if (nameElement && statusElement) {
+        // Simulate assignment animation
+        statusElement.textContent = 'Finding nearby partner...';
+        
+        setTimeout(() => {
+          nameElement.textContent = randomName;
+          statusElement.innerHTML = '<span class="status-dot"></span> Partner assigned & heading to store';
+        }, 2000);
+
+        setTimeout(() => {
+          statusElement.innerHTML = '<span class="status-dot"></span> Packing your order';
+        }, 4000);
+
+        setTimeout(() => {
+          statusElement.innerHTML = '<span class="status-dot"></span> On the way to you!';
+        }, 6000);
+      }
+    }
+
+    // Start Live Delivery Tracking (Called after order is placed)
+    function startLiveDeliveryTracking() {
+      const tracker = document.getElementById('express-tracker');
+      if (!tracker) return;
+
+      tracker.style.display = 'block';
+      
+      let currentStep = 1;
+      const totalSteps = 4;
+      const stepDuration = 2500; // 2.5 seconds per step (10 mins / 4 steps)
+
+      const interval = setInterval(() => {
+        if (currentStep > totalSteps) {
+          clearInterval(interval);
+          return;
+        }
+
+        // Mark current step as completed
+        const prevStep = document.getElementById(`step-${currentStep - 1}`);
+        if (prevStep) {
+          prevStep.classList.remove('active');
+          prevStep.classList.add('completed');
+        }
+
+        // Activate current step
+        const currStep = document.getElementById(`step-${currentStep}`);
+        if (currStep) {
+          currStep.classList.add('active');
+        }
+
+        // Update progress bar
+        const progress = (currentStep / totalSteps) * 100;
+        const progressBar = document.getElementById('tracker-progress');
+        if (progressBar) {
+          progressBar.style.width = progress + '%';
+        }
+
+        // Update ETA countdown
+        const eta = 10 - (currentStep * 2.5);
+        const etaElement = document.getElementById('delivery-eta');
+        const liveEtaElement = document.getElementById('live-eta');
+        
+        if (etaElement) {
+          etaElement.textContent = Math.ceil(eta) + ' mins';
+        }
+        if (liveEtaElement) {
+          liveEtaElement.textContent = Math.ceil(eta);
+        }
+
+        currentStep++;
+      }, stepDuration);
+    }
+
+    // Update delivery ETA countdown
+    function startETACountdown(minutes) {
+      let seconds = minutes * 60;
+      
+      const countdown = setInterval(() => {
+        seconds--;
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        
+        const etaElement = document.getElementById('delivery-eta');
+        const liveEtaElement = document.getElementById('live-eta');
+        
+        if (etaElement) {
+          etaElement.textContent = mins + ' mins ' + secs + ' secs';
+        }
+        if (liveEtaElement) {
+          liveEtaElement.textContent = mins;
+        }
+
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          // Show delivery completed notification
+          if (etaElement) {
+            etaElement.textContent = 'Arriving now!';
+          }
+        }
+      }, 1000);
+    }
+
+    // Check if it's peak hour for surge pricing
+    function checkPeakHourSurge() {
+      const hour = new Date().getHours();
+      const surgePricingElement = document.getElementById('express-surge-pricing');
+      
+      // Peak hours: 12-2 PM and 7-10 PM
+      const isPeakHour = (hour >= 12 && hour <= 14) || (hour >= 19 && hour <= 22);
+      
+      if (surgePricingElement) {
+        surgePricingElement.style.display = isPeakHour ? 'flex' : 'none';
+      }
+
+      return isPeakHour;
+    }
+
+    // Initialize peak hour check on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      checkPeakHourSurge();
+    });
 
     // Address Selection
     function selectAddress(index, address) {
