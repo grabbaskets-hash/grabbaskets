@@ -15,7 +15,7 @@
     console.error('Database Error: {{ $database_error }}');
   </script>
   @endif
-  <!-- Festive Diwali Theme -->
+  <!-- Modern Clean Theme - Light Blue & Cream -->
   <style>
     /* Trending Section - Sleek Dark Neon Design */
     .trending-neon-section {
@@ -141,25 +141,26 @@
         font-size: 1rem !important;
       }
     }
-    /* 🪔 Diwali Festive Theme Colors */
+    /* Clean Modern Theme Colors */
     :root {
-      --diwali-gold: #FFD700;
-      --diwali-orange: #FF6B00;
-      --diwali-red: #FF4444;
-      --diwali-purple: #8B008B;
-      --diwali-yellow: #FFA500;
-      --festive-gradient: linear-gradient(135deg, #FF6B00 0%, #FFD700 50%, #FF4444 100%);
+      --primary-blue: #4A90E2;
+      --light-blue: #E3F2FD;
+      --cream: #FFF8E7;
+      --soft-cream: #FFFBF0;
+      --accent-blue: #2196F3;
+      --dark-blue: #1976D2;
+      --text-dark: #2C3E50;
     }
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #FFF8E7 0%, #FFEBCD 25%, #FFE4B5 50%, #FFDAB9 75%, #FFE4E1 100%);
+      background: linear-gradient(135deg, #E3F2FD 0%, #FFF8E7 50%, #E3F2FD 100%);
       background-attachment: fixed;
       overflow-x: hidden;
       position: relative;
     }
     
-    /* Festive Sparkle Animation */
+    /* Subtle Pattern */
     body::before {
       content: '';
       position: fixed;
@@ -168,21 +169,12 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(2px 2px at 20% 30%, rgba(255, 215, 0, 0.4), transparent),
-        radial-gradient(2px 2px at 60% 70%, rgba(255, 107, 0, 0.4), transparent),
-        radial-gradient(1px 1px at 50% 50%, rgba(255, 68, 68, 0.4), transparent),
-        radial-gradient(1px 1px at 80% 10%, rgba(255, 215, 0, 0.3), transparent),
-        radial-gradient(2px 2px at 90% 60%, rgba(255, 107, 0, 0.3), transparent);
-      background-size: 200% 200%;
-      animation: festiveSparkle 15s ease-in-out infinite;
+        radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.05), transparent),
+        radial-gradient(circle at 80% 70%, rgba(33, 150, 243, 0.05), transparent);
+      background-size: 100% 100%;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.6;
-    }
-    
-    @keyframes festiveSparkle {
-      0%, 100% { background-position: 0% 0%; }
-      50% { background-position: 100% 100%; }
+      opacity: 0.5;
     }
     
     /* Container Positioning */
@@ -191,12 +183,12 @@
       z-index: 1;
     }
 
-    /* Modern Navbar Styling - Festive Theme */
+    /* Modern Navbar Styling - Clean Theme */
     .navbar {
-      background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B00 100%);
+      background: linear-gradient(135deg, #FFFFFF 0%, #E3F2FD 100%);
       backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.2);
-      border-bottom: 3px solid rgba(255, 107, 0, 0.3);
+      box-shadow: 0 2px 15px rgba(74, 144, 226, 0.1);
+      border-bottom: 1px solid rgba(74, 144, 226, 0.2);
       position: sticky;
       top: 0;
       z-index: 1030;
@@ -204,20 +196,19 @@
     }
 
     .navbar.scrolled {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 165, 0, 0.95) 50%, rgba(255, 107, 0, 0.95) 100%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(227, 242, 253, 0.98) 100%);
       backdrop-filter: blur(15px);
-      box-shadow: 0 6px 30px rgba(255, 107, 0, 0.4);
+      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.15);
     }
 
     .navbar-brand {
       font-weight: 800;
       font-size: 1.8rem;
-      background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700);
+      background: linear-gradient(45deg, #4A90E2, #2196F3);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: 1px;
-      text-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
       transition: all 0.3s ease;
     }
 
@@ -227,7 +218,7 @@
     }
 
     .nav-link {
-      color: #8B0000 !important; /* Festive dark red */
+      color: #2C3E50 !important;
       font-weight: 600;
       border-radius: 20px;
       padding: 8px 16px !important;
@@ -244,7 +235,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 107, 0, 0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.2), transparent);
       transition: left 0.5s ease;
     }
 
@@ -253,33 +244,33 @@
     }
 
     .nav-link:hover {
-      background: rgba(255, 215, 0, 0.3);
-      color: #8B0000 !important;
+      background: rgba(74, 144, 226, 0.15);
+      color: #2C3E50 !important;
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+      box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
     }
 
     .navbar-toggler {
-      border: 2px solid #FF6B00;
+      border: 2px solid #4A90E2;
       border-radius: 10px;
       padding: 6px 10px;
       transition: all 0.3s ease;
     }
 
     .navbar-toggler:hover {
-      background: rgba(255, 107, 0, 0.2);
+      background: rgba(74, 144, 226, 0.1);
       transform: scale(1.05);
     }
 
     .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FF6B00' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%234A90E2' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
 
     /* Search Bar Enhancement */
     .search-form {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border-radius: 25px;
-      box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+      box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1);
     }
 
     /* Gender Filter Tabs */
@@ -287,7 +278,7 @@
       display: flex;
       gap: 8px;
       margin-bottom: 25px;
-      background: rgba(139, 69, 19, 0.05);
+      background: rgba(74, 144, 226, 0.05);
       padding: 8px;
       border-radius: 15px;
       justify-content: center;
@@ -342,10 +333,10 @@
     }
 
     .mega-category-card {
-      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #E3F2FD 100%);
       border-radius: 16px;
       padding: 20px;
-      border: 1px solid rgba(139, 69, 19, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.1);
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
@@ -358,7 +349,7 @@
       left: 0;
       width: 100%;
       height: 3px;
-      background: linear-gradient(45deg, #8B4513, #D2691E);
+      background: linear-gradient(45deg, #4A90E2, #2196F3);
       transform: scaleX(0);
       transition: transform 0.3s ease;
     }
@@ -369,8 +360,8 @@
 
     .mega-category-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(139, 69, 19, 0.15);
-      border-color: rgba(139, 69, 19, 0.2);
+      box-shadow: 0 15px 35px rgba(74, 144, 226, 0.15);
+      border-color: rgba(74, 144, 226, 0.2);
     }
 
     .mega-category-header {
@@ -379,7 +370,7 @@
       gap: 12px;
       margin-bottom: 15px;
       padding-bottom: 12px;
-      border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+      border-bottom: 1px solid rgba(74, 144, 226, 0.1);
     }
 
     .mega-category-emoji {
@@ -389,14 +380,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(210, 105, 30, 0.1));
+      background: linear-gradient(45deg, rgba(74, 144, 226, 0.1), rgba(33, 150, 243, 0.1));
       border-radius: 12px;
       transition: all 0.3s ease;
     }
 
     .mega-category-card:hover .mega-category-emoji {
       transform: scale(1.1) rotate(5deg);
-      background: linear-gradient(45deg, rgba(139, 69, 19, 0.2), rgba(210, 105, 30, 0.2));
+      background: linear-gradient(45deg, rgba(74, 144, 226, 0.2), rgba(33, 150, 243, 0.2));
     }
 
     .mega-category-title {
@@ -1257,15 +1248,15 @@
     }
 
     .category-card {
-      background: #f3f4f6;
+      background: linear-gradient(135deg, #ffffff 0%, #FFF8E7 100%);
       border: none;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(35, 47, 62, 0.04);
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.04);
       transition: box-shadow 0.2s, transform 0.2s;
     }
 
     .category-card:hover {
-      box-shadow: 0 4px 16px rgba(255, 153, 0, 0.18);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, 0.18);
       transform: translateY(-4px) scale(1.03);
     }
 
@@ -1274,14 +1265,14 @@
       object-fit: cover;
       margin-bottom: 10px;
       border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(35, 47, 62, 0.22), 0 2px 0 #fff inset, 0 0 0 4px #ff990033;
-  transform: perspective(600px) rotateY(-18deg) scale(1.12) rotateX(6deg);
-  transition: transform 0.4s cubic-bezier(.25, .8, .25, 1), box-shadow 0.4s;
+      box-shadow: 0 12px 32px rgba(74, 144, 226, 0.22), 0 2px 0 #fff inset, 0 0 0 4px rgba(74, 144, 226, 0.2);
+      transform: perspective(600px) rotateY(-18deg) scale(1.12) rotateX(6deg);
+      transition: transform 0.4s cubic-bezier(.25, .8, .25, 1), box-shadow 0.4s;
     }
 
     .category-card:hover img {
       transform: perspective(600px) rotateY(18deg) scale(1.18) rotateX(-6deg);
-      box-shadow: 0 24px 48px rgba(255, 153, 0, 0.28), 0 4px 0 #fff inset, 0 0 0 6px #ff9900aa;
+      box-shadow: 0 24px 48px rgba(74, 144, 226, 0.28), 0 4px 0 #fff inset, 0 0 0 6px rgba(74, 144, 226, 0.4);
     }
 
     .products-section {
@@ -1298,13 +1289,13 @@
     .product-card {
       border: none;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(35, 47, 62, 0.04);
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.04);
       transition: box-shadow 0.2s, transform 0.2s;
-      background: #fff;
+      background: linear-gradient(135deg, #ffffff 0%, #E3F2FD 100%);
     }
 
     .product-card:hover {
-      box-shadow: 0 4px 16px rgba(255, 153, 0, 0.18);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, 0.18);
       transform: translateY(-4px) scale(1.03);
     }
 
@@ -1312,11 +1303,11 @@
       height: 180px;
       object-fit: cover;
       border-radius: 24px 24px 0 0;
-      box-shadow: 0 16px 40px rgba(35, 47, 62, 0.18), 0 0 0 4px #ff9900aa;
+      box-shadow: 0 16px 40px rgba(74, 144, 226, 0.18), 0 0 0 4px rgba(74, 144, 226, 0.4);
       transform: perspective(800px) rotateY(-10deg) scale(1.08) rotateX(4deg);
       transition: transform 0.4s cubic-bezier(.25, .8, .25, 1), box-shadow 0.4s;
       transform: perspective(800px) rotateY(10deg) scale(1.13) rotateX(-4deg);
-      box-shadow: 0 32px 64px rgba(255, 153, 0, 0.22), 0 0 0 8px #ff9900cc;
+      box-shadow: 0 32px 64px rgba(74, 144, 226, 0.22), 0 0 0 8px rgba(74, 144, 226, 0.5);
     }
 
     .product-card .card-title {
@@ -1966,125 +1957,103 @@ li a{
 
     /* Navbar User Greeting */
     .nav-link:has(.user-greeting) {
-      background: rgba(139, 69, 19, 0.05);
-      border: 1px solid rgba(139, 69, 19, 0.1);
+      background: rgba(74, 144, 226, 0.05);
+      border: 1px solid rgba(74, 144, 226, 0.1);
     }
 
-    /* 🌟 Diwali Theme Banner - Enhanced Mobile & Desktop Responsive */
-    .diwali-theme-banner {
-      background-image: url("/images/diwali-bg1.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      border-radius: 15px;
-      min-height: 300px;
+    /* Modern Clean Banner Styles */
+    .modern-clean-banner {
+      border-radius: 0;
+      min-height: 400px;
       position: relative;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 40px 20px;
     }
 
-    /* Overlay for better contrast */
-    .diwali-theme-banner::before {
+    /* Subtle overlay pattern */
+    .modern-clean-banner::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 15px;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
       z-index: 1;
     }
 
-    /* 🔥 Enhanced Text Glow for better readability */
-    .text-glow {
-      text-shadow: 
-        0 0 5px #ffd700, 
-        0 0 10px #ffae42, 
-        0 0 20px #ffa500,
-        2px 2px 4px rgba(0,0,0,0.3);
-    }
-
-    /* Ensure content stays above all effects */
-    .diwali-theme-banner > * {
+    /* Ensure content stays above overlay */
+    .modern-clean-banner > * {
       position: relative;
-      z-index: 5;
-      text-align: center;
-    }
-
-    /* 🪔 Optional: Floating Diya Glow (light orbs) */
-    .diwali-theme-banner::before,
-    .diwali-theme-banner::after {
-      pointer-events: none;
+      z-index: 2;
     }
 
     /* Enhanced Responsive layout */
     @media (max-width: 576px) {
-      .diwali-theme-banner {
-        min-height: 250px;
-        padding: 15px;
-        border-radius: 10px;
+      .modern-clean-banner {
+        min-height: 300px !important;
+        padding: 30px 15px !important;
       }
 
-      .diwali-theme-banner h1 {
-        font-size: 1.5rem !important;
-        margin-bottom: 10px;
+      .modern-clean-banner h1 {
+        font-size: 1.75rem !important;
+        margin-bottom: 15px !important;
       }
 
-      .diwali-theme-banner p {
-        font-size: 0.9rem !important;
-        margin-bottom: 15px;
+      .modern-clean-banner p {
+        font-size: 1rem !important;
+        margin-bottom: 20px !important;
       }
 
-      .diwali-theme-banner .btn {
-        font-size: 0.9rem;
-        padding: 8px 16px;
+      .modern-clean-banner .btn {
+        font-size: 0.95rem !important;
+        padding: 10px 25px !important;
       }
     }
 
     @media (min-width: 577px) and (max-width: 768px) {
-      .diwali-theme-banner {
-        min-height: 320px;
-        padding: 25px;
+      .modern-clean-banner {
+        min-height: 350px !important;
+        padding: 35px 25px !important;
       }
 
-      .diwali-theme-banner h1 {
-        font-size: 2rem !important;
+      .modern-clean-banner h1 {
+        font-size: 2.25rem !important;
       }
 
-      .diwali-theme-banner p {
-        font-size: 1rem !important;
+      .modern-clean-banner p {
+        font-size: 1.1rem !important;
       }
     }
 
     @media (min-width: 769px) {
-      .diwali-theme-banner {
+      .modern-clean-banner {
         min-height: 400px;
         padding: 40px;
-        border-radius: 20px;
-      }
-
-      .diwali-theme-banner .d-flex {
-        text-align: left !important;
       }
     }
 
     @media (min-width: 992px) {
-      .diwali-theme-banner {
+      .modern-clean-banner {
         min-height: 450px;
       }
     }
 
+    /* Product Banner Content */
+    .product-banner-content {
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      padding: 40px 20px;
+    }
 
-
-
-
-    /* 🪔 Second Diwali Banner Theme - Enhanced Mobile Responsive */
-    .diwali-theme-banner-2 {
-      background-image: url("/images/diwali-bg2.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+    @media (max-width: 768px) {
+      .product-banner-content {
+        min-height: 350px;
+        padding: 30px 15px;
+      }
     }
 
     /* Optional: Add subtle fireworks motion overlay */
@@ -2447,8 +2416,8 @@ li a{
   </nav>
 
   <!-- Simple Menu Button -->
-  <button type="button" class="btn btn-lg btn-warning shadow position-fixed"
-    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;"
+  <button type="button" class="btn btn-lg shadow position-fixed"
+    style="bottom:32px;right:32px;z-index:1050;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;"
     data-bs-toggle="modal" data-bs-target="#categoryMenuModal">
     <i class="bi bi-grid-3x3-gap"></i>
   </button>
@@ -2468,21 +2437,21 @@ li a{
       </div>
     </div>
   </div>
-  <!-- Hero Section with Enhanced Responsive Carousel -->
+  <!-- Hero Section with Modern Clean Carousel -->
   <section class="hero-section">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
       <div class="carousel-inner">
-        {{-- 🎆 Diwali Banner (first slide) - Enhanced Mobile Layout --}}
+        {{-- Welcome Banner (first slide) - Clean Modern Layout --}}
         <div class="carousel-item active">
-          <div class="diwali-theme-banner">
+          <div class="modern-clean-banner" style="background: linear-gradient(135deg, #4A90E2 0%, #2196F3 100%); min-height: 400px; display: flex; align-items: center;">
             <div class="container">
               <div class="row align-items-center justify-content-center">
-                <div class="col-12 col-lg-8 text-center text-lg-end">
-                  <h1 class="fw-bold text-glow text-light mb-3">🪔 Lights, Gifts & More</h1>
-                  <p class="fs-5 text-light mb-4">Celebrate Diwali with joy, color, and style — only on GrabBaskets.</p>
+                <div class="col-12 col-lg-8 text-center">
+                  <h1 class="fw-bold text-white mb-3" style="font-size: clamp(2rem, 5vw, 3.5rem);">Welcome to GrabBaskets</h1>
+                  <p class="fs-5 text-white mb-4" style="opacity: 0.95;">Discover amazing products at unbeatable prices</p>
                   <div class="banner-buttons">
-                    <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg shadow-lg">
-                      <i class="bi bi-gift-fill me-2"></i>Shop Gifts
+                    <a href="{{ route('products.index') }}" class="btn btn-light btn-lg shadow-lg" style="border-radius: 50px; padding: 12px 35px; font-weight: 700;">
+                      <i class="bi bi-shop me-2"></i>Start Shopping
                     </a>
                   </div>
                 </div>
@@ -2491,18 +2460,18 @@ li a{
           </div>
         </div>
         
-        <!-- 🪔 Diwali Exclusive Offers Banner - Enhanced Mobile Layout -->
+        <!-- Special Offers Banner - Clean Modern Layout -->
         <div class="carousel-item">
-          <div class="diwali-theme-banner diwali-theme-banner-2">
+          <div class="modern-clean-banner" style="background: linear-gradient(135deg, #FFF8E7 0%, #E3F2FD 100%); min-height: 400px; display: flex; align-items: center;">
             <div class="container">
               <div class="row align-items-center justify-content-center">
-                <div class="col-12 col-lg-8 text-center text-lg-start">
-                  <h1 class="fw-bold text-glow text-light mb-3">💫 GrabBaskets Diwali Festival</h1>
-                  <p class="fs-5 text-light mb-3">Light up your home with grand offers this festive season!</p>
-                  <p class="fs-6 text-warning mb-4">✨ Limited Time Offers | 🕓 Hurry! Ends this weekend.</p>
+                <div class="col-12 col-lg-8 text-center">
+                  <h1 class="fw-bold mb-3" style="color: #2C3E50; font-size: clamp(2rem, 5vw, 3.5rem);">🎉 Special Offers Just For You</h1>
+                  <p class="fs-5 mb-3" style="color: #4A90E2;">Grab amazing deals on your favorite products!</p>
+                  <p class="fs-6 text-muted mb-4">✨ Limited Time | ⏰ Don't Miss Out</p>
                   <div class="banner-buttons">
-                    <a href="{{ route('products.index') }}" class="btn btn-warning btn-lg shadow-lg">
-                      <i class="bi bi-lightning-charge-fill me-2"></i>Shop Now & Save Big
+                    <a href="{{ route('products.index') }}" class="btn btn-lg shadow-lg" style="background: linear-gradient(135deg, #4A90E2, #2196F3); color: white; border-radius: 50px; padding: 12px 35px; font-weight: 700; border: none;">
+                      <i class="bi bi-lightning-charge-fill me-2"></i>Shop Deals Now
                     </a>
                   </div>
                 </div>
@@ -2511,29 +2480,30 @@ li a{
           </div>
         </div>
 
-        {{-- 🛍️ Product Banners - Enhanced Responsive Design --}}
+        {{-- Product Banners - Clean Responsive Design --}}
         @foreach($products as $index => $product)
           <div class="carousel-item">
-            <div class="product-banner-content" style="background: linear-gradient(90deg,#232f3e,#ff9900);">
+            <div class="product-banner-content" style="background: linear-gradient(135deg, #FFF8E7 0%, #E3F2FD 100%); min-height: 400px; display: flex; align-items: center;">
               <div class="container">
                 <div class="row align-items-center">
                   <div class="col-12 col-lg-8">
-                    <div class="text-white">
-                      <h2 class="h2 fw-bold mb-3 text-glow">
-                        🔥 {{ $product->discount ?? 30 }}% OFF – {{ $product->category?->name ?? 'Uncategorized' }}
+                    <div style="color: #2C3E50;">
+                      <h2 class="h2 fw-bold mb-3">
+                        <span class="badge" style="background: linear-gradient(135deg, #4A90E2, #2196F3); color: white; font-size: 1.2rem; padding: 8px 20px; border-radius: 50px;">{{ $product->discount ?? 30 }}% OFF</span>
                       </h2>
-                      <p class="mb-2 fs-6">⭐ {{ $product->rating ?? 4.8 }}/5 from {{ $product->reviews_count ?? 500 }}+ happy buyers</p>
-                      <p class="mb-4 text-warning fw-bold fs-6">⚡ Hurry! Only {{ $product->stock ?? 10 }} left in stock</p>
+                      <h3 class="mb-3" style="color: #2C3E50; font-size: clamp(1.5rem, 4vw, 2.5rem);">{{ $product->category?->name ?? 'Special Category' }}</h3>
+                      <p class="mb-2 fs-6" style="color: #4A90E2;">⭐ {{ $product->rating ?? 4.8 }}/5 from {{ $product->reviews_count ?? 500 }}+ happy buyers</p>
+                      <p class="mb-4 fw-bold fs-6" style="color: #FF6B6B;">⚡ Hurry! Only {{ $product->stock ?? 10 }} left in stock</p>
                       
-                      <div class="banner-buttons">
-                        <a href="{{ route('product.details', $product->id) }}" class="btn btn-light text-dark">
-                          <i class="bi bi-eye-fill me-2"></i>Shop Now
+                      <div class="banner-buttons d-flex gap-3 flex-wrap">
+                        <a href="{{ route('product.details', $product->id) }}" class="btn btn-lg" style="background: white; color: #4A90E2; border: 2px solid #4A90E2; border-radius: 50px; padding: 12px 30px; font-weight: 700;">
+                          <i class="bi bi-eye-fill me-2"></i>View Details
                         </a>
                         <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
                           @csrf
                           <input type="hidden" name="product_id" value="{{ $product->id }}">
-                          <button type="submit" class="btn btn-warning" style="background:#ff9900;color:#232f3e;">
-                            <i class="bi bi-cart-plus-fill me-2"></i>Grab Now
+                          <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #4A90E2, #2196F3); color: white; border: none; border-radius: 50px; padding: 12px 30px; font-weight: 700;">
+                            <i class="bi bi-cart-plus-fill me-2"></i>Add to Cart
                           </button>
                         </form>
                       </div>
@@ -2913,10 +2883,10 @@ li a{
                       @csrf
                       <input type="hidden" name="product_id" value="{{ $product->id }}">
                       <input type="number" name="quantity" min="1" value="1" class="form-control me-2" style="width:70px;" required>
-                      <button type="submit" class="btn btn-warning flex-grow-1">Add</button>
+                      <button type="submit" class="btn flex-grow-1" style="background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;">Add</button>
                     </form>
                     @else
-                    <a href="{{ route('login') }}" class="btn btn-warning w-100 mt-2">Login</a>
+                    <a href="{{ route('login') }}" class="btn w-100 mt-2" style="background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;">Login</a>
                     @endauth
                   </div>
                 </div>
@@ -3059,19 +3029,19 @@ li a{
     </div>
   {{-- </section> --}}
 
-  <!-- Products by Category Showcase - FESTIVE DIWALI THEME -->
-  <section class="py-5" style="background: linear-gradient(135deg, #FFF5E6 0%, #FFEBCD 50%, #FFF5E6 100%);">
+  <!-- Products by Category Showcase - MODERN CLEAN THEME -->
+  <section class="py-5" style="background: linear-gradient(135deg, #E3F2FD 0%, #FFFBF0 50%, #E3F2FD 100%);">
     <div class="container">
-      <!-- Festive Section Header with Diyas -->
+      <!-- Clean Section Header -->
       <div class="text-center mb-5">
         <div class="d-inline-block position-relative mb-3">
-          <h2 class="display-4 fw-bold mb-0" style="background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700, #FF6B00, #FF4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);">
-            🪔 Shop by Category 🪔
+          <h2 class="display-4 fw-bold mb-0" style="background: linear-gradient(45deg, #4A90E2, #2196F3, #64B5F6, #2196F3, #4A90E2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);">
+            Shop by Category
           </h2>
-          <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 200px; height: 4px; background: linear-gradient(90deg, transparent, #FF6B00, #FFD700, #FF6B00, transparent); border-radius: 2px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"></div>
+          <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 200px; height: 4px; background: linear-gradient(90deg, transparent, #4A90E2, #2196F3, #4A90E2, transparent); border-radius: 2px; box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);"></div>
         </div>
-        <p class="lead mt-4" style="color: #FF4444; font-weight: 600;">✨ Explore our festive collections with dazzling deals ✨</p>
-        <p class="text-muted">🎆 Special Diwali Offers on Every Category! �</p>
+        <p class="lead mt-4" style="color: #2196F3; font-weight: 600;">Explore our collections with amazing deals</p>
+        <p class="text-muted">Special Offers on Every Category!</p>
       </div>
 
       <!-- Category Grid with Emojis -->
@@ -3084,47 +3054,47 @@ li a{
                   background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%);
                   border-radius: 20px;
                   padding: 25px 20px;
-                  border: 2px solid rgba(255, 107, 0, 0.2);
+                  border: 2px solid rgba(74, 144, 226, 0.2);
                   transition: all 0.3s ease;
                   height: 100%;
                   position: relative;
                   overflow: hidden;
-                  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1);
+                  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.15), 0 0 20px rgba(74, 144, 226, 0.1);
                 " onmouseover="
                   this.style.transform='translateY(-10px) scale(1.02)';
-                  this.style.boxShadow='0 15px 40px rgba(255, 107, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.2)';
-                  this.style.borderColor='rgba(255, 107, 0, 0.5)';
+                  this.style.boxShadow='0 15px 40px rgba(74, 144, 226, 0.3), 0 0 40px rgba(74, 144, 226, 0.2)';
+                  this.style.borderColor='rgba(74, 144, 226, 0.5)';
                 " onmouseout="
                   this.style.transform='translateY(0) scale(1)';
-                  this.style.boxShadow='0 4px 15px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1)';
-                  this.style.borderColor='rgba(255, 107, 0, 0.2)';
+                  this.style.boxShadow='0 4px 15px rgba(74, 144, 226, 0.15), 0 0 20px rgba(74, 144, 226, 0.1)';
+                  this.style.borderColor='rgba(74, 144, 226, 0.2)';
                 ">
                   
-                  <!-- Festive Gradient Background Effect -->
-                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,107,0,0.05) 0%, rgba(255,215,0,0.05) 100%); pointer-events: none; opacity: 0; transition: opacity 0.3s;" class="hover-gradient"></div>
+                  <!-- Modern Clean Background Effect -->
+                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(74,144,226,0.05) 0%, rgba(33,150,243,0.05) 100%); pointer-events: none; opacity: 0; transition: opacity 0.3s;" class="hover-gradient"></div>
                   
-                  <!-- Emoji Circle with Festive Glow -->
+                  <!-- Emoji Circle with Blue Glow -->
                   <div class="text-center mb-3">
                     <div style="
                       width: 100px;
                       height: 100px;
                       margin: 0 auto;
-                      background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,107,0,0.15) 100%);
+                      background: linear-gradient(135deg, rgba(74,144,226,0.15) 0%, rgba(33,150,243,0.15) 100%);
                       border-radius: 50%;
                       display: flex;
                       align-items: center;
                       justify-content: center;
                       font-size: 3.5rem;
                       transition: all 0.3s ease;
-                      box-shadow: 0 5px 15px rgba(255, 107, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.3);
-                      border: 3px solid rgba(255, 107, 0, 0.3);
+                      box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2), 0 0 30px rgba(74, 144, 226, 0.3);
+                      border: 3px solid rgba(74, 144, 226, 0.3);
                     " class="emoji-circle">
                       {{ $category->emoji ?? '🛒' }}
                     </div>
                   </div>
                   
-                  <!-- Category Name with Festive Color -->
-                  <h5 class="text-center fw-bold mb-2" style="color: #FF4444; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(255, 68, 68, 0.2);">
+                  <!-- Category Name with Blue Color -->
+                  <h5 class="text-center fw-bold mb-2" style="color: #2196F3; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);">
                     {{ $category->name }}
                   </h5>
                   
@@ -3139,15 +3109,15 @@ li a{
                   @endphp
                   <div class="text-center">
                     <span class="badge" style="
-                      background: linear-gradient(45deg, #FF6B00, #FF9500);
+                      background: linear-gradient(45deg, #4A90E2, #2196F3);
                       color: white;
                       font-size: 0.85rem;
                       padding: 6px 15px;
                       border-radius: 20px;
                       font-weight: 600;
-                      box-shadow: 0 2px 10px rgba(255, 107, 0, 0.4);
+                      box-shadow: 0 2px 10px rgba(74, 144, 226, 0.4);
                     ">
-                      🎁 {{ $productCount }} {{ $productCount === 1 ? 'Item' : 'Items' }}
+                      {{ $productCount }} {{ $productCount === 1 ? 'Item' : 'Items' }}
                     </span>
                   </div>
                   
@@ -3168,19 +3138,19 @@ li a{
                           ">{{ Str::limit($subcat->name, 12) }}</span>
                         @endforeach
                         @if($category->subcategories->count() > 3)
-                          <span style="font-weight: 600; color: #FF6B00;">+{{ $category->subcategories->count() - 3 }}</span>
+                          <span style="font-weight: 600; color: #4A90E2;">+{{ $category->subcategories->count() - 3 }}</span>
                         @endif
                       </div>
                     </div>
                   @endif
                   
-                  <!-- View Arrow Indicator with Festive Color -->
+                  <!-- View Arrow Indicator with Blue Color -->
                   <div class="text-center mt-3">
                     <span style="
                       display: inline-flex;
                       align-items: center;
                       gap: 5px;
-                      color: #FF6B00;
+                      color: #4A90E2;
                       font-size: 0.9rem;
                       font-weight: 600;
                       transition: all 0.3s;
@@ -3204,42 +3174,42 @@ li a{
         @endif
       </div>
 
-      <!-- Festive View All Categories Button -->
+      <!-- Clean View All Categories Button -->
       <div class="text-center mt-5">
         <a href="{{ route('buyer.dashboard') }}" class="btn btn-lg" style="
-          background: linear-gradient(45deg, #FF4444, #FF6B00, #FFD700);
+          background: linear-gradient(45deg, #4A90E2, #2196F3, #64B5F6);
           color: white;
           border: none;
           border-radius: 30px;
           padding: 15px 50px;
           font-weight: 700;
           font-size: 1.1rem;
-          box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.3);
+          box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4), 0 0 30px rgba(74, 144, 226, 0.3);
           transition: all 0.3s ease;
-          border: 2px solid rgba(255, 215, 0, 0.5);
+          border: 2px solid rgba(74, 144, 226, 0.5);
         " onmouseover="
           this.style.transform='translateY(-3px) scale(1.05)';
-          this.style.boxShadow='0 12px 35px rgba(255, 107, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.5)';
-          this.style.background='linear-gradient(45deg, #FFD700, #FF6B00, #FF4444)';
+          this.style.boxShadow='0 12px 35px rgba(74, 144, 226, 0.5), 0 0 50px rgba(74, 144, 226, 0.5)';
+          this.style.background='linear-gradient(45deg, #64B5F6, #2196F3, #4A90E2)';
         " onmouseout="
           this.style.transform='translateY(0) scale(1)';
-          this.style.boxShadow='0 8px 25px rgba(255, 107, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.3)';
-          this.style.background='linear-gradient(45deg, #FF4444, #FF6B00, #FFD700)';
+          this.style.boxShadow='0 8px 25px rgba(74, 144, 226, 0.4), 0 0 30px rgba(74, 144, 226, 0.3)';
+          this.style.background='linear-gradient(45deg, #4A90E2, #2196F3, #64B5F6)';
         ">
           <i class="bi bi-stars me-2"></i>
-          🪔 Explore All Festive Categories 🪔
+          Explore All Categories
           <i class="bi bi-arrow-right ms-2"></i>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Festive Hover Effects -->
+  <!-- Enhanced Clean Hover Effects -->
   <style>
     .category-card-emoji-design:hover .emoji-circle {
       transform: scale(1.15) rotate(5deg);
-      background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,107,0,0.3) 100%);
-      box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.5);
+      background: linear-gradient(135deg, rgba(74,144,226,0.3) 0%, rgba(33,150,243,0.3) 100%);
+      box-shadow: 0 10px 30px rgba(74, 144, 226, 0.4), 0 0 40px rgba(74, 144, 226, 0.5);
     }
     
     .category-card-emoji-design:hover .hover-gradient {
@@ -3248,7 +3218,7 @@ li a{
     
     .category-card-emoji-design:hover .view-arrow i {
       transform: translateX(5px);
-      color: #FFD700;
+      color: #4A90E2;
     }
     
     @media (max-width: 576px) {
@@ -3263,15 +3233,15 @@ li a{
       }
     }
     
-    /* Festive Product Card Hover Effects */
+    /* Modern Product Card Hover Effects */
     .festive-product-card {
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     .festive-product-card:hover {
       transform: translateY(-12px) scale(1.02);
-      box-shadow: 0 15px 40px rgba(255, 107, 0, 0.25), 0 0 50px rgba(255, 215, 0, 0.2) !important;
-      border-color: rgba(255, 107, 0, 0.5) !important;
+      box-shadow: 0 15px 40px rgba(74, 144, 226, 0.25), 0 0 50px rgba(74, 144, 226, 0.2) !important;
+      border-color: rgba(74, 144, 226, 0.5) !important;
     }
     
     .festive-product-card::before {
@@ -3281,7 +3251,7 @@ li a{
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 107, 0, 0.05));
+      background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(33, 150, 243, 0.05));
       opacity: 0;
       transition: opacity 0.4s ease;
       pointer-events: none;
@@ -3779,7 +3749,7 @@ li a{
             {{ \Illuminate\Support\Str::limit($lookbookProduct->description ?? 'Carefully curated furniture, well matched in style and looks', 120) }}
           </p>
           <a href="{{ route('product.details', $lookbookProduct->id) }}">
-            <button class="btn btn-warning px-4 py-2">Explore now</button>
+            <button class="btn px-4 py-2" style="background:linear-gradient(135deg,#4A90E2,#2196F3);border:none;color:white;">Explore now</button>
           </a>
         </div>
         <div class="col-md-6 text-center">
