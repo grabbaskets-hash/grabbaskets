@@ -144,4 +144,13 @@ class WishlistController extends Controller
             'in_wishlist' => $inWishlist
         ]);
     }
+
+    public function count()
+    {
+        $count = Wishlist::where('user_id', Auth::id())->count();
+        
+        return response()->json([
+            'count' => $count
+        ]);
+    }
 }

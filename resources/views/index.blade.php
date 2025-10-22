@@ -478,7 +478,7 @@
       }
 
       body {
-        padding-bottom: 70px;
+        padding-bottom: 80px; /* Increased from 70px for better spacing */
       }
     }
 
@@ -488,12 +488,13 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      padding: 8px;
+      padding: 10px 8px; /* Increased padding */
       color: var(--text-light);
       text-decoration: none;
       font-size: 0.75rem;
       transition: all 0.3s ease;
       position: relative;
+      cursor: pointer;
     }
 
     .mobile-nav-item.active,
@@ -3135,7 +3136,7 @@ li a{
                   <p class="fs-5 text-white mb-4" style="opacity: 0.95;">Discover amazing products at unbeatable prices</p>
                   <div class="banner-buttons">
                     <a href="{{ route('products.index') }}" class="btn btn-light btn-lg shadow-lg" style="border-radius: 50px; padding: 12px 35px; font-weight: 700;">
-                      <i class="bi bi-shop me-2"></i>Start Shopping
+                      <i class="bi bi-shop me-2"></i>Start Shopping  
                     </a>
                   </div>
                 </div>
@@ -5143,6 +5144,15 @@ li a{
     
     // Toggle wishlist
     function toggleWishlist(productId, button) {
+        // Check if user is authenticated
+        @guest
+            showWishlistToast('Please login to add items to wishlist');
+            setTimeout(() => {
+                window.location.href = '{{ route('login') }}';
+            }, 1500);
+            return;
+        @endguest
+
         fetch('/wishlist/toggle', {
             method: 'POST',
             headers: {
@@ -5152,21 +5162,61 @@ li a{
             },
             body: JSON.stringify({ product_id: productId })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Please login to add items to wishlist');
+                }
+                throw new Error('Failed to update wishlist');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 updateHeartIcon(button, data.in_wishlist);
                 
                 // Show success message
                 showWishlistToast(data.message);
+                
+                // Update mobile nav wishlist badge if exists
+                updateWishlistBadge();
             } else {
-                alert(data.message || 'Failed to update wishlist');
+                showWishlistToast(data.message || 'Failed to update wishlist');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Please login to add items to wishlist');
+            showWishlistToast(error.message || 'An error occurred. Please try again.');
         });
+    }
+    
+    // Update wishlist badge count in mobile nav
+    function updateWishlistBadge() {
+        fetch('/wishlist/count', {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const wishlistNavItem = document.querySelector('a[href="{{ route('wishlist.index') }}"]');
+            if (wishlistNavItem) {
+                let badge = wishlistNavItem.querySelector('.badge');
+                if (data.count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge';
+                        wishlistNavItem.appendChild(badge);
+                    }
+                    badge.textContent = data.count;
+                } else if (badge) {
+                    badge.remove();
+                }
+            }
+        })
+        .catch(error => console.error('Error updating wishlist badge:', error));
     }
     
     // Update heart icon
@@ -5261,10 +5311,23 @@ li a{
         <span class="badge">{{ count(session('cart')) }}</span>
       @endif
     </a>
-    <a href="#" class="mobile-nav-item">
-      <i class="bi bi-heart"></i>
-      <span>Wishlist</span>
-    </a>
+    @auth
+      <a href="{{ route('wishlist.index') }}" class="mobile-nav-item">
+        <i class="bi bi-heart"></i>
+        <span>Wishlist</span>
+        @php
+          $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+        @endphp
+        @if($wishlistCount > 0)
+          <span class="badge">{{ $wishlistCount }}</span>
+        @endif
+      </a>
+    @else
+      <a href="{{ route('login') }}" class="mobile-nav-item">
+        <i class="bi bi-heart"></i>
+        <span>Wishlist</span>
+      </a>
+    @endauth
     @auth
       <a href="{{ route('profile.show') }}" class="mobile-nav-item">
         <i class="bi bi-person-circle"></i>
