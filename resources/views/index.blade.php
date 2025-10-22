@@ -3368,14 +3368,14 @@ li a{
 
     <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive with Hide/Show -->
     <div id="floatingActionsContainer" class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;transition:transform 0.3s ease, opacity 0.3s ease;">
+      <!-- Hide Button (small, always visible on mobile) -->
+      <button class="fab-hide-btn" id="fabHideBtn" onclick="hideFloatingButton()" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:6px;box-shadow:0 3px 10px rgba(220,53,69,0.3);font-size:0.9rem;position:absolute;top:-38px;right:8px;width:32px;height:32px;cursor:pointer;transition:all 0.3s;opacity:0.9;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.9';this.style.transform='scale(1)'">
+        <span style="font-weight:bold;line-height:1;">✕</span>
+      </button>
+      
       <!-- Main FAB Button -->
       <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
         <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
-      </button>
-      
-      <!-- Hide Button (appears on long press or swipe) -->
-      <button class="fab-hide-btn" id="fabHideBtn" onclick="hideFloatingButton()" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:8px;box-shadow:0 4px 12px rgba(220,53,69,0.3);font-size:1.2rem;position:absolute;top:-45px;right:0;width:40px;height:40px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-        <span>✕</span>
       </button>
       
       <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
@@ -4975,8 +4975,16 @@ li a{
     // Initialize FAB visibility state from localStorage
     document.addEventListener('DOMContentLoaded', function() {
       const fabHidden = localStorage.getItem('fabHidden') === 'true';
+      const fabHideBtn = document.getElementById('fabHideBtn');
+      
+      // Apply saved state
       if (fabHidden && window.innerWidth <= 768) {
         hideFloatingButton(false); // Don't save again, just apply state
+      }
+      
+      // Show hide button on mobile (always visible on mobile)
+      if (window.innerWidth <= 768) {
+        fabHideBtn.style.display = 'block';
       }
       
       // Add click events to floating category cards
@@ -4989,26 +4997,12 @@ li a{
         });
       });
 
-      // Show hide button on hover (desktop) or touch (mobile)
+      // Desktop: show hide button on hover
       const fabContainer = document.getElementById('floatingActionsContainer');
-      const fabHideBtn = document.getElementById('fabHideBtn');
       
-      if (window.innerWidth <= 768) {
-        // Mobile: show hide button with long press
-        let pressTimer;
-        fabContainer.addEventListener('touchstart', () => {
-          pressTimer = setTimeout(() => {
-            fabHideBtn.style.display = 'flex';
-          }, 500); // Long press 500ms
-        });
-        
-        fabContainer.addEventListener('touchend', () => {
-          clearTimeout(pressTimer);
-        });
-      } else {
-        // Desktop: show hide button on hover
+      if (window.innerWidth > 768) {
         fabContainer.addEventListener('mouseenter', () => {
-          fabHideBtn.style.display = 'flex';
+          fabHideBtn.style.display = 'block';
         });
         
         fabContainer.addEventListener('mouseleave', () => {
