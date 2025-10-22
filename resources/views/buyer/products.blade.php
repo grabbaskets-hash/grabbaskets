@@ -103,6 +103,33 @@
             background-color: #e6a600;
         }
 
+        /* Store Card Enhancements */
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(12, 131, 31, 0.25) !important;
+        }
+
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(12, 131, 31, 0.3) !important;
+        }
+
+        .bg-success-subtle {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .text-success {
+            color: #198754 !important;
+        }
+
         /* Responsive Grid Enhancements */
         @media (min-width: 1200px) {
             .col-xl-3 {
@@ -458,59 +485,144 @@
 
                 <!-- Store Cards (if any stores match the search) -->
                 @if(isset($matchedStores) && $matchedStores->isNotEmpty())
-                <div class="mb-4">
-                    <h4 class="fw-bold mb-3">
-                        <i class="bi bi-shop"></i> Stores Matching Your Search
-                    </h4>
-                    <div class="row g-3">
+                <div class="mb-5">
+                    <div class="alert alert-success border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 5px solid #0C831F !important;">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shop-window fs-3 text-success me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1 fw-bold">🎉 Store Found!</h5>
+                                <p class="mb-0">We found {{ $matchedStores->count() }} store(s) matching your search "{{ request('q') }}"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
                         @foreach($matchedStores as $store)
                         <div class="col-md-6">
-                            <div class="card h-100 shadow-sm" style="border-radius: 12px; border: 2px solid #0C831F; overflow: hidden;">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="card-title mb-1" style="color: #0C831F; font-weight: 700;">
+                            <div class="card h-100 shadow-lg hover-lift" style="border-radius: 16px; border: 3px solid #0C831F; overflow: hidden; transition: all 0.3s ease;">
+                                <!-- Store Header with Gradient -->
+                                <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #0C831F, #0A6917); border: none;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h4 class="mb-1 fw-bold">
                                                 <i class="bi bi-shop-window"></i> {{ $store->store_name ?? $store->name }}
-                                            </h5>
+                                            </h4>
                                             @if($store->store_name && $store->name && $store->store_name !== $store->name)
-                                                <p class="text-muted small mb-2">Owner: {{ $store->name }}</p>
+                                                <small class="opacity-75">
+                                                    <i class="bi bi-person-circle"></i> Owned by {{ $store->name }}
+                                                </small>
                                             @endif
                                         </div>
-                                        <span class="badge bg-success">{{ $store->product_count ?? 0 }} Products</span>
+                                        <div class="text-center">
+                                            <div class="badge bg-white text-success fs-6 px-3 py-2" style="border-radius: 12px;">
+                                                <i class="bi bi-box-seam"></i>
+                                                <strong>{{ $store->product_count ?? 0 }}</strong>
+                                                <div style="font-size: 0.75rem;">Products</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    
-                                    <div class="mb-3">
-                                        @if($store->store_address)
-                                            <p class="mb-2 small">
-                                                <i class="bi bi-geo-alt-fill text-danger"></i> 
-                                                {{ \Illuminate\Support\Str::limit($store->store_address, 60) }}
-                                            </p>
+                                </div>
+
+                                <!-- Store Body with Details -->
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <!-- Location Information -->
+                                        @if($store->store_address || $store->city || $store->state)
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-start mb-2">
+                                                <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-geo-alt-fill text-danger fs-5"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold text-dark">Location</h6>
+                                                    @if($store->store_address)
+                                                        <p class="mb-1 text-muted small">{{ $store->store_address }}</p>
+                                                    @endif
+                                                    @if($store->city || $store->state || $store->pincode)
+                                                        <p class="mb-0 text-muted small">
+                                                            <i class="bi bi-pin-map"></i>
+                                                            {{ implode(', ', array_filter([$store->city, $store->state, $store->pincode])) }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                         @endif
-                                        @if($store->store_contact)
-                                            <p class="mb-2 small">
-                                                <i class="bi bi-telephone-fill text-primary"></i> 
-                                                {{ $store->store_contact }}
-                                            </p>
+
+                                        <!-- Contact Information -->
+                                        @if($store->store_contact || $store->email)
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-start mb-2">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-telephone-fill text-primary fs-5"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold text-dark">Contact</h6>
+                                                    @if($store->store_contact)
+                                                        <p class="mb-1 text-muted small">
+                                                            <i class="bi bi-phone"></i> {{ $store->store_contact }}
+                                                        </p>
+                                                    @endif
+                                                    @if($store->email)
+                                                        <p class="mb-0 text-muted small">
+                                                            <i class="bi bi-envelope"></i> {{ $store->email }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                         @endif
-                                        @if($store->gst_number)
-                                            <p class="mb-0 small">
-                                                <i class="bi bi-file-text-fill text-secondary"></i> 
-                                                GST: {{ $store->gst_number }}
-                                            </p>
+
+                                        <!-- Business Information -->
+                                        @if($store->gst_number || $store->gift_option)
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-start mb-2">
+                                                <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-file-text-fill text-warning fs-5"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold text-dark">Business Info</h6>
+                                                    @if($store->gst_number)
+                                                        <p class="mb-1 text-muted small">
+                                                            <i class="bi bi-receipt"></i> GST: <strong>{{ $store->gst_number }}</strong>
+                                                        </p>
+                                                    @endif
+                                                    @if($store->gift_option)
+                                                        <span class="badge bg-success-subtle text-success">
+                                                            <i class="bi bi-gift"></i> Gift Wrapping Available
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                         @endif
                                     </div>
-                                    
+                                </div>
+
+                                <!-- Store Footer with Action Button -->
+                                <div class="card-footer bg-light border-0 p-4">
                                     @if(isset($store->user_id))
                                         <a href="{{ route('store.catalog', $store->user_id) }}" 
-                                           class="btn w-100" 
-                                           style="background: linear-gradient(135deg, #0C831F, #0A6917); color: white; border-radius: 8px; font-weight: 600;">
-                                            <i class="bi bi-grid-3x3-gap"></i> View Catalog
+                                           class="btn btn-lg w-100 text-white fw-bold shadow-sm hover-scale" 
+                                           style="background: linear-gradient(135deg, #0C831F, #0A6917); border-radius: 12px; padding: 14px; transition: all 0.3s ease;">
+                                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                                            View Complete Catalog
+                                            <i class="bi bi-arrow-right ms-2"></i>
                                         </a>
                                     @endif
                                 </div>
                             </div>
                         </div>
                         @endforeach
+                    </div>
+
+                    <!-- Divider -->
+                    <hr class="my-5" style="border-top: 2px dashed #dee2e6;">
+                    
+                    <div class="text-center mb-4">
+                        <h5 class="text-muted">
+                            <i class="bi bi-box-seam"></i> Products from this store
+                        </h5>
                     </div>
                 </div>
                 @endif
