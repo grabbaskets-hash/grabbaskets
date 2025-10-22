@@ -4,28 +4,510 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout</title>
+  <title>Checkout - GrabBaskets</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places" async defer></script>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: #f8f9fa;
+      background: #f5f5f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    .card {
-      border-radius: 1rem;
+    /* Location Bar Below Navbar */
+    .location-bar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    .btn-orange {
-      background-color: #ff9900;
-      color: #232f3e;
-      font-weight: bold;
+    .location-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
     }
 
-    .btn-orange:hover {
-      background-color: #e68a00;
-      color: #232f3e;
+    .location-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .location-text {
+      flex: 1;
+    }
+
+    .location-label {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .location-address {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .change-location-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .change-location-btn:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* Checkout Progress Tabs */
+    .checkout-tabs {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 30px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .tab-nav {
+      display: flex;
+      border-bottom: 3px solid #e0e0e0;
+    }
+
+    .tab-item {
+      flex: 1;
+      padding: 20px 30px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s;
+      background: #fafafa;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+    }
+
+    .tab-item:hover {
+      background: #f5f5f5;
+    }
+
+    .tab-item.active {
+      background: white;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .tab-item.completed {
+      background: #e8f5e9;
+    }
+
+    .tab-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+
+    .tab-item.active .tab-number {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .tab-item.completed .tab-number {
+      background: #4caf50;
+      color: white;
+    }
+
+    .tab-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tab-subtitle {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* Tab Content */
+    .tab-content-wrapper {
+      display: none;
+    }
+
+    .tab-content-wrapper.active {
+      display: block;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Address Cards */
+    .address-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .address-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .address-card.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .address-type-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-home {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .badge-office {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .badge-other {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .address-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .address-text {
+      font-size: 1rem;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .address-details {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* Map Container */
+    #map {
+      height: 400px;
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Order Summary Card */
+    .order-summary {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 100px;
+    }
+
+    .summary-header {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .item-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .item-qty {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: #333;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      font-size: 0.95rem;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-top: 2px solid #e0e0e0;
+      margin-top: 12px;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    /* Payment Options */
+    .payment-option {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .payment-option:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .payment-option.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    }
+
+    .payment-radio {
+      width: 24px;
+      height: 24px;
+      accent-color: #667eea;
+    }
+
+    .payment-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .payment-info {
+      flex: 1;
+    }
+
+    .payment-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .payment-desc {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary-custom {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary-custom:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-add-address {
+      background: white;
+      border: 2px dashed #667eea;
+      color: #667eea;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .btn-add-address:hover {
+      background: rgba(102, 126, 234, 0.05);
+      border-style: solid;
+    }
+
+    /* Form Styling */
+    .form-control-custom {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-control-custom:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tab-item {
+        padding: 16px 12px;
+      }
+
+      .tab-title {
+        font-size: 0.9rem;
+      }
+
+      .tab-subtitle {
+        display: none;
+      }
+
+      .order-summary {
+        position: relative;
+        top: 0;
+        margin-top: 20px;
+      }
+
+      #map {
+        height: 300px;
+      }
+    }
+
+    /* Loading Animation */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(102, 126, 234, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -36,10 +518,10 @@
   <!-- Navbar -->
   <nav class="navbar navbar-light bg-white shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-dark" href="#">
-        <span class="material-icons align-middle text-warning">storefront</span> MyShop
+      <a class="navbar-brand fw-bold text-dark" href="/">
+        <span class="material-icons align-middle text-warning">storefront</span> GrabBaskets
       </a>
-      <div class="d-flex">
+      <div class="d-flex gap-2">
         <a href="/cart" class="btn btn-outline-dark d-flex align-items-center gap-1">
           <span class="material-icons">shopping_cart</span> Cart
         </a>
@@ -47,213 +529,537 @@
     </div>
   </nav>
 
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
+  <!-- Location Bar -->
+  <div class="location-bar">
+    <div class="container">
+      <div class="location-content" onclick="detectLocationAuto()">
+        <div class="location-icon">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <div class="location-text">
+          <div class="location-label">Delivering to</div>
+          <div class="location-address" id="current-location">
+            <i class="bi bi-hourglass-split"></i> Detecting your location...
+          </div>
+        </div>
+        <button class="change-location-btn" type="button">
+          <i class="bi bi-arrow-repeat"></i> Change
+        </button>
+      </div>
+    </div>
+  </div>
 
-        <div class="card shadow border-0">
-          <div class="card-body p-5">
-            <div class="text-center mb-4">
-              <span class="material-icons" style="font-size:3rem;color:#ff9900;">shopping_cart_checkout</span>
-              <h2 class="fw-bold mt-2 mb-0" style="color:#232f3e;">Checkout</h2>
-            </div>
+  <div class="container py-4">
+    <!-- Checkout Progress Tabs -->
+    <div class="checkout-tabs">
+      <div class="tab-nav">
+        <div class="tab-item active" data-tab="address">
+          <div class="tab-number">1</div>
+          <div class="tab-title">Delivery Address</div>
+          <div class="tab-subtitle">Where should we deliver?</div>
+        </div>
+        <div class="tab-item" data-tab="payment">
+          <div class="tab-number">2</div>
+          <div class="tab-title">Payment Method</div>
+          <div class="tab-subtitle">Complete your order</div>
+        </div>
+      </div>
+    </div>
 
-            <form id="checkout-form" method="POST" action="{{ route('cart.checkout') }}">
-              @csrf
-              <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                  <div class="card p-3 mb-3">
-                    <h5 class="fw-semibold mb-3">
-                      <span class="material-icons align-middle text-primary">location_on</span> Delivery Address
-                    </h5>
+    <form id="checkout-form" method="POST" action="{{ route('cart.checkout') }}">
+      @csrf
 
-                    <div class="mb-3">
-                      <label class="form-label">
-                        <span class="material-icons align-middle text-secondary">home</span> Select Address
-                      </label>
-                      <select name="address" class="form-select">
-                        @foreach($addresses as $addr)
-                          <option value="{{ $addr }}">{{ $addr }}</option>
-                        @endforeach
-                      </select>
+      <div class="row g-4">
+        <!-- Left Column - Tab Content -->
+        <div class="col-lg-8">
+          
+          <!-- Step 1: Address Tab -->
+          <div class="tab-content-wrapper active" id="address-tab">
+            <h4 class="mb-4 fw-bold">
+              <i class="bi bi-geo-alt-fill text-primary"></i> Select Delivery Address
+            </h4>
+
+            <!-- Existing Addresses -->
+            @if(count($addresses) > 0)
+              <div class="mb-4">
+                <h6 class="text-muted mb-3">SAVED ADDRESSES</h6>
+                @foreach($addresses as $index => $addr)
+                  <div class="address-card" onclick="selectAddress({{ $index }}, '{{ $addr }}')">
+                    <div class="address-type-badge badge-home">
+                      <i class="bi bi-house-fill"></i> Home
                     </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">
-                        <span class="material-icons align-middle text-info">edit_location_alt</span> Or enter new
-                        address
-                      </label>
-                      <input type="text" name="new_address"
-                        class="form-control @error('new_address') is-invalid @enderror" placeholder="Flat, Street, Area"
-                        value="{{ old('new_address') }}">
-                      @error('new_address') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
+                    <div class="address-icon">
+                      <i class="bi bi-geo-alt-fill"></i>
                     </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">
-                        <span class="material-icons align-middle text-warning">apartment</span> Address Type
-                      </label>
-                      <select name="address_type" class="form-select @error('address_type') is-invalid @enderror">
-                        <option value="home" {{ old('address_type') == 'home' ? 'selected' : '' }}>Home</option>
-                        <option value="office" {{ old('address_type') == 'office' ? 'selected' : '' }}>Office</option>
-                        <option value="other" {{ old('address_type') == 'other' ? 'selected' : '' }}>Other</option>
-                      </select>
-                      @error('address_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="address-text">{{ $addr }}</div>
+                    <div class="address-details">
+                      <i class="bi bi-telephone-fill"></i> {{ auth()->user()->phone ?? 'No phone' }}
                     </div>
-
-                    <button type="button"
-                      class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                      onclick="getLocation()">
-                      <span class="material-icons">my_location</span> Use Current Location
-                    </button>
+                    <input type="radio" name="address" value="{{ $addr }}" style="display: none;" id="addr-{{ $index }}">
                   </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="card p-3 mb-3">
-                    <h5 class="fw-semibold mb-3">
-                      <span class="material-icons align-middle text-success">map</span> Location Details
-                    </h5>
-
-                    <div class="mb-3">
-                      <label class="form-label">City</label>
-                      <input type="text" name="city" id="city" class="form-control @error('city') is-invalid @enderror"
-                        placeholder="City" value="{{ old('city', $user->city) }}">
-                      @error('city') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">State</label>
-                      <input type="text" name="state" id="state"
-                        class="form-control @error('state') is-invalid @enderror" placeholder="State"
-                        value="{{ old('state', $user->state) }}">
-                      @error('state') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">Pincode</label>
-                      <input type="text" name="pincode" id="pincode"
-                        class="form-control @error('pincode') is-invalid @enderror" placeholder="Pincode"
-                        value="{{ old('pincode', $user->pincode) }}">
-                      @error('pincode') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                  </div>
-                </div>
-
+                @endforeach
               </div>
+            @endif
 
-              <div class="row g-4 mb-4">
+            <!-- Add New Address Form -->
+            <div class="mb-4">
+              <button type="button" class="btn-add-address" onclick="toggleAddressForm()">
+                <i class="bi bi-plus-circle" style="font-size: 1.5rem;"></i>
+                <div class="mt-2">Add New Address</div>
+              </button>
 
-                <div class="col-md-6">
-                  <div class="card p-3 mb-3">
-                    <h5 class="fw-semibold mb-3">
-                      <span class="material-icons align-middle text-indigo-700">receipt_long</span> Order Summary
-                    </h5>
+              <div id="new-address-form" style="display: none; margin-top: 20px;">
+                <div class="card p-4">
+                  <h6 class="fw-bold mb-3">
+                    <i class="bi bi-map"></i> Enter New Address
+                  </h6>
 
-                    <ul class="list-group mb-3 rounded-3 shadow-sm">
-                      @foreach($items as $item)
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                          <div class="flex-grow-1">
-                            <span class="fw-semibold">{{ $item->product->name }} x {{ $item->quantity }}</span>
-                            @if($item->product->gift_option === 'yes')
-                              <div class="text-success small">
-                                <span class="material-icons" style="font-size: 16px;">card_giftcard</span> Gift option
-                                available
-                              </div>
-                            @endif
-                          </div>
-                          <span class="fw-bold">₹{{ number_format($item->price * $item->quantity, 2) }}</span>
-                        </li>
-                      @endforeach
-                    </ul>
-
-                    <div class="mb-2"><span class="material-icons align-middle text-muted">calculate</span> Subtotal:
-                      ₹{{ number_format($totals['subtotal'], 2) }}</div>
-                    <div class="mb-2"><span class="material-icons align-middle text-danger">discount</span> Discount:
-                      -₹{{ number_format($totals['discountTotal'], 2) }}</div>
-                    <div class="mb-2"><span class="material-icons align-middle text-info">local_shipping</span>
-                      Delivery: ₹{{ number_format($totals['deliveryTotal'], 2) }}</div>
-                    <div class="fw-bold"><span class="material-icons align-middle text-success">payments</span> Total:
-                      ₹{{ number_format($totals['total'], 2) }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="card p-3 mb-3">
-                  <h5 class="fw-semibold mb-3">
-                    <span class="material-icons align-middle text-warning">credit_card</span> Payment Method
-                  </h5>
+                  <!-- Google Map -->
+                  <div id="map"></div>
 
                   <div class="mb-3">
-                    <select name="payment_method" class="form-select" id="payment-method">
-                      <option value="razorpay">Razorpay (Card/UPI/Wallet)</option>
-                      <option value="cod">Cash on Delivery</option>
-                    </select>
+                    <label class="form-label fw-semibold">Full Address</label>
+                    <textarea name="new_address" id="new_address" class="form-control-custom w-100" rows="3"
+                      placeholder="House/Flat no, Street name, Area, Landmark"></textarea>
                   </div>
 
-                  <div id="payment-gateway" class="mb-3"></div>
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">City</label>
+                      <input type="text" name="city" id="city" class="form-control-custom w-100" 
+                        value="{{ old('city', $user->city) }}" placeholder="City">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">State</label>
+                      <input type="text" name="state" id="state" class="form-control-custom w-100" 
+                        value="{{ old('state', $user->state) }}" placeholder="State">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Pincode</label>
+                      <input type="text" name="pincode" id="pincode" class="form-control-custom w-100" 
+                        value="{{ old('pincode', $user->pincode) }}" placeholder="6-digit pincode" pattern="[0-9]{6}">
+                    </div>
+                  </div>
 
-                  <button type="button" class="btn btn-orange w-100 py-2" id="place-order-btn">
-                    <span class="material-icons">shopping_bag</span> <span id="btn-text">Place Order</span>
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Address Type</label>
+                    <div class="btn-group w-100" role="group">
+                      <input type="radio" class="btn-check" name="address_type" id="type-home" value="home" checked>
+                      <label class="btn btn-outline-primary" for="type-home">
+                        <i class="bi bi-house-fill"></i> Home
+                      </label>
+
+                      <input type="radio" class="btn-check" name="address_type" id="type-office" value="office">
+                      <label class="btn btn-outline-primary" for="type-office">
+                        <i class="bi bi-building"></i> Office
+                      </label>
+
+                      <input type="radio" class="btn-check" name="address_type" id="type-other" value="other">
+                      <label class="btn btn-outline-primary" for="type-other">
+                        <i class="bi bi-geo"></i> Other
+                      </label>
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn btn-primary w-100" onclick="saveNewAddress()">
+                    <i class="bi bi-check-circle-fill"></i> Save & Continue
                   </button>
                 </div>
               </div>
+            </div>
 
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-end gap-3 mt-4">
+              <button type="button" class="btn-primary-custom" onclick="goToPayment()">
+                Continue to Payment <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
           </div>
 
-          </form>
+          <!-- Step 2: Payment Tab -->
+          <div class="tab-content-wrapper" id="payment-tab">
+            <h4 class="mb-4 fw-bold">
+              <i class="bi bi-credit-card-fill text-success"></i> Select Payment Method
+            </h4>
 
+            <!-- Payment Options -->
+            <div class="payment-option selected" onclick="selectPayment('razorpay')">
+              <input type="radio" name="payment_method" id="razorpay" value="razorpay" class="payment-radio" checked>
+              <div class="payment-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-credit-card-fill"></i>
+              </div>
+              <div class="payment-info">
+                <div class="payment-title">Razorpay Payment Gateway</div>
+                <div class="payment-desc">Pay securely using Cards, UPI, Wallets & Net Banking</div>
+              </div>
+            </div>
+
+            <div class="payment-option" onclick="selectPayment('cod')">
+              <input type="radio" name="payment_method" id="cod" value="cod" class="payment-radio">
+              <div class="payment-icon" style="background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <div class="payment-info">
+                <div class="payment-title">Cash on Delivery (COD)</div>
+                <div class="payment-desc">Pay with cash when your order is delivered</div>
+              </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between gap-3 mt-4">
+              <button type="button" class="btn-secondary-custom" onclick="goToAddress()">
+                <i class="bi bi-arrow-left"></i> Back to Address
+              </button>
+              <button type="button" class="btn-primary-custom" id="place-order-btn">
+                <i class="bi bi-shield-check-fill"></i> <span id="btn-text">Place Secure Order</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="col-lg-4">
+          <div class="order-summary">
+            <div class="summary-header">
+              <i class="bi bi-bag-check-fill"></i> Order Summary
+            </div>
+
+            <!-- Cart Items -->
+            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+              @foreach($items as $item)
+                <div class="summary-item">
+                  @if($item->product->image)
+                    <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="item-image">
+                  @else
+                    <div class="item-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-image" style="font-size: 1.5rem; color: #999;"></i>
+                    </div>
+                  @endif
+                  <div class="item-info">
+                    <div class="item-name">{{ $item->product->name }}</div>
+                    <div class="item-qty">Qty: {{ $item->quantity }}</div>
+                  </div>
+                  <div class="item-price">₹{{ number_format($item->price * $item->quantity, 2) }}</div>
+                </div>
+              @endforeach
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong>₹{{ number_format($totals['subtotal'], 2) }}</strong>
+            </div>
+
+            <div class="summary-row">
+              <span><i class="bi bi-tag-fill text-danger"></i> Discount</span>
+              <strong class="text-danger">-₹{{ number_format($totals['discountTotal'], 2) }}</strong>
+            </div>
+
+            <div class="summary-row">
+              <span><i class="bi bi-truck"></i> Delivery Charges</span>
+              <strong class="text-success">
+                @if($totals['deliveryTotal'] == 0)
+                  FREE
+                @else
+                  ₹{{ number_format($totals['deliveryTotal'], 2) }}
+                @endif
+              </strong>
+            </div>
+
+            <div class="summary-total">
+              <span>Total Amount</span>
+              <strong style="color: #667eea;">₹{{ number_format($totals['total'], 2) }}</strong>
+            </div>
+
+            <div class="text-center mt-3 p-3" style="background: #f0f7ff; border-radius: 8px;">
+              <i class="bi bi-shield-check text-primary"></i>
+              <small class="text-muted d-block mt-1">Secure SSL Encrypted Payment</small>
+            </div>
+          </div>
         </div>
       </div>
 
-    </div>
+      <input type="hidden" name="latitude" id="latitude">
+      <input type="hidden" name="longitude" id="longitude">
+    </form>
   </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="text-center text-white">
+      <div class="spinner"></div>
+      <div class="mt-3">Processing your order...</div>
+    </div>
   </div>
 
   <script>
-    const select = document.getElementById('payment-method');
-    const gatewayDiv = document.getElementById('payment-gateway');
-    const placeOrderBtn = document.getElementById('place-order-btn');
-    const btnText = document.getElementById('btn-text');
+    let map;
+    let marker;
+    let selectedAddressIndex = null;
 
-    if (select && gatewayDiv) {
-      select.addEventListener('change', function () {
-        if (this.value === 'razorpay') {
-          gatewayDiv.innerHTML = '<div class="alert alert-info"><span class="material-icons">info</span> Secure payment with Razorpay</div>';
-          btnText.textContent = 'Pay with Razorpay';
-        } else if (this.value === 'cod') {
-          gatewayDiv.innerHTML = '<div class="alert alert-warning"><span class="material-icons">local_shipping</span> Pay when your order is delivered</div>';
-          btnText.textContent = 'Place Order (COD)';
+    // Auto-detect location on page load
+    window.addEventListener('load', function() {
+      detectLocationAuto();
+      if (typeof google !== 'undefined') {
+        initMap();
+      }
+    });
+
+    // Initialize Google Map
+    function initMap() {
+      const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // Bangalore
+      
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: defaultLocation,
+        styles: [
+          { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+        ]
+      });
+
+      marker = new google.maps.Marker({
+        position: defaultLocation,
+        map: map,
+        draggable: true,
+        animation: google.maps.Animation.DROP,
+        title: 'Your Delivery Location'
+      });
+
+      marker.addListener('dragend', function() {
+        const position = marker.getPosition();
+        document.getElementById('latitude').value = position.lat();
+        document.getElementById('longitude').value = position.lng();
+        geocodeLocation(position.lat(), position.lng());
+      });
+
+      // Try to get current location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          map.setCenter(pos);
+          marker.setPosition(pos);
+          document.getElementById('latitude').value = pos.lat;
+          document.getElementById('longitude').value = pos.lng;
+          geocodeLocation(pos.lat, pos.lng);
+        });
+      }
+    }
+
+    // Auto-detect location for location bar
+    function detectLocationAuto() {
+      if (navigator.geolocation) {
+        document.getElementById('current-location').innerHTML = '<i class="bi bi-hourglass-split"></i> Detecting...';
+        
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            // Use Google Geocoding API
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key={{ config('services.google.maps_api_key') }}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.results && data.results[0]) {
+                  const address = data.results[0].formatted_address;
+                  document.getElementById('current-location').innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${address}`;
+                  
+                  // Also update form fields
+                  const components = data.results[0].address_components;
+                  components.forEach(comp => {
+                    if (comp.types.includes('locality')) {
+                      document.getElementById('city').value = comp.long_name;
+                    }
+                    if (comp.types.includes('administrative_area_level_1')) {
+                      document.getElementById('state').value = comp.long_name;
+                    }
+                    if (comp.types.includes('postal_code')) {
+                      document.getElementById('pincode').value = comp.long_name;
+                    }
+                  });
+                } else {
+                  document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
+                }
+              })
+              .catch(() => {
+                document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
+              });
+          },
+          function() {
+            document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Click to detect location';
+          }
+        );
+      } else {
+        document.getElementById('current-location').innerHTML = '<i class="bi bi-geo-alt"></i> Geolocation not supported';
+      }
+    }
+
+    // Geocode location
+    function geocodeLocation(lat, lng) {
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key={{ config('services.google.maps_api_key') }}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.results && data.results[0]) {
+            const addressComponents = data.results[0].address_components;
+            
+            document.getElementById('new_address').value = data.results[0].formatted_address;
+            
+            addressComponents.forEach(component => {
+              if (component.types.includes('locality')) {
+                document.getElementById('city').value = component.long_name;
+              }
+              if (component.types.includes('administrative_area_level_1')) {
+                document.getElementById('state').value = component.long_name;
+              }
+              if (component.types.includes('postal_code')) {
+                document.getElementById('pincode').value = component.long_name;
+              }
+            });
+
+            // Update location bar
+            document.getElementById('current-location').innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${data.results[0].formatted_address}`;
+          }
+        });
+    }
+
+    // Tab Navigation
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+        switchTab(targetTab);
+      });
+    });
+
+    function switchTab(tabName) {
+      // Update tab items
+      document.querySelectorAll('.tab-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.tab === tabName) {
+          item.classList.add('active');
         }
       });
 
-      // Trigger change event on page load
-      select.dispatchEvent(new Event('change'));
+      // Update tab content
+      document.querySelectorAll('.tab-content-wrapper').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(tabName + '-tab').classList.add('active');
     }
 
-    // Handle place order button click
-    placeOrderBtn.addEventListener('click', function () {
-      const paymentMethod = select.value;
+    function goToPayment() {
+      // Validate address selection
+      const selectedAddress = document.querySelector('input[name="address"]:checked');
+      const newAddress = document.getElementById('new_address').value;
+      
+      if (!selectedAddress && !newAddress) {
+        alert('Please select or add a delivery address');
+        return;
+      }
+
+      // Mark address step as completed
+      document.querySelector('.tab-item[data-tab="address"]').classList.add('completed');
+      switchTab('payment');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToAddress() {
+      switchTab('address');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Address Selection
+    function selectAddress(index, address) {
+      // Remove selected class from all
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to clicked
+      event.currentTarget.classList.add('selected');
+      
+      // Check the radio button
+      document.getElementById('addr-' + index).checked = true;
+      
+      selectedAddressIndex = index;
+    }
+
+    // Toggle address form
+    function toggleAddressForm() {
+      const form = document.getElementById('new-address-form');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        if (typeof google !== 'undefined' && !map) {
+          setTimeout(initMap, 100);
+        }
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    function saveNewAddress() {
+      const address = document.getElementById('new_address').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const pincode = document.getElementById('pincode').value;
+
+      if (!address || !city || !state || !pincode) {
+        alert('Please fill all address fields');
+        return;
+      }
+
+      // Hide the form
+      toggleAddressForm();
+      
+      // Continue to payment
+      goToPayment();
+    }
+
+    // Payment Selection
+    function selectPayment(method) {
+      // Remove selected class from all
+      document.querySelectorAll('.payment-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      // Add selected class to clicked
+      event.currentTarget.classList.add('selected');
+      
+      // Update radio button
+      document.getElementById(method).checked = true;
+      
+      // Update button text
+      const btnText = document.getElementById('btn-text');
+      if (method === 'razorpay') {
+        btnText.textContent = 'Pay with Razorpay';
+      } else {
+        btnText.textContent = 'Place Order (COD)';
+      }
+    }
+
+    // Place Order
+    document.getElementById('place-order-btn').addEventListener('click', function() {
+      const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
       if (paymentMethod === 'razorpay') {
         initiateRazorpayPayment();
       } else {
-        // For COD, submit the form normally
+        // For COD, submit the form
+        document.getElementById('loading-overlay').classList.add('active');
         document.getElementById('checkout-form').submit();
       }
     });
 
     function initiateRazorpayPayment() {
-      // Show loading
+      const placeOrderBtn = document.getElementById('place-order-btn');
+      const btnText = document.getElementById('btn-text');
+      
       placeOrderBtn.disabled = true;
       btnText.textContent = 'Processing...';
 
-      // Get form data
       const formData = new FormData(document.getElementById('checkout-form'));
 
-      // Create Razorpay order
       fetch('{{ route("payment.createOrder") }}', {
         method: 'POST',
         body: formData,
@@ -261,50 +1067,51 @@
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            alert(data.error);
-            placeOrderBtn.disabled = false;
-            btnText.textContent = 'Pay with Razorpay';
-            return;
-          }
-
-          // Initialize Razorpay
-          const options = {
-            key: '{{ config("services.razorpay.key") }}',
-            amount: data.amount,
-            currency: data.currency,
-            name: data.name,
-            description: data.description,
-            order_id: data.order_id,
-            prefill: data.prefill,
-            theme: {
-              color: '#ff9900'
-            },
-            handler: function (response) {
-              verifyPayment(response);
-            },
-            modal: {
-              ondismiss: function () {
-                placeOrderBtn.disabled = false;
-                btnText.textContent = 'Pay with Razorpay';
-              }
-            }
-          };
-
-          const rzp = new Razorpay(options);
-          rzp.open();
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Payment initialization failed. Please try again.');
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
           placeOrderBtn.disabled = false;
           btnText.textContent = 'Pay with Razorpay';
-        });
+          return;
+        }
+
+        const options = {
+          key: '{{ config("services.razorpay.key") }}',
+          amount: data.amount,
+          currency: data.currency,
+          name: data.name,
+          description: data.description,
+          order_id: data.order_id,
+          prefill: data.prefill,
+          theme: {
+            color: '#667eea'
+          },
+          handler: function(response) {
+            verifyPayment(response);
+          },
+          modal: {
+            ondismiss: function() {
+              placeOrderBtn.disabled = false;
+              btnText.textContent = 'Pay with Razorpay';
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Payment initialization failed. Please try again.');
+        placeOrderBtn.disabled = false;
+        btnText.textContent = 'Pay with Razorpay';
+      });
     }
 
     function verifyPayment(paymentData) {
+      document.getElementById('loading-overlay').classList.add('active');
+      
       fetch('{{ route("payment.verify") }}', {
         method: 'POST',
         headers: {
@@ -313,46 +1120,25 @@
         },
         body: JSON.stringify(paymentData)
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert(data.message);
-            window.location.href = data.redirect;
-          } else {
-            alert(data.error || 'Payment verification failed');
-            placeOrderBtn.disabled = false;
-            btnText.textContent = 'Pay with Razorpay';
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Payment verification failed. Please contact support.');
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          window.location.href = data.redirect;
+        } else {
+          alert(data.error || 'Payment verification failed');
+          document.getElementById('loading-overlay').classList.remove('active');
           placeOrderBtn.disabled = false;
           btnText.textContent = 'Pay with Razorpay';
-        });
-    }
-
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (pos) {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.address) {
-                document.querySelector('input[name="new_address"]').value = data.display_name || '';
-                document.getElementById('city').value = data.address.city || data.address.town || data.address.village || '';
-                document.getElementById('state').value = data.address.state || '';
-                document.getElementById('pincode').value = data.address.postcode || '';
-              }
-            });
-        }, function () {
-          alert('Unable to fetch location.');
-        });
-      } else {
-        alert('Geolocation is not supported by your browser.');
-      }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Payment verification failed. Please contact support.');
+        document.getElementById('loading-overlay').classList.remove('active');
+        placeOrderBtn.disabled = false;
+        btnText.textContent = 'Pay with Razorpay';
+      });
     }
   </script>
 
