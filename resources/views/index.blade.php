@@ -17,6 +17,18 @@
   @endif
   <!-- Modern Clean Theme - Light Blue & Cream -->
   <style>
+    /* Delivery Badge Pulse Animation */
+    @keyframes pulse {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+      }
+      50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 23, 68, 0);
+      }
+    }
+
     /* Trending Section - Sleek Dark Neon Design */
     .trending-neon-section {
       position: relative;
@@ -2574,6 +2586,63 @@ li a{
         <button class="zepto-cat-nav zepto-cat-next d-none d-md-grid" type="button" onclick="scrollZeptoCats(1)">
           <i class="bi bi-chevron-right"></i>
         </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🚀 Delivery Options Banner - Zepto/Blinkit Style -->
+  <section class="py-3" style="background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border-bottom: 1px solid rgba(76, 175, 80, 0.1);">
+    <div class="container">
+      <div class="row g-3 align-items-center">
+        <!-- Quick Delivery (Zepto/Blinkit Style) -->
+        <div class="col-12 col-md-6">
+          <div class="delivery-card" style="background: linear-gradient(135deg, #ffffff 0%, #E8F5E9 100%); padding: 20px; border-radius: 16px; border: 2px solid rgba(76, 175, 80, 0.3); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(76, 175, 80, 0.1)'">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4CAF50, #66BB6A); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">
+                <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; color: white;"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <h5 class="mb-0 fw-bold" style="color: #2E7D32; font-size: 1.2rem;">⚡ 10-Minute Delivery</h5>
+                  <span class="badge" style="background: linear-gradient(45deg, #FF5252, #FF1744); color: white; font-size: 0.7rem; padding: 3px 8px; animation: pulse 2s infinite;">HOT</span>
+                </div>
+                <p class="mb-0 text-muted" style="font-size: 0.9rem; line-height: 1.4;">
+                  <strong style="color: #4CAF50;">Within 5km radius</strong> • Groceries, Essentials & More
+                </p>
+                <small class="text-success fw-semibold">🎯 Perfect for urgent needs!</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Standard Delivery (Amazon Style) -->
+        <div class="col-12 col-md-6">
+          <div class="delivery-card" style="background: linear-gradient(135deg, #ffffff 0%, #E3F2FD 100%); padding: 20px; border-radius: 16px; border: 2px solid rgba(33, 150, 243, 0.3); box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(33, 150, 243, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(33, 150, 243, 0.1)'">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #2196F3, #42A5F5); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);">
+                <i class="bi bi-truck" style="font-size: 2rem; color: white;"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <h5 class="mb-0 fw-bold" style="color: #1976D2; font-size: 1.2rem;">🚚 Standard Delivery</h5>
+                  <span class="badge" style="background: linear-gradient(45deg, #2196F3, #1976D2); color: white; font-size: 0.7rem; padding: 3px 8px;">RELIABLE</span>
+                </div>
+                <p class="mb-0 text-muted" style="font-size: 0.9rem; line-height: 1.4;">
+                  <strong style="color: #2196F3;">2-5 days nationwide</strong> • All products available
+                </p>
+                <small class="text-primary fw-semibold">📦 Free delivery on orders above ₹499</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Banner -->
+      <div class="text-center mt-3">
+        <p class="mb-0" style="font-size: 0.85rem; color: #666;">
+          <i class="bi bi-info-circle-fill me-1" style="color: #4CAF50;"></i>
+          <strong>10-min delivery</strong> available for select pin codes within 5km • Check availability at checkout
+        </p>
       </div>
     </div>
   </section>
