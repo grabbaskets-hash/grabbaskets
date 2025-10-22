@@ -246,6 +246,15 @@ public function search(Request $request)
         // Get search statistics
         $totalResults = $products->total();
         
+        // Prepare filters array for the view
+        $filters = [
+            'price_min' => $request->input('price_min'),
+            'price_max' => $request->input('price_max'),
+            'discount_min' => $request->input('discount_min'),
+            'free_delivery' => $request->boolean('free_delivery'),
+            'sort' => $request->input('sort', 'relevance')
+        ];
+        
         // Log search query for analytics
         if ($request->filled('q')) {
             \Illuminate\Support\Facades\Log::info('Search Query', [
@@ -256,7 +265,7 @@ public function search(Request $request)
             ]);
         }
 
-        return view('buyer.products', compact('products', 'searchQuery', 'totalResults', 'matchedStores'));
+        return view('buyer.products', compact('products', 'searchQuery', 'totalResults', 'matchedStores', 'filters'));
         
     } catch (\Exception $e) {
         \Illuminate\Support\Facades\Log::error('Search Error', [
@@ -270,6 +279,7 @@ public function search(Request $request)
             'searchQuery' => $request->input('q', ''),
             'totalResults' => 0,
             'matchedStores' => collect([]),
+            'filters' => [],
             'error' => 'An error occurred while searching. Please try again.'
         ]);
     }
