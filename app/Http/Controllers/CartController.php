@@ -25,11 +25,13 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'nullable|integer|min:1|max:10',
+            'delivery_type' => 'nullable|in:express_10min,standard',
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
         $qty = max(1, (int) $request->input('quantity', 1));
+        $deliveryType = $request->input('delivery_type', 'standard');
 
         $item = CartItem::firstOrNew([
             'user_id' => Auth::id(),
@@ -43,10 +45,11 @@ class CartController extends Controller
             $item->discount = $product->discount ?? 0;
             $item->delivery_charge = $product->delivery_charge ?? 0;
             $item->quantity = $qty;
+            $item->delivery_type = $deliveryType;
         }
         $item->save();
 
-        return redirect()->route('cart.index')->with('Sucess');
+        return redirect()->route('cart.index')->with('success', 'Item added to ' . ($deliveryType === 'express_10min' ? '10-min' : 'standard') . ' cart!');
     }
 
     public function update(Request $request, CartItem $cartItem)
@@ -141,6 +144,60 @@ class CartController extends Controller
         CartItem::where('user_id', Auth::id())->delete();
 
         return redirect()->route('cart.index')->with('success', 'Order placed! Payment ' . ($payment_status === 'paid' ? 'successful' : 'pending for COD'));
+    }
+
+    /**
+     * Show new checkout page with separate carts for express and standard delivery
+     */
+    public function showCheckoutNew()
+    {
+        $expressCartItems = CartItem::with('product')
+            ->where('user_id', Auth::id())
+            ->where('delivery_type', 'express_10min')
+            ->get();
+
+        $standardCartItems = CartItem::with('product')
+            ->where('user_id', Auth::id())
+            ->where('delivery_type', 'standard')
+            ->get();
+
+        if ($expressCartItems->isEmpty() && $standardCartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('info', 'Your cart is empty');
+        }
+
+        // Calculate totals
+        $expressTotal = $expressCartItems->sum(function ($item) {
+            return $this->lineAmount($item);
+        });
+
+        $standardTotal = $standardCartItems->sum(function ($item) {
+            return $this->lineAmount($item);
+        });
+
+        return view('cart.checkout-new', compact(
+            'expressCartItems',
+            'standardCartItems',
+            'expressTotal',
+            'standardTotal'
+        ));
+    }
+
+    /**
+     * Switch item delivery type
+     */
+    public function switchDeliveryType(Request $request, CartItem $cartItem)
+    {
+        if ($cartItem->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'delivery_type' => 'required|in:express_10min,standard',
+        ]);
+
+        $cartItem->update(['delivery_type' => $request->delivery_type]);
+
+        return back()->with('success', 'Delivery type updated!');
     }
 
     private function calculateTotals($items)

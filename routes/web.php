@@ -532,7 +532,9 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
     Route::post('/cart/{cartItem}/move-to-wishlist', [CartController::class, 'moveToWishlist'])->name('cart.moveToWishlist');
+    Route::post('/cart/{cartItem}/switch-delivery', [CartController::class, 'switchDeliveryType'])->name('cart.switchDelivery');
     Route::get('/checkout', [CartController::class, 'showCheckout'])->name('cart.checkout.page');
+    Route::get('/checkout-new', [CartController::class, 'showCheckoutNew'])->name('cart.checkout.new');
     Route::post('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     // Payment routes
     Route::post('/payment/create-order', [PaymentController::class, 'createOrder'])->name('payment.createOrder');
