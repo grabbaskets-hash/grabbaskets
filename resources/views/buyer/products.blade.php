@@ -456,6 +456,65 @@
                 </div>
                 @endif
 
+                <!-- Store Cards (if any stores match the search) -->
+                @if(isset($matchedStores) && $matchedStores->isNotEmpty())
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-3">
+                        <i class="bi bi-shop"></i> Stores Matching Your Search
+                    </h4>
+                    <div class="row g-3">
+                        @foreach($matchedStores as $store)
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm" style="border-radius: 12px; border: 2px solid #0C831F; overflow: hidden;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title mb-1" style="color: #0C831F; font-weight: 700;">
+                                                <i class="bi bi-shop-window"></i> {{ $store->store_name ?? $store->name }}
+                                            </h5>
+                                            @if($store->store_name && $store->name && $store->store_name !== $store->name)
+                                                <p class="text-muted small mb-2">Owner: {{ $store->name }}</p>
+                                            @endif
+                                        </div>
+                                        <span class="badge bg-success">{{ $store->product_count ?? 0 }} Products</span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        @if($store->store_address)
+                                            <p class="mb-2 small">
+                                                <i class="bi bi-geo-alt-fill text-danger"></i> 
+                                                {{ \Illuminate\Support\Str::limit($store->store_address, 60) }}
+                                            </p>
+                                        @endif
+                                        @if($store->store_contact)
+                                            <p class="mb-2 small">
+                                                <i class="bi bi-telephone-fill text-primary"></i> 
+                                                {{ $store->store_contact }}
+                                            </p>
+                                        @endif
+                                        @if($store->gst_number)
+                                            <p class="mb-0 small">
+                                                <i class="bi bi-file-text-fill text-secondary"></i> 
+                                                GST: {{ $store->gst_number }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                    
+                                    @if(isset($store->user_id))
+                                        <a href="{{ route('store.catalog', $store->user_id) }}" 
+                                           class="btn w-100" 
+                                           style="background: linear-gradient(135deg, #0C831F, #0A6917); color: white; border-radius: 8px; font-weight: 600;">
+                                            <i class="bi bi-grid-3x3-gap"></i> View Catalog
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Search & Sort -->
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
                     <form method="GET" action="{{ url()->current() }}" class="search-bar d-flex me-2 mb-2"

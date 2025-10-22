@@ -575,6 +575,9 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
 // Public product search - Anyone can search
 Route::get('/products', [BuyerController::class, 'search'])->name('products.index');
 
+// Store/Seller catalog - View all products from a specific store
+Route::get('/store/{seller_id}/catalog', [BuyerController::class, 'storeCatalog'])->name('store.catalog');
+
 // Courier Tracking (Public access)
 Route::get('/tracking', [CourierTrackingController::class, 'showForm'])->name('tracking.form');
 Route::post('/tracking/track', [CourierTrackingController::class, 'track'])->name('tracking.track');

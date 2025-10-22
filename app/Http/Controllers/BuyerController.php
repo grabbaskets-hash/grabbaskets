@@ -150,6 +150,7 @@ public function search(Request $request)
 {
     try {
         $searchQuery = $request->input('q', '');
+        $matchedStores = collect();
         
         $query = Product::with(['category', 'subcategory'])
             ->whereNotNull('image')
@@ -160,6 +161,24 @@ public function search(Request $request)
 
         if ($request->filled('q')) {
             $search = trim($searchQuery);
+            
+            // Search for matching stores
+            $matchedStores = Seller::where('name', 'like', "%{$search}%")
+                ->orWhere('store_name', 'like', "%{$search}%")
+                ->with(['user' => function($query) {
+                    $query->select('id', 'email');
+                }])
+                ->get()
+                ->map(function($seller) {
+                    // Get user ID for this seller
+                    $user = User::where('email', $seller->email)->first();
+                    if ($user) {
+                        $seller->user_id = $user->id;
+                        // Count products for this seller
+                        $seller->product_count = Product::where('seller_id', $user->id)->count();
+                    }
+                    return $seller;
+                });
             
             $query->where(function ($q) use ($search) {
                 // Search in product fields that actually exist in database
@@ -237,7 +256,7 @@ public function search(Request $request)
             ]);
         }
 
-        return view('buyer.products', compact('products', 'searchQuery', 'totalResults'));
+        return view('buyer.products', compact('products', 'searchQuery', 'totalResults', 'matchedStores'));
         
     } catch (\Exception $e) {
         \Illuminate\Support\Facades\Log::error('Search Error', [
@@ -250,11 +269,52 @@ public function search(Request $request)
             'products' => collect([]),
             'searchQuery' => $request->input('q', ''),
             'totalResults' => 0,
+            'matchedStores' => collect([]),
             'error' => 'An error occurred while searching. Please try again.'
         ]);
     }
 }
 
+
+    public function storeCatalog(Request $request, $seller_id)
+    {
+        // Get seller information
+        $user = User::findOrFail($seller_id);
+        $seller = Seller::where('email', $user->email)->first();
+        
+        if (!$seller) {
+            abort(404, 'Store not found');
+        }
+        
+        // Get all products from this seller
+        $query = Product::where('seller_id', $seller_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
+        
+        // Add sorting
+        $sort = $request->input('sort', 'newest');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'discount':
+                $query->orderBy('discount', 'desc');
+                break;
+            default: // newest
+                $query->orderBy('created_at', 'desc');
+        }
+        
+        $products = $query->paginate(24)->appends($request->query());
+        $totalProducts = $query->count();
+        
+        return view('buyer.store-catalog', compact('seller', 'products', 'totalProducts'));
+    }
 
     public function productsByCategory(Request $request, $category_id)
     {
