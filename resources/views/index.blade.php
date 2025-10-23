@@ -3086,6 +3086,11 @@ li a{
       to { opacity: 1; }
     }
 
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
     @keyframes slideInUp {
       from {
         opacity: 0;
@@ -3135,6 +3140,203 @@ li a{
       border-radius: 4px;
       font-size: 0.75rem;
       margin-top: 8px;
+    }
+
+    /* ============================================
+       MOBILE LOCATION BAR
+       ============================================ */
+    .mobile-location-bar {
+      display: none;
+      background: linear-gradient(135deg, #0C831F 0%, #0A6B19 100%);
+      color: white;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-location-bar {
+        display: block;
+      }
+
+      .mobile-location-bar.below-nav {
+        position: relative;
+        top: 0;
+      }
+    }
+
+    .mobile-location-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .mobile-location-icon {
+      font-size: 1.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    .mobile-location-text {
+      flex: 1;
+    }
+
+    .mobile-location-label {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-bottom: 2px;
+    }
+
+    .mobile-location-address {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* ============================================
+       MOBILE LOGIN CARD
+       ============================================ */
+    .mobile-login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: slideInUp 0.3s ease;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-login-card.show {
+        display: block;
+      }
+    }
+
+    .mobile-login-card h3 {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .mobile-login-card p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .mobile-login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-login-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .mobile-login-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(12, 131, 31, 0.1);
+    }
+
+    .mobile-login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #0C831F 0%, #0A6B19 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mobile-login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(12, 131, 31, 0.3);
+    }
+
+    .mobile-login-divider {
+      text-align: center;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .mobile-login-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .mobile-login-divider span {
+      background: white;
+      padding: 0 16px;
+      position: relative;
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+
+    .mobile-login-footer {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .mobile-login-footer a {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .mobile-login-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--bg-light);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--text-light);
+    }
+
+    /* ============================================
+       HIDE BANNER ON MOBILE
+       ============================================ */
+    @media (max-width: 768px) {
+      #heroCarousel {
+        display: none;
+      }
+
+      .mobile-location-section {
+        display: block;
+        padding-top: 8px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-location-section {
+        display: none;
+      }
     }
   </style>
 
@@ -3279,6 +3481,70 @@ li a{
       </form>
     </div>
   </div>
+
+  <!-- Mobile Location Bar -->
+  <div class="mobile-location-bar below-nav" onclick="openLocationModal()">
+    <div class="mobile-location-content">
+      <i class="bi bi-geo-alt-fill mobile-location-icon"></i>
+      <div class="mobile-location-text">
+        <div class="mobile-location-label" id="mobileLocationLabel">Delivery in 10 mins</div>
+        <div class="mobile-location-address" id="mobileLocationText">Detecting location...</div>
+      </div>
+      <i class="bi bi-chevron-down" style="font-size: 1.2rem;"></i>
+    </div>
+  </div>
+
+  <!-- Mobile Login Card Section -->
+  @guest
+  <div class="mobile-location-section">
+    <div class="mobile-login-card show" id="mobileLoginCard">
+      <button class="mobile-login-close" onclick="closeMobileLoginCard()">
+        <i class="bi bi-x"></i>
+      </button>
+      
+      <h3>🎉 Welcome to GrabBaskets!</h3>
+      <p>Login to unlock exclusive deals and faster checkout</p>
+      
+      <form action="{{ route('login') }}" method="POST" class="mobile-login-form">
+        @csrf
+        <input 
+          type="email" 
+          name="email" 
+          class="mobile-login-input" 
+          placeholder="📧 Email Address"
+          required
+          autocomplete="email"
+        >
+        
+        <input 
+          type="password" 
+          name="password" 
+          class="mobile-login-input" 
+          placeholder="🔒 Password"
+          required
+          autocomplete="current-password"
+        >
+        
+        <button type="submit" class="mobile-login-btn">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Login Now
+        </button>
+      </form>
+      
+      <div class="mobile-login-divider">
+        <span>OR</span>
+      </div>
+      
+      <a href="{{ route('products.index') }}" class="mobile-login-btn" style="display: block; text-align: center; text-decoration: none; background: white; color: var(--primary-color); border: 2px solid var(--primary-color);">
+        <i class="bi bi-bag-check me-2"></i>Continue as Guest
+      </a>
+      
+      <div class="mobile-login-footer">
+        Don't have an account? 
+        <a href="{{ route('buyer.register') }}">Sign up</a>
+      </div>
+    </div>
+  </div>
+  @endguest
 
   <!-- Old navbar kept for reference but hidden -->
   <nav class="navbar navbar-expand-lg d-none" id="mainNavbar">
@@ -6195,6 +6461,29 @@ li a{
         
         // Add animation
         locationElement.style.animation = 'fadeInUp 0.5s ease';
+      }
+
+      // Update mobile location bar
+      const mobileLocationText = document.getElementById('mobileLocationText');
+      const mobileLocationLabel = document.getElementById('mobileLocationLabel');
+      
+      if (mobileLocationText && locationText) {
+        mobileLocationText.textContent = locationText;
+        mobileLocationLabel.textContent = 'Delivery in 10 mins';
+        
+        // Add animation
+        mobileLocationText.style.animation = 'fadeInUp 0.5s ease';
+      }
+    }
+
+    // Close mobile login card
+    function closeMobileLoginCard() {
+      const card = document.getElementById('mobileLoginCard');
+      if (card) {
+        card.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => {
+          card.style.display = 'none';
+        }, 300);
       }
     }
 
