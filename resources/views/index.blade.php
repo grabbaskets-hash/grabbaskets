@@ -3540,7 +3540,7 @@ li a{
       
       <div class="mobile-login-footer">
         Don't have an account? 
-        <a href="{{ route('buyer.register') }}">Sign up</a>
+        <a href="{{ route('register') }}">Sign up</a>
       </div>
     </div>
   </div>
