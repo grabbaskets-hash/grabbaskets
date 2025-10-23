@@ -162,9 +162,16 @@ public function search(Request $request)
         if ($request->filled('q')) {
             $search = trim($searchQuery);
             
-            // Search for matching stores
-            $matchedStores = Seller::where('name', 'like', "%{$search}%")
-                ->orWhere('store_name', 'like', "%{$search}%")
+            // Search for matching stores - CASE INSENSITIVE and works with 2+ characters
+            // Using DB::raw with LOWER() for case-insensitive search in MySQL
+            $matchedStores = Seller::where(function($query) use ($search) {
+                    // Case-insensitive search on name
+                    $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                          // Case-insensitive search on store_name
+                          ->orWhereRaw('LOWER(store_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                          // Also search by email (case-insensitive)
+                          ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+                })
                 ->with(['user' => function($query) {
                     $query->select('id', 'email');
                 }])
@@ -181,22 +188,25 @@ public function search(Request $request)
                 });
             
             $query->where(function ($q) use ($search) {
-                // Search in product fields that actually exist in database
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('unique_id', 'like', "%{$search}%")
-                  // Search in category
+                // Search in product fields - CASE INSENSITIVE
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(unique_id) LIKE ?', ['%' . strtolower($search) . '%'])
+                  // Search in category (case-insensitive)
                   ->orWhereHas('category', function($query) use ($search) {
-                      $query->where('name', 'like', "%{$search}%");
+                      $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%']);
                   })
-                  // Search in subcategory
+                  // Search in subcategory (case-insensitive)
                   ->orWhereHas('subcategory', function($query) use ($search) {
-                      $query->where('name', 'like', "%{$search}%");
+                      $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%']);
                   });
                   
                 // Search in sellers table (match seller emails to user emails, then to product seller_id)
-                $sellerEmails = Seller::where('name', 'like', "%{$search}%")
-                    ->orWhere('store_name', 'like', "%{$search}%")
+                // Case-insensitive search
+                $sellerEmails = Seller::where(function($query) use ($search) {
+                        $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                              ->orWhereRaw('LOWER(store_name) LIKE ?', ['%' . strtolower($search) . '%']);
+                    })
                     ->pluck('email');
                     
                 if ($sellerEmails->isNotEmpty()) {
@@ -229,12 +239,12 @@ public function search(Request $request)
                 break;
             default: // relevance
                 if ($request->filled('q')) {
-                    // When searching, prioritize exact matches in existing columns
+                    // When searching, prioritize exact matches - CASE INSENSITIVE
                     $query->orderByRaw("CASE 
-                        WHEN name LIKE ? THEN 1
-                        WHEN description LIKE ? THEN 2
+                        WHEN LOWER(name) LIKE ? THEN 1
+                        WHEN LOWER(description) LIKE ? THEN 2
                         ELSE 3
-                    END", ["%{$search}%", "%{$search}%"])
+                    END", ['%' . strtolower($search) . '%', '%' . strtolower($search) . '%'])
                     ->orderBy('created_at', 'desc');
                 } else {
                     $query->latest();
