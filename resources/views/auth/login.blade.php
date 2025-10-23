@@ -85,6 +85,71 @@
       color: #ff6b00;
       text-decoration: underline;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+        margin: 0.5rem;
+      }
+
+      .brand {
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .btn-primary {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.95rem;
+      }
+
+      .col-md-6 {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+      }
+
+      .card {
+        padding: 1.25rem;
+        border-radius: 15px;
+      }
+
+      .brand {
+        font-size: 1.2rem;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+      }
+
+      .form-control,
+      .input-group-text {
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
