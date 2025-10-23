@@ -56,6 +56,7 @@ class AuthenticatedSessionController extends Controller
                 'login_success' => true
             ]);
         }
+        
         if ($role === 'buyer') {
             return redirect()->route('home')->with([
                 'success' => $greeting,
@@ -63,7 +64,9 @@ class AuthenticatedSessionController extends Controller
                 'login_success' => true
             ]);
         }
-        return redirect()->intended(route('dashboard', absolute: false))->with([
+        
+        // Default redirect to home for any other role or if role is not set
+        return redirect()->route('home')->with([
             'success' => $greeting,
             'tamil_greeting' => true,
             'login_success' => true
