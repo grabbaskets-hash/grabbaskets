@@ -37,7 +37,8 @@ class AuthenticatedSessionController extends Controller
         // Gender-based greeting
         $greeting = $this->getGenderBasedGreeting($user->sex ?? 'other', $user->name);
 
-        // Send login email notification
+        // Send login email notification (commented out temporarily for debugging)
+        /*
         if ($user->email) {
             $subject = 'Login Notification';
             $message = $role === 'seller'
@@ -48,6 +49,7 @@ class AuthenticatedSessionController extends Controller
                     ->subject($subject);
             });
         }
+        */
         
         // Check if login is from mobile homepage card
         $fromHomepage = $request->input('from_homepage') === 'true' || 
