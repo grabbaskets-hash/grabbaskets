@@ -284,8 +284,17 @@ public function search(Request $request)
             'trace' => $e->getTraceAsString()
         ]);
         
+        // Return empty paginated result instead of collection
+        $emptyProducts = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect([]),
+            0,
+            24,
+            1,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        
         return view('buyer.products', [
-            'products' => collect([]),
+            'products' => $emptyProducts,
             'searchQuery' => $request->input('q', ''),
             'totalResults' => 0,
             'matchedStores' => collect([]),
