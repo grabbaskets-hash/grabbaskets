@@ -2788,6 +2788,128 @@ li a{
       .zepto-cat-icon { width: 72px; height: 72px; }
       .zepto-cat-name { font-size: 0.82rem; max-width: 92px; }
     }
+
+    /* ============ BLINKIT-STYLE MOBILE 3×3 GRID ============ */
+    @media (max-width: 767px) {
+      /* Hide desktop scrolling navigation */
+      .zepto-cat-nav {
+        display: none !important;
+      }
+
+      /* Convert horizontal scroll to 3×3 grid */
+      .zepto-cat-track {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-flow: row;
+        grid-auto-columns: auto;
+        gap: 16px;
+        overflow-x: visible;
+        overflow-y: visible;
+        padding: 12px 16px 16px;
+        scroll-snap-type: none;
+      }
+
+      /* Show only first 9 items in mobile grid */
+      .zepto-cat-item:nth-child(n+10) {
+        display: none;
+      }
+
+      /* Center items in grid cells */
+      .zepto-cat-item {
+        scroll-snap-align: none;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Mobile category link styling */
+      .zepto-cat-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #232f3e;
+        gap: 8px;
+        width: 100%;
+      }
+
+      /* Larger icons for mobile Blinkit style */
+      .zepto-cat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px; /* Rounded square like Blinkit */
+        background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+        border: 2px solid rgba(139, 69, 19, 0.12);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease;
+      }
+
+      /* Enhanced hover effect for mobile */
+      .zepto-cat-link:active .zepto-cat-icon {
+        transform: scale(0.95);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+      }
+
+      /* Category name - more readable on mobile */
+      .zepto-cat-name {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #333;
+        line-height: 1.2;
+        max-width: 100%;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-align: center;
+        word-break: break-word;
+        max-height: 32px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* Emoji larger on mobile */
+      .zepto-cat-emoji {
+        font-size: 1.8rem;
+      }
+
+      /* Mobile header adjustments */
+      .zepto-cat-header {
+        padding: 0 16px 12px;
+      }
+
+      .zepto-cat-header h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      /* View all link styling */
+      .zepto-cat-header a {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      /* Add "View All" button at bottom for mobile */
+      .zepto-cat-section::after {
+        content: '';
+        display: block;
+        height: 0;
+      }
+    }
+
+    /* Tablet optimization (768px - 1024px) */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .zepto-cat-track {
+        grid-auto-columns: 90px;
+        gap: 14px;
+      }
+
+      .zepto-cat-icon {
+        width: 68px;
+        height: 68px;
+      }
+    }
   </style>
 </head>
 
@@ -3259,6 +3381,13 @@ li a{
         <button class="zepto-cat-nav zepto-cat-next d-none d-md-grid" type="button" onclick="scrollZeptoCats(1)">
           <i class="bi bi-chevron-right"></i>
         </button>
+      </div>
+
+      <!-- Mobile "View All Categories" Button -->
+      <div class="d-md-none text-center mt-3 px-3">
+        <a href="{{ route('buyer.dashboard') }}" class="btn btn-outline-primary w-100" style="border-radius: 12px; padding: 12px; font-weight: 600; border: 2px solid #667eea;">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>View All Categories
+        </a>
       </div>
     </div>
   </section>
