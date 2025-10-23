@@ -2910,7 +2910,236 @@ li a{
         height: 68px;
       }
     }
+
+    /* ============================================
+       LOCATION MODAL (Zepto/Blinkit Style)
+       ============================================ */
+    .location-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9998;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .location-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+      animation: slideInUp 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .location-modal.active {
+      display: block;
+    }
+
+    .location-modal-overlay.active {
+      display: block;
+    }
+
+    .location-modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .location-modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .location-modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .location-modal-close:hover {
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    .location-modal-body {
+      padding: 20px;
+    }
+
+    .location-detect-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #0C831F 0%, #0A6B19 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+    }
+
+    .location-detect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(12, 131, 31, 0.3);
+    }
+
+    .location-detect-btn:active {
+      transform: translateY(0);
+    }
+
+    .location-detect-btn i {
+      font-size: 1.2rem;
+      animation: pulse 2s infinite;
+    }
+
+    .location-divider {
+      text-align: center;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .location-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .location-divider span {
+      background: white;
+      padding: 0 16px;
+      position: relative;
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+
+    .location-search-input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 16px center;
+    }
+
+    .location-search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(12, 131, 31, 0.1);
+    }
+
+    .location-loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+    }
+
+    .location-loading i {
+      font-size: 2rem;
+      color: var(--primary-color);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .current-location-display {
+      padding: 12px 16px;
+      background: var(--bg-light);
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .current-location-display.active {
+      display: block;
+    }
+
+    .current-location-display .location-icon {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      margin-right: 8px;
+    }
+
+    .current-location-text {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .current-location-address {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .location-accuracy {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(12, 131, 31, 0.1);
+      color: var(--primary-color);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-top: 8px;
+    }
   </style>
+
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places" async defer></script>
 </head>
 
 <body>
@@ -2933,11 +3162,14 @@ li a{
         </a>
 
         <!-- Delivery Location (Desktop) -->
-        <div class="desktop-only" style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px;">
+        <div class="desktop-only" 
+             id="locationDisplay"
+             onclick="openLocationModal()"
+             style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px; transition: all 0.2s;">
           <i class="bi bi-geo-alt-fill" style="color: var(--primary-color);"></i>
           <div style="line-height: 1.2;">
-            <div style="font-size: 0.75rem; color: var(--text-light);">Delivery in 10 mins</div>
-            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">Select Location</div>
+            <div style="font-size: 0.75rem; color: var(--text-light);" id="locationLabel">Delivery in 10 mins</div>
+            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);" id="locationText">Detecting location...</div>
           </div>
           <i class="bi bi-chevron-down" style="color: var(--text-light); font-size: 0.8rem;"></i>
         </div>
@@ -5613,6 +5845,404 @@ li a{
       </a>
     @endauth
   </div>
+
+  <!-- Location Detection Modal -->
+  <div class="location-modal-overlay" id="locationModalOverlay" onclick="closeLocationModal()"></div>
+  <div class="location-modal" id="locationModal">
+    <div class="location-modal-header">
+      <h3><i class="bi bi-geo-alt-fill text-success me-2"></i>Select Location</h3>
+      <button class="location-modal-close" onclick="closeLocationModal()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <div class="location-modal-body">
+      <!-- Auto Detect Button -->
+      <button class="location-detect-btn" onclick="detectCurrentLocation()">
+        <i class="bi bi-crosshair"></i>
+        <span id="detectButtonText">Detect My Location</span>
+      </button>
+
+      <div class="location-divider">
+        <span>OR</span>
+      </div>
+
+      <!-- Search Input -->
+      <input 
+        type="text" 
+        class="location-search-input" 
+        id="locationSearchInput"
+        placeholder="Search for your area, street name..."
+        autocomplete="off"
+      >
+
+      <!-- Loading State -->
+      <div class="location-loading" id="locationLoading" style="display: none;">
+        <i class="bi bi-arrow-repeat"></i>
+        <p>Detecting your location...</p>
+      </div>
+
+      <!-- Current Location Display -->
+      <div class="current-location-display" id="currentLocationDisplay">
+        <div style="display: flex; align-items: start;">
+          <i class="bi bi-geo-alt-fill location-icon"></i>
+          <div style="flex: 1;">
+            <div class="current-location-text">Current Location</div>
+            <div class="current-location-address" id="detectedAddress">Loading...</div>
+            <div class="location-accuracy">
+              <i class="bi bi-check-circle-fill me-1"></i>
+              <span id="accuracyText">High accuracy</span>
+            </div>
+          </div>
+        </div>
+        <button 
+          class="btn btn-success mt-3 w-100"
+          onclick="confirmLocation()"
+          style="border-radius: 8px; padding: 12px; font-weight: 600;"
+        >
+          Confirm Location
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Detection JavaScript -->
+  <script>
+    // Global variables
+    let currentLocationData = {
+      latitude: null,
+      longitude: null,
+      address: '',
+      area: '',
+      city: '',
+      state: '',
+      pincode: '',
+      country: ''
+    };
+
+    let googleMapsLoaded = false;
+    let autocompleteService = null;
+
+    // Wait for Google Maps to load
+    function initGoogleMaps() {
+      if (typeof google !== 'undefined' && google.maps) {
+        googleMapsLoaded = true;
+        console.log('✅ Google Maps loaded successfully');
+        
+        // Initialize autocomplete service
+        autocompleteService = new google.maps.places.AutocompleteService();
+        
+        // Auto-detect location on page load
+        autoDetectLocation();
+      } else {
+        console.log('⏳ Waiting for Google Maps to load...');
+        setTimeout(initGoogleMaps, 200);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initGoogleMaps();
+      
+      // Check if location is already saved in localStorage
+      const savedLocation = localStorage.getItem('userLocation');
+      if (savedLocation) {
+        try {
+          currentLocationData = JSON.parse(savedLocation);
+          updateLocationDisplay(currentLocationData.area || currentLocationData.address);
+        } catch (e) {
+          console.error('Error parsing saved location:', e);
+        }
+      }
+    });
+
+    // Auto-detect location on page load (silent)
+    function autoDetectLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            // Reverse geocode silently
+            reverseGeocode(lat, lng, function(address) {
+              currentLocationData = {
+                latitude: lat,
+                longitude: lng,
+                address: address.fullAddress,
+                area: address.area,
+                city: address.city,
+                state: address.state,
+                pincode: address.pincode,
+                country: address.country
+              };
+              
+              // Save to localStorage
+              localStorage.setItem('userLocation', JSON.stringify(currentLocationData));
+              
+              // Update display
+              updateLocationDisplay(address.area || address.city);
+              
+              console.log('✅ Location detected:', address.area, address.city);
+            });
+          },
+          function(error) {
+            console.log('📍 Location detection skipped (user may have denied)');
+            document.getElementById('locationText').textContent = 'Select Location';
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+      }
+    }
+
+    // Open location modal
+    function openLocationModal() {
+      document.getElementById('locationModal').classList.add('active');
+      document.getElementById('locationModalOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close location modal
+    function closeLocationModal() {
+      document.getElementById('locationModal').classList.remove('active');
+      document.getElementById('locationModalOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Detect current location (manual)
+    function detectCurrentLocation() {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+      }
+
+      // Show loading
+      document.getElementById('detectButtonText').textContent = 'Detecting...';
+      document.getElementById('locationLoading').style.display = 'block';
+      document.getElementById('currentLocationDisplay').classList.remove('active');
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const accuracy = position.coords.accuracy;
+
+          console.log('📍 Location detected:', lat, lng, 'Accuracy:', accuracy + 'm');
+
+          // Reverse geocode to get address
+          reverseGeocode(lat, lng, function(address) {
+            // Hide loading
+            document.getElementById('locationLoading').style.display = 'none';
+            document.getElementById('detectButtonText').textContent = 'Detect My Location';
+
+            // Update current location display
+            document.getElementById('detectedAddress').textContent = address.fullAddress;
+            
+            // Update accuracy text
+            let accuracyLevel = accuracy < 50 ? 'High accuracy' : accuracy < 200 ? 'Medium accuracy' : 'Low accuracy';
+            document.getElementById('accuracyText').textContent = accuracyLevel;
+            
+            // Show location display
+            document.getElementById('currentLocationDisplay').classList.add('active');
+
+            // Store location data
+            currentLocationData = {
+              latitude: lat,
+              longitude: lng,
+              address: address.fullAddress,
+              area: address.area,
+              city: address.city,
+              state: address.state,
+              pincode: address.pincode,
+              country: address.country
+            };
+          });
+        },
+        function(error) {
+          document.getElementById('locationLoading').style.display = 'none';
+          document.getElementById('detectButtonText').textContent = 'Detect My Location';
+          
+          let errorMessage = 'Unable to detect location. ';
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += 'Please allow location access in your browser settings.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += 'Location information is unavailable.';
+              break;
+            case error.TIMEOUT:
+              errorMessage += 'Location request timed out.';
+              break;
+            default:
+              errorMessage += 'An unknown error occurred.';
+          }
+          alert(errorMessage);
+          console.error('Geolocation error:', error);
+        },
+        { 
+          enableHighAccuracy: true, 
+          timeout: 10000, 
+          maximumAge: 0 
+        }
+      );
+    }
+
+    // Reverse geocode using Google Maps API
+    function reverseGeocode(lat, lng, callback) {
+      if (!googleMapsLoaded) {
+        console.error('Google Maps not loaded yet');
+        return;
+      }
+
+      const apiKey = '{{ config("services.google.maps_api_key") }}';
+      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+
+      fetch(geocodeUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'OK' && data.results.length > 0) {
+            const result = data.results[0];
+            
+            // Extract address components
+            let area = '';
+            let city = '';
+            let state = '';
+            let pincode = '';
+            let country = '';
+            
+            result.address_components.forEach(component => {
+              if (component.types.includes('sublocality') || component.types.includes('sublocality_level_1')) {
+                area = component.long_name;
+              }
+              if (component.types.includes('locality')) {
+                city = component.long_name;
+              }
+              if (component.types.includes('administrative_area_level_1')) {
+                state = component.long_name;
+              }
+              if (component.types.includes('postal_code')) {
+                pincode = component.long_name;
+              }
+              if (component.types.includes('country')) {
+                country = component.long_name;
+              }
+            });
+
+            const fullAddress = result.formatted_address;
+            
+            callback({
+              fullAddress: fullAddress,
+              area: area,
+              city: city,
+              state: state,
+              pincode: pincode,
+              country: country
+            });
+          } else {
+            console.error('Geocoding failed:', data.status);
+            callback({
+              fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+              area: 'Unknown',
+              city: 'Unknown',
+              state: '',
+              pincode: '',
+              country: ''
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Geocoding error:', error);
+          callback({
+            fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            area: 'Unknown',
+            city: 'Unknown',
+            state: '',
+            pincode: '',
+            country: ''
+          });
+        });
+    }
+
+    // Confirm location
+    function confirmLocation() {
+      if (!currentLocationData.latitude || !currentLocationData.longitude) {
+        alert('Please detect your location first');
+        return;
+      }
+
+      // Save to localStorage
+      localStorage.setItem('userLocation', JSON.stringify(currentLocationData));
+
+      // Update navbar display
+      updateLocationDisplay(currentLocationData.area || currentLocationData.city);
+
+      // Close modal
+      closeLocationModal();
+
+      // Show success message
+      showToast('✅ Location saved successfully!');
+
+      console.log('✅ Location confirmed:', currentLocationData);
+    }
+
+    // Update location display in navbar
+    function updateLocationDisplay(locationText) {
+      const locationElement = document.getElementById('locationText');
+      const locationLabel = document.getElementById('locationLabel');
+      
+      if (locationElement && locationText) {
+        locationElement.textContent = locationText;
+        locationLabel.textContent = 'Delivery in 10 mins';
+        
+        // Add animation
+        locationElement.style.animation = 'fadeInUp 0.5s ease';
+      }
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(12, 131, 31, 0.95);
+        color: white;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideInUp 0.3s ease;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      `;
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+
+    // Search input functionality (basic)
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('locationSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const query = e.target.value.trim();
+          if (query.length > 2) {
+            // TODO: Implement Places Autocomplete
+            console.log('Searching for:', query);
+          }
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>
