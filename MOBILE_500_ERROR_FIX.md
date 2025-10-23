@@ -64,6 +64,21 @@ Changed the route reference to use the correct route name.
 php artisan view:clear
 php artisan cache:clear
 php artisan config:clear
+php artisan route:clear
+php artisan optimize
+```
+
+⚠️ **IMPORTANT**: If the error persists after clearing caches, the compiled view files may be stuck. Manually delete them:
+
+```bash
+# Delete all cached view files
+rm storage/framework/views/*.php
+
+# Or on Windows PowerShell:
+Remove-Item storage\framework\views\*.php -Force
+
+# Then recompile
+php artisan view:cache
 php artisan optimize
 ```
 
@@ -236,9 +251,11 @@ Related documentation files:
 **Problem**: 500 Server Error on mobile homepage  
 **Root Cause**: Invalid route name `buyer.register`  
 **Fix**: Changed to correct route name `register`  
+**Cache Issue**: Cached view file needed manual clearing  
 **Status**: ✅ **FIXED & DEPLOYED**  
 **Commit**: `074a44ac`  
-**Pushed**: October 23, 2025
+**Pushed**: October 23, 2025  
+**Verified**: ✅ Homepage returns 200 OK
 
 ---
 
