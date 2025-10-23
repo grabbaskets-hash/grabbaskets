@@ -3507,6 +3507,9 @@ li a{
       
       <form action="{{ route('login') }}" method="POST" class="mobile-login-form">
         @csrf
+        <input type="hidden" name="from_homepage" value="true">
+        <input type="hidden" name="role" value="buyer">
+        
         <input 
           type="email" 
           name="email" 

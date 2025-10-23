@@ -49,11 +49,25 @@ class AuthenticatedSessionController extends Controller
             });
         }
         
+        // Check if login is from mobile homepage card
+        $fromHomepage = $request->input('from_homepage') === 'true' || 
+                       $request->header('referer') && str_contains($request->header('referer'), url('/'));
+        
         if ($role === 'seller') {
             return redirect()->route('seller.dashboard')->with([
                 'success' => $greeting,
                 'tamil_greeting' => true,
                 'login_success' => true
+            ]);
+        }
+        
+        // For buyers logging in from homepage, redirect back to homepage
+        if ($role === 'buyer' && $fromHomepage) {
+            return redirect()->route('home')->with([
+                'success' => $greeting,
+                'tamil_greeting' => true,
+                'login_success' => true,
+                'show_welcome' => true
             ]);
         }
         
