@@ -657,6 +657,69 @@
       const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       window.location.href = emailUrl;
     }
+
+    // AJAX Wishlist Toggle - Prevents redirect and updates UI
+    document.addEventListener('DOMContentLoaded', function() {
+      const wishlistForm = document.getElementById('wishlist-form');
+      
+      if (wishlistForm) {
+        wishlistForm.addEventListener('submit', function(e) {
+          e.preventDefault(); // Prevent form submission/redirect
+          
+          const formData = new FormData(this);
+          const button = this.querySelector('#wishlist-btn');
+          const icon = button.querySelector('i');
+          
+          // Send AJAX request
+          fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': formData.get('_token'),
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              product_id: formData.get('product_id')
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Toggle heart icon
+              if (data.in_wishlist) {
+                // Added to wishlist - show filled red heart
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill', 'text-danger');
+                button.classList.add('btn-danger');
+                button.classList.remove('btn-outline-dark');
+              } else {
+                // Removed from wishlist - show empty heart
+                icon.classList.remove('bi-heart-fill', 'text-danger');
+                icon.classList.add('bi-heart');
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-dark');
+              }
+              
+              // Optional: Show brief success toast
+              const toast = document.createElement('div');
+              toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-success alert-dismissible fade show';
+              toast.style.zIndex = '9999';
+              toast.innerHTML = `
+                <i class="bi bi-check-circle-fill"></i> ${data.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              `;
+              document.body.appendChild(toast);
+              
+              setTimeout(() => toast.remove(), 3000);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update wishlist. Please try again.');
+          });
+        });
+      }
+    });
   </script>
 </body>
 
