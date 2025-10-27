@@ -182,6 +182,13 @@
       transform: translateY(-2px);
     }
 
+    /* Special styling for delivery partner button */
+    .nav-icon-btn.delivery-partner-btn:hover {
+      background: linear-gradient(135deg, #FF9900 0%, #FF6B00 100%) !important;
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4) !important;
+    }
+
     .nav-icon-btn .badge {
       position: absolute;
       top: -5px;
@@ -3388,6 +3395,13 @@ li a{
 
         <!-- Nav Icons -->
         <div class="nav-icons desktop-only">
+          <!-- Delivery Partner Button - Prominent -->
+          <a href="{{ route('delivery-partner.auth.register') }}" class="nav-icon-btn" 
+             style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); animation: pulse 2s infinite;">
+            <i class="bi bi-scooter" style="font-size: 1.3rem;"></i>
+            <span>Partner with us</span>
+          </a>
+          
           @auth
             <!-- Cart -->
             <a href="{{ route('cart.index') }}" class="nav-icon-btn">
@@ -3889,6 +3903,76 @@ li a{
         <a href="{{ route('buyer.dashboard') }}" class="btn btn-outline-primary w-100" style="border-radius: 12px; padding: 12px; font-weight: 600; border: 2px solid #667eea;">
           <i class="bi bi-grid-3x3-gap-fill me-2"></i>View All Categories
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delivery Partner Promotional Section -->
+  <section class="py-4" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="text-white">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="d-flex align-items-center justify-content-center" 
+                   style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; backdrop-filter: blur(10px);">
+                <i class="bi bi-scooter" style="font-size: 2rem; color: white;"></i>
+              </div>
+              <div>
+                <h2 class="mb-1 fw-bold" style="font-size: 1.8rem;">Partner with GrabBaskets</h2>
+                <p class="mb-0" style="opacity: 0.9; font-size: 1.1rem;">Earn ₹15,000 - ₹25,000 per month delivering with us</p>
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill" style="font-size: 1.2rem;"></i>
+                  <span style="font-weight: 600;">Flexible Hours</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-cash-stack" style="font-size: 1.2rem;"></i>
+                  <span style="font-weight: 600;">Daily Payments</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-fuel-pump-fill" style="font-size: 1.2rem;"></i>
+                  <span style="font-weight: 600;">Fuel Allowance</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-shield-check" style="font-size: 1.2rem;"></i>
+                  <span style="font-weight: 600;">Insurance</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4 text-center">
+          <div class="d-grid gap-2">
+            <a href="{{ route('delivery-partner.auth.register') }}" 
+               class="btn btn-light btn-lg fw-bold" 
+               style="border-radius: 12px; padding: 15px 30px; color: #FF6B00; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+              <i class="bi bi-plus-circle-fill me-2"></i>Join Now as Partner
+            </a>
+            <a href="{{ route('delivery-partner.auth.login') }}" 
+               class="btn btn-outline-light btn-lg" 
+               style="border-radius: 12px; padding: 12px 30px; border: 2px solid rgba(255,255,255,0.7); color: white;">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Partner Login
+            </a>
+          </div>
+          
+          <div class="mt-3">
+            <small class="text-white" style="opacity: 0.8;">
+              <i class="bi bi-telephone-fill me-1"></i>Need help? Call: 1800-123-4567
+            </small>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -6078,6 +6162,12 @@ li a{
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
     </a>
+    <!-- Delivery Partner Button - Prominent on Mobile -->
+    <a href="{{ route('delivery-partner.auth.register') }}" class="mobile-nav-item" 
+       style="background: linear-gradient(135deg, #FF6B00, #FF9900); color: white; border-radius: 12px; margin: 0 4px; box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);">
+      <i class="bi bi-scooter" style="font-size: 1.2rem;"></i>
+      <span style="font-weight: 600;">Partner</span>
+    </a>
     <a href="{{ route('cart.index') }}" class="mobile-nav-item">
       <i class="bi bi-cart3"></i>
       <span>Cart</span>
@@ -6085,23 +6175,6 @@ li a{
         <span class="badge">{{ count(session('cart')) }}</span>
       @endif
     </a>
-    @auth
-      <a href="{{ route('wishlist.index') }}" class="mobile-nav-item">
-        <i class="bi bi-heart"></i>
-        <span>Wishlist</span>
-        @php
-          $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
-        @endphp
-        @if($wishlistCount > 0)
-          <span class="badge">{{ $wishlistCount }}</span>
-        @endif
-      </a>
-    @else
-      <a href="{{ route('login') }}" class="mobile-nav-item">
-        <i class="bi bi-heart"></i>
-        <span>Wishlist</span>
-      </a>
-    @endauth
     @auth
       <a href="{{ route('profile.show') }}" class="mobile-nav-item">
         <i class="bi bi-person-circle"></i>
