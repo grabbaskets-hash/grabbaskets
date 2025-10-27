@@ -248,6 +248,7 @@
             <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
                     Products</a></li>
             <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
+            <li><a class="nav-link" href="{{ url('/admin/warehouse/dashboard') }}"><i class="bi bi-boxes"></i> Warehouse Management</a></li>
             <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
             <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
             <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>

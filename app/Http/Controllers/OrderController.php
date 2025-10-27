@@ -277,9 +277,11 @@ Grabbasket Team
             ], 400);
         }
 
-        // Get store coordinates (mock data - replace with actual store data)
-        $storeLatitude = 12.9716; // Default Bangalore
-        $storeLongitude = 77.5946;
+        // Get warehouse coordinates
+        // GrabBaskets Warehouse: Mahatma Gandhi Nagar Rd, Near Annai Therasa English School
+        // MRR Nagar, Palani Chettipatti, Theni, Tamil Nadu 625531
+        $storeLatitude = 10.0103; // Theni, Tamil Nadu
+        $storeLongitude = 77.4773; // Theni, Tamil Nadu
 
         // Check eligibility
         $eligibility = \App\Services\QuickDeliveryService::checkEligibility(

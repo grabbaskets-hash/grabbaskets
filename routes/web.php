@@ -814,6 +814,77 @@ Route::prefix('admin/index-editor')->group(function () {
     Route::get('/preview', [App\Http\Controllers\Admin\IndexPageEditorController::class, 'preview'])->name('admin.index-editor.preview');
 });
 
+// Admin Warehouse Management Routes
+Route::prefix('admin/warehouse')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Admin\WarehouseController::class, 'dashboard'])->name('admin.warehouse.dashboard');
+    Route::get('/inventory', [App\Http\Controllers\Admin\WarehouseController::class, 'inventory'])->name('admin.warehouse.inventory');
+    Route::get('/product/{id}', [App\Http\Controllers\Admin\WarehouseController::class, 'show'])->name('admin.warehouse.product.show');
+    Route::put('/product/{id}', [App\Http\Controllers\Admin\WarehouseController::class, 'update'])->name('admin.warehouse.product.update');
+    Route::get('/stock-movements', [App\Http\Controllers\Admin\WarehouseController::class, 'stockMovements'])->name('admin.warehouse.stock-movements');
+    Route::post('/add-stock', [App\Http\Controllers\Admin\WarehouseController::class, 'addStock'])->name('admin.warehouse.add-stock');
+    Route::get('/quick-delivery', [App\Http\Controllers\Admin\WarehouseController::class, 'quickDeliveryOptimization'])->name('admin.warehouse.quick-delivery');
+    Route::post('/product/{id}/toggle-quick-delivery', [App\Http\Controllers\Admin\WarehouseController::class, 'toggleQuickDelivery'])->name('admin.warehouse.toggle-quick-delivery');
+    Route::post('/bulk-operation', [App\Http\Controllers\Admin\WarehouseController::class, 'bulkOperation'])->name('admin.warehouse.bulk-operation');
+    Route::get('/export-inventory', [App\Http\Controllers\Admin\WarehouseController::class, 'exportInventory'])->name('admin.warehouse.export-inventory');
+});
+
+// Separate Warehouse Staff Authentication & Management Routes
+Route::prefix('warehouse')->group(function () {
+    // Authentication routes
+    Route::get('/login', [App\Http\Controllers\Warehouse\AuthController::class, 'showLoginForm'])->name('warehouse.login');
+    Route::post('/login', [App\Http\Controllers\Warehouse\AuthController::class, 'login']);
+    Route::post('/logout', [App\Http\Controllers\Warehouse\AuthController::class, 'logout'])->name('warehouse.logout');
+    
+    // Protected warehouse routes
+    Route::middleware('auth:warehouse')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Warehouse\DashboardController::class, 'index'])->name('warehouse.dashboard');
+        Route::get('/stats', [App\Http\Controllers\Warehouse\DashboardController::class, 'quickStats'])->name('warehouse.stats');
+        Route::get('/notifications', [App\Http\Controllers\Warehouse\DashboardController::class, 'notifications'])->name('warehouse.notifications');
+        Route::get('/search', [App\Http\Controllers\Warehouse\DashboardController::class, 'search'])->name('warehouse.search');
+        
+        // User Profile Management
+        Route::get('/profile', [App\Http\Controllers\Warehouse\AuthController::class, 'profile'])->name('warehouse.profile');
+        Route::put('/profile', [App\Http\Controllers\Warehouse\AuthController::class, 'updateProfile'])->name('warehouse.profile.update');
+        
+        // User Management (Managers only)
+        Route::get('/users', [App\Http\Controllers\Warehouse\AuthController::class, 'userManagement'])->name('warehouse.users');
+        Route::post('/users', [App\Http\Controllers\Warehouse\AuthController::class, 'createUser'])->name('warehouse.users.create');
+        Route::put('/users/{id}', [App\Http\Controllers\Warehouse\AuthController::class, 'updateUser'])->name('warehouse.users.update');
+        Route::post('/users/{id}/toggle-status', [App\Http\Controllers\Warehouse\AuthController::class, 'toggleUserStatus'])->name('warehouse.users.toggle-status');
+        
+        // Inventory Management
+        Route::get('/inventory', [App\Http\Controllers\Warehouse\InventoryController::class, 'index'])->name('warehouse.inventory');
+        Route::get('/inventory/add', [App\Http\Controllers\Warehouse\InventoryController::class, 'showAddStock'])->name('warehouse.inventory.add');
+        Route::post('/inventory/add', [App\Http\Controllers\Warehouse\InventoryController::class, 'addStock'])->name('warehouse.inventory.store');
+        Route::get('/inventory/adjust', [App\Http\Controllers\Warehouse\InventoryController::class, 'showAdjustStock'])->name('warehouse.inventory.adjust');
+        Route::post('/inventory/adjust', [App\Http\Controllers\Warehouse\InventoryController::class, 'adjustStock'])->name('warehouse.inventory.adjust.store');
+        Route::get('/inventory/{id}', [App\Http\Controllers\Warehouse\InventoryController::class, 'show'])->name('warehouse.inventory.show');
+        Route::put('/inventory/{id}', [App\Http\Controllers\Warehouse\InventoryController::class, 'update'])->name('warehouse.inventory.update');
+        
+        // Stock Movements
+        Route::get('/stock-movements', [App\Http\Controllers\Warehouse\StockMovementController::class, 'index'])->name('warehouse.stock-movements');
+        Route::get('/stock-movements/{id}', [App\Http\Controllers\Warehouse\StockMovementController::class, 'show'])->name('warehouse.stock-movements.show');
+        
+        // Quick Delivery Management
+        Route::get('/quick-delivery', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'index'])->name('warehouse.quick-delivery');
+        Route::post('/quick-delivery/{id}/toggle', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'toggle'])->name('warehouse.quick-delivery.toggle');
+        Route::get('/quick-delivery/optimize', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'optimize'])->name('warehouse.quick-delivery.optimize');
+        
+        // Reports & Analytics
+        Route::get('/reports', [App\Http\Controllers\Warehouse\ReportController::class, 'index'])->name('warehouse.reports');
+        Route::get('/reports/stock-summary', [App\Http\Controllers\Warehouse\ReportController::class, 'stockSummary'])->name('warehouse.reports.stock-summary');
+        Route::get('/reports/movements', [App\Http\Controllers\Warehouse\ReportController::class, 'movements'])->name('warehouse.reports.movements');
+        Route::get('/reports/export', [App\Http\Controllers\Warehouse\ReportController::class, 'export'])->name('warehouse.reports.export');
+        
+        // Location Management
+        Route::get('/locations', [App\Http\Controllers\Warehouse\LocationController::class, 'index'])->name('warehouse.locations');
+        Route::post('/locations', [App\Http\Controllers\Warehouse\LocationController::class, 'store'])->name('warehouse.locations.store');
+        Route::put('/locations/{id}', [App\Http\Controllers\Warehouse\LocationController::class, 'update'])->name('warehouse.locations.update');
+        Route::delete('/locations/{id}', [App\Http\Controllers\Warehouse\LocationController::class, 'destroy'])->name('warehouse.locations.destroy');
+    });
+});
+
 // Debug route to check emojis
 Route::get('/debug/emojis', function () {
     $categories = App\Models\Category::select('id', 'name', 'emoji')->get();

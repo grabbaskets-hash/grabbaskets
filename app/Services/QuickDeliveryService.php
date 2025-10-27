@@ -15,16 +15,21 @@ class QuickDeliveryService
     {
         $distance = self::calculateDistance($latitude, $longitude, $storeLatitude, $storeLongitude);
         
-        // 10-min delivery available within 5km
-        $isEligible = $distance <= 5.0;
+        // Get radius from configuration (default 5km)
+        $radiusKm = config('warehouse.delivery.quick_delivery_radius_km', 5.0);
+        $isEligible = $distance <= $radiusKm;
+        
+        // Get delivery time from configuration (default 10 minutes)
+        $quickDeliveryTime = config('warehouse.delivery.quick_delivery_time_minutes', 10);
+        $standardDeliverySpeed = config('warehouse.delivery.standard_delivery_speed_kmh', 5);
         
         return [
             'eligible' => $isEligible,
             'distance_km' => round($distance, 2),
-            'eta_minutes' => $isEligible ? 10 : ceil($distance / 5 * 60), // 5km per 60 min avg
+            'eta_minutes' => $isEligible ? $quickDeliveryTime : ceil($distance / $standardDeliverySpeed * 60),
             'message' => $isEligible 
                 ? '⚡ 10-Minute Delivery Available!' 
-                : '🚚 Standard Delivery (Within ' . ceil($distance / 5 * 60) . ' minutes)'
+                : '🚚 Standard Delivery (Within ' . ceil($distance / $standardDeliverySpeed * 60) . ' minutes)'
         ];
     }
 
