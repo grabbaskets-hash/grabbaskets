@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'warehouse_users',
         ],
+        'delivery_partner' => [
+            'driver' => 'session',
+            'provider' => 'delivery_partners',
+        ],
     ],
 
     /*
@@ -71,6 +75,10 @@ return [
         'warehouse_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\WarehouseUser::class,
+        ],
+        'delivery_partners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\DeliveryPartner::class,
         ],
 
         // 'users' => [
@@ -101,6 +109,12 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'delivery_partners' => [
+            'provider' => 'delivery_partners',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,

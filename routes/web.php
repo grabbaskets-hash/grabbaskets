@@ -1378,3 +1378,95 @@ Route::get('/test-deployment', function () {
 Route::get('/test-images', function () {
     return view('test-images');
 })->name('test.images');
+
+/*
+|--------------------------------------------------------------------------
+| Delivery Partner Routes
+|--------------------------------------------------------------------------
+*/
+
+// Delivery Partner Authentication Routes (Guest only)
+Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:delivery_partner')->group(function () {
+    // Registration
+    Route::get('/register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showRegisterForm'])
+        ->name('register');
+    Route::post('/register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'register'])
+        ->name('register.post');
+    
+    // Login
+    Route::get('/login', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showLoginForm'])
+        ->name('login');
+    Route::post('/login', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'login'])
+        ->name('login.post');
+});
+
+// Delivery Partner Protected Routes
+Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:delivery_partner')->group(function () {
+    // Logout
+    Route::post('/logout', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'logout'])
+        ->name('logout');
+    
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\DeliveryPartner\DashboardController::class, 'index'])
+        ->name('dashboard');
+    
+    // Profile Management
+    Route::get('/profile', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'profile'])
+        ->name('profile');
+    Route::post('/profile', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'updateProfile'])
+        ->name('profile.update');
+    Route::post('/change-password', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'changePassword'])
+        ->name('change-password');
+    
+    // Status Management
+    Route::post('/toggle-online', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'toggleOnlineStatus'])
+        ->name('toggle-online');
+    Route::post('/toggle-availability', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'toggleAvailability'])
+        ->name('toggle-availability');
+    Route::post('/update-location', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'updateLocation'])
+        ->name('update-location');
+    
+    // Orders Management
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
+            ->name('index');
+        Route::get('/available', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'available'])
+            ->name('available');
+        Route::get('/{order}', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'show'])
+            ->name('show');
+        Route::post('/{order}/accept', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'accept'])
+            ->name('accept');
+        Route::post('/{order}/pickup', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'pickup'])
+            ->name('pickup');
+        Route::post('/{order}/deliver', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'deliver'])
+            ->name('deliver');
+        Route::post('/{order}/cancel', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'cancel'])
+            ->name('cancel');
+        Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
+            ->name('update-status');
+    });
+    
+    // Earnings and Reports
+    Route::prefix('earnings')->name('earnings.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
+            ->name('index');
+        Route::get('/weekly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'weekly'])
+            ->name('weekly');
+        Route::get('/monthly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'monthly'])
+            ->name('monthly');
+        Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
+            ->name('withdraw');
+    });
+    
+    // Notifications
+    Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
+        ->name('notifications');
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
+    
+    // Support and Help
+    Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
+        ->name('support');
+    Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
+        ->name('support.submit');
+});
