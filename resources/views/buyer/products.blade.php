@@ -877,87 +877,85 @@
     </div>
 
     <!-- Footer Start -->
-  <footer class="footer bg-dark text-white pt-5 pb-4 mt-5">
-    <div class="container">
-      <div class="row">
+    <footer class="footer bg-dark text-white pt-5 pb-4 mt-5">
+        <div class="container">
+            <div class="row">
 
-        <!-- About -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">About</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Grabbasket Stories</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Corporate Info</a></li>
-          </ul>
+                <!-- About -->
+                <div class="col-md-2 col-6 mb-3">
+                    <h6 class="fw-bold text-uppercase">About</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Grabbasket Stories</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Corporate Info</a></li>
+                    </ul>
+                </div>
+
+                <!-- Group Companies -->
+                <div class="col-md-2 col-6 mb-3">
+                    <h6 class="fw-bold text-uppercase">Quick Links</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
+                        <li><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
+                        <li><a href="/orders/track" class="text-white-50 text-decoration-none">Orders</a></li>
+                    </ul>
+                </div>
+
+                <!-- Help -->
+                <div class="col-md-2 col-6 mb-3">
+                    <h6 class="fw-bold text-uppercase">Help</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Payments</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Shipping</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Cancellation & Returns</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Policy -->
+                <div class="col-md-2 col-6 mb-3">
+                    <h6 class="fw-bold text-uppercase">Consumer Policy</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Terms of Use</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Security</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Privacy</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Sitemap</a></li>
+                    </ul>
+                </div>
+
+                <!-- Address -->
+                <div class="col-md-4 col-12 mb-3">
+                    <h6 class="fw-bold text-uppercase">Registered Office Address</h6>
+                    <p class="text-white-50 small mb-1">
+                        Swivel IT and Training Institute<br>
+                        Mahatma Gandhi Nagar Rd, near Annai Therasa English School,<br>
+                        MRR Nagar, Palani Chettipatti,,<br>
+                        Theni, 625531, TamilNadu, India.
+                    </p>
+                    <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
+                    <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+
+            <!-- Bottom Row -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
+                <div class="mb-2 mb-md-0">
+                    © 2025 grabbaskets.com
+                </div>
+                <div class="social-icons">
+                    <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
         </div>
-
-        <!-- Group Companies -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Quick Links</h6>
-          <ul class="list-unstyled small">
-            <li><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
-            <li><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
-            <li><a href="/orders/track" class="text-white-50 text-decoration-none">Orders</a></li>
-          </ul>
-        </div>
-
-        <!-- Help -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Help</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Payments</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Shipping</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Cancellation & Returns</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
-          </ul>
-        </div>
-
-        <!-- Policy -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Consumer Policy</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Terms of Use</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Security</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Privacy</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Sitemap</a></li>
-          </ul>
-        </div>
-
-        <!-- Address -->
-        <div class="col-md-4 col-12 mb-3">
-          <h6 class="fw-bold text-uppercase">Registered Office Address</h6>
-          <p class="text-white-50 small mb-1">
-            Swivel IT and Training Institute<br>
-            Mahatma Gandhi Nagar Rd, near Annai Therasa English School,<br>
-            MRR Nagar, Palani Chettipatti,,<br>
-            Theni, 625531, TamilNadu, India.
-          </p>
-          <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
-          <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
-        </div>
-      </div>
-
-      <hr class="border-secondary">
-
-      <!-- Bottom Row -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
-        <div class="mb-2 mb-md-0">
-          © 2025 grabbaskets.com
-        </div>
-        <div class="social-icons">
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
-          <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
