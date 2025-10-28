@@ -260,7 +260,7 @@
   <div class="container-fluid">
     <!-- Logo -->
     <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
-      <img src="{{ asset('build/assets/logo-image.png') }}" alt="Logo" width="150" class="me-2">
+      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
     </a>
 
     <!-- Mobile Toggle Button -->
