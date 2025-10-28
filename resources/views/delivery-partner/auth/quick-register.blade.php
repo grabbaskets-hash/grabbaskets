@@ -2,6 +2,10 @@
 
 @section('title', 'Quick Registration - Delivery Partner')
 
+@push('head-scripts')
+<script src="{{ asset('js/delivery-partner-form-handler.js') }}"></script>
+@endpush
+
 @section('content')
 <div class="auth-container">
     <div class="auth-header">
@@ -224,19 +228,9 @@
         }
     });
 
-    // Form submission
-    document.getElementById('quick-registration-form').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submit-btn');
-        const submitText = submitBtn.querySelector('.submit-text');
-        const loadingText = submitBtn.querySelector('.loading-text');
-        
-        // Show loading state
-        submitBtn.disabled = true;
-        submitText.classList.add('d-none');
-        loadingText.classList.remove('d-none');
-        
-        // Show success message
-        showToast('Setting up your delivery partner account...', 'success');
+    // Initialize form handler to prevent multiple submissions
+    document.addEventListener('DOMContentLoaded', function() {
+        new DeliveryPartnerFormHandler('quick-registration-form', 'submit-btn');
     });
 
     // Helper functions
@@ -300,6 +294,26 @@
         max-width: 400px;
         margin: 0 auto;
         padding: 20px;
+    }
+
+    /* Prevent multiple submissions */
+    .form-submitting {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .form-submitting .btn {
+        cursor: not-allowed;
+    }
+
+    /* Loading animation */
+    .loading-text .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
     .auth-header .logo {

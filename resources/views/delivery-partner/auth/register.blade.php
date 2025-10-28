@@ -2,6 +2,10 @@
 
 @section('title', 'Join as Delivery Partner')
 
+@push('head-scripts')
+<script src="{{ asset('js/delivery-partner-form-handler.js') }}"></script>
+@endpush
+
 @section('content')
 <div class="delivery-card">
     <div class="delivery-header">
@@ -821,22 +825,9 @@
         }
     });
 
-    // OPTIMIZED FORM SUBMISSION - Show loading state immediately
-    document.getElementById('registration-form').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submit-btn');
-        const submitText = submitBtn.querySelector('.submit-text');
-        const loadingText = submitBtn.querySelector('.loading-text');
-        
-        // Show loading state
-        submitBtn.disabled = true;
-        submitText.classList.add('d-none');
-        loadingText.classList.remove('d-none');
-        
-        // Show progress message
-        showToast('Processing your application, please wait...', 'info');
-        
-        // Compress images before upload for faster processing
-        compressFormImages();
+    // Initialize form handler to prevent multiple submissions
+    document.addEventListener('DOMContentLoaded', function() {
+        new DeliveryPartnerFormHandler('registration-form', 'submit-btn');
     });
 
     // Compress images to reduce upload time
@@ -921,6 +912,9 @@
 
     // Clear saved data on successful submission
     form.addEventListener('submit', function() {
+        // Add submitting class for visual feedback
+        this.classList.add('form-submitting');
+        
         setTimeout(() => {
             inputs.forEach(input => {
                 localStorage.removeItem(`delivery_partner_${input.name}`);
@@ -928,4 +922,70 @@
         }, 1000);
     });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    /* Prevent multiple submissions */
+    .form-submitting {
+        pointer-events: none;
+        opacity: 0.7;
+        position: relative;
+    }
+
+    .form-submitting::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-submitting .btn {
+        cursor: not-allowed !important;
+    }
+
+    .form-submitting input,
+    .form-submitting select,
+    .form-submitting textarea {
+        background-color: #f8f9fa !important;
+        cursor: not-allowed !important;
+    }
+
+    /* Loading animation */
+    .loading-text .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Progress indicator */
+    .submission-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #007bff;
+        z-index: 9999;
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: progressBar 3s ease-in-out forwards;
+    }
+
+    @keyframes progressBar {
+        0% { transform: scaleX(0); }
+        50% { transform: scaleX(0.7); }
+        100% { transform: scaleX(1); }
+    }
+</style>
 @endpush
