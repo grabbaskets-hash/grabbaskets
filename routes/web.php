@@ -1426,47 +1426,47 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:d
     Route::post('/update-location', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'updateLocation'])
         ->name('update-location');
     
-    // Orders Management
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
-            ->name('index');
-        Route::get('/available', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'available'])
-            ->name('available');
-        Route::get('/{order}', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'show'])
-            ->name('show');
-        Route::post('/{order}/accept', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'accept'])
-            ->name('accept');
-        Route::post('/{order}/pickup', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'pickup'])
-            ->name('pickup');
-        Route::post('/{order}/deliver', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'deliver'])
-            ->name('deliver');
-        Route::post('/{order}/cancel', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'cancel'])
-            ->name('cancel');
-        Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
-            ->name('update-status');
-    });
+    // Orders Management - TODO: Implement OrderController
+    // Route::prefix('orders')->name('orders.')->group(function () {
+    //     Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
+    //         ->name('index');
+    //     Route::get('/available', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'available'])
+    //         ->name('available');
+    //     Route::get('/{order}', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'show'])
+    //         ->name('show');
+    //     Route::post('/{order}/accept', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'accept'])
+    //         ->name('accept');
+    //     Route::post('/{order}/pickup', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'pickup'])
+    //         ->name('pickup');
+    //     Route::post('/{order}/deliver', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'deliver'])
+    //         ->name('deliver');
+    //     Route::post('/{order}/cancel', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'cancel'])
+    //         ->name('cancel');
+    //     Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
+    //         ->name('update-status');
+    // });
     
-    // Earnings and Reports
-    Route::prefix('earnings')->name('earnings.')->group(function () {
-        Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
-            ->name('index');
-        Route::get('/weekly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'weekly'])
-            ->name('weekly');
-        Route::get('/monthly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'monthly'])
-            ->name('monthly');
-        Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
-            ->name('withdraw');
-    });
+    // Earnings and Reports - TODO: Implement EarningsController
+    // Route::prefix('earnings')->name('earnings.')->group(function () {
+    //     Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
+    //         ->name('index');
+    //     Route::get('/weekly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'weekly'])
+    //         ->name('weekly');
+    //     Route::get('/monthly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'monthly'])
+    //         ->name('monthly');
+    //     Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
+    //         ->name('withdraw');
+    // });
     
-    // Notifications
-    Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
-        ->name('notifications');
-    Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
-        ->name('notifications.read');
+    // Notifications - TODO: Implement NotificationController
+    // Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
+    //     ->name('notifications');
+    // Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
+    //     ->name('notifications.read');
     
-    // Support and Help
-    Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
-        ->name('support');
-    Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
-        ->name('support.submit');
+    // Support and Help - TODO: Implement SupportController
+    // Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
+    //     ->name('support');
+    // Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
+    //     ->name('support.submit');
 });
