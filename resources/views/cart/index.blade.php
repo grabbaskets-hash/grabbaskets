@@ -321,25 +321,51 @@
           @foreach($items as $item)
           <div class="cart-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              @if($item->product && ($item->product->image || $item->product->image_data))
+              @if($item->product)
               <a href="{{ route('product.details', $item->product->id) }}" class="me-3">
-             <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                @php
+                  $productImage = ($item->product->image || $item->product->image_data) ? 
+                                 $item->product->image_url : 
+                                 'https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Image';
+                @endphp
+                <img src="{{ $productImage }}" 
+                     alt="{{ $item->product->name }}" 
+                     class="product-img" 
+                     style="cursor: pointer; transition: transform 0.2s;" 
+                     onmouseover="this.style.transform='scale(1.1)'" 
+                     onmouseout="this.style.transform='scale(1)'"
+                     onerror="this.src='https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Image'">
               </a>
+              @else
+              <div class="me-3">
+                <img src="https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Product" 
+                     alt="No Product" 
+                     class="product-img">
+              </div>
               @endif
 
               <div>
                 <h5 class="fw-semibold mb-2">
+                  @if($item->product)
                   <a href="{{ route('product.details', $item->product->id) }}" class="text-decoration-none text-dark">
-                    {{ optional($item->product)->name ?? 'Product' }}
+                    {{ $item->product->name }}
                   </a>
+                  @else
+                  <span class="text-muted">Product Unavailable</span>
+                  @endif
                 </h5>
+                @if($item->product)
                 <p class="text-muted mb-2">
                   Price: <strong>₹{{ number_format($item->price, 2) }}</strong> |
                   Discount: <strong>{{ $item->discount ? $item->discount . '%' : '-' }}</strong> |
                   Delivery:
                   <strong>{{ $item->delivery_charge ? '₹' . number_format($item->delivery_charge, 2) : 'Free' }}</strong>
                 </p>
+                @else
+                <p class="text-muted mb-2">Product details unavailable</p>
+                @endif
 
+                @if($item->product)
                 <form method="POST" action="{{ route('cart.update', $item) }}" class="d-flex align-items-center">
                   @csrf
                   @method('PATCH')
@@ -347,6 +373,9 @@
                     class="form-control form-control-sm me-2" style="width: 80px;">
                   <button class="btn btn-sm btn-outline-primary">Update</button>
                 </form>
+                @else
+                <p class="text-muted small">Cannot update unavailable product</p>
+                @endif
               </div>
             </div>
 
