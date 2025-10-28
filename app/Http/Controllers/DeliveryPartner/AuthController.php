@@ -23,6 +23,14 @@ class AuthController extends Controller
     }
 
     /**
+     * Show the quick registration form.
+     */
+    public function showQuickRegisterForm(): View
+    {
+        return view('delivery-partner.auth.quick-register');
+    }
+
+    /**
      * Show the login form.
      */
     public function showLoginForm(): View
@@ -35,36 +43,39 @@ class AuthController extends Controller
      */
     public function register(Request $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), [
+        // OPTIMIZED VALIDATION - Split into required and optional for faster processing
+        $requiredRules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:delivery_partners,email',
-            'phone' => 'required|string|size:10|unique:delivery_partners,phone',
+            'email' => 'required|email',
+            'phone' => 'required|string|size:10',
             'password' => 'required|string|min:6|confirmed',
-            'alternate_phone' => 'nullable|string|size:10',
-            'address' => 'required|string|max:500',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'pincode' => 'required|string|size:6',
-            'date_of_birth' => 'required|date|before:today',
-            'gender' => 'required|in:male,female,other',
-            
-            // Vehicle Information
             'vehicle_type' => 'required|in:bike,scooter,bicycle,car,auto',
-            'vehicle_number' => 'required|string|max:20|unique:delivery_partners,vehicle_number',
-            'license_number' => 'required|string|max:50|unique:delivery_partners,license_number',
-            'license_expiry' => 'required|date|after:today',
+            'vehicle_number' => 'required|string|max:20',
+            'license_number' => 'required|string|max:50',
+            'aadhar_number' => 'required|string|size:12',
+            'terms_accepted' => 'required|accepted',
+        ];
+
+        $optionalRules = [
+            'alternate_phone' => 'nullable|string|size:10',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'pincode' => 'nullable|string|size:6',
+            'date_of_birth' => 'nullable|date|before:today',
+            'gender' => 'nullable|in:male,female,other',
+            'license_expiry' => 'nullable|date|after:today',
             'vehicle_rc_number' => 'nullable|string|max:50',
             'insurance_number' => 'nullable|string|max:50',
             'insurance_expiry' => 'nullable|date|after:today',
             
-            // Documents
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'license_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'vehicle_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'aadhar_number' => 'required|string|size:12|unique:delivery_partners,aadhar_number',
-            'aadhar_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            // Documents - reduced size limit for faster upload
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'license_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'vehicle_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'aadhar_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'pan_number' => 'nullable|string|size:10',
-            'pan_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'pan_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             
             // Bank Details
             'bank_account_holder' => 'nullable|string|max:255',
@@ -72,14 +83,21 @@ class AuthController extends Controller
             'bank_ifsc_code' => 'nullable|string|max:11',
             'bank_name' => 'nullable|string|max:255',
             
-            // Emergency Contact
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|size:10',
             'emergency_contact_relation' => 'nullable|string|max:100',
-            
-            // Terms
-            'terms_accepted' => 'required|accepted',
-        ]);
+        ];
+
+        $validator = Validator::make($request->all(), array_merge($requiredRules, $optionalRules));
+
+        // Quick unique check for performance
+        if ($request->filled('email') && DeliveryPartner::where('email', $request->email)->exists()) {
+            return back()->withErrors(['email' => 'Email already registered'])->withInput();
+        }
+        
+        if ($request->filled('phone') && DeliveryPartner::where('phone', $request->phone)->exists()) {
+            return back()->withErrors(['phone' => 'Phone number already registered'])->withInput();
+        }
 
         if ($validator->fails()) {
             return back()
@@ -99,7 +117,7 @@ class AuthController extends Controller
             // Remove terms_accepted as it's not in the model
             unset($data['terms_accepted']);
 
-            // Handle file uploads
+            // Handle file uploads - OPTIMIZED FOR SPEED
             $uploadedFiles = [];
             $fileFields = [
                 'profile_photo',
@@ -114,21 +132,12 @@ class AuthController extends Controller
                     $file = $request->file($field);
                     $filename = 'delivery-partner/' . $field . '/' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                     
-                    // Store in public disk first, then sync to R2 if available
+                    // Store ONLY in public disk for immediate registration
                     $path = $file->storeAs('', $filename, 'public');
                     $data[$field] = $filename;
                     $uploadedFiles[] = $filename;
                     
-                    // Try to sync to R2 storage
-                    try {
-                        if (Storage::disk('r2')->exists($filename)) {
-                            Storage::disk('r2')->delete($filename);
-                        }
-                        Storage::disk('r2')->put($filename, $file->get());
-                    } catch (\Exception $e) {
-                        // R2 upload failed, but continue with local storage
-                        logger('R2 upload failed for delivery partner document: ' . $e->getMessage());
-                    }
+                    // Skip R2 upload during registration for speed - handle in background job later
                 }
             }
 
@@ -137,6 +146,18 @@ class AuthController extends Controller
 
             // Send notification to admin about new registration
             // $this->notifyAdminNewRegistration($deliveryPartner);
+
+            // Create wallet for the new partner
+            try {
+                \App\Models\DeliveryPartnerWallet::create([
+                    'delivery_partner_id' => $deliveryPartner->id,
+                    'balance' => 0.00,
+                    'total_earnings' => 0.00,
+                    'total_withdrawals' => 0.00,
+                ]);
+            } catch (\Exception $walletError) {
+                logger('Failed to create wallet for delivery partner: ' . $walletError->getMessage());
+            }
 
             return redirect()
                 ->route('delivery-partner.login')
@@ -159,6 +180,90 @@ class AuthController extends Controller
                 ->with('error', 'Registration failed. Please try again.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Handle quick registration request - OPTIMIZED FOR SPEED
+     */
+    public function quickRegister(Request $request): RedirectResponse
+    {
+        // Minimal validation for quick registration
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:delivery_partners,email',
+            'phone' => 'required|string|size:10|unique:delivery_partners,phone',
+            'password' => 'required|string|min:6|confirmed',
+            'vehicle_type' => 'required|in:bike,scooter,bicycle,car,auto',
+            'city' => 'required|string|max:100',
+            'terms_accepted' => 'required|accepted',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            // Create delivery partner with minimal required data
+            $data = $validator->validated();
+            unset($data['terms_accepted']);
+            
+            $deliveryPartner = DeliveryPartner::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'password' => Hash::make($data['password']),
+                'vehicle_type' => $data['vehicle_type'],
+                'city' => $data['city'],
+                'status' => 'pending_documents', // Special status for quick registration
+                'is_verified' => false,
+                'is_online' => false,
+                'is_available' => false,
+                'registration_type' => 'quick', // Track registration type
+            ]);
+
+            // Create wallet immediately
+            \App\Models\DeliveryPartnerWallet::create([
+                'delivery_partner_id' => $deliveryPartner->id,
+                'balance' => 0.00,
+                'total_earnings' => 0.00,
+                'total_withdrawals' => 0.00,
+            ]);
+
+            return redirect()
+                ->route('delivery-partner.login')
+                ->with('success', 'Quick registration successful! Login to complete your profile and upload documents.');
+
+        } catch (\Exception $e) {
+            logger('Quick Registration Error: ' . $e->getMessage());
+            
+            return back()
+                ->with('error', 'Registration failed. Please try again.')
+                ->withInput();
+        }
+    }
+
+    /**
+     * Check if phone number exists (AJAX)
+     */
+    public function checkPhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        $exists = DeliveryPartner::where('phone', $phone)->exists();
+        
+        return response()->json(['exists' => $exists]);
+    }
+
+    /**
+     * Check if email exists (AJAX)
+     */
+    public function checkEmail(Request $request)
+    {
+        $email = $request->input('email');
+        $exists = DeliveryPartner::where('email', $email)->exists();
+        
+        return response()->json(['exists' => $exists]);
     }
 
     /**

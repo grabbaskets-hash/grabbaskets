@@ -1397,6 +1397,18 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
     Route::post('/register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'register'])
         ->name('register.post');
     
+    // Quick Registration - OPTIMIZED FOR SPEED
+    Route::get('/quick-register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showQuickRegisterForm'])
+        ->name('quick-register');
+    Route::post('/quick-register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'quickRegister'])
+        ->name('quick-register.post');
+    
+    // AJAX validation routes
+    Route::post('/check-phone', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkPhone'])
+        ->name('check-phone');
+    Route::post('/check-email', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkEmail'])
+        ->name('check-email');
+    
     // Login
     Route::get('/login', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showLoginForm'])
         ->name('login');
@@ -1427,8 +1439,25 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:d
         ->name('toggle-online');
     Route::post('/toggle-availability', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'toggleAvailability'])
         ->name('toggle-availability');
-    Route::post('/update-location', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'updateLocation'])
+    // Location update route (moved to DeliveryRequestController for better organization)
+    Route::post('/update-location', [App\Http\Controllers\DeliveryRequestController::class, 'updateLocation'])
         ->name('update-location');
+    
+    // Delivery Requests Management - NEW WALLET SYSTEM WITH ₹25 REWARDS
+    Route::prefix('requests')->name('requests.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DeliveryRequestController::class, 'index'])
+            ->name('index');
+        Route::get('/{deliveryRequest}', [App\Http\Controllers\DeliveryRequestController::class, 'show'])
+            ->name('show');
+        Route::post('/{deliveryRequest}/accept', [App\Http\Controllers\DeliveryRequestController::class, 'accept'])
+            ->name('accept');
+        Route::post('/{deliveryRequest}/pickup', [App\Http\Controllers\DeliveryRequestController::class, 'pickup'])
+            ->name('pickup');
+        Route::post('/{deliveryRequest}/complete', [App\Http\Controllers\DeliveryRequestController::class, 'complete'])
+            ->name('complete');
+        Route::post('/{deliveryRequest}/cancel', [App\Http\Controllers\DeliveryRequestController::class, 'cancel'])
+            ->name('cancel');
+    });
     
     // Orders Management - TODO: Implement OrderController
     // Route::prefix('orders')->name('orders.')->group(function () {

@@ -35,7 +35,7 @@ class DashboardController extends Controller
         // Get notifications
         $notifications = $this->getNotifications($partner);
 
-        return view('delivery-partner.dashboard.index', compact(
+        return view('delivery_partner.dashboard', compact(
             'partner',
             'stats', 
             'recentOrders',
@@ -54,49 +54,60 @@ class DashboardController extends Controller
         $thisWeek = Carbon::now()->startOfWeek();
         $thisMonth = Carbon::now()->startOfMonth();
 
+        // Get wallet information
+        $wallet = $partner->wallet;
+        
+        // Get delivery request statistics
+        $totalRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->count();
+        $completedRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->completed()->count();
+        $todayRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+            ->completed()
+            ->whereDate('delivered_at', $today)
+            ->count();
+
         return [
-            'total_orders' => $partner->total_orders,
-            'completed_orders' => $partner->completed_orders,
-            'completion_rate' => $partner->completion_rate,
-            'rating' => $partner->rating,
-            'total_earnings' => $partner->total_earnings,
-            'this_month_earnings' => $partner->this_month_earnings,
-            'today_earnings' => $partner->today_earnings,
-            'pending_orders' => $partner->pending_orders_count,
-            'today_deliveries' => $partner->orders()
-                ->where('delivery_status', 'delivered')
-                ->whereDate('delivered_at', $today)
-                ->count(),
-            'week_deliveries' => $partner->orders()
-                ->where('delivery_status', 'delivered')
+            'total_orders' => $totalRequests,
+            'completed_orders' => $completedRequests,
+            'completion_rate' => $totalRequests > 0 ? round(($completedRequests / $totalRequests) * 100, 1) : 0,
+            'rating' => $partner->rating ?? 4.5,
+            'total_earnings' => $wallet ? $wallet->balance : 0,
+            'this_month_earnings' => $wallet ? $wallet->this_month_earnings : 0,
+            'today_earnings' => $wallet ? $wallet->today_earnings : 0,
+            'pending_requests' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->active()->count(),
+            'today_deliveries' => $todayRequests,
+            'week_deliveries' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->completed()
                 ->where('delivered_at', '>=', $thisWeek)
                 ->count(),
-            'month_deliveries' => $partner->orders()
-                ->where('delivery_status', 'delivered')
+            'month_deliveries' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->completed()
                 ->where('delivered_at', '>=', $thisMonth)
                 ->count(),
             'active_hours' => $this->getActiveHours($partner),
+            'wallet_balance' => $wallet ? $wallet->balance : 0,
+            'total_withdrawals' => $wallet ? $wallet->total_withdrawals : 0,
+            'available_earnings' => $wallet ? $wallet->available_earnings : 0,
         ];
     }
 
     /**
-     * Get recent orders for the partner.
+     * Get recent delivery requests for the partner.
      */
     private function getRecentOrders(DeliveryPartner $partner, int $limit = 5)
     {
-        return $partner->orders()
-            ->with(['user', 'orderItems.product'])
+        return \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+            ->with(['order'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
     }
 
     /**
-     * Get available orders nearby.
+     * Get available delivery requests nearby.
      */
     private function getAvailableOrders(DeliveryPartner $partner, int $limit = 10)
     {
-        if (!$partner->isAvailableForDelivery()) {
+        if (!$partner->is_online || $partner->status !== 'available') {
             return collect();
         }
 
@@ -165,21 +176,21 @@ class DashboardController extends Controller
         }
 
         // Document expiry warnings
-        if ($partner->license_expiry && $partner->license_expiry->diffInDays(today()) <= 30) {
+        if ($partner->license_expiry && Carbon::parse($partner->license_expiry)->diffInDays(today()) <= 30) {
             $notifications[] = [
                 'type' => 'warning',
                 'title' => 'License Expiry Warning',
-                'message' => 'Your license expires on ' . $partner->license_expiry->format('d M Y'),
+                'message' => 'Your license expires on ' . Carbon::parse($partner->license_expiry)->format('d M Y'),
                 'icon' => 'fas fa-id-card',
                 'time' => 'Important',
             ];
         }
 
-        if ($partner->insurance_expiry && $partner->insurance_expiry->diffInDays(today()) <= 30) {
+        if ($partner->insurance_expiry && Carbon::parse($partner->insurance_expiry)->diffInDays(today()) <= 30) {
             $notifications[] = [
                 'type' => 'warning',
                 'title' => 'Insurance Expiry Warning',
-                'message' => 'Your insurance expires on ' . $partner->insurance_expiry->format('d M Y'),
+                'message' => 'Your insurance expires on ' . Carbon::parse($partner->insurance_expiry)->format('d M Y'),
                 'icon' => 'fas fa-shield-alt',
                 'time' => 'Important',
             ];

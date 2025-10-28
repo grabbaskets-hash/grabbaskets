@@ -3359,7 +3359,7 @@ li a{
   @endif --}}
   <!-- Modern Enhanced Navbar -->
 
-  <!-- Blinkit/Zepto Style Navigation -->
+  <!-- Navigation -->
   <nav class="navbar-modern">
     <div class="container">
       <div class="d-flex align-items-center gap-3 w-100">
@@ -3955,16 +3955,28 @@ li a{
         
         <div class="col-md-4 text-center">
           <div class="d-grid gap-2">
-            <a href="{{ route('delivery-partner.register') }}" 
+            <!-- Quick Registration CTA - OPTIMIZED FOR SPEED -->
+            <a href="{{ route('delivery-partner.quick-register') }}" 
                class="btn btn-light btn-lg fw-bold" 
                style="border-radius: 12px; padding: 15px 30px; color: #FF6B00; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-              <i class="bi bi-plus-circle-fill me-2"></i>Join Now as Partner
+              <i class="bi bi-lightning-charge-fill me-2"></i>Quick Join (2 min)
             </a>
-            <a href="{{ route('delivery-partner.login') }}" 
-               class="btn btn-outline-light btn-lg" 
-               style="border-radius: 12px; padding: 12px 30px; border: 2px solid rgba(255,255,255,0.7); color: white;">
-              <i class="bi bi-box-arrow-in-right me-2"></i>Partner Login
-            </a>
+            <div class="row g-1">
+              <div class="col-6">
+                <a href="{{ route('delivery-partner.register') }}" 
+                   class="btn btn-outline-light btn-sm w-100" 
+                   style="border-radius: 8px; padding: 8px 12px; border: 2px solid rgba(255,255,255,0.5); color: white; font-size: 0.85rem;">
+                  <i class="bi bi-file-earmark-text me-1"></i>Full Form
+                </a>
+              </div>
+              <div class="col-6">
+                <a href="{{ route('delivery-partner.login') }}" 
+                   class="btn btn-outline-light btn-sm w-100" 
+                   style="border-radius: 8px; padding: 8px 12px; border: 2px solid rgba(255,255,255,0.5); color: white; font-size: 0.85rem;">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                </a>
+              </div>
+            </div>
           </div>
           
           <div class="mt-3">
@@ -4439,7 +4451,7 @@ li a{
         </div>
       </div>
 
-      <!-- Trending Now - Modern Blinkit/Zepto Style -->
+      <!-- Trending Now - Modern Style -->
       <div class="mb-4">
         <div class="section-header-modern">
           <h2>
@@ -6152,7 +6164,7 @@ li a{
     document.addEventListener('DOMContentLoaded', initWishlistHearts);
   </script>
 
-  <!-- Mobile Bottom Navigation (Blinkit/Zepto Style) -->
+  <!-- Mobile Bottom Navigation  -->
   <div class="mobile-bottom-nav">
     <a href="{{ route('home') }}" class="mobile-nav-item active">
       <i class="bi bi-house-fill"></i>

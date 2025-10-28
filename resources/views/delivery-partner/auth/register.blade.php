@@ -598,7 +598,12 @@
                         <i class="fas fa-arrow-left me-2"></i>Previous
                     </button>
                     <button type="submit" class="btn btn-primary" id="submit-btn">
-                        <i class="fas fa-paper-plane me-2"></i>Submit Application
+                        <span class="submit-text">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Application
+                        </span>
+                        <span class="loading-text d-none">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Processing...
+                        </span>
                     </button>
                 </div>
             </div>
@@ -814,6 +819,113 @@
         } else {
             e.target.setCustomValidity('');
         }
+    });
+
+    // OPTIMIZED FORM SUBMISSION - Show loading state immediately
+    document.getElementById('registration-form').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = submitBtn.querySelector('.submit-text');
+        const loadingText = submitBtn.querySelector('.loading-text');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitText.classList.add('d-none');
+        loadingText.classList.remove('d-none');
+        
+        // Show progress message
+        showToast('Processing your application, please wait...', 'info');
+        
+        // Compress images before upload for faster processing
+        compressFormImages();
+    });
+
+    // Compress images to reduce upload time
+    function compressFormImages() {
+        const imageInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
+        imageInputs.forEach(input => {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                if (file.size > 500000) { // If larger than 500KB
+                    // Create a simple compression by reducing quality
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        // Reduce dimensions if too large
+                        let { width, height } = img;
+                        const maxDimension = 800;
+                        
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = (height * maxDimension) / width;
+                                width = maxDimension;
+                            } else {
+                                width = (width * maxDimension) / height;
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                    };
+                    
+                    img.src = URL.createObjectURL(file);
+                }
+            }
+        });
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 5000);
+    }
+
+    // Auto-save form data to localStorage for recovery
+    const form = document.getElementById('registration-form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+        // Load saved data on page load
+        const savedValue = localStorage.getItem(`delivery_partner_${input.name}`);
+        if (savedValue && input.type !== 'file' && input.type !== 'password') {
+            input.value = savedValue;
+        }
+        
+        // Save data on input
+        input.addEventListener('input', function() {
+            if (this.type !== 'file' && this.type !== 'password') {
+                localStorage.setItem(`delivery_partner_${this.name}`, this.value);
+            }
+        });
+    });
+
+    // Clear saved data on successful submission
+    form.addEventListener('submit', function() {
+        setTimeout(() => {
+            inputs.forEach(input => {
+                localStorage.removeItem(`delivery_partner_${input.name}`);
+            });
+        }, 1000);
     });
 </script>
 @endpush
