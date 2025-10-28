@@ -164,30 +164,30 @@
             .filter-card {
                 margin-bottom: 15px;
             }
-            
+
             .search-bar {
                 width: 100% !important;
                 margin-bottom: 10px;
             }
-            
+
             .card-body {
                 padding: 15px !important;
             }
-            
+
             .card-title {
                 font-size: 0.95rem !important;
                 min-height: 38px !important;
             }
-            
+
             .card-text {
                 font-size: 0.85rem !important;
                 min-height: 50px !important;
             }
-            
+
             .price-section {
                 padding: 8px !important;
             }
-            
+
             .price-section span {
                 font-size: 1.1rem !important;
             }
@@ -198,81 +198,168 @@
                 flex: 0 0 100%;
                 max-width: 100%;
             }
-            
+
             .navbar-brand img {
                 width: 140px !important;
             }
-            
+
             .container {
                 padding-left: 10px;
                 padding-right: 10px;
             }
-            
+
             .row.g-4 {
                 gap: 1rem !important;
             }
-            
+
             .card {
                 margin-bottom: 1rem;
             }
         }
 
-       /* Footer Styles */
-        footer { background-color: #343a40; color: #fff; width: 100%; }
-        footer a { color: #fff; text-decoration: none; }
-        footer a:hover { color: #ddd; }
-
-        .footer-main-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-            gap: 3rem;
-            align-items: start;
-            max-width: 1200px;
-            margin: 0 auto;
+        .footer {
+            font-size: 0.9rem;
         }
-        .follow{
+
+        .footer h6 {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .footer .social-icons i {
+            font-size: 1.3rem;
+            transition: color 0.3s;
+        }
+
+        .footer .social-icons i:hover {
+            color: #fff;
+        }
+
+        .follow {
             position: relative;
             left: -40px;
-           
+
         }
-        .para{
+
+        .para {
             font-size: 15px;
-            top:15px;
-            position:relative;
+            top: 15px;
+            position: relative;
         }
 
-        .brand-column { padding-left:0; margin-left:-0.5rem; }
-        .brand-column h3, .brand-column p { margin-left:-3rem; }
-        .quick-links-column, .support-column { padding: 0 1rem; }
-        .follow-column { text-align: right; padding-right:0; }
-        .follow-icons { display:flex; gap:0.9rem; justify-content:flex-end; }
+        .brand-column {
+            padding-left: 0;
+            margin-left: -0.5rem;
+        }
 
-        .bottom-bar { background-color:#212529; padding:10px 0; text-align:center; font-size:0.9rem; color:#ccc; }
+        .brand-column h3,
+        .brand-column p {
+            margin-left: -3rem;
+        }
+
+        .quick-links-column,
+        .support-column {
+            padding: 0 1rem;
+        }
+
+        .follow-column {
+            text-align: right;
+            padding-right: 0;
+        }
+
+        .follow-icons {
+            display: flex;
+            gap: 0.9rem;
+            justify-content: flex-end;
+        }
+
+        .bottom-bar {
+            background-color: #212529;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
 
         /* Tablet */
         @media (max-width: 991px) {
-            .footer-main-grid { grid-template-columns: 1fr 1fr; gap:2.5rem; }
-            .brand-column { grid-column:1; margin-left:-0.5rem; }
-            .quick-links-column { grid-column:2; }
-            .support-column { grid-column:1; }
-            .follow-column { grid-column:2; text-align:right; }
+            .footer-main-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2.5rem;
+            }
+
+            .brand-column {
+                grid-column: 1;
+                margin-left: -0.5rem;
+            }
+
+            .quick-links-column {
+                grid-column: 2;
+            }
+
+            .support-column {
+                grid-column: 1;
+            }
+
+            .follow-column {
+                grid-column: 2;
+                text-align: right;
+            }
         }
 
         /* Mobile */
         @media (max-width: 767px) {
-            .footer-main-grid { grid-template-columns: 1fr; gap:2rem; }
-            .brand-column { grid-column:1; margin-left:0; padding-left:0; }
-            .quick-links-column, .support-column { padding:0; }
-            .follow-column { text-align:left; padding-right:0; }
-            .follow-icons { justify-content:flex-start; margin-top:1rem; }
+            .footer-main-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .brand-column {
+                grid-column: 1;
+                margin-left: 0;
+                padding-left: 0;
+            }
+
+            .quick-links-column,
+            .support-column {
+                padding: 0;
+            }
+
+            .follow-column {
+                text-align: left;
+                padding-right: 0;
+            }
+
+            .follow-icons {
+                justify-content: flex-start;
+                margin-top: 1rem;
+            }
         }
 
         /* Extra Small */
         @media (max-width: 575px) {
-            .footer-main-grid { gap:1.5rem; }
-            .brand-column h3 { font-size:1.25rem; }
-            .brand-column p { font-size:0.813rem; }
-            .follow-icons { flex-wrap:wrap; gap:0.75rem; }
+            .footer-main-grid {
+                gap: 1.5rem;
+            }
+
+            .brand-column h3 {
+                font-size: 1.25rem;
+            }
+
+            .brand-column p {
+                font-size: 0.813rem;
+            }
+
+            .follow-icons {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -281,51 +368,63 @@
     <x-back-button />
 
 
-  <nav class="navbar navbar-expand-lg" style="background-color:rgb(30, 30, 55);">
-  <div class="container-fluid d-flex justify-content-around align-items-center">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
+      </a>
 
-    <!-- Logo -->
-    <a href="{{ url('/') }}" class="nav-link text-orange">
-      <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="180px">
-    </a>
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <!-- Search Bar -->
-    <form class="d-none d-lg-flex mx-auto" role="search" style="width: 600px;">
-      <input class="form-control me-2" type="search" placeholder="Search products,brands and more..." aria-label="Search">
-      <button class="btn btn-outline-warning" type="submit">Search</button>
-    </form>
+      <!-- Navbar Content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Search Bar -->
+        <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
+          <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
+            aria-label="Search">
+          <button class="btn btn-outline-warning" type="submit">Search</button>
+        </form>
 
-    <!-- Right Side: Hello + Buttons -->
-    <div class="d-flex align-items-center gap-2">
+        <!-- Right Side -->
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item d-none d-lg-block me-2">
+            <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+          </li>
 
-    <!-- Hello User -->
-    <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ optional(Auth::user())->name ?? 'Guest' }}</span>
+          <!-- Account Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
+              id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle"></i> My Account
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
+              <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+              <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a></li>
+              <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
+              <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase"></i> My Order</a></li>
+              <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
+              <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
+            </ul>
+          </li>
 
-      <!-- My Account Dropdown -->
-      <div class="dropdown">
-        <button class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" 
-                type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-circle"></i> My Account
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
-          <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
-          <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
-          <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-          <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-          <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
+              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
+          </li>
         </ul>
       </div>
-
-      <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1"
-         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </a>
-      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-      </form>
     </div>
-  </div>
-</nav>
+  </nav>
 
     <!-- Main Container -->
     <div class="container my-4">
@@ -390,20 +489,20 @@
 
                 <!-- Gender-Based Product Suggestions -->
                 @php
-                    $user = Auth::user();
-                    $suggested = collect();
-                    if ($user && isset($user->sex)) {
-                        $sex = strtolower($user->sex);
-                        $suggested = $products->filter(function($prod) use ($sex) {
-                            $cat = strtolower(optional($prod->category)->name ?? '');
-                            if ($sex === 'female') {
-                                return str_contains($cat, 'women') || str_contains($cat, 'beauty') || str_contains($cat, 'fashion');
-                            } elseif ($sex === 'male') {
-                                return str_contains($cat, 'men') || str_contains($cat, 'electronics') || str_contains($cat, 'sports');
-                            }
-                            return true;
-                        })->take(6);
-                    }
+                $user = Auth::user();
+                $suggested = collect();
+                if ($user && isset($user->sex)) {
+                $sex = strtolower($user->sex);
+                $suggested = $products->filter(function($prod) use ($sex) {
+                $cat = strtolower(optional($prod->category)->name ?? '');
+                if ($sex === 'female') {
+                return str_contains($cat, 'women') || str_contains($cat, 'beauty') || str_contains($cat, 'fashion');
+                } elseif ($sex === 'male') {
+                return str_contains($cat, 'men') || str_contains($cat, 'electronics') || str_contains($cat, 'sports');
+                }
+                return true;
+                })->take(6);
+                }
                 @endphp
                 @if($user && $suggested->count())
                 <div class="mb-4">
@@ -423,13 +522,13 @@
                                 <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none text-dark d-block w-100 h-100" style="z-index:1;">
                                     <div class="flex-shrink-0 w-100 h-50 rounded-lg overflow-hidden border">
                                         @php
-                                            $categoryName = optional($product->category)->name ?? '';
-                                            $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
-                                            $unsplashQuery = $unsplashQuery ?: 'product colorful';
+                                        $categoryName = optional($product->category)->name ?? '';
+                                        $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
+                                        $unsplashQuery = $unsplashQuery ?: 'product colorful';
                                         @endphp
                                         @if ($product->image || $product->image_data)
-                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover"
-                                                 onerror="
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover"
+                                            onerror="
                                                     if (!this.dataset.fallback) {
                                                         this.dataset.fallback = '1';
                                                         this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
@@ -438,7 +537,7 @@
                                                     }
                                                  ">
                                         @else
-                                            <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover">
+                                        <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="w-100 h-100 object-cover">
                                         @endif
                                     </div>
                                     <div class="flex-grow-1 ms-2">
@@ -446,23 +545,23 @@
                                         <div class="price mt-1">
                                             ₹{{ number_format($product->discount > 0 ? $product->price * (1 - $product->discount / 100) : $product->price, 2) }}
                                             @if($product->discount > 0)
-                                                <span class="old-price text-muted">₹{{ number_format($product->price, 2) }}</span>
-                                                <span class="badge bg-success ms-2">{{ $product->discount }}% off</span>
+                                            <span class="old-price text-muted">₹{{ number_format($product->price, 2) }}</span>
+                                            <span class="badge bg-success ms-2">{{ $product->discount }}% off</span>
                                             @endif
                                         </div>
                                     </div>
                                 </a>
                                 <div class="mt-2 ms-2 d-flex gap-2 justify-content-between">
                                     @auth
-                                        <form method="POST" action="{{ route('cart.add') }}" class="flex-grow-1">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
-                                        </form>
+                                    <form method="POST" action="{{ route('cart.add') }}" class="flex-grow-1">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
+                                    </form>
                                     @else
-                                        <a href="{{ route('login') }}" class="btn btn-warning btn-sm flex-grow-1">Login to add</a>
+                                    <a href="{{ route('login') }}" class="btn btn-warning btn-sm flex-grow-1">Login to add</a>
                                     @endauth
-                                    
+
                                     <!-- Share Button for Recommended Products -->
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown">
@@ -508,9 +607,9 @@
                                                 <i class="bi bi-shop-window"></i> {{ $store->store_name ?? $store->name }}
                                             </h4>
                                             @if($store->store_name && $store->name && $store->store_name !== $store->name)
-                                                <small class="opacity-75">
-                                                    <i class="bi bi-person-circle"></i> Owned by {{ $store->name }}
-                                                </small>
+                                            <small class="opacity-75">
+                                                <i class="bi bi-person-circle"></i> Owned by {{ $store->name }}
+                                            </small>
                                             @endif
                                         </div>
                                         <div class="text-center">
@@ -536,13 +635,13 @@
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1 fw-bold text-dark">Location</h6>
                                                     @if($store->store_address)
-                                                        <p class="mb-1 text-muted small">{{ $store->store_address }}</p>
+                                                    <p class="mb-1 text-muted small">{{ $store->store_address }}</p>
                                                     @endif
                                                     @if($store->city || $store->state || $store->pincode)
-                                                        <p class="mb-0 text-muted small">
-                                                            <i class="bi bi-pin-map"></i>
-                                                            {{ implode(', ', array_filter([$store->city, $store->state, $store->pincode])) }}
-                                                        </p>
+                                                    <p class="mb-0 text-muted small">
+                                                        <i class="bi bi-pin-map"></i>
+                                                        {{ implode(', ', array_filter([$store->city, $store->state, $store->pincode])) }}
+                                                    </p>
                                                     @endif
                                                 </div>
                                             </div>
@@ -559,14 +658,14 @@
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1 fw-bold text-dark">Contact</h6>
                                                     @if($store->store_contact)
-                                                        <p class="mb-1 text-muted small">
-                                                            <i class="bi bi-phone"></i> {{ $store->store_contact }}
-                                                        </p>
+                                                    <p class="mb-1 text-muted small">
+                                                        <i class="bi bi-phone"></i> {{ $store->store_contact }}
+                                                    </p>
                                                     @endif
                                                     @if($store->email)
-                                                        <p class="mb-0 text-muted small">
-                                                            <i class="bi bi-envelope"></i> {{ $store->email }}
-                                                        </p>
+                                                    <p class="mb-0 text-muted small">
+                                                        <i class="bi bi-envelope"></i> {{ $store->email }}
+                                                    </p>
                                                     @endif
                                                 </div>
                                             </div>
@@ -583,14 +682,14 @@
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1 fw-bold text-dark">Business Info</h6>
                                                     @if($store->gst_number)
-                                                        <p class="mb-1 text-muted small">
-                                                            <i class="bi bi-receipt"></i> GST: <strong>{{ $store->gst_number }}</strong>
-                                                        </p>
+                                                    <p class="mb-1 text-muted small">
+                                                        <i class="bi bi-receipt"></i> GST: <strong>{{ $store->gst_number }}</strong>
+                                                    </p>
                                                     @endif
                                                     @if($store->gift_option)
-                                                        <span class="badge bg-success-subtle text-success">
-                                                            <i class="bi bi-gift"></i> Gift Wrapping Available
-                                                        </span>
+                                                    <span class="badge bg-success-subtle text-success">
+                                                        <i class="bi bi-gift"></i> Gift Wrapping Available
+                                                    </span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -602,13 +701,13 @@
                                 <!-- Store Footer with Action Button -->
                                 <div class="card-footer bg-light border-0 p-4">
                                     @if(isset($store->user_id))
-                                        <a href="{{ route('store.catalog', $store->user_id) }}" 
-                                           class="btn btn-lg w-100 text-white fw-bold shadow-sm hover-scale" 
-                                           style="background: linear-gradient(135deg, #0C831F, #0A6917); border-radius: 12px; padding: 14px; transition: all 0.3s ease;">
-                                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                                            View Complete Catalog
-                                            <i class="bi bi-arrow-right ms-2"></i>
-                                        </a>
+                                    <a href="{{ route('store.catalog', $store->user_id) }}"
+                                        class="btn btn-lg w-100 text-white fw-bold shadow-sm hover-scale"
+                                        style="background: linear-gradient(135deg, #0C831F, #0A6917); border-radius: 12px; padding: 14px; transition: all 0.3s ease;">
+                                        <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                                        View Complete Catalog
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
                                     @endif
                                 </div>
                             </div>
@@ -618,7 +717,7 @@
 
                     <!-- Divider -->
                     <hr class="my-5" style="border-top: 2px dashed #dee2e6;">
-                    
+
                     <div class="text-center mb-4">
                         <h5 class="text-muted">
                             <i class="bi bi-box-seam"></i> Products from this store
@@ -652,7 +751,7 @@
 
                 <!-- Product Cards Grid -->
                 <div class="row g-4">
-                @forelse($products as $product)
+                    @forelse($products as $product)
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                         <div class="card h-100 position-relative" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                             <!-- Wishlist Heart Button -->
@@ -663,21 +762,21 @@
                                     <i class="bi bi-heart{{ $product->isWishlistedBy(auth()->user()) ? '-fill text-danger' : '' }} fs-5"></i>
                                 </button>
                             </form>
-                            
+
                             <!-- Product Image -->
                             <div style="position: relative; overflow: hidden; height: 250px;">
                                 @php
-                                    $categoryName = optional($product->category)->name ?? '';
-                                    $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
-                                    $unsplashQuery = $unsplashQuery ?: 'product colorful';
+                                $categoryName = optional($product->category)->name ?? '';
+                                $unsplashQuery = trim($product->name . ' ' . $categoryName . ' colorful');
+                                $unsplashQuery = $unsplashQuery ?: 'product colorful';
                                 @endphp
                                 <a href="{{ route('product.details', $product->id) }}">
                                     @if ($product->image || $product->image_data)
-                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
-                                            class="card-img-top" style="height: 250px; object-fit: cover; transition: transform 0.3s;"
-                                            onmouseover="this.style.transform='scale(1.05)'"
-                                            onmouseout="this.style.transform='scale(1)'"
-                                            onerror="
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                        class="card-img-top" style="height: 250px; object-fit: cover; transition: transform 0.3s;"
+                                        onmouseover="this.style.transform='scale(1.05)'"
+                                        onmouseout="this.style.transform='scale(1)'"
+                                        onerror="
                                                 if (!this.dataset.fallback) {
                                                     this.dataset.fallback = '1';
                                                     this.src = 'https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}';
@@ -686,10 +785,10 @@
                                                 }
                                             ">
                                     @else
-                                        <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                    <img src="https://source.unsplash.com/400x400/?{{ urlencode($unsplashQuery) }}" alt="{{ $product->name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
                                     @endif
                                 </a>
-                                
+
                                 @if($product->discount > 0)
                                 <div style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #FF4444, #FF6B00); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);">
                                     {{ $product->discount }}% OFF
@@ -704,7 +803,7 @@
                                         {{ \Illuminate\Support\Str::limit($product->name, 50) }}
                                     </a>
                                 </h6>
-                                
+
                                 <p class="card-text small text-muted mb-3" style="line-height: 1.5; min-height: 60px;">
                                     {{ \Illuminate\Support\Str::limit($product->description, 80) }}
                                 </p>
@@ -718,7 +817,7 @@
                                                     ₹{{ number_format($product->discount > 0 ? $product->price * (1 - $product->discount / 100) : $product->price, 2) }}
                                                 </span>
                                                 @if($product->discount > 0)
-                                                    <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
+                                                <small class="text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</small>
                                                 @endif
                                             </div>
                                             @if($product->discount > 0)
@@ -732,19 +831,19 @@
                                     <!-- Action Buttons -->
                                     <div class="d-grid gap-2">
                                         @auth
-                                            <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                <button type="submit" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
-                                                    <i class="bi bi-cart-plus"></i> Add to Cart
-                                                </button>
-                                            </form>
+                                        <form method="POST" action="{{ route('cart.add') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <button type="submit" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
+                                                <i class="bi bi-cart-plus"></i> Add to Cart
+                                            </button>
+                                        </form>
                                         @else
-                                            <a href="{{ route('login') }}" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
-                                                <i class="bi bi-box-arrow-in-right"></i> Login to Buy
-                                            </a>
+                                        <a href="{{ route('login') }}" class="btn btn-warning w-100 fw-semibold" style="border-radius: 8px;">
+                                            <i class="bi bi-box-arrow-in-right"></i> Login to Buy
+                                        </a>
                                         @endauth
-                                        
+
                                         <!-- Share Button -->
                                         <div class="dropdown">
                                             <button class="btn btn-outline-secondary btn-sm w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-radius: 8px;">
@@ -762,11 +861,11 @@
                             </div>
                         </div>
                     </div>
-                @empty
+                    @empty
                     <div class="col-12">
                         <div class="alert alert-warning">No products found.</div>
                     </div>
-                @endforelse
+                    @endforelse
                 </div>
 
                 <!-- Pagination -->
@@ -778,86 +877,111 @@
     </div>
 
     <!-- Footer Start -->
-    <footer>
-        <div class="container py-5">
-            <div class="footer-main-grid">
-                <!-- Brand Column -->
-                <div class="brand-column">
-                    <h3 class="mb-3"><img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo"  width="180px">
-                    <p class="para">Your trusted online marketplace for quality products at the best prices.</p>
-                </div>
+  <footer class="footer bg-dark text-white pt-5 pb-4 mt-5">
+    <div class="container">
+      <div class="row">
 
-                <!-- Quick Links -->
-                <div class="quick-links-column">
-                    <h4 class="mb-3">Quick Links</h4>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ route('buyer.dashboard') }}">Shop</a></li>
-                        <li><a href="{{ route('seller.dashboard') }}">Seller</a></li>
-                        <li><a href="{{ route('cart.index') }}">Cart</a></li>
-                        <li><a href="{{ route('login') }}">Login</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div class="support-column">
-                    <h4 class="mb-3">Customer Support</h4>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <!-- Follow Us -->
-                <div class="follow-column">
-                    <h4 class="mb-3 follow"> Follow Us</h4>
-                    <div class="follow-icons">
-                        <a href="https://wa.me/1234567890" target="_blank" class="bg-secondary rounded-circle p-2">
-                            <i class="bi bi-whatsapp text-white"></i>
-                        </a>
-                        <a href="https://instagram.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-                            <i class="bi bi-instagram text-white"></i>
-                        </a>
-                        <a href="https://twitter.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-                            <i class="bi bi-twitter text-white"></i>
-                        </a>
-                        <a href="https://facebook.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-                            <i class="bi bi-facebook text-white"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <!-- About -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">About</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Grabbasket Stories</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Corporate Info</a></li>
+          </ul>
         </div>
-        <div class="bottom-bar">
-            &copy; 2025 grabbasket. All Rights Reserved.
+
+        <!-- Group Companies -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Quick Links</h6>
+          <ul class="list-unstyled small">
+            <li><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
+            <li><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
+            <li><a href="/orders/track" class="text-white-50 text-decoration-none">Orders</a></li>
+          </ul>
         </div>
-    </footer>
+
+        <!-- Help -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Help</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Payments</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Shipping</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Cancellation & Returns</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Policy -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Consumer Policy</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Terms of Use</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Security</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Privacy</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Sitemap</a></li>
+          </ul>
+        </div>
+
+        <!-- Address -->
+        <div class="col-md-4 col-12 mb-3">
+          <h6 class="fw-bold text-uppercase">Registered Office Address</h6>
+          <p class="text-white-50 small mb-1">
+            Swivel IT and Training Institute<br>
+            Mahatma Gandhi Nagar Rd, near Annai Therasa English School,<br>
+            MRR Nagar, Palani Chettipatti,,<br>
+            Theni, 625531, TamilNadu, India.
+          </p>
+          <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
+          <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
+        </div>
+      </div>
+
+      <hr class="border-secondary">
+
+      <!-- Bottom Row -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
+        <div class="mb-2 mb-md-0">
+          © 2025 grabbaskets.com
+        </div>
+        <div class="social-icons">
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
+          <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Share Functions for Product Listing
         function shareProduct(productId, platform, productName, price) {
             const baseUrl = window.location.origin;
             const productUrl = `${baseUrl}/product/${productId}`;
             const text = `Check out this amazing product: ${productName} - ₹${price} on grabbasket!`;
-            
-            switch(platform) {
+
+            switch (platform) {
                 case 'whatsapp':
                     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + productUrl)}`;
                     window.open(whatsappUrl, '_blank');
                     break;
-                    
+
                 case 'facebook':
                     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
                     window.open(facebookUrl, '_blank', 'width=600,height=400');
                     break;
-                    
+
                 case 'twitter':
                     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(productUrl)}`;
                     window.open(twitterUrl, '_blank', 'width=600,height=400');
                     break;
-                    
+
                 case 'copy':
                     navigator.clipboard.writeText(productUrl).then(function() {
                         // Show success feedback
@@ -865,7 +989,7 @@
                         const btn = dropdown.querySelector('button');
                         const originalHtml = btn.innerHTML;
                         btn.innerHTML = '<i class="bi bi-check text-success"></i>';
-                        
+
                         setTimeout(function() {
                             btn.innerHTML = originalHtml;
                         }, 2000);
@@ -880,63 +1004,63 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Get all wishlist forms
             const wishlistForms = document.querySelectorAll('form[action*="wishlist.toggle"]');
-            
+
             wishlistForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault(); // Prevent form submission/redirect
-                    
+
                     const formData = new FormData(form);
                     const button = form.querySelector('button');
                     const icon = button.querySelector('i');
-                    
+
                     // Send AJAX request
                     fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': formData.get('_token'),
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            product_id: formData.get('product_id')
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': formData.get('_token'),
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                product_id: formData.get('product_id')
+                            })
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Toggle heart icon
-                            if (data.in_wishlist) {
-                                // Added to wishlist - show filled red heart
-                                icon.classList.remove('bi-heart');
-                                icon.classList.add('bi-heart-fill', 'text-danger');
-                            } else {
-                                // Removed from wishlist - show empty heart
-                                icon.classList.remove('bi-heart-fill', 'text-danger');
-                                icon.classList.add('bi-heart');
-                            }
-                            
-                            // Optional: Show brief success message (can be removed if you don't want notifications)
-                            // You can uncomment below for visual feedback
-                            /*
-                            const toast = document.createElement('div');
-                            toast.className = 'position-fixed bottom-0 end-0 p-3';
-                            toast.style.zIndex = '9999';
-                            toast.innerHTML = `
-                                <div class="toast show" role="alert">
-                                    <div class="toast-body bg-success text-white">
-                                        ${data.message}
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Toggle heart icon
+                                if (data.in_wishlist) {
+                                    // Added to wishlist - show filled red heart
+                                    icon.classList.remove('bi-heart');
+                                    icon.classList.add('bi-heart-fill', 'text-danger');
+                                } else {
+                                    // Removed from wishlist - show empty heart
+                                    icon.classList.remove('bi-heart-fill', 'text-danger');
+                                    icon.classList.add('bi-heart');
+                                }
+
+                                // Optional: Show brief success message (can be removed if you don't want notifications)
+                                // You can uncomment below for visual feedback
+                                /*
+                                const toast = document.createElement('div');
+                                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                                toast.style.zIndex = '9999';
+                                toast.innerHTML = `
+                                    <div class="toast show" role="alert">
+                                        <div class="toast-body bg-success text-white">
+                                            ${data.message}
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                            document.body.appendChild(toast);
-                            setTimeout(() => toast.remove(), 2000);
-                            */
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Optionally show error message
-                    });
+                                `;
+                                document.body.appendChild(toast);
+                                setTimeout(() => toast.remove(), 2000);
+                                */
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Optionally show error message
+                        });
                 });
             });
         });
