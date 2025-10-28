@@ -152,33 +152,32 @@
       font-weight: 600;
       color: #0a1a3f;
     }
-    
-    /* Footer Styles */
-    footer {
-      background-color: #343a40;
+
+    .footer {
+      font-size: 0.9rem;
+    }
+
+    .footer h6 {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
       color: #fff;
-      width: 100%;
-      margin-top: auto;
     }
 
-    footer a {
+    .footer a:hover {
       color: #fff;
-      text-decoration: none;
+      text-decoration: underline;
     }
 
-    footer a:hover {
-      color: #ddd;
+    .footer .social-icons i {
+      font-size: 1.3rem;
+      transition: color 0.3s;
     }
 
-    .footer-main-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-      gap: 3rem;
-      align-items: start;
-      max-width: 1200px;
-      margin: 0 auto;
+    .footer .social-icons i:hover {
+      color: #fff;
     }
-        /* Tablet */
+
+    /* Tablet */
     @media (max-width: 991px) {
       .footer-main-grid {
         grid-template-columns: 1fr 1fr;
@@ -203,7 +202,8 @@
         text-align: right;
       }
     }
-     .bottom-bar {
+
+    .bottom-bar {
       background-color: #212529;
       padding: 10px 0;
       text-align: center;
@@ -270,7 +270,7 @@
     <div class="container-fluid">
       <!-- Logo -->
       <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
-      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
+        <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
       </a>
 
       <!-- Mobile Toggle Button -->
@@ -331,22 +331,22 @@
       <!-- Image -->
       <div class="col-lg-6 text-center">
         @if($product->image || $product->image_data)
-          <img src="{{ $product->original_image_url }}" class="product-image img-fluid" alt="{{ $product->name }}" 
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-          <div class="mt-3">
-            <a href="{{ $product->original_image_url }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
-              <i class="bi bi-box-arrow-up-right"></i> View original
-            </a>
-          </div>
-          <div style="display: none; padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
-            <i class="bi bi-image" style="font-size: 3rem;"></i>
-            <p class="mt-2 mb-0">Image not available</p>
-          </div>
+        <img src="{{ $product->original_image_url }}" class="product-image img-fluid" alt="{{ $product->name }}"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="mt-3">
+          <a href="{{ $product->original_image_url }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-arrow-up-right"></i> View original
+          </a>
+        </div>
+        <div style="display: none; padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
+          <i class="bi bi-image" style="font-size: 3rem;"></i>
+          <p class="mt-2 mb-0">Image not available</p>
+        </div>
         @else
-          <div style="padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
-            <i class="bi bi-image" style="font-size: 3rem;"></i>
-            <p class="mt-2 mb-0">No image available</p>
-          </div>
+        <div style="padding: 40px; background: #f8f9fa; border-radius: 16px; color: #6c757d;">
+          <i class="bi bi-image" style="font-size: 3rem;"></i>
+          <p class="mt-2 mb-0">No image available</p>
+        </div>
         @endif
       </div>
 
@@ -361,11 +361,11 @@
 
         <p class="price">
           @if($product->discount > 0)
-            ₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}
-            <span class="old-price">₹{{ number_format($product->price, 2) }}</span>
-            <span class="discount">{{ $product->discount }}% off</span>
+          ₹{{ number_format($product->price * (1 - $product->discount / 100), 2) }}
+          <span class="old-price">₹{{ number_format($product->price, 2) }}</span>
+          <span class="discount">{{ $product->discount }}% off</span>
           @else
-            ₹{{ number_format($product->price, 2) }}
+          ₹{{ number_format($product->price, 2) }}
           @endif
         </p>
         <p class="text-muted">Delivery:
@@ -380,22 +380,22 @@
             <button class="btn btn-success btn-sm" onclick="shareOnWhatsApp()">
               <i class="bi bi-whatsapp"></i> WhatsApp
             </button>
-            
+
             <!-- Facebook Share -->
             <button class="btn btn-primary btn-sm" onclick="shareOnFacebook()">
               <i class="bi bi-facebook"></i> Facebook
             </button>
-            
+
             <!-- Twitter Share -->
             <button class="btn btn-info btn-sm" onclick="shareOnTwitter()">
               <i class="bi bi-twitter"></i> Twitter
             </button>
-            
+
             <!-- Copy Link -->
             <button class="btn btn-secondary btn-sm" onclick="copyLink()">
               <i class="bi bi-link-45deg"></i> Copy Link
             </button>
-            
+
             <!-- Email Share -->
             <button class="btn btn-warning btn-sm" onclick="shareViaEmail()">
               <i class="bi bi-envelope"></i> Email
@@ -466,54 +466,54 @@
     </div>
     <div class="tab-pane fade" id="store-info">
       @if($seller && $seller->id > 0)
-        <h4>{{ $seller->store_name ?? 'N/A' }}</h4>
-        <p><strong>Shop Name:</strong> {{ $seller->store_name ?? 'N/A' }}</p>
-        <p><strong>Address:</strong> {{ $seller->store_address ?? 'N/A' }}</p>
-        <p><strong>Contact:</strong> {{ $seller->store_contact ?? 'N/A' }}</p>
-        <a href="{{ route('store.products', $seller->id) }}" class="btn btn-outline-dark">View Store Products</a>
+      <h4>{{ $seller->store_name ?? 'N/A' }}</h4>
+      <p><strong>Shop Name:</strong> {{ $seller->store_name ?? 'N/A' }}</p>
+      <p><strong>Address:</strong> {{ $seller->store_address ?? 'N/A' }}</p>
+      <p><strong>Contact:</strong> {{ $seller->store_contact ?? 'N/A' }}</p>
+      <a href="{{ route('store.products', $seller->id) }}" class="btn btn-outline-dark">View Store Products</a>
       @else
-        <div class="alert alert-warning mb-0">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          Seller information is currently not available for this product.
-        </div>
+      <div class="alert alert-warning mb-0">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Seller information is currently not available for this product.
+      </div>
       @endif
     </div>
     <div class="tab-pane fade" id="reviews">
       <!-- Review form -->
       @auth
-        <form method="POST" action="{{ route('product.addReview', $product->id) }}" class="mb-4 p-3 rounded review-card">
-          @csrf
-          <label class="form-label fw-bold">Your Rating</label>
-          <div class="rating-stars mb-2 d-flex gap-1">
-            @for($i = 5; $i >= 1; $i--)
-              <input type="radio" name="rating" value="{{ $i }}" id="star{{ $i }}">
-              <label for="star{{ $i }}" style="cursor:pointer; font-size:1.5rem;">★</label>
-            @endfor
-          </div>
-          <textarea name="comment" class="form-control mb-3 rounded" rows="3"
-            placeholder="Share your experience..."></textarea>
-          <button class="btn btn-gold px-4"><i class="bi bi-send"></i> Submit Review</button>
-        </form>
+      <form method="POST" action="{{ route('product.addReview', $product->id) }}" class="mb-4 p-3 rounded review-card">
+        @csrf
+        <label class="form-label fw-bold">Your Rating</label>
+        <div class="rating-stars mb-2 d-flex gap-1">
+          @for($i = 5; $i >= 1; $i--)
+          <input type="radio" name="rating" value="{{ $i }}" id="star{{ $i }}">
+          <label for="star{{ $i }}" style="cursor:pointer; font-size:1.5rem;">★</label>
+          @endfor
+        </div>
+        <textarea name="comment" class="form-control mb-3 rounded" rows="3"
+          placeholder="Share your experience..."></textarea>
+        <button class="btn btn-gold px-4"><i class="bi bi-send"></i> Submit Review</button>
+      </form>
       @endauth
 
       <h5 class="fw-bold mb-3">Customer Reviews</h5>
       @if($reviews->count())
-        @foreach($reviews as $review)
-          <div class="review-card mb-3 p-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="review-user">{{ $review->user->name }}</span>
-              <div class="review-stars">
-                @for($i = 1; $i <= 5; $i++)
-                  <i class="bi {{ $i <= $review->rating ? 'bi-star-fill' : 'bi-star' }}"></i>
-                @endfor
-              </div>
-            </div>
-            <p class="mb-0">{{ $review->comment }}</p>
-            <small class="text-muted">{{ $review->created_at->format('M j, Y') }}</small>
+      @foreach($reviews as $review)
+      <div class="review-card mb-3 p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="review-user">{{ $review->user->name }}</span>
+          <div class="review-stars">
+            @for($i = 1; $i <= 5; $i++)
+              <i class="bi {{ $i <= $review->rating ? 'bi-star-fill' : 'bi-star' }}"></i>
+              @endfor
           </div>
-        @endforeach
+        </div>
+        <p class="mb-0">{{ $review->comment }}</p>
+        <small class="text-muted">{{ $review->created_at->format('M j, Y') }}</small>
+      </div>
+      @endforeach
       @else
-        <p class="text-muted">No reviews yet. Be the first to share your thoughts!</p>
+      <p class="text-muted">No reviews yet. Be the first to share your thoughts!</p>
       @endif
     </div>
   </div>
@@ -523,34 +523,34 @@
     <h4 class="mb-3 text-dark">Other Products from this Store</h4>
     <div class="row g-3">
       @forelse($otherProducts as $op)
-        <div class="col-6 col-md-3">
-          <a href="{{ route('product.details', $op->id) }}" class="card h-100 text-decoration-none text-dark">
-            @if($op->image || $op->image_data)
-              <img src="{{ $op->image_url }}" class="card-img-top" alt="{{ $op->name }}" 
-                   style="height: 200px; object-fit: cover;"
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-              <div style="display: none; height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                <i class="bi bi-image" style="font-size: 2rem;"></i>
-              </div>
+      <div class="col-6 col-md-3">
+        <a href="{{ route('product.details', $op->id) }}" class="card h-100 text-decoration-none text-dark">
+          @if($op->image || $op->image_data)
+          <img src="{{ $op->image_url }}" class="card-img-top" alt="{{ $op->name }}"
+            style="height: 200px; object-fit: cover;"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div style="display: none; height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+            <i class="bi bi-image" style="font-size: 2rem;"></i>
+          </div>
+          @else
+          <div style="height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+            <i class="bi bi-image" style="font-size: 2rem;"></i>
+          </div>
+          @endif
+          <div class="card-body text-center">
+            <h6>{{ $op->name }}</h6>
+            @if($op->discount > 0)
+            <div class="text-gold fw-bold">₹{{ number_format($op->price * (1 - $op->discount / 100), 2) }}</div>
+            <small class="text-muted text-decoration-line-through">₹{{ number_format($op->price, 2) }}</small>
+            <small class="text-danger">({{ $op->discount }}% off)</small>
             @else
-              <div style="height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                <i class="bi bi-image" style="font-size: 2rem;"></i>
-              </div>
+            <div class="text-gold fw-bold">₹{{ number_format($op->price, 2) }}</div>
             @endif
-            <div class="card-body text-center">
-              <h6>{{ $op->name }}</h6>
-              @if($op->discount > 0)
-                <div class="text-gold fw-bold">₹{{ number_format($op->price * (1 - $op->discount / 100), 2) }}</div>
-                <small class="text-muted text-decoration-line-through">₹{{ number_format($op->price, 2) }}</small>
-                <small class="text-danger">({{ $op->discount }}% off)</small>
-              @else
-                <div class="text-gold fw-bold">₹{{ number_format($op->price, 2) }}</div>
-              @endif
-            </div>
-          </a>
-        </div>
+          </div>
+        </a>
+      </div>
       @empty
-        <p>No other products.</p>
+      <p>No other products.</p>
       @endforelse
     </div>
   </div>
@@ -668,7 +668,7 @@
         btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-success');
-        
+
         setTimeout(function() {
           btn.innerHTML = originalText;
           btn.classList.remove('btn-success');
@@ -690,62 +690,62 @@
     // AJAX Wishlist Toggle - Prevents redirect and updates UI
     document.addEventListener('DOMContentLoaded', function() {
       const wishlistForm = document.getElementById('wishlist-form');
-      
+
       if (wishlistForm) {
         wishlistForm.addEventListener('submit', function(e) {
           e.preventDefault(); // Prevent form submission/redirect
-          
+
           const formData = new FormData(this);
           const button = this.querySelector('#wishlist-btn');
           const icon = button.querySelector('i');
-          
+
           // Send AJAX request
           fetch(this.action, {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': formData.get('_token'),
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              product_id: formData.get('product_id')
+              method: 'POST',
+              headers: {
+                'X-CSRF-TOKEN': formData.get('_token'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                product_id: formData.get('product_id')
+              })
             })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              // Toggle heart icon
-              if (data.in_wishlist) {
-                // Added to wishlist - show filled red heart
-                icon.classList.remove('bi-heart');
-                icon.classList.add('bi-heart-fill', 'text-danger');
-                button.classList.add('btn-danger');
-                button.classList.remove('btn-outline-dark');
-              } else {
-                // Removed from wishlist - show empty heart
-                icon.classList.remove('bi-heart-fill', 'text-danger');
-                icon.classList.add('bi-heart');
-                button.classList.remove('btn-danger');
-                button.classList.add('btn-outline-dark');
-              }
-              
-              // Optional: Show brief success toast
-              const toast = document.createElement('div');
-              toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-success alert-dismissible fade show';
-              toast.style.zIndex = '9999';
-              toast.innerHTML = `
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Toggle heart icon
+                if (data.in_wishlist) {
+                  // Added to wishlist - show filled red heart
+                  icon.classList.remove('bi-heart');
+                  icon.classList.add('bi-heart-fill', 'text-danger');
+                  button.classList.add('btn-danger');
+                  button.classList.remove('btn-outline-dark');
+                } else {
+                  // Removed from wishlist - show empty heart
+                  icon.classList.remove('bi-heart-fill', 'text-danger');
+                  icon.classList.add('bi-heart');
+                  button.classList.remove('btn-danger');
+                  button.classList.add('btn-outline-dark');
+                }
+
+                // Optional: Show brief success toast
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-success alert-dismissible fade show';
+                toast.style.zIndex = '9999';
+                toast.innerHTML = `
                 <i class="bi bi-check-circle-fill"></i> ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
               `;
-              document.body.appendChild(toast);
-              
-              setTimeout(() => toast.remove(), 3000);
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to update wishlist. Please try again.');
-          });
+                document.body.appendChild(toast);
+
+                setTimeout(() => toast.remove(), 3000);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Failed to update wishlist. Please try again.');
+            });
         });
       }
     });
