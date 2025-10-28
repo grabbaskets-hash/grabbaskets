@@ -3396,7 +3396,7 @@ li a{
         <!-- Nav Icons -->
         <div class="nav-icons desktop-only">
           <!-- Delivery Partner Button - Prominent -->
-          <a href="{{ route('delivery-partner.auth.register') }}" class="nav-icon-btn" 
+          <a href="{{ route('delivery-partner.register') }}" class="nav-icon-btn" 
              style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); animation: pulse 2s infinite;">
             <i class="bi bi-scooter" style="font-size: 1.3rem;"></i>
             <span>Partner with us</span>
@@ -3955,12 +3955,12 @@ li a{
         
         <div class="col-md-4 text-center">
           <div class="d-grid gap-2">
-            <a href="{{ route('delivery-partner.auth.register') }}" 
+            <a href="{{ route('delivery-partner.register') }}" 
                class="btn btn-light btn-lg fw-bold" 
                style="border-radius: 12px; padding: 15px 30px; color: #FF6B00; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
               <i class="bi bi-plus-circle-fill me-2"></i>Join Now as Partner
             </a>
-            <a href="{{ route('delivery-partner.auth.login') }}" 
+            <a href="{{ route('delivery-partner.login') }}" 
                class="btn btn-outline-light btn-lg" 
                style="border-radius: 12px; padding: 12px 30px; border: 2px solid rgba(255,255,255,0.7); color: white;">
               <i class="bi bi-box-arrow-in-right me-2"></i>Partner Login
@@ -6163,7 +6163,7 @@ li a{
       <span>Categories</span>
     </a>
     <!-- Delivery Partner Button - Prominent on Mobile -->
-    <a href="{{ route('delivery-partner.auth.register') }}" class="mobile-nav-item" 
+    <a href="{{ route('delivery-partner.register') }}" class="mobile-nav-item" 
        style="background: linear-gradient(135deg, #FF6B00, #FF9900); color: white; border-radius: 12px; margin: 0 4px; box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);">
       <i class="bi bi-scooter" style="font-size: 1.2rem;"></i>
       <span style="font-weight: 600;">Partner</span>

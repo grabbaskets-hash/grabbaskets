@@ -16,6 +16,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -432,7 +433,10 @@ Route::get('/', function () {
             'database_error' => 'Unable to load products at this time. Please try again later.'
         ]);
     }
-})->name('home');
+})->name('home_old');
+
+// New simplified home route using controller
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
     $user_id = $request->query('user_id');
