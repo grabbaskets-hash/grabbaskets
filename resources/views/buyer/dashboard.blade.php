@@ -163,57 +163,63 @@
 <body>
     <x-back-button />
 
-    <nav class="navbar navbar-expand-lg" style="background-color:rgb(30, 30, 55);">
-        <div class="container-fluid d-flex justify-content-around align-items-center">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
+      </a>
 
-            <!-- Logo -->
-            <a href="{{ url('/') }}" class="nav-link text-orange">
-                <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="180px">
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Navbar Content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Search Bar -->
+        <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
+          <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
+            aria-label="Search">
+          <button class="btn btn-outline-warning" type="submit">Search</button>
+        </form>
+
+        <!-- Right Side -->
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item d-none d-lg-block me-2">
+            <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+          </li>
+
+          <!-- Account Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
+              id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle"></i> My Account
             </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
+              <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+              <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a></li>
+              <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
+              <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase"></i> My Order</a></li>
+              <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
+              <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
+            </ul>
+          </li>
 
-            <!-- Search Bar -->
-            <form class="d-none d-lg-flex mx-auto" role="search" style="width: 600px;">
-                <input class="form-control me-2" type="search" placeholder="Search products,brands and more..." aria-label="Search">
-                <button class="btn btn-outline-warning" type="submit">Search</button>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
+              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
             </form>
-
-            <!-- Right Side: Hello + Buttons -->
-            <div class="d-flex align-items-center gap-2">
-
-                <!-- Hello User -->
-                <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
-
-                <!-- Notification Bell -->
-                <x-notification-bell />
-
-                <!-- My Account Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" 
-                            type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i> My Account
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
-                        <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
-                        <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
-                        <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-                        <li><a class="dropdown-item" href="{{ route('seller.dashboard') }}"><i class="bi bi-briefcase"></i> Seller</a></li>
-                        <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-                        <li><a class="dropdown-item" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
-                        <li><a class="dropdown-item" href="{{ route('notifications.index') }}"><i class="bi bi-bell"></i> Notifications</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
-                    </ul>
-                </div>
-
-                <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            </div>
-        </div>
-    </nav>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
     <!-- Dashboard Header -->
     <div class="dashboard-header">
