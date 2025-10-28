@@ -13,8 +13,6 @@
             background-color: #f8f9fa;
         }
 
-       
-
         .dashboard-header {
             background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
@@ -91,8 +89,7 @@
 
             <!-- Search Bar -->
             <form class="d-none d-lg-flex mx-auto" role="search" style="width: 600px;">
-                <input class="form-control me-2" type="search" placeholder="Search products,brands and more..."
-                    aria-label="Search">
+                <input class="form-control me-2" type="search" placeholder="Search products,brands and more..." aria-label="Search">
                 <button class="btn btn-outline-warning" type="submit">Search</button>
             </form>
 
@@ -100,7 +97,10 @@
             <div class="d-flex align-items-center gap-2">
 
                 <!-- Hello User -->
-                <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()?->name ?? 'User' }}</span>
+                <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
+
+                <!-- Notification Bell -->
+                <x-notification-bell />
 
                 <!-- My Account Dropdown -->
                 <div class="dropdown">
@@ -108,18 +108,15 @@
                         type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle"></i> My Account
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown"
-                        style="min-width: 220px;">
-                        <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i>
-                                Profile</a></li>
-                        <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a>
-                        </li>
-                        <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i>
-                                Shop</a></li>
-                        <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i>
-                                Wishlist</a></li>
-                        <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i>
-                                Home</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
+                        <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
+                        <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
+                        <li><a class="dropdown-item" href="{{ route('seller.dashboard') }}"><i class="bi bi-briefcase"></i> Seller</a></li>
+                        <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
+                        <li><a class="dropdown-item" href="{{ route('notifications.index') }}"><i class="bi bi-bell"></i> Notifications</a></li>
+                        <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
                     </ul>
                 </div>
 
@@ -133,25 +130,24 @@
             </div>
         </div>
     </nav>
-
     <div class="container mt-4">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             @php
-                $user = Auth::user();
-                $gender = $user->sex ?? 'other';
-                $greeting = match ($gender) {
-                    'male' => "Welcome back, Mr. {$user->name}!",
-                    'female' => "Welcome back, Ms. {$user->name}!",
-                    default => "Welcome back, {$user->name}!"
-                };
+            $user = Auth::user();
+            $gender = $user->sex ?? 'other';
+            $greeting = match ($gender) {
+            'male' => "Welcome back, Mr. {$user->name}!",
+            'female' => "Welcome back, Ms. {$user->name}!",
+            default => "Welcome back, {$user->name}!"
+            };
             @endphp
             <h2>{{ $greeting }}</h2>
             <p class="mb-0">Discover amazing products and great deals!</p>
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         <!-- Quick Stats -->
@@ -193,13 +189,13 @@
             <h4 class="mb-3"><i class="bi bi-grid-3x3-gap"></i> Browse by Categories</h4>
             <div class="row">
                 @foreach($categories as $category)
-                    <div class="col-md-2 col-sm-4 col-6 mb-3">
-                        <a href="{{ route('buyer.productsByCategory', $category->id) }}"
-                            class="btn btn-outline-primary w-100 py-3 text-center">
-                            <i class="bi bi-tag d-block mb-2"></i>
-                            {{ $category->name }}
-                        </a>
-                    </div>
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <a href="{{ route('buyer.productsByCategory', $category->id) }}"
+                        class="btn btn-outline-primary w-100 py-3 text-center">
+                        <i class="bi bi-tag d-block mb-2"></i>
+                        {{ $category->name }}
+                    </a>
+                </div>
                 @endforeach
             </div>
         </div>
@@ -208,65 +204,65 @@
         <h4 class="mb-3"><i class="bi bi-star"></i> Latest Products</h4>
         <div class="row">
             @foreach($products as $product)
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="product-card position-relative">
-                        @if($product->discount > 0)
-                            <span class="discount-badge">{{ $product->discount }}% OFF</span>
-                        @endif
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="product-card position-relative">
+                    @if($product->discount > 0)
+                    <span class="discount-badge">{{ $product->discount }}% OFF</span>
+                    @endif
 
-                        @if($product->image || $product->image_data)
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
-                                 onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
-                        @else
-                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                            </div>
-                        @endif
+                    @if($product->image || $product->image_data)
+                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
+                        onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                    @else
+                    <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    @endif
 
-                        <div class="p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="mb-0 flex-grow-1">{{ $product->name }}</h6>
-                                <x-wishlist-heart :product="$product" />
-                            </div>
+                    <div class="p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0 flex-grow-1">{{ $product->name }}</h6>
+                            <x-wishlist-heart :product="$product" />
+                        </div>
 
-                            <p class="text-muted small mb-2">{{ Str::limit($product->description, 60) }}</p>
+                        <p class="text-muted small mb-2">{{ Str::limit($product->description, 60) }}</p>
 
-                            <div class="mb-2">
-                                @if($product->gift_option === 'yes')
-                                    <span class="badge gift-badge me-1">
-                                        <i class="bi bi-gift"></i> Gift Option
-                                    </span>
+                        <div class="mb-2">
+                            @if($product->gift_option === 'yes')
+                            <span class="badge gift-badge me-1">
+                                <i class="bi bi-gift"></i> Gift Option
+                            </span>
+                            @endif
+                            @if($product->delivery_charge == 0)
+                            <span class="badge bg-success">Free Delivery</span>
+                            @endif
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="price-tag">₹{{ number_format($product->price, 2) }}</span>
+                                @if($product->delivery_charge > 0)
+                                <small class="text-muted d-block">+ ₹{{ $product->delivery_charge }} delivery</small>
                                 @endif
-                                @if($product->delivery_charge == 0)
-                                    <span class="badge bg-success">Free Delivery</span>
-                                @endif
                             </div>
+                        </div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="price-tag">₹{{ number_format($product->price, 2) }}</span>
-                                    @if($product->delivery_charge > 0)
-                                        <small class="text-muted d-block">+ ₹{{ $product->delivery_charge }} delivery</small>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="mt-3 d-grid gap-2">
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-cart-plus"></i> Add to Cart
-                                    </button>
-                                </form>
-                                <a href="{{ route('product.details', $product->id) }}"
-                                    class="btn btn-outline-secondary btn-sm">
-                                    <i class="bi bi-eye"></i> View Details
-                                </a>
-                            </div>
+                        <div class="mt-3 d-grid gap-2">
+                            <form method="POST" action="{{ route('cart.add') }}">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                            <a href="{{ route('product.details', $product->id) }}"
+                                class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
                         </div>
                     </div>
                 </div>
+            </div>
             @endforeach
         </div>
 
@@ -275,7 +271,7 @@
             {{ $products->links() }}
         </div>
     </div>
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
