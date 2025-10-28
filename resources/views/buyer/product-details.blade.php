@@ -153,31 +153,30 @@
       color: #0a1a3f;
     }
     
-    /* Footer Styles */
-    footer {
-      background-color: #343a40;
+      .footer {
+      font-size: 0.9rem;
+    }
+
+    .footer h6 {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
       color: #fff;
-      width: 100%;
-      margin-top: auto;
     }
 
-    footer a {
+    .footer a:hover {
       color: #fff;
-      text-decoration: none;
+      text-decoration: underline;
     }
 
-    footer a:hover {
-      color: #ddd;
+    .footer .social-icons i {
+      font-size: 1.3rem;
+      transition: color 0.3s;
     }
 
-    .footer-main-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-      gap: 3rem;
-      align-items: start;
-      max-width: 1200px;
-      margin: 0 auto;
+    .footer .social-icons i:hover {
+      color: #fff;
     }
+
         /* Tablet */
     @media (max-width: 991px) {
       .footer-main-grid {
@@ -266,60 +265,74 @@
   <x-back-button />
 
 
-  <nav class="navbar navbar-expand-lg" style="background-color:rgb(30, 30, 55);">
-  <div class="container-fluid d-flex justify-content-around align-items-center">
-
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
+  <div class="container-fluid">
     <!-- Logo -->
-    <a href="{{ url('/') }}" class="nav-link text-orange">
-      <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="180px">
+    <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
     </a>
 
-    <!-- Search Bar -->
-    <form class="d-none d-lg-flex mx-auto" role="search" style="width: 600px;">
-      <input class="form-control me-2" type="search" placeholder="Search products,brands and more..." aria-label="Search">
-      <button class="btn btn-outline-warning" type="submit">Search</button>
-    </form>
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <!-- Right Side: Hello + Buttons -->
-    <div class="d-flex align-items-center gap-2">
-
-      <!-- Hello User -->
-      @auth
-      <span class="d-none d-lg-inline" style="color:beige;">Hello, {{ Auth::user()->name }}</span>
-      @else
-      <span class="d-none d-lg-inline" style="color:beige;">Hello, Guest</span>
-      @endauth
-
-      <!-- My Account Dropdown -->
-      <div class="dropdown">
-        <button class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" 
-                type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-circle"></i> My Account
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
-          @auth
-          <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
-          <li><a class="dropdown-item" href="{{  url('/cart')  }}"><i class="bi bi-cart"></i> Cart</a></li>
-          <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-          <li><a class="dropdown-item" href="{{  url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-          <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
-          @else
-          <li><a class="dropdown-item" href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-          <li><a class="dropdown-item" href="{{ route('register') }}"><i class="bi bi-person-plus"></i> Register</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Browse Products</a></li>
-          <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Home</a></li>
-          @endauth
-        </ul>
-      </div>
-
-      <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1"
-         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </a>
-      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Search Bar -->
+      <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
+        <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
+          aria-label="Search">
+        <button class="btn btn-outline-warning" type="submit">Search</button>
       </form>
+
+      <!-- Right Side -->
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item d-none d-lg-block me-2">
+          <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+        </li>
+
+        <!-- Account Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
+            id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i> My Account
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
+            <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+            <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a></li>
+            <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
+            <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase"></i> My Orders</a></li>
+            <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
+            <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
+          </ul>
+        </li>
+
+        <!-- Clear Cart Button -->
+        @if($items->count())
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <form method="POST" action="{{ route('cart.clear') }}">
+            @csrf
+            @method('DELETE')
+            <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100">
+              <i class="bi bi-trash"></i> Clear
+            </button>
+          </form>
+        </li>
+        @endif
+
+        <!-- Logout -->
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+          </form>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
@@ -555,54 +568,83 @@
     </div>
   </div>
   </div>
-    <footer>
-    <div class="container py-5">
-      <div class="footer-main-grid">
-        <div class="brand-column">
-          <h3 class="mb-3"><img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="180px"></h3>
-          <p class="para">Your trusted online marketplace for quality products at the best prices.</p>
-        </div>
+  <footer class="footer bg-dark text-white pt-5 pb-4 mt-5">
+    <div class="container">
+      <div class="row">
 
-        <div class="quick-links-column">
-          <h4 class="mb-3">Quick Links</h4>
-          <ul class="list-unstyled">
-            <li><a href="{{ route('buyer.dashboard') }}">Shop</a></li>
-            <li><a href="{{ route('seller.dashboard') }}">Seller</a></li>
-            <li><a href="{{ route('cart.index') }}">Cart</a></li>
-            <li><a href="{{ route('login') }}">Login</a></li>
+        <!-- About -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">About</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Grabbasket Stories</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Corporate Info</a></li>
           </ul>
         </div>
 
-        <div class="support-column">
-          <h4 class="mb-3">Customer Support</h4>
-          <ul class="list-unstyled">
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Contact Us</a></li>
+        <!-- Group Companies -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Quick Links</h6>
+          <ul class="list-unstyled small">
+            <li><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
+            <li><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
+            <li><a href="/orders/track" class="text-white-50 text-decoration-none">Orders</a></li>
           </ul>
         </div>
 
-        <div class="follow-column">
-          <h4 class="mb-3 follow">Follow Us</h4>
-          <div class="follow-icons">
-            <a href="https://wa.me/1234567890" target="_blank" class="bg-secondary rounded-circle p-2">
-              <i class="bi bi-whatsapp text-white"></i>
-            </a>
-            <a href="https://instagram.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-              <i class="bi bi-instagram text-white"></i>
-            </a>
-            <a href="https://twitter.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-              <i class="bi bi-twitter text-white"></i>
-            </a>
-            <a href="https://facebook.com/yourprofile" target="_blank" class="bg-secondary rounded-circle p-2">
-              <i class="bi bi-facebook text-white"></i>
-            </a>
-          </div>
+        <!-- Help -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Help</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Payments</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Shipping</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Cancellation & Returns</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Policy -->
+        <div class="col-md-2 col-6 mb-3">
+          <h6 class="fw-bold text-uppercase">Consumer Policy</h6>
+          <ul class="list-unstyled small">
+            <li><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Terms of Use</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Security</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Privacy</a></li>
+            <li><a href="#" class="text-white-50 text-decoration-none">Sitemap</a></li>
+          </ul>
+        </div>
+
+        <!-- Address -->
+        <div class="col-md-4 col-12 mb-3">
+          <h6 class="fw-bold text-uppercase">Registered Office Address</h6>
+          <p class="text-white-50 small mb-1">
+            Swivel IT and Training Institute<br>
+            Mahatma Gandhi Nagar Rd, near Annai Therasa English School,<br>
+            MRR Nagar, Palani Chettipatti,,<br>
+            Theni, 625531, TamilNadu, India.
+          </p>
+          <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
+          <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
         </div>
       </div>
-    </div>
-    <div class="bottom-bar">
-      &copy; 2025 grabbasket. All Rights Reserved.
+
+      <hr class="border-secondary">
+
+      <!-- Bottom Row -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
+        <div class="mb-2 mb-md-0">
+          © 2025 grabbaskets.com
+        </div>
+        <div class="social-icons">
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
+          <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
     </div>
   </footer>
 
