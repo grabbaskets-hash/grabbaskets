@@ -124,12 +124,91 @@
     .sidebar-content {
       padding: 0;
       padding-bottom: 60px;
-      /* Prevent logout from sticking to bottom */
       margin-top: 30px;
     }
 
     .sidebar-content::-webkit-scrollbar {
       width: 6px;
+    }
+
+
+    /* === NOTIFICATION BELL DROPDOWN FIX === */
+    .sidebar-header .notification-bell {
+      position: relative;
+      /* Ensure it's a positioning context for its children */
+    }
+
+    /* Target the notification dropdown (assuming it's a direct child or descendant of the bell) */
+    .sidebar-header .notification-bell~.dropdown-menu,
+    .sidebar-header .notification-bell+.dropdown-menu,
+    .sidebar-header .notification-bell .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      /* Position below the bell */
+      left: 50%;
+      /* Start from the center of the bell */
+      transform: translateX(-50%);
+      /* Center it horizontally */
+      z-index: 1002;
+      /* Higher than the sidebar (z-index: 1000) */
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      min-width: 280px;
+      max-width: 320px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Optional: If the dropdown needs to appear on the right side specifically */
+    .sidebar-header .notification-bell .dropdown-menu {
+      left: auto;
+      /* Override the centering */
+      right: -10px;
+      /* Position slightly to the right of the bell */
+      transform: none;
+      /* Remove centering transform */
+    }
+
+    /* Ensure the dropdown doesn't get clipped by the sidebar */
+    .sidebar-header .notification-bell .dropdown-menu {
+      /* This is the key: use 'fixed' positioning to escape the sidebar's bounds */
+      position: fixed;
+      top: calc(100% + 0px);
+      /* Position below the header with a small gap */
+      left: calc(100vw - 350px);
+      /* Position near the right edge of the viewport */
+      width: 320px;
+      z-index: 1002;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    /* === NOTIFICATION BELL DROPDOWN FIX === */
+    /* === NOTIFICATION BELL DROPDOWN FIX === */
+    .dropdown-menu {
+      position: fixed !important;
+      top: 0 !important;
+      /* Fixed at the very top of the screen */
+      right: 20px !important;
+      /* Position near the right edge */
+      z-index: 1002 !important;
+      /* Ensure it's above the sidebar */
+      width: 320px !important;
+      background: #fff !important;
+      border: 1px solid rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+      border-radius: 8px !important;
+      padding: 1rem !important;
+    }
+
+    /* Optional: Adjust the arrow if needed */
+    .dropdown-menu::before {
+      display: none !important;
     }
 
     .sidebar-content::-webkit-scrollbar-track {
