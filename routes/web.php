@@ -601,6 +601,15 @@ Route::prefix('api/tracking')->group(function () {
     Route::get('/detect/{trackingNumber}', [CourierTrackingController::class, 'apiDetectCourier'])->name('api.tracking.detect');
 });
 
+// API Health Check for diagnostics
+Route::get('/api/health-check', function () {
+    return response()->json([
+        'status' => 'ok', 
+        'timestamp' => now(),
+        'server_time' => microtime(true)
+    ]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (Session-based, not auth middleware)
@@ -1414,6 +1423,11 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
         ->name('login');
     Route::post('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'login'])
         ->name('login.post');
+        
+    // Diagnostics page for debugging login issues
+    Route::get('/login-diagnostics', function() {
+        return view('delivery-partner.auth.diagnostics');
+    })->name('login.diagnostics');
 });
 
 // Delivery Partner Protected Routes
