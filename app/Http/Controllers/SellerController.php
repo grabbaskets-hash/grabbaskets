@@ -493,18 +493,31 @@ class SellerController extends Controller {
             return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
         }
     }
-    public function dashboard()
+  public function dashboard(Request $request)
     {
-        // Check if user is authenticated
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to access seller dashboard.');
+        $search = $request->input('search');
+
+        // Start with seller’s products
+        $productsQuery = Product::with(['category', 'subcategory'])
+            ->where('seller_id', Auth::id());
+
+        // ✅ Apply search filter if keyword entered
+        if ($search) {
+            $productsQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('subcategory', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $products = Product::with(['category', 'subcategory', 'productImages'])
-            ->where('seller_id', Auth::id())
-            ->latest()
-            ->get();
-        return view('seller.dashboard', compact('products'));
+        // ✅ Get results
+        $products = $productsQuery->latest()->get();
+
+        return view('seller.dashboard', compact('products', 'search'));
     }
     /**
      * Update product images by uploading a ZIP file where each image filename is the product unique_id

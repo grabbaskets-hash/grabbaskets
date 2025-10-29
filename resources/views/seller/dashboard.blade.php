@@ -14,34 +14,216 @@
             background-color: #f8f9fa;
         }
 
-        /* Sidebar */
+        /* === SIDEBAR === */
         .sidebar {
             position: fixed;
             top: 0;
             bottom: 0;
             left: 0;
-            width: 240px;
-            background: #212529;
+            width: 260px;
+            background: #1a1a1a;
             color: #fff;
-            padding-top: 60px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             z-index: 1000;
+            height: 100vh;
+            overflow-y: auto;
+            /* ✅ Scroll inside sidebar */
+            overflow-x: hidden;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         }
 
+        /* === SIDEBAR LOGO BOX === */
+        /* === SIDEBAR LOGO BOX === */
+        .sidebar-logo-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            background: #003366;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar-logo-img {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            margin-top: -3px;
+            /* Pull up slightly to counter height increase */
+            margin-bottom: -3px;
+        }
+
+        .sidebar-logo-text {
+            color: #fff;
+            font-size: 0.85rem;
+            line-height: 1.1;
+            text-align: left;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar-logo-text strong {
+            font-size: 0.95rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .sidebar-logo-text small {
+            opacity: 0.8;
+            font-size: 0.7rem;
+            font-weight: 400;
+        }
+
+        /* Fixed Header */
+        .sidebar-header {
+            position: sticky;
+            top: 0;
+            padding: 12px 20px;
+            z-index: 1001;
+            /* Must be higher than other sidebar content */
+            background: #1a1a1a;
+            /* Match sidebar background to avoid "ghosting" */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100px;
+            /* Adjusted height for better fit */
+        }
+
+        .sidebar-header .logoimg {
+            width: 130px;
+            height: auto;
+            filter: brightness(0.9);
+        }
+
+        .sidebar-header .notification-bell {
+            font-size: 1.2rem;
+            color: #adb5bd;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            width: 32px;
+        }
+
+        .sidebar-header .notification-bell:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* Scrollable Content */
+        .sidebar-content {
+            padding: 0;
+            padding-bottom: 60px;
+            /* Prevent logout from sticking to bottom */
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        /* Nav Links */
         .sidebar .nav-link {
             color: #adb5bd;
-            margin: 6px 0;
+            margin: 6px 15px;
             border-radius: 6px;
+            padding: 10px 15px;
+            transition: all 0.2s ease;
         }
 
-        .sidebar .nav-link.active,
-        .sidebar .nav-link:hover {
-            background: #0d6efd;
-            color: #fff;
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: linear-gradient(90deg, #0d6efd, #6610f2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
         }
 
         .sidebar .nav-link i {
-            margin-right: 8px;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Logout Highlight */
+        .sidebar .nav-link[href="#"] {
+            color: #dc3545;
+        }
+
+        .sidebar .nav-link[href="#"]:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* === CONTENT AREA === */
+        .content {
+            margin-left: 240px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            /* Ensure full height */
+            background: #f8f9fa;
+            position: relative;
+            z-index: 999;
+            /* Ensure content stays above other elements */
+        }
+
+        /* === MOBILE TOGGLE === */
+        .menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #fff;
+            z-index: 1101;
+            background: #212529;
+            padding: 8px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-toggle:hover {
+            background: #343a40;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -240px;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 1001;
+                /* Higher than content */
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+
+            .menu-toggle {
+                color: #fff;
+                background: #212529;
+            }
         }
 
         /* Content area */
@@ -118,6 +300,35 @@
             z-index: 1101;
         }
 
+        /* Search Bar */
+        .search-bar form {
+            display: flex;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+        }
+
+        .search-bar input {
+            border: none;
+            border-radius: 10px;
+            box-shadow: none;
+            flex-grow: 1;
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .search-bar button {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
         .nav-pills {
             position: relative;
             bottom: 50px;
@@ -132,77 +343,81 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar d-flex flex-column p-3" id="sidebarMenu">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <img src="{{ asset('asset/images/grablogo.jpg') }}" alt="Logo" class="logoimg" width="150px">
+  
+    <div class="sidebar d-flex flex-column p-0" id="sidebarMenu">
+        <div class="sidebar-header">
+            <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" class="sidebar-logo-img">
             <x-notification-bell />
         </div>
-        <ul class="nav nav-pills flex-column" style="margin-top:65px;">
-            <li>
-                <a class="nav-link" href="{{ route('seller.createProduct') }}">
-                    <i class="bi bi-plus-circle"></i> Add Product
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.imageLibrary') }}">
-                    <i class="bi bi-images"></i> Image Library
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.bulkUploadForm') }}">
-                    <i class="bi bi-cloud-upload"></i> Bulk Upload Excel
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.bulkImageReupload') }}">
-                    <i class="bi bi-images"></i> Bulk Image Re-upload
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.createCategorySubcategory') }}">
-                    <i class="bi bi-plus-square"></i> Add Category
-                </a>
-            </li>
-            <li>
-                <a class="nav-link active" href="{{ route('seller.dashboard') }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.transactions') }}">
-                    <i class="bi bi-cart-check"></i> Orders
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.importExport') }}">
-                    <i class="bi bi-arrow-down-up"></i> Import / Export
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('tracking.form') }}">
-                    <i class="bi bi-truck"></i> Track Package
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('notifications.index') }}">
-                    <i class="bi bi-bell"></i> Notifications
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="{{ route('seller.profile') }}">
-                    <i class="bi bi-person-circle"></i> Profile
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" href="#"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </li>
-        </ul>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-            @csrf
-        </form>
+
+        <div class="sidebar-content">
+            <ul class="nav nav-pills flex-column" style="margin-top: 20px;">
+                <li>
+                    <a class="nav-link" href="{{ route('seller.createProduct') }}">
+                        <i class="bi bi-plus-circle"></i> Add Product
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.imageLibrary') }}">
+                        <i class="bi bi-images"></i> Image Library
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.bulkUploadForm') }}">
+                        <i class="bi bi-cloud-upload"></i> Bulk Upload Excel
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.bulkImageReupload') }}">
+                        <i class="bi bi-images"></i> Bulk Image Re-upload
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.createCategorySubcategory') }}">
+                        <i class="bi bi-plus-square"></i> Add Category
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link active" href="{{ route('seller.dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link " href="{{ route('seller.transactions') }}">
+                        <i class="bi bi-cart-check"></i> Orders
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.importExport') }}">
+                        <i class="bi bi-arrow-down-up"></i> Import / Export
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('tracking.form') }}">
+                        <i class="bi bi-truck"></i> Track Package
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('notifications.index') }}">
+                        <i class="bi bi-bell"></i> Notifications
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{{ route('seller.profile') }}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="#"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        </div>
     </div>
 
     <!-- Content -->
@@ -210,10 +425,10 @@
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             @php
-              $user = Auth::user();
-              $dashboardPhoto = $user && $user->profile_picture 
-                ? $user->profile_picture 
-                : asset('asset/images/grabbasket.png');
+            $user = Auth::user();
+            $dashboardPhoto = $user && $user->profile_picture
+            ? $user->profile_picture
+            : asset('asset/images/grabbasket.png');
             @endphp
             <img src="{{ $dashboardPhoto }}" alt="Seller Profile">
             <h2>Welcome, {{ Auth::user()->name ?? 'Seller' }}!</h2>
@@ -254,7 +469,12 @@
                 </div>
             </div>
         </div>
-
+        <div class="search-bar mb-4 col-md-8 mx-auto">
+            <form action="{{ route('seller.dashboard') }}" method="GET">
+                <input type="text" name="search" placeholder="Search products, orders, or reviews..." value="{{ request('search') }}">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+            </form>
+        </div>
         <!-- Products Table -->
         <div class="orders-table p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -293,17 +513,17 @@
                         <tr>
                             <td>
                                 @if($p->image_url)
-                                    <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
-                                        <img src="{{ $p->image_url }}" 
-                                             alt="{{ $p->name }}" 
-                                             style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;" 
-                                             onmouseover="this.style.transform='scale(1.1)'" 
-                                             onmouseout="this.style.transform='scale(1)'"
-                                             onerror="this.onerror=null; if(this.src.includes('githubusercontent.com')) { const path = this.src.split('/storage/app/public/')[1]; this.src = '{{ url('/serve-image/') }}/' + path.split('/')[0] + '/' + path.split('/').slice(1).join('/'); }">
-                                    </a>
+                                <a href="{{ route('product.details', $p->id) }}" class="d-inline-block">
+                                    <img src="{{ $p->image_url }}"
+                                        alt="{{ $p->name }}"
+                                        style="height:48px; width:48px; object-fit:cover; border-radius:8px; border:1px solid #eee; cursor:pointer; transition: transform 0.2s;"
+                                        onmouseover="this.style.transform='scale(1.1)'"
+                                        onmouseout="this.style.transform='scale(1)'"
+                                        onerror="this.onerror=null; if(this.src.includes('githubusercontent.com')) { const path = this.src.split('/storage/app/public/')[1]; this.src = '{{ url('/serve-image/') }}/' + path.split('/')[0] + '/' + path.split('/').slice(1).join('/'); }">
+                                </a>
                                 @endif
                                 @if($p->image)
-                                    <div class="mt-1 small text-secondary">Legacy: <span style="word-break:break-all">{{ $p->image }}</span></div>
+                                <div class="mt-1 small text-secondary">Legacy: <span style="word-break:break-all">{{ $p->image }}</span></div>
                                 @endif
                             </td>
                             <td><a href="{{ route('product.details', $p->id) }}" class="text-decoration-none text-dark">{{ $p->name }}</a></td>
@@ -317,9 +537,9 @@
                             <td class="d-flex gap-2">
                                 <a href="{{ route('seller.editProduct', $p) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                                 <a href="{{ route('seller.productGallery', $p) }}" class="btn btn-sm btn-outline-info">
-                                    Gallery 
+                                    Gallery
                                     @if($p->productImages->count() > 0)
-                                        <span class="badge bg-info">{{ $p->productImages->count() }}</span>
+                                    <span class="badge bg-info">{{ $p->productImages->count() }}</span>
                                     @endif
                                 </a>
                                 <form action="{{ route('seller.destroyProduct', $p) }}" method="POST" onsubmit="return confirm('Delete this product? This will remove its images too.');">
@@ -354,7 +574,8 @@
                                 required>
                             <div class="form-text">Each image filename (without extension) must match a product's unique
                                 ID. Example: <code>PROD-123.jpg</code> will update the image for product with unique ID
-                                <code>PROD-123</code>.</div>
+                                <code>PROD-123</code>.
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-upload me-1"></i>Upload & Update Images
