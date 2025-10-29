@@ -1409,10 +1409,10 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
     Route::post('/check-email', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkEmail'])
         ->name('check-email');
     
-    // Login - ULTRA OPTIMIZED VERSION
-    Route::get('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'showLoginForm'])
+    // Login - SUPER FAST VERSION (No caching overhead)
+    Route::get('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'showLoginForm'])
         ->name('login');
-    Route::post('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'login'])
+    Route::post('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'login'])
         ->name('login.post');
 });
 

@@ -194,11 +194,29 @@
             form.appendChild(typeField);
             
             // Set a timeout to show "still loading" message if taking too long
-            setTimeout(() => {
-                if (this.disabled) {
-                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Still processing...';
-                }
-            }, 3000);
+            const loadingTimeouts = [
+                setTimeout(() => {
+                    if (this.disabled) {
+                        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Connecting...';
+                    }
+                }, 2000),
+                setTimeout(() => {
+                    if (this.disabled) {
+                        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Almost there...';
+                    }
+                }, 5000),
+                setTimeout(() => {
+                    if (this.disabled) {
+                        this.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Taking longer than expected...';
+                        this.className = 'btn btn-warning opacity-75';
+                    }
+                }, 10000)
+            ];
+            
+            // Clear timeouts when form submits successfully
+            form.addEventListener('submit', () => {
+                loadingTimeouts.forEach(timeout => clearTimeout(timeout));
+            });
         }
     });
 
