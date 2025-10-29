@@ -284,59 +284,65 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle login request with optimized authentication.
-     * 
-     * Uses composite database indexes and streamlined authentication flow
-     * for significantly improved login performance (60-80% faster).
+     * Handle login request.
      */
-    public function login(DeliveryPartnerLoginRequest $request): RedirectResponse
+    public function login(Request $request): RedirectResponse
     {
-        try {
-            // Use optimized authentication with composite indexes
-            $request->authenticate();
-            
-            // Regenerate session for security
+        $credentials = $request->validate([
+            'login' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // Determine if login is email or phone
+        $loginField = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        
+        $loginData = [
+            $loginField => $credentials['login'],
+            'password' => $credentials['password']
+        ];
+
+        if (Auth::guard('delivery_partner')->attempt($loginData, $request->boolean('remember'))) {
             $request->session()->regenerate();
             
             $partner = Auth::guard('delivery_partner')->user();
             
-            // Provide appropriate status-based welcome messages
-            $message = $this->getWelcomeMessage($partner);
-            $messageType = $partner->status === 'pending' ? 'warning' : 'success';
+            // Update last active timestamp
+            try {
+                $partner->update(['last_active_at' => now()]);
+            } catch (\Exception $e) {
+                // Silent fail - not critical
+            }
             
+            // Check partner status
+            if ($partner->status === 'pending') {
+                return redirect()
+                    ->route('delivery-partner.dashboard')
+                    ->with('warning', 'Your account is still under review. You will be notified once approved.');
+            } elseif ($partner->status === 'rejected') {
+                Auth::guard('delivery_partner')->logout();
+                return back()
+                    ->withErrors(['login' => 'Your account has been rejected. Please contact support.']);
+            } elseif ($partner->status === 'suspended') {
+                Auth::guard('delivery_partner')->logout();
+                return back()
+                    ->withErrors(['login' => 'Your account has been suspended. Please contact support.']);
+            } elseif ($partner->status === 'inactive') {
+                Auth::guard('delivery_partner')->logout();
+                return back()
+                    ->withErrors(['login' => 'Your account is inactive. Please contact support.']);
+            }
+
             return redirect()
                 ->intended(route('delivery-partner.dashboard'))
-                ->with($messageType, $message);
-                
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()
-                ->withErrors($e->errors())
-                ->onlyInput('login');
-        } catch (\Exception $e) {
-            // Log unexpected errors
-            logger('Delivery Partner Login Error: ' . $e->getMessage());
-            
-            return back()
-                ->withErrors(['login' => 'Login failed. Please try again.'])
-                ->onlyInput('login');
+                ->with('success', 'Welcome back, ' . $partner->name . '!');
         }
+
+        return back()
+            ->withErrors(['login' => 'Invalid credentials.'])
+            ->onlyInput('login');
     }
 
-    /**
-     * Get appropriate welcome message based on delivery partner status.
-     */
-    private function getWelcomeMessage(DeliveryPartner $partner): string
-    {
-        switch ($partner->status) {
-            case 'pending':
-                return 'Your account is still under review. You will be notified once approved.';
-            case 'approved':
-            case 'active':
-                return 'Welcome back, ' . $partner->name . '!';
-            default:
-                return 'Login successful!';
-        }
-    }
+
 
     /**
      * Handle logout request.
