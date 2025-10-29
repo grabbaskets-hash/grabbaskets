@@ -29,66 +29,21 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
+        
         $user = Auth::user();
-        $role = $user->role ?? $request->input('role');
+        $role = $user->role ?? 'buyer';
         
-        // Gender-based greeting
-        $greeting = $this->getGenderBasedGreeting($user->sex ?? 'other', $user->name);
-
-        // Send login email notification (commented out temporarily for debugging)
-        /*
-        if ($user->email) {
-            $subject = 'Login Notification';
-            $message = $role === 'seller'
-                ? "Dear {$user->name}, you have successfully logged in as a seller."
-                : "Dear {$user->name}, you have successfully logged in as a buyer.";
-            Mail::raw($message, function ($mail) use ($user, $subject) {
-                $mail->to($user->email)
-                    ->subject($subject);
-            });
-        }
-        */
+        // Simple greeting message (faster processing)
+        $greeting = "வணக்கம் {$user->name}! Welcome back to GrabBasket!";
         
-        // Check if login is from mobile homepage card
-        $fromHomepage = $request->input('from_homepage') === 'true' || 
-                       $request->header('referer') && str_contains($request->header('referer'), url('/'));
+        // Streamlined redirect logic
+        $redirectRoute = $role === 'seller' ? 'seller.dashboard' : 'home';
         
-        if ($role === 'seller') {
-            return redirect()->route('seller.dashboard')->with([
-                'success' => $greeting,
-                'tamil_greeting' => true,
-                'login_success' => true
-            ]);
-        }
-        
-        // For buyers logging in from homepage, redirect back to homepage
-        if ($role === 'buyer' && $fromHomepage) {
-            return redirect()->route('home')->with([
-                'success' => $greeting,
-                'tamil_greeting' => true,
-                'login_success' => true,
-                'show_welcome' => true
-            ]);
-        }
-        
-        if ($role === 'buyer') {
-            return redirect()->route('home')->with([
-                'success' => $greeting,
-                'tamil_greeting' => true,
-                'login_success' => true
-            ]);
-        }
-        
-        // Default redirect to home for any other role or if role is not set
-        return redirect()->route('home')->with([
+        return redirect()->route($redirectRoute)->with([
             'success' => $greeting,
-            'tamil_greeting' => true,
             'login_success' => true
         ]);
-
-        
     }
 
     /**

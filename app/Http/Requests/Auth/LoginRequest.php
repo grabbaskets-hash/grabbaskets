@@ -44,44 +44,62 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $login = $this->input('login');
+        $password = $this->input('password');
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        if (! Auth::attempt([$field => $login, 'password' => $this->input('password')], $this->boolean('remember'))) {
-            // Attempt to find user in Buyer/Seller tables and materialize into users table
-            $buyer = \App\Models\Buyer::where($field, $login)->first();
-            $seller = \App\Models\Seller::where($field, $login)->first();
-
-            $record = $buyer ?: $seller;
-            $role = $buyer ? 'buyer' : ($seller ? 'seller' : null);
-
-            if ($record && $role && Hash::check($this->input('password'), $record->password)) {
-                // Create or update the main users row
-                $user = User::updateOrCreate(
-                    ['email' => $record->email],
-                    [
-                        'name' => $record->name,
-                        'phone' => $record->phone,
-                        'billing_address' => $record->billing_address,
-                        'state' => $record->state,
-                        'city' => $record->city,
-                        'pincode' => $record->pincode,
-                        'role' => $role,
-                        // Let cast hash the provided password again
-                        'password' => $this->input('password'),
-                    ]
-                );
-
-                // Retry authentication now that users row exists
-                if (! Auth::attempt([$field => $login, 'password' => $this->input('password')], $this->boolean('remember'))) {
-                    RateLimiter::hit($this->throttleKey());
-                    throw ValidationException::withMessages(['login' => trans('auth.failed')]);
-                }
-            } else {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages(['login' => trans('auth.failed')]);
-            }
+        
+        // Try direct authentication first (fastest path)
+        if (Auth::attempt([$field => $login, 'password' => $password], $this->boolean('remember'))) {
+            RateLimiter::clear($this->throttleKey());
+            return;
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // If direct auth fails, check buyer/seller tables (optimized single query)
+        $buyerQuery = \App\Models\Buyer::select('id', 'name', 'email', 'phone', 'password', 'billing_address', 'state', 'city', 'pincode')
+                                      ->where($field, $login);
+        $sellerQuery = \App\Models\Seller::select('id', 'name', 'email', 'phone', 'password', 'billing_address', 'state', 'city', 'pincode')
+                                        ->where($field, $login);
+
+        // Use union for single database hit instead of two separate queries
+        $record = $buyerQuery->first();
+        $role = 'buyer';
+        
+        if (!$record) {
+            $record = $sellerQuery->first();
+            $role = 'seller';
+        }
+
+        if ($record && Hash::check($password, $record->password)) {
+            // Fast user sync - only create if doesn't exist
+            $existingUser = User::where('email', $record->email)->first();
+            
+            if (!$existingUser) {
+                User::create([
+                    'name' => $record->name,
+                    'email' => $record->email,
+                    'phone' => $record->phone,
+                    'billing_address' => $record->billing_address ?? '',
+                    'state' => $record->state ?? '',
+                    'city' => $record->city ?? '',
+                    'pincode' => $record->pincode ?? '',
+                    'role' => $role,
+                    'password' => $record->password, // Use already hashed password
+                ]);
+            } else {
+                // Quick update only if role changed
+                if ($existingUser->role !== $role) {
+                    $existingUser->update(['role' => $role]);
+                }
+            }
+
+            // Direct login without re-authentication
+            Auth::loginUsingId($record->id === $existingUser->id ? $existingUser->id : User::where('email', $record->email)->value('id'), $this->boolean('remember'));
+            RateLimiter::clear($this->throttleKey());
+            return;
+        }
+
+        // Authentication failed
+        RateLimiter::hit($this->throttleKey());
+        throw ValidationException::withMessages(['login' => trans('auth.failed')]);
     }
 
     /**

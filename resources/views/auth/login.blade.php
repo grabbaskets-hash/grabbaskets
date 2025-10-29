@@ -241,5 +241,49 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Login form optimization for faster submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.querySelector('form');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        // Prevent multiple submissions and show loading state
+        loginForm.addEventListener('submit', function(e) {
+            // Disable button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Signing in...';
+            
+            // Re-enable after 5 seconds as fallback
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 5000);
+        });
+        
+        // Prefill form validation for faster processing
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        
+        [loginInput, passwordInput].forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const feedback = this.parentElement.nextElementSibling;
+                if (feedback && feedback.classList.contains('text-danger')) {
+                    feedback.style.display = 'none';
+                }
+            });
+        });
+        
+        // Auto-submit on Enter key for faster login
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && loginInput.value && passwordInput.value) {
+                e.preventDefault();
+                loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        });
+    });
+  </script>
 </body>
 </html>
