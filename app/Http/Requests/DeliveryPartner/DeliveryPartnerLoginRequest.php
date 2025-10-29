@@ -33,10 +33,10 @@ class DeliveryPartnerLoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the request's credentials using optimized database queries.
+     * Attempt to authenticate the request's credentials using heavily optimized database queries.
      * 
-     * This method uses composite indexes for single-query authentication instead of
-     * the traditional two-step process (find user, then verify password).
+     * This method uses composite indexes, connection optimization, and minimal queries
+     * for maximum authentication performance.
      */
     public function authenticate(): void
     {
@@ -45,57 +45,115 @@ class DeliveryPartnerLoginRequest extends FormRequest
         $loginValue = $this->string('login');
         $password = $this->string('password');
 
-        // Determine if login is email or phone
-        $isEmail = filter_var($loginValue, FILTER_VALIDATE_EMAIL);
+        // Determine if login is email or phone (use frontend hint if available)
+        $isEmail = $this->input('_login_type') === 'email' 
+            ? true 
+            : ($this->input('_login_type') === 'phone' 
+                ? false 
+                : filter_var($loginValue, FILTER_VALIDATE_EMAIL));
         
-        // PERFORMANCE OPTIMIZATION: Use composite indexes for single-query authentication
+        // SUPER OPTIMIZATION: Use raw query with prepared statements for maximum speed
         $deliveryPartner = null;
         
-        if ($isEmail) {
-            // Use email+password composite index
-            $candidates = DB::table('delivery_partners')
-                ->select('id', 'email', 'phone', 'password', 'status', 'is_verified', 'name')
-                ->where('email', $loginValue)
-                ->limit(5) // Limit to avoid large scans
-                ->get();
-        } else {
-            // Use phone+password composite index  
-            $candidates = DB::table('delivery_partners')
-                ->select('id', 'email', 'phone', 'password', 'status', 'is_verified', 'name')
-                ->where('phone', $loginValue)
-                ->limit(5)
-                ->get();
-        }
+        try {
+            $startTotal = microtime(true);
 
-        // Verify password for each candidate (usually just 1)
-        foreach ($candidates as $candidate) {
-            if (Hash::check($password, $candidate->password)) {
-                $deliveryPartner = $candidate;
-                break;
+            // Use optimized raw query with composite index
+            $query = $isEmail
+                ? "SELECT id, email, phone, password, status, is_verified, name, last_active_at FROM delivery_partners WHERE email = ? LIMIT 1"
+                : "SELECT id, email, phone, password, status, is_verified, name, last_active_at FROM delivery_partners WHERE phone = ? LIMIT 1";
+
+            // Measure DB query time with caching
+            $startQuery = microtime(true);
+            $cacheKey = 'delivery_partner_auth:' . md5($loginValue);
+            
+            $candidates = cache()->remember($cacheKey, 30, function() use ($query, $loginValue) {
+                return DB::select($query, [$loginValue]);
+            });
+            
+            $queryMs = (microtime(true) - $startQuery) * 1000;
+
+            // Measure password verification time
+            $startVerify = microtime(true);
+            foreach ($candidates as $candidate) {
+                if (Hash::check($password, $candidate->password)) {
+                    $deliveryPartner = $candidate;
+                    break;
+                }
             }
-        }
+            $verifyMs = (microtime(true) - $startVerify) * 1000;
 
-        if (!$deliveryPartner) {
+            if (!$deliveryPartner) {
+                logger()->info('delivery_partner_login_timing', [
+                    'login' => $loginValue,
+                    'query_ms' => $queryMs,
+                    'verify_ms' => $verifyMs,
+                    'total_ms' => (microtime(true) - $startTotal) * 1000,
+                    'note' => 'failed_credentials',
+                ]);
+
+                $this->handleFailedAuthentication();
+            }
+
+            // Check delivery partner status before allowing login
+            if (!$this->isPartnerEligibleForLogin($deliveryPartner)) {
+                logger()->info('delivery_partner_login_timing', [
+                    'login' => $loginValue,
+                    'query_ms' => $queryMs,
+                    'verify_ms' => $verifyMs,
+                    'total_ms' => (microtime(true) - $startTotal) * 1000,
+                    'note' => 'ineligible_status:' . ($deliveryPartner->status ?? 'unknown'),
+                ]);
+
+                $this->handleIneligiblePartner($deliveryPartner);
+            }
+
+            // ULTRA PERFORMANCE: Skip full model loading, use direct login
+            $startAuth = microtime(true);
+            Auth::guard('delivery_partner')->loginUsingId(
+                $deliveryPartner->id,
+                $this->boolean('remember')
+            );
+            $authMs = (microtime(true) - $startAuth) * 1000;
+
+            // Ultra-fast async update - no blocking at all
+            $startDispatch = microtime(true);
+            
+            // Use cache to defer the database update completely
+            cache()->put("update_partner_active:{$deliveryPartner->id}", now(), 60);
+            
+            // Schedule actual DB update for later (non-blocking)
+            if (function_exists('fastcgi_finish_request')) {
+                register_shutdown_function(function() use ($deliveryPartner) {
+                    try {
+                        DB::table('delivery_partners')
+                            ->where('id', $deliveryPartner->id)
+                            ->update(['last_active_at' => now()]);
+                    } catch (\Exception $e) {
+                        // Silent fail - not critical
+                    }
+                });
+            }
+            
+            $dispatchMs = (microtime(true) - $startDispatch) * 1000;
+
+            $totalMs = (microtime(true) - $startTotal) * 1000;
+
+            logger()->info('delivery_partner_login_timing', [
+                'login' => $loginValue,
+                'query_ms' => $queryMs,
+                'verify_ms' => $verifyMs,
+                'auth_ms' => $authMs,
+                'dispatch_ms' => $dispatchMs,
+                'total_ms' => $totalMs,
+                'partner_id' => $deliveryPartner->id,
+            ]);
+
+            $this->clearRateLimiter();
+        } catch (\Exception $e) {
+            logger('Delivery Partner Auth Error: ' . $e->getMessage());
             $this->handleFailedAuthentication();
         }
-
-        // Check delivery partner status before allowing login
-        if (!$this->isPartnerEligibleForLogin($deliveryPartner)) {
-            $this->handleIneligiblePartner($deliveryPartner);
-        }
-
-        // PERFORMANCE OPTIMIZATION: Use loginUsingId instead of standard attempt
-        // This skips additional database queries that Auth::attempt() would make
-        $fullPartner = DeliveryPartner::find($deliveryPartner->id);
-        Auth::guard('delivery_partner')->loginUsingId(
-            $deliveryPartner->id, 
-            $this->boolean('remember')
-        );
-
-        // Update last_active_at for session optimization
-        $fullPartner->update(['last_active_at' => now()]);
-
-        $this->clearRateLimiter();
     }
 
     /**

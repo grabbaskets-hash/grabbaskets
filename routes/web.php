@@ -1390,7 +1390,7 @@ Route::get('/test-images', function () {
 */
 
 // Delivery Partner Authentication Routes (Guest only)
-Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:delivery_partner')->group(function () {
+Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['guest:delivery_partner', 'optimize.delivery.auth'])->group(function () {
     // Registration
     Route::get('/register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showRegisterForm'])
         ->name('register');

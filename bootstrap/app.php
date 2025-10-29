@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'optimize.login' => \App\Http\Middleware\OptimizeLoginSession::class,
+            'optimize.delivery.auth' => \App\Http\Middleware\OptimizeDeliveryPartnerAuth::class,
         ]);
         
         // Add global middleware for login optimization

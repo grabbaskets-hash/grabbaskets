@@ -158,12 +158,35 @@
         }
     }
 
-    // Login form submission with loading state
+    // ULTRA-OPTIMIZED: Login form submission with immediate visual feedback and pre-processing
     document.getElementById('login-btn').addEventListener('click', function(e) {
         const form = e.target.closest('form');
         if (form.checkValidity()) {
-            this.innerHTML = '<span class="spinner"></span> Signing In...';
+            // Immediate visual feedback for better perceived performance
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing In...';
             this.disabled = true;
+            this.className = 'btn btn-primary opacity-75';
+            
+            // Pre-process form data for faster backend processing
+            const loginField = document.getElementById('login');
+            const passwordField = document.getElementById('password');
+            
+            // Trim whitespace and normalize input
+            loginField.value = loginField.value.trim().toLowerCase();
+            
+            // Add performance hints to form
+            const optimizeField = document.createElement('input');
+            optimizeField.type = 'hidden';
+            optimizeField.name = '_optimize_auth';
+            optimizeField.value = '1';
+            form.appendChild(optimizeField);
+            
+            // Add login type hint for faster backend processing
+            const typeField = document.createElement('input'); 
+            typeField.type = 'hidden';
+            typeField.name = '_login_type';
+            typeField.value = loginField.value.includes('@') ? 'email' : 'phone';
+            form.appendChild(typeField);
         }
     });
 
