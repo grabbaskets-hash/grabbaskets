@@ -32,7 +32,6 @@
         }
 
         .sidebar .logo {
-            background-color: #1a1a2e;
             margin-top: -40px
         }
 
@@ -229,6 +228,67 @@
             left: 30px;
             transition: transform 0.2s;
         }
+
+        /* === SCROLLABLE SIDEBAR CONTENT === */
+        .sidebar {
+            /* Ensure the sidebar itself doesn't scroll, only its content */
+            overflow: hidden;
+            /* Keep your existing height */
+            height: 100vh;
+        }
+
+        .sidebar-content {
+            /* This is the key: make only this part scrollable */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Add some padding at the bottom so the logout button isn't stuck to the edge */
+            padding-bottom: 20px;
+            /* This ensures the scrollbar appears inside the sidebar */
+            height: calc(100vh - 180px);
+            /* Adjust '180px' if your logo/header height changes */
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        /* Optional: Style the scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: #2d2d40;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        /* === SIDEBAR LOGO BOX === */
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            height: 100px;
+        }
+
+        .sidebar .logo img {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            margin-top: -3px;
+            /* Pull up slightly to counter height increase */
+            margin-bottom: -50px;
+        }
     </style>
 </head>
 
@@ -236,32 +296,33 @@
     <div class="menu-toggle d-md-none">
         <i class="bi bi-list"></i>
     </div>
-
     <div class="sidebar" id="sidebarMenu">
-        <div class="logo">
-            <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="150px">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="150px">
+            </div>
         </div>
-
-        <ul class="nav nav-pills flex-column">
-            <li><a class="nav-link active" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
-                    Dashboard</a></li>
-            <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
-                    Products</a></li>
-            <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
-            <li><a class="nav-link" href="{{ url('/admin/warehouse/dashboard') }}"><i class="bi bi-boxes"></i> Warehouse Management</a></li>
-            <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
-            <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
-            <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>
-            <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
-            <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
-            <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i> Promotional Notifications</a></li>
-            <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
-            <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
-                    Product Upload</a></li>
-            <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Logout</a>
-            </li>
-        </ul>
+        <div class="sidebar-content">
+            <ul class="nav nav-pills flex-column">
+                <li><a class="nav-link active" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
+                        Dashboard</a></li>
+                <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
+                        Products</a></li>
+                <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
+                <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
+                <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
+                <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
+                <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
+                <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i> Promotional Notifications</a></li>
+                <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
+                        Product Upload</a></li>
+                <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <div class="content">
@@ -348,61 +409,62 @@
                         </thead>
                         <tbody>
                             @forelse($ordersCount as $order)
-                                <tr>
-                                    <td class="fw-bold">{{ $order->id }}</td>
-                                    <td>
-                                        <i class="bi bi-person-circle text-primary"></i>
-                                        {{ $order->buyerUser->name ?? 'Unknown' }}
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-box-seam text-success"></i>
-                                        {{ $order->product->name ?? '-' }}
-                                    </td>
-                                    <td><span class="badge bg-info">{{ $order->quantity }}</span></td>
-                                    <td class="fw-semibold text-success">₹{{ number_format($order->amount, 2) }}</td>
-                                    <td>
-                                        @if($order->status === 'Delivered')
-                                            <span class="badge bg-success">{{ $order->status }}</span>
-                                        @elseif($order->status === 'Pending')
-                                            <span class="badge bg-warning">{{ $order->status }}</span>
-                                        @elseif($order->status === 'Cancelled')
-                                            <span class="badge bg-danger">{{ $order->status }}</span>
-                                        @else
-                                            <span class="badge bg-secondary">{{ $order->status }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($order->payment_method === 'Online')
-                                            <span class="badge bg-primary"><i class="bi bi-credit-card"></i> Online</span>
-                                        @elseif($order->payment_method === 'COD')
-                                            <span class="badge bg-secondary"><i class="bi bi-cash"></i> COD</span>
-                                        @else
-                                            <span class="badge bg-dark">{{ $order->payment_method }}</span>
-                                        @endif
-                                    </td>
-                                    <td><i class="bi bi-calendar-event"></i>
-                                        {{ $order->created_at->format('d M Y, h:i A') }}</td>
-                                    <td>
-                                        <form method="POST" action="{{ route('admin.updateTracking', $order->id) }}"
-                                            class="d-flex gap-2 align-items-center">
-                                            @csrf
-                                            <input type="text" name="tracking_number" class="form-control form-control-sm"
-                                                placeholder="Tracking #" value="{{ $order->tracking_number }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Save</button>
-                                        </form>
-                                        @if($order->tracking_number)
-                                            <div class="mt-1 text-success small">Tracking #:
-                                                <strong>{{ $order->tracking_number }}</strong>
-                                            </div>
-                                        @endif
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td class="fw-bold">{{ $order->id }}</td>
+                                <td>
+                                    <i class="bi bi-person-circle text-primary"></i>
+                                    {{ $order->buyerUser->name ?? 'Unknown' }}
+                                </td>
+                                <td>
+                                    <i class="bi bi-box-seam text-success"></i>
+                                    {{ $order->product->name ?? '-' }}
+                                </td>
+                                <td><span class="badge bg-info">{{ $order->quantity }}</span></td>
+                                <td class="fw-semibold text-success">₹{{ number_format($order->amount, 2) }}</td>
+                                <td>
+                                    @if($order->status === 'Delivered')
+                                    <span class="badge bg-success">{{ $order->status }}</span>
+                                    @elseif($order->status === 'Pending')
+                                    <span class="badge bg-warning">{{ $order->status }}</span>
+                                    @elseif($order->status === 'Cancelled')
+                                    <span class="badge bg-danger">{{ $order->status }}</span>
+                                    @else
+                                    <span class="badge bg-secondary">{{ $order->status }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($order->payment_method === 'Online')
+                                    <span class="badge bg-primary"><i class="bi bi-credit-card"></i> Online</span>
+                                    @elseif($order->payment_method === 'COD')
+                                    <span class="badge bg-secondary"><i class="bi bi-cash"></i> COD</span>
+                                    @else
+                                    <span class="badge bg-dark">{{ $order->payment_method }}</span>
+                                    @endif
+                                </td>
+                                <td><i class="bi bi-calendar-event"></i>
+                                    {{ $order->created_at->format('d M Y, h:i A') }}
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ route('admin.updateTracking', $order->id) }}"
+                                        class="d-flex gap-2 align-items-center">
+                                        @csrf
+                                        <input type="text" name="tracking_number" class="form-control form-control-sm"
+                                            placeholder="Tracking #" value="{{ $order->tracking_number }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Save</button>
+                                    </form>
+                                    @if($order->tracking_number)
+                                    <div class="mt-1 text-success small">Tracking #:
+                                        <strong>{{ $order->tracking_number }}</strong>
+                                    </div>
+                                    @endif
+                                </td>
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="9" class="text-muted py-3">
-                                        <i class="bi bi-inbox fs-4"></i> No orders found.
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="9" class="text-muted py-3">
+                                    <i class="bi bi-inbox fs-4"></i> No orders found.
+                                </td>
+                            </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -416,18 +478,18 @@
 
     <!-- Mobile Sidebar Toggle -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
             const sidebar = document.getElementById('sidebarMenu');
 
             if (menuToggle) {
-                menuToggle.addEventListener('click', function () {
+                menuToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('show');
                 });
             }
 
             // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function (event) {
+            document.addEventListener('click', function(event) {
                 if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
                     const isClickInsideSidebar = sidebar.contains(event.target) || menuToggle.contains(event.target);
                     if (!isClickInsideSidebar) {
