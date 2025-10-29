@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,82 +12,21 @@
         body {
             background-color: #f4f6f9;
         }
-        
-        /* Keep original sidebar styling exactly as shown */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 230px;
-            background: #212529;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease-in-out;
-            z-index: 1000;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar { left: -230px; }
-            .sidebar.show { left: 0; }
-        }
-        
-        .sidebar .logo {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            text-align: center;
-            padding: 20px 0;
-            background: #212529;
-            z-index: 1100;
-            border-bottom: 1px solid #343a40;
-        }
-        
-        .sidebar .logo img {
-            max-width: 160px;
-            object-fit: contain;
-            display: inline-block;
-            transition: transform 0.2s;
-        }
-        
-        .sidebar .logo img:hover {
-            transform: scale(1.05);
-        }
-        
-        .sidebar .nav-link {
-            color: #adb5bd;
-            margin: 6px 0;
-            border-radius: 6px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .sidebar .nav-link.active,
-        .sidebar .nav-link:hover {
-            background: #0d6efd;
-            color: #fff;
-        }
-        
-        .sidebar .nav-link i {
-            margin-right: 8px;
-            font-size: 18px;
-        }
-        
+
+
+
         .content {
             margin-left: 230px;
             padding: 20px;
             transition: margin-left 0.3s ease-in-out;
         }
-        
+
         @media (max-width: 768px) {
             .content {
                 margin-left: 0;
             }
         }
-        
+
         .menu-toggle {
             position: fixed;
             top: 10px;
@@ -96,20 +36,20 @@
             color: #212529;
             z-index: 1200;
         }
-        
+
         .img {
             position: relative;
             margin-top: -40px;
         }
-        
+
         .filter-controls {
             background: #fff;
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
-        
+
         /* Fix pagination styling to match your design */
         .pagination {
             display: flex;
@@ -117,11 +57,11 @@
             margin-top: 20px;
             gap: 5px;
         }
-        
+
         .pagination .page-item {
             margin: 0;
         }
-        
+
         .pagination .page-link {
             color: #2c3e50;
             border: 1px solid #ddd;
@@ -129,19 +69,19 @@
             border-radius: 4px;
             transition: all 0.3s ease;
         }
-        
+
         .pagination .page-link:hover {
             background-color: #3498db;
             color: white;
             border-color: #3498db;
         }
-        
+
         .pagination .page-item.active .page-link {
             background-color: #3498db;
             color: white;
             border-color: #3498db;
         }
-        
+
         /* Table styling to match your design */
         .table thead th {
             background-color: #2c3e50;
@@ -149,11 +89,11 @@
             font-weight: 600;
             text-align: center;
         }
-        
+
         .table tbody tr:hover {
             background-color: #f8f9fa;
         }
-        
+
         .btn-update {
             padding: 5px 10px;
             background-color: #3498db;
@@ -163,11 +103,11 @@
             cursor: pointer;
             font-size: 14px;
         }
-        
+
         .btn-update:hover {
             background-color: #2980b9;
         }
-        
+
         .btn-save {
             padding: 5px 10px;
             background-color: #2ecc71;
@@ -177,68 +117,221 @@
             cursor: pointer;
             font-size: 14px;
         }
-        
+
         .btn-save:hover {
             background-color: #27ae60;
         }
-        
+
         .payment-badge {
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .payment-badge.paypal {
             background-color: #003087;
             color: white;
         }
-        
+
         .payment-badge.credit-card {
             background-color: #2c3e50;
             color: white;
         }
-        
+
         .payment-badge.cod {
             background-color: #e67e22;
             color: white;
         }
-        
+
         /* Header styling */
         .card-header {
             background-color: #2c3e50;
             color: white;
             font-weight: 600;
         }
-        
+
         /* Status dropdown styling */
         .form-select {
             padding: 5px 10px;
             font-size: 14px;
         }
+
+
+        /* ===== OLD-STYLE SIDEBAR (FLAT DARK) ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 250px;
+            background-color: #1e1e2f;
+            color: #fff;
+            padding-top: 20px;
+            z-index: 1000;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .logo {
+            margin-top: -40px
+        }
+
+
+
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            margin: 8px 15px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #2d2d40;
+            color: #fff;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #007bff;
+            color: white;
+            border-left: 4px solid #0056b3;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar .nav-link.text-danger {
+            color: #ff6b6b;
+        }
+
+        .sidebar .nav-link.text-danger:hover {
+            color: #ff4757;
+            background-color: #2d2d40;
+        }
+
+        /* ===== MOBILE SIDEBAR TOGGLE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+        }
+
+        .sidebar .logo img {
+            margin-top: 60px;
+            position: relative;
+            left: 30px;
+            transition: transform 0.2s;
+        }
+
+        /* === SCROLLABLE SIDEBAR CONTENT === */
+        .sidebar {
+            /* Ensure the sidebar itself doesn't scroll, only its content */
+            overflow: hidden;
+            /* Keep your existing height */
+            height: 100vh;
+        }
+
+        .sidebar-content {
+            /* This is the key: make only this part scrollable */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Add some padding at the bottom so the logout button isn't stuck to the edge */
+            padding-bottom: 20px;
+            /* This ensures the scrollbar appears inside the sidebar */
+            height: calc(100vh - 180px);
+            /* Adjust '180px' if your logo/header height changes */
+            padding-left: 15px;
+            margin-top: 50px;
+            padding-right: 15px;
+        }
+
+        /* Optional: Style the scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: #2d2d40;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        /* === SIDEBAR LOGO BOX === */
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            height: 100px;
+        }
+
+        .sidebar .logo img {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            /* Pull up slightly to counter height increase */
+            /* margin-bottom: -50px; */
+        }
     </style>
 </head>
+
 <body>
     <div class="menu-toggle d-md-none">
         <i class="bi bi-list"></i>
     </div>
-
     <div class="sidebar" id="sidebarMenu">
-        <div class="logo">
-            <img src="{{ asset('asset/images/grabbasket.jpg') }}" class="img"
-                 alt="Grab Basket Admin Panel"
-                 onerror="this.onerror=null;this.src='https://via.placeholder.com/150x50?text=Logo';">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="150px">
+            </div>
         </div>
-        <ul class="nav nav-pills flex-column">
-            <li><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a class="nav-link" href="/admin/products"><i class="bi bi-box-seam"></i> Products</a></li>
-            <li><a class="nav-link active" href="/admin/orders"><i class="bi bi-cart-check"></i> Orders</a></li>
-            <li><a class="nav-link" href="/admin/manageuser"><i class="bi bi-people"></i> Users</a></li>
-            <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk Product Upload</a></li>
-            <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Logout</a>
-            </li>
-        </ul>
+        <div class="sidebar-content">
+            <ul class="nav nav-pills flex-column">
+                <li><a class="nav-link " href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
+                        Dashboard</a></li>
+                <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
+                        Products</a></li>
+                <li><a class="nav-link active" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
+                <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
+                <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
+                <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
+                <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
+                <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i> Promotional Notifications</a></li>
+                <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
+                        Product Upload</a></li>
+                <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <div class="content">
@@ -251,29 +344,29 @@
                     <div class="col-md-3">
                         <label class="form-label">Search</label>
                         <input type="text" name="search" class="form-control"
-                               value="{{ request('search') }}"
-                               placeholder="Customer or Product...">
+                            value="{{ request('search') }}"
+                            placeholder="Customer or Product...">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
                             <option value="all">All Statuses</option>
                             @foreach($statuses as $status)
-                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                                    {{ $status }}
-                                </option>
+                            <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                {{ $status }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">From</label>
                         <input type="date" name="start_date" class="form-control"
-                               value="{{ request('start_date') }}">
+                            value="{{ request('start_date') }}">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">To</label>
                         <input type="date" name="end_date" class="form-control"
-                               value="{{ request('end_date') }}">
+                            value="{{ request('end_date') }}">
                     </div>
                     <div class="col-md-3 d-flex gap-2">
                         <button type="submit" class="btn btn-primary w-100">
@@ -309,71 +402,71 @@
                         </thead>
                         <tbody>
                             @forelse($orders as $order)
-                                <tr>
-                                    <td class="fw-bold">{{ $order->id }}</td>
-                                    <td>
-                                        <i class="bi bi-person-circle text-primary"></i>
-                                        {{ $order->buyerUser->name ?? 'Unknown' }}
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-box-seam text-success"></i>
-                                        {{ $order->product->name ?? '-' }}
-                                    </td>
-                                    <td><span class="badge bg-info">{{ $order->quantity ?? 1 }}</span></td>
-                                    <td class="fw-semibold text-success">₹{{ number_format($order->amount, 2) }}</td>
-                                    <td>
-                                        <!-- ✅ Form-based status update -->
-                                        <form action="{{ route('admin.updateOrderStatus', $order->id) }}" method="POST" class="d-flex align-items-center justify-content-center gap-2">
-                                            @csrf
-                                            <select name="status" class="form-select form-select-sm w-auto">
-                                                <option value="Pending" {{ $order->status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="Shipped" {{ $order->status == 'Shipped' ? 'selected' : '' }}>Shipped</option>
-                                                <option value="Delivered" {{ $order->status == 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                                                <option value="Cancelled" {{ $order->status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <tr>
+                                <td class="fw-bold">{{ $order->id }}</td>
+                                <td>
+                                    <i class="bi bi-person-circle text-primary"></i>
+                                    {{ $order->buyerUser->name ?? 'Unknown' }}
+                                </td>
+                                <td>
+                                    <i class="bi bi-box-seam text-success"></i>
+                                    {{ $order->product->name ?? '-' }}
+                                </td>
+                                <td><span class="badge bg-info">{{ $order->quantity ?? 1 }}</span></td>
+                                <td class="fw-semibold text-success">₹{{ number_format($order->amount, 2) }}</td>
+                                <td>
+                                    <!-- ✅ Form-based status update -->
+                                    <form action="{{ route('admin.updateOrderStatus', $order->id) }}" method="POST" class="d-flex align-items-center justify-content-center gap-2">
+                                        @csrf
+                                        <select name="status" class="form-select form-select-sm w-auto">
+                                            <option value="Pending" {{ $order->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="Shipped" {{ $order->status == 'Shipped' ? 'selected' : '' }}>Shipped</option>
+                                            <option value="Delivered" {{ $order->status == 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                                            <option value="Cancelled" {{ $order->status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <!-- ✅ Tracking number update -->
+                                    <form action="{{ route('admin.updateTracking', $order->id) }}" method="POST" class="d-flex flex-column gap-2">
+                                        @csrf
+                                        <div class="d-flex gap-2">
+                                            <input type="text" name="tracking_number" value="{{ $order->tracking_number }}" class="form-control form-control-sm" placeholder="Tracking Number">
+                                            <select name="courier_name" class="form-select form-select-sm">
+                                                <option value="">Select Courier</option>
+                                                <option value="Delhivery" {{ $order->courier_name == 'Delhivery' ? 'selected' : '' }}>Delhivery</option>
+                                                <option value="Blue Dart" {{ $order->courier_name == 'Blue Dart' ? 'selected' : '' }}>Blue Dart</option>
+                                                <option value="DTDC" {{ $order->courier_name == 'DTDC' ? 'selected' : '' }}>DTDC</option>
+                                                <option value="India Post" {{ $order->courier_name == 'India Post' ? 'selected' : '' }}>India Post</option>
+                                                <option value="FedEx" {{ $order->courier_name == 'FedEx' ? 'selected' : '' }}>FedEx</option>
+                                                <option value="Ecom Express" {{ $order->courier_name == 'Ecom Express' ? 'selected' : '' }}>Ecom Express</option>
+                                                <option value="Professional Couriers" {{ $order->courier_name == 'Professional Couriers' ? 'selected' : '' }}>Professional Couriers</option>
+                                                <option value="GATI" {{ $order->courier_name == 'GATI' ? 'selected' : '' }}>GATI</option>
                                             </select>
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <!-- ✅ Tracking number update -->
-                                        <form action="{{ route('admin.updateTracking', $order->id) }}" method="POST" class="d-flex flex-column gap-2">
-                                            @csrf
-                                            <div class="d-flex gap-2">
-                                                <input type="text" name="tracking_number" value="{{ $order->tracking_number }}" class="form-control form-control-sm" placeholder="Tracking Number">
-                                                <select name="courier_name" class="form-select form-select-sm">
-                                                    <option value="">Select Courier</option>
-                                                    <option value="Delhivery" {{ $order->courier_name == 'Delhivery' ? 'selected' : '' }}>Delhivery</option>
-                                                    <option value="Blue Dart" {{ $order->courier_name == 'Blue Dart' ? 'selected' : '' }}>Blue Dart</option>
-                                                    <option value="DTDC" {{ $order->courier_name == 'DTDC' ? 'selected' : '' }}>DTDC</option>
-                                                    <option value="India Post" {{ $order->courier_name == 'India Post' ? 'selected' : '' }}>India Post</option>
-                                                    <option value="FedEx" {{ $order->courier_name == 'FedEx' ? 'selected' : '' }}>FedEx</option>
-                                                    <option value="Ecom Express" {{ $order->courier_name == 'Ecom Express' ? 'selected' : '' }}>Ecom Express</option>
-                                                    <option value="Professional Couriers" {{ $order->courier_name == 'Professional Couriers' ? 'selected' : '' }}>Professional Couriers</option>
-                                                    <option value="GATI" {{ $order->courier_name == 'GATI' ? 'selected' : '' }}>GATI</option>
-                                                </select>
-                                            </div>
-                                            <button type="submit" class="btn btn-sm btn-outline-success">
-                                                <i class="bi bi-truck"></i> Update Tracking
-                                            </button>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        @if($order->payment_method === 'Online')
-                                            <span class="badge payment-badge paypal">Online</span>
-                                        @elseif($order->payment_method === 'COD')
-                                            <span class="badge payment-badge cod">COD</span>
-                                        @else
-                                            <span class="badge payment-badge credit-card">{{ $order->payment_method }}</span>
-                                        @endif
-                                    </td>
-                                    <td><i class="bi bi-calendar-event"></i> {{ $order->created_at->format('d M Y, h:i A') }}</td>
-                                </tr>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-truck"></i> Update Tracking
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    @if($order->payment_method === 'Online')
+                                    <span class="badge payment-badge paypal">Online</span>
+                                    @elseif($order->payment_method === 'COD')
+                                    <span class="badge payment-badge cod">COD</span>
+                                    @else
+                                    <span class="badge payment-badge credit-card">{{ $order->payment_method }}</span>
+                                    @endif
+                                </td>
+                                <td><i class="bi bi-calendar-event"></i> {{ $order->created_at->format('d M Y, h:i A') }}</td>
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="9" class="text-muted py-3">
-                                        <i class="bi bi-inbox fs-4"></i> No orders found.
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="9" class="text-muted py-3">
+                                    <i class="bi bi-inbox fs-4"></i> No orders found.
+                                </td>
+                            </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -391,16 +484,17 @@
 
     <!-- Mobile Sidebar Toggle -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
             const sidebar = document.getElementById('sidebarMenu');
 
             if (menuToggle) {
-                menuToggle.addEventListener('click', function () {
+                menuToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('show');
                 });
             }
         });
     </script>
 </body>
+
 </html>

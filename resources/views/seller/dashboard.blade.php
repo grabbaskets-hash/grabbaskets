@@ -122,7 +122,7 @@
         .sidebar-content {
             padding: 0;
             padding-bottom: 60px;
-            margin-top: 30px;
+            margin-top: 60px;
             /* Prevent logout from sticking to bottom */
         }
 
