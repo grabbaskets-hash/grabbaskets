@@ -2332,17 +2332,50 @@
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Payment API Response Status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      })
       .then(data => {
+        console.log('Payment API Response Data:', data);
+        
         if (data.error) {
+          console.error('Payment API Error:', data.error);
           alert(data.error);
           placeOrderBtn.disabled = false;
           btnText.textContent = 'Pay with Razorpay';
           return;
         }
 
+        if (!data.success || !data.order_id) {
+          console.error('Invalid payment response:', data);
+          alert('Invalid payment response. Please try again.');
+          placeOrderBtn.disabled = false;
+          btnText.textContent = 'Pay with Razorpay';
+          return;
+        }
+
+        // Validate Razorpay key
+        const razorpayKey = '{{ config("services.razorpay.key") }}';
+        if (!razorpayKey) {
+          console.error('Razorpay key not configured');
+          alert('Payment system not configured. Please contact support.');
+          placeOrderBtn.disabled = false;
+          btnText.textContent = 'Pay with Razorpay';
+          return;
+        }
+
+        console.log('Initializing Razorpay with:', {
+          key: razorpayKey,
+          amount: data.amount,
+          order_id: data.order_id
+        });
+
         const options = {
-          key: '{{ config("services.razorpay.key") }}',
+          key: razorpayKey,
           amount: data.amount,
           currency: data.currency,
           name: data.name,
@@ -2363,12 +2396,45 @@
           }
         };
 
-        const rzp = new Razorpay(options);
-        rzp.open();
+        try {
+          // Check if Razorpay is loaded
+          if (typeof Razorpay === 'undefined') {
+            throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
+          }
+
+          const rzp = new Razorpay(options);
+          
+          // Add error handler for Razorpay
+          rzp.on('payment.failed', function (response) {
+            console.error('Razorpay payment failed:', response.error);
+            alert('Payment failed: ' + response.error.description);
+            placeOrderBtn.disabled = false;
+            btnText.textContent = 'Pay with Razorpay';
+          });
+
+          rzp.open();
+        } catch (razorpayError) {
+          console.error('Razorpay initialization error:', razorpayError);
+          alert('Payment system error: ' + razorpayError.message);
+          placeOrderBtn.disabled = false;
+          btnText.textContent = 'Pay with Razorpay';
+        }
       })
       .catch(error => {
-        console.error('Error:', error);
-        alert('Payment initialization failed. Please try again.');
+        console.error('Payment initialization error:', error);
+        let errorMessage = 'Payment initialization failed. ';
+        
+        if (error.message.includes('HTTP 5')) {
+          errorMessage += 'Server error. Please try again in a moment.';
+        } else if (error.message.includes('HTTP 4')) {
+          errorMessage += 'Please check your information and try again.';
+        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+          errorMessage += 'Network error. Please check your connection and try again.';
+        } else {
+          errorMessage += 'Please try again or contact support.';
+        }
+        
+        alert(errorMessage);
         placeOrderBtn.disabled = false;
         btnText.textContent = 'Pay with Razorpay';
       });
