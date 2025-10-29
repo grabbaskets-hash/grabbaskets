@@ -227,8 +227,13 @@ class AuthController extends Controller
             \App\Models\DeliveryPartnerWallet::create([
                 'delivery_partner_id' => $deliveryPartner->id,
                 'balance' => 0.00,
-                'total_earnings' => 0.00,
-                'total_withdrawals' => 0.00,
+                'total_earned' => 0.00,
+                'total_withdrawn' => 0.00,
+                'pending_amount' => 0.00,
+                'total_deliveries' => 0,
+                'successful_deliveries' => 0,
+                'average_rating' => 0.00,
+                'is_active' => true,
             ]);
 
             return redirect()

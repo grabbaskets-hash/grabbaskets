@@ -75,7 +75,8 @@ class DeliveryPartner extends Authenticatable
         'emergency_contact_relation',
         'admin_notes',
         'approved_at',
-        'last_active_at'
+        'last_active_at',
+        'registration_type'
     ];
 
     /**
