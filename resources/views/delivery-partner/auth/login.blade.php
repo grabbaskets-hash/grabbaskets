@@ -171,8 +171,13 @@
             const loginField = document.getElementById('login');
             const passwordField = document.getElementById('password');
             
-            // Trim whitespace and normalize input
-            loginField.value = loginField.value.trim().toLowerCase();
+            // Normalize input for faster database lookup
+            if (loginField.value.includes('@')) {
+                loginField.value = loginField.value.trim().toLowerCase();
+            } else {
+                // Remove all non-digits from phone
+                loginField.value = loginField.value.replace(/\D/g, '');
+            }
             
             // Add performance hints to form
             const optimizeField = document.createElement('input');
@@ -187,6 +192,13 @@
             typeField.name = '_login_type';
             typeField.value = loginField.value.includes('@') ? 'email' : 'phone';
             form.appendChild(typeField);
+            
+            // Set a timeout to show "still loading" message if taking too long
+            setTimeout(() => {
+                if (this.disabled) {
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Still processing...';
+                }
+            }, 3000);
         }
     });
 
