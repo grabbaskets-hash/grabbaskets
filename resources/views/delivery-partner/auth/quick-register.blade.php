@@ -1,4 +1,4 @@
-@extends('delivery-partner.auth.layout')
+@extends('delivery-partner.layouts.app')
 
 @section('title', 'Quick Registration - Delivery Partner')
 
