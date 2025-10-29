@@ -302,12 +302,12 @@
           </a>
         </li>
         <li>
-          <a class="nav-link active" href="{{ route('seller.dashboard') }}">
+          <a class="nav-link " href="{{ route('seller.dashboard') }}">
             <i class="bi bi-speedometer2"></i> Dashboard
           </a>
         </li>
         <li>
-          <a class="nav-link " href="{{ route('seller.transactions') }}">
+          <a class="nav-link active" href="{{ route('seller.transactions') }}">
             <i class="bi bi-cart-check"></i> Orders
           </a>
         </li>

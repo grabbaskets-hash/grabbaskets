@@ -597,7 +597,7 @@
           </a>
         </li>
         <li>
-          <a class="nav-link active" href="{{ route('seller.dashboard') }}">
+          <a class="nav-link " href="{{ route('seller.dashboard') }}">
             <i class="bi bi-speedometer2"></i> Dashboard
           </a>
         </li>
@@ -622,7 +622,7 @@
           </a>
         </li>
         <li>
-          <a class="nav-link" href="{{ route('seller.profile') }}">
+          <a class="nav-link active" href="{{ route('seller.profile') }}">
             <i class="bi bi-person-circle"></i> Profile
           </a>
         </li>
