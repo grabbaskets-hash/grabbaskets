@@ -63,14 +63,9 @@ class DeliveryPartnerLoginRequest extends FormRequest
                 ? "SELECT id, email, phone, password, status, is_verified, name, last_active_at FROM delivery_partners WHERE email = ? LIMIT 1"
                 : "SELECT id, email, phone, password, status, is_verified, name, last_active_at FROM delivery_partners WHERE phone = ? LIMIT 1";
 
-            // Measure DB query time with caching
+            // Measure DB query time
             $startQuery = microtime(true);
-            $cacheKey = 'delivery_partner_auth:' . md5($loginValue);
-            
-            $candidates = cache()->remember($cacheKey, 30, function() use ($query, $loginValue) {
-                return DB::select($query, [$loginValue]);
-            });
-            
+            $candidates = DB::select($query, [$loginValue]);
             $queryMs = (microtime(true) - $startQuery) * 1000;
 
             // Measure password verification time
@@ -116,25 +111,17 @@ class DeliveryPartnerLoginRequest extends FormRequest
             );
             $authMs = (microtime(true) - $startAuth) * 1000;
 
-            // Ultra-fast async update - no blocking at all
+            // Async update last_active_at to avoid blocking login
             $startDispatch = microtime(true);
-            
-            // Use cache to defer the database update completely
-            cache()->put("update_partner_active:{$deliveryPartner->id}", now(), 60);
-            
-            // Schedule actual DB update for later (non-blocking)
-            if (function_exists('fastcgi_finish_request')) {
-                register_shutdown_function(function() use ($deliveryPartner) {
-                    try {
-                        DB::table('delivery_partners')
-                            ->where('id', $deliveryPartner->id)
-                            ->update(['last_active_at' => now()]);
-                    } catch (\Exception $e) {
-                        // Silent fail - not critical
-                    }
-                });
-            }
-            
+            dispatch(function () use ($deliveryPartner) {
+                try {
+                    DB::table('delivery_partners')
+                        ->where('id', $deliveryPartner->id)
+                        ->update(['last_active_at' => now()]);
+                } catch (\Exception $e) {
+                    logger('Delivery Partner Async update failed: ' . $e->getMessage());
+                }
+            })->afterResponse();
             $dispatchMs = (microtime(true) - $startDispatch) * 1000;
 
             $totalMs = (microtime(true) - $startTotal) * 1000;
@@ -152,6 +139,21 @@ class DeliveryPartnerLoginRequest extends FormRequest
             $this->clearRateLimiter();
         } catch (\Exception $e) {
             logger('Delivery Partner Auth Error: ' . $e->getMessage());
+            logger('Delivery Partner Auth Stack: ' . $e->getTraceAsString());
+            
+            // Fallback to basic authentication if optimized version fails
+            try {
+                $loginField = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+                $credentials = [$loginField => $loginValue, 'password' => $password];
+                
+                if (Auth::guard('delivery_partner')->attempt($credentials, $this->boolean('remember'))) {
+                    $this->clearRateLimiter();
+                    return;
+                }
+            } catch (\Exception $fallbackError) {
+                logger('Delivery Partner Fallback Auth Error: ' . $fallbackError->getMessage());
+            }
+            
             $this->handleFailedAuthentication();
         }
     }
