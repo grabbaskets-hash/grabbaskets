@@ -8,6 +8,7 @@ use App\Models\DeliveryPartner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
@@ -284,10 +285,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle login request.
+     * Handle login request with performance monitoring.
      */
     public function login(Request $request): RedirectResponse
     {
+        $startTime = microtime(true);
+        
         $credentials = $request->validate([
             'login' => 'required|string',
             'password' => 'required|string',
@@ -301,16 +304,30 @@ class AuthController extends Controller
             'password' => $credentials['password']
         ];
 
+        $authStartTime = microtime(true);
+        // Use efficient authentication with minimal queries
         if (Auth::guard('delivery_partner')->attempt($loginData, $request->boolean('remember'))) {
+            $authTime = (microtime(true) - $authStartTime) * 1000;
+            
+            $sessionStartTime = microtime(true);
             $request->session()->regenerate();
+            $sessionTime = (microtime(true) - $sessionStartTime) * 1000;
             
+            $userStartTime = microtime(true);
             $partner = Auth::guard('delivery_partner')->user();
+            $userTime = (microtime(true) - $userStartTime) * 1000;
             
-            // Update last active timestamp
+            // Update last active timestamp efficiently (only if more than 1 hour old)
+            $updateStartTime = microtime(true);
+            $updateTime = 0;
             try {
-                $partner->update(['last_active_at' => now()]);
+                if (!$partner->last_active_at || $partner->last_active_at->diffInHours(now()) >= 1) {
+                    $partner->update(['last_active_at' => now()]);
+                    $updateTime = (microtime(true) - $updateStartTime) * 1000;
+                }
             } catch (\Exception $e) {
                 // Silent fail - not critical
+                $updateTime = (microtime(true) - $updateStartTime) * 1000;
             }
             
             // Check partner status
@@ -332,10 +349,32 @@ class AuthController extends Controller
                     ->withErrors(['login' => 'Your account is inactive. Please contact support.']);
             }
 
+            $totalTime = (microtime(true) - $startTime) * 1000;
+            
+            // Log performance metrics
+            Log::info("DeliveryPartner Login Success", [
+                'partner_id' => $partner->id,
+                'login_field' => $loginField,
+                'auth_time_ms' => round($authTime, 2),
+                'session_time_ms' => round($sessionTime, 2),
+                'user_time_ms' => round($userTime, 2),
+                'update_time_ms' => round($updateTime, 2),
+                'total_time_ms' => round($totalTime, 2),
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             return redirect()
                 ->intended(route('delivery-partner.dashboard'))
                 ->with('success', 'Welcome back, ' . $partner->name . '!');
         }
+
+        $failTime = (microtime(true) - $startTime) * 1000;
+        Log::warning("DeliveryPartner Login Failed", [
+            'login_field' => $loginField,
+            'total_time_ms' => round($failTime, 2),
+            'ip' => $request->ip()
+        ]);
 
         return back()
             ->withErrors(['login' => 'Invalid credentials.'])
