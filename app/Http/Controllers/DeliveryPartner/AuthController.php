@@ -216,7 +216,16 @@ class AuthController extends Controller
                 'password' => Hash::make($data['password']),
                 'vehicle_type' => $data['vehicle_type'],
                 'city' => $data['city'],
-                'status' => 'pending_documents', // Special status for quick registration
+                'address' => 'To be provided', // Placeholder for quick registration
+                'state' => 'To be provided', // Required field
+                'pincode' => '000000', // Placeholder pincode
+                'date_of_birth' => '2000-01-01', // Placeholder DOB
+                'gender' => 'male', // Default gender
+                'vehicle_number' => 'To be provided', // Placeholder
+                'license_number' => 'To be provided', // Placeholder
+                'license_expiry' => '2025-12-31', // Placeholder
+                'aadhar_number' => 'To be provided', // Placeholder
+                'status' => 'pending', // Use valid enum value
                 'is_verified' => false,
                 'is_online' => false,
                 'is_available' => false,
@@ -242,9 +251,11 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             logger('Quick Registration Error: ' . $e->getMessage());
+            logger('Quick Registration Stack Trace: ' . $e->getTraceAsString());
+            logger('Quick Registration Data: ' . json_encode($request->all()));
             
             return back()
-                ->with('error', 'Registration failed. Please try again.')
+                ->with('error', 'Registration failed: ' . $e->getMessage())
                 ->withInput();
         }
     }
