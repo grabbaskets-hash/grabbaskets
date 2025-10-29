@@ -3934,19 +3934,19 @@ li a{
               <div class="col-6 col-md-3">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-cash-stack" style="font-size: 1.2rem;"></i>
-                  <span style="font-weight: 600;">Daily Payments</span>
+                  <span style="font-weight: 600;">Weekly Payments</span>
                 </div>
               </div>
               <div class="col-6 col-md-3">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-fuel-pump-fill" style="font-size: 1.2rem;"></i>
-                  <span style="font-weight: 600;">Fuel Allowance</span>
+                  <span style="font-weight: 600;">INR 25 for each order</span>
                 </div>
               </div>
               <div class="col-6 col-md-3">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-shield-check" style="font-size: 1.2rem;"></i>
-                  <span style="font-weight: 600;">Insurance</span>
+                  <span style="font-weight: 600;">INR 500 FOR SHOP ORDER </span>
                 </div>
               </div>
             </div>
@@ -3981,7 +3981,7 @@ li a{
           
           <div class="mt-3">
             <small class="text-white" style="opacity: 0.8;">
-              <i class="bi bi-telephone-fill me-1"></i>Need help? Call: 1800-123-4567
+              <i class="bi bi-telephone-fill me-1"></i>Need help? Call: 84380 74230
             </small>
           </div>
         </div>
@@ -3989,11 +3989,11 @@ li a{
     </div>
   </section>
 
-  <!-- 🚀 Delivery Options Banner - Zepto/Blinkit Style -->
+  <!-- 🚀 Delivery Options Banner -->
   <section class="py-3" style="background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border-bottom: 1px solid rgba(76, 175, 80, 0.1);">
     <div class="container">
       <div class="row g-3 align-items-center">
-        <!-- Quick Delivery (Zepto/Blinkit Style) -->
+        <!-- Quick Delivery  -->
         <div class="col-12 col-md-6">
           <div class="delivery-card" style="background: linear-gradient(135deg, #ffffff 0%, #E8F5E9 100%); padding: 20px; border-radius: 16px; border: 2px solid rgba(76, 175, 80, 0.3); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(76, 175, 80, 0.1)'">
             <div class="d-flex align-items-center gap-3">
