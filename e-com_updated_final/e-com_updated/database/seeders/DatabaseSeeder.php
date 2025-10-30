@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             SubcategorySeeder::class,
             ProductSeeder::class,
+            CategoryEmojiSeeder::class,
         ]);
 
         // Create a test user if none exists

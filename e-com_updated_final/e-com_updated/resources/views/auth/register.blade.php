@@ -71,6 +71,89 @@
     color: #232f3e;   /* dark navy on hover */
     text-decoration: underline;
   }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 992px) {
+    .col-lg-7 {
+      max-width: 90%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+
+    .card {
+      padding: 1.5rem;
+    }
+
+    .brand {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+    }
+
+    h4 {
+      font-size: 1.3rem;
+    }
+
+    .form-control,
+    .form-select {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      padding: 0.7rem 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .col-md-6 {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .py-5 {
+      padding-top: 2rem !important;
+      padding-bottom: 2rem !important;
+    }
+
+    .card {
+      padding: 1.25rem;
+      border-radius: 15px;
+    }
+
+    .brand {
+      font-size: 1.2rem;
+    }
+
+    h4 {
+      font-size: 1.1rem;
+    }
+
+    .form-label {
+      font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+    }
+
+    .row.g-3 {
+      row-gap: 0.75rem !important;
+    }
+  }
 </style>
 </head>
 <body>

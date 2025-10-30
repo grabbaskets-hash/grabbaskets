@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Category;
 use App\Models\Subcategory;
@@ -14,6 +14,8 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Services\NotificationService;
 use App\Services\InfobipSmsService;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -30,7 +32,8 @@ class AdminController extends Controller
         $request->validate([
             'seller_email' => 'required|email',
             'products_file' => 'required|file|mimes:csv,txt,xlsx,xls',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
+            'images.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:4096',
+            'images_zip' => 'sometimes|file|mimes:zip|max:102400', // optional ZIP up to 100MB
         ]);
 
         $seller = User::where('email', $request->seller_email)->where('role', 'seller')->first();
@@ -39,51 +42,80 @@ class AdminController extends Controller
         }
 
         $file = $request->file('products_file');
-        $ext = $file->getClientOriginalExtension();
-        $rows = [];
-        if (in_array($ext, ['csv', 'txt'])) {
-            $rows = array_map('str_getcsv', file($file->getRealPath()));
-        } else {
-            return back()->withErrors(['products_file' => 'Only CSV is supported in this demo.']);
-        }
+        $ext = strtolower($file->getClientOriginalExtension());
 
-        $header = array_map('trim', array_map('strtolower', $rows[0]));
-        unset($rows[0]);
-
-        $imageMap = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $imageMap[strtolower($filename)] = $image;
-            }
-        }
-
+        $errors = [];
         $count = 0;
         $updatedImages = 0;
-        foreach ($rows as $row) {
-            $data = array_combine($header, $row);
-            if (!$data) continue;
 
-            $data['seller_id'] = $seller->id;
-
-            if (isset($data['unique_id']) && Product::where('unique_id', $data['unique_id'])->exists()) {
-                continue;
-            }
-
-            $uid = isset($data['unique_id']) ? strtolower($data['unique_id']) : null;
-            if ($uid && isset($imageMap[$uid])) {
-                $img = $imageMap[$uid];
-                $folder = "admin/{$seller->id}/{$data['category_id']}/{$data['subcategory_id']}";
-                $path = $img->store($folder, 'public');
-                $data['image'] = $path;
-                $updatedImages++;
-            }
-
-            Product::create($data);
-            $count++;
+        // Optional: store ZIP temporarily for ProductsImport
+        $zipPath = null;
+        if ($request->hasFile('images_zip')) {
+            $zipPath = $request->file('images_zip')->store('temp/bulk-uploads', 'local');
         }
 
-        $msg = "$count products uploaded for $seller->email. $updatedImages images assigned.";
+        if (in_array($ext, ['xlsx', 'xls'])) {
+            // Use ProductsImport for Excel with optional ZIP and force seller_id
+            $import = new \App\Imports\ProductsImport($zipPath, $seller->id);
+            Excel::import($import, $file);
+            $count = $import->getSuccessCount();
+            $errors = $import->getErrors();
+        } elseif (in_array($ext, ['csv', 'txt'])) {
+            // Backward-compatible CSV handling with optional individual images[]
+            $rows = array_map('str_getcsv', file($file->getRealPath()));
+            $header = array_map('trim', array_map('strtolower', $rows[0]));
+            unset($rows[0]);
+
+            $imageMap = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                    $imageMap[strtolower($filename)] = $image;
+                }
+            }
+
+            foreach ($rows as $row) {
+                $data = array_combine($header, $row);
+                if (!$data) continue;
+
+                $data['seller_id'] = $seller->id;
+
+                if (isset($data['unique_id']) && Product::where('unique_id', $data['unique_id'])->exists()) {
+                    continue;
+                }
+
+                $uid = isset($data['unique_id']) ? strtolower($data['unique_id']) : null;
+                if ($uid && isset($imageMap[$uid])) {
+                    $img = $imageMap[$uid];
+                    $folder = "admin/{$seller->id}/" . ($data['category_id'] ?? 'uncategorized') . "/" . ($data['subcategory_id'] ?? 'general');
+                    $path = $img->store($folder, 'public');
+                    $data['image'] = $path;
+                    $updatedImages++;
+                }
+
+                try {
+                    Product::create($data);
+                    $count++;
+                } catch (\Throwable $e) {
+                    $errors[] = $e->getMessage();
+                }
+            }
+        } else {
+            return back()->withErrors(['products_file' => 'Unsupported file type. Use CSV, XLSX or XLS.']);
+        }
+
+        // Clean up temp ZIP
+        if ($zipPath && Storage::disk('local')->exists($zipPath)) {
+            Storage::disk('local')->delete($zipPath);
+        }
+
+        $msg = "Imported {$count} products for {$seller->email}.";
+        if ($updatedImages > 0) {
+            $msg .= " {$updatedImages} images assigned.";
+        }
+        if (!empty($errors)) {
+            return back()->with('success', $msg)->with('import_errors', $errors);
+        }
         return back()->with('success', $msg);
     }
 
@@ -136,22 +168,84 @@ class AdminController extends Controller
 
     public function products(Request $request)
     {
-        $query = Product::with(['seller', 'category', 'subcategory']);
+        try {
+            $query = Product::with(['seller', 'category', 'subcategory']);
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->whereHas('category', function ($q) use ($request) {
+                    $q->where('name', $request->category);
+                });
+            }
+
+            $categories = Category::pluck('name')->toArray();
+            $products = $query->paginate(10)->appends($request->only(['search', 'category']));
+            $sellers = User::where('role', 'seller')->pluck('name', 'id');
+
+            return view('admin.products', compact('products', 'categories', 'sellers'));
+        } catch (\Throwable $e) {
+            Log::error('Admin products page failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Admin products error');
         }
+    }
 
-        if ($request->filled('category') && $request->category !== 'all') {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('name', $request->category);
-            });
+    // Show products grouped by sellers
+    public function productsBySeller(Request $request)
+    {
+        try {
+            $search = $request->input('search');
+            $selectedSeller = $request->input('seller_id');
+
+            // Get all sellers with product counts using the correct relationship
+            $sellersQuery = User::where('role', 'seller')
+                ->withCount(['products' => function($query) {
+                    $query->whereNotNull('image'); // Only count products with images
+                }]);
+
+            // Apply search filter
+            if ($search) {
+                $sellersQuery->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            $sellers = $sellersQuery->orderBy('products_count', 'desc')->get();
+
+            // Get products for selected seller
+            $products = null;
+            $selectedSellerInfo = null;
+            
+            if ($selectedSeller) {
+                $selectedSellerInfo = User::find($selectedSeller);
+                if ($selectedSellerInfo) {
+                    $products = Product::with(['category', 'subcategory'])
+                        ->where('seller_id', $selectedSeller)
+                        ->whereNotNull('image')
+                        ->latest()
+                        ->paginate(12)
+                        ->appends(['seller_id' => $selectedSeller, 'search' => $search]);
+                }
+            }
+
+            return view('admin.products-by-seller', compact('sellers', 'products', 'selectedSellerInfo', 'search', 'selectedSeller'));
+        } catch (\Throwable $e) {
+            Log::error('Admin products by seller page failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Admin products by seller error');
         }
-
-        $categories = Category::pluck('name')->toArray();
-        $products = $query->paginate(10)->appends($request->only(['search', 'category']));
-
-        return view('admin.products', compact('products', 'categories'));
     }
 
     // ✅ Enhanced users() with search, role, and status filters
@@ -501,5 +595,21 @@ Grabbasket Team
         $sentCount = NotificationService::sendAutomatedPromotionalEmail($type);
 
         return back()->with('success', "Promotional emails sent to {$sentCount} buyers successfully!");
+    }
+    /**
+     * Update the seller for a product (admin action)
+     */
+    public function updateProductSeller(Request $request, Product $product)
+    {
+        $request->validate([
+            'seller_id' => 'required|exists:users,id',
+        ]);
+        $seller = User::where('id', $request->seller_id)->where('role', 'seller')->first();
+        if (!$seller) {
+            return back()->with('error', 'Selected user is not a valid seller.');
+        }
+        $product->seller_id = $seller->id;
+        $product->save();
+        return back()->with('success', 'Seller updated successfully.');
     }
 }

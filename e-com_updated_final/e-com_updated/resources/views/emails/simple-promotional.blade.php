@@ -37,7 +37,7 @@
             @endif
             
             <p style="text-align: center; margin: 30px 0;">
-                <a href="{{ url('/') }}" class="btn">🛒 Shop Now</a>
+                <a href="{{ config('app.url') }}" class="btn">🛒 Shop Now</a>
             </p>
             
             <p><strong>Why Choose GRAB BASKETS?</strong></p>

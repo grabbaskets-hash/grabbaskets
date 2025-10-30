@@ -28,74 +28,134 @@ class PaymentController extends Controller
 
     public function createOrder(Request $request)
     {
-        $request->validate([
-            'address' => 'nullable|string|max:255',
-            'new_address' => 'nullable|string|max:255',
-            'address_type' => 'nullable|in:home,office,other',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'pincode' => ['required', 'string', 'max:10', 'regex:/^[0-9]{5,10}$/'],
-        ]);
-
-        $items = CartItem::with('product')
-            ->where('user_id', Auth::id())
-            ->get();
-
-        if ($items->isEmpty()) {
-            return response()->json(['error' => 'Your cart is empty'], 400);
-        }
-
-        $totals = $this->calculateTotals($items);
-        $address = $request->new_address ?: $request->address;
-
-        // Save new address if provided
-        if ($request->new_address) {
-            \App\Models\Address::create([
-                'user_id' => Auth::id(),
-                'address' => $address,
-                'city' => $request->city,
-                'state' => $request->state,
-                'pincode' => $request->pincode,
-                'type' => $request->address_type,
+        try {
+            // Enhanced validation
+            $request->validate([
+                'address' => 'nullable|string|max:255',
+                'new_address' => 'nullable|string|max:255',
+                'address_type' => 'nullable|in:home,office,other',
+                'city' => 'required|string|max:100',
+                'state' => 'required|string|max:100',
+                'pincode' => ['required', 'string', 'max:10', 'regex:/^[0-9]{5,10}$/'],
             ]);
+
+            // Check if user is authenticated
+            if (!Auth::check()) {
+                return response()->json(['error' => 'Please login to continue'], 401);
+            }
+
+            $items = CartItem::with('product')
+                ->where('user_id', Auth::id())
+                ->get();
+
+            if ($items->isEmpty()) {
+                return response()->json(['error' => 'Your cart is empty'], 400);
+            }
+
+            $totals = $this->calculateTotals($items);
+            $address = $request->new_address ?: $request->address;
+
+            // Validate that we have a valid address
+            if (empty($address)) {
+                return response()->json(['error' => 'Please provide a delivery address'], 400);
+            }
+
+            // Save new address if provided
+            if ($request->new_address) {
+                try {
+                    \App\Models\Address::create([
+                        'user_id' => Auth::id(),
+                        'address' => $address,
+                        'city' => $request->city,
+                        'state' => $request->state,
+                        'pincode' => $request->pincode,
+                        'type' => $request->address_type,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to save address: ' . $e->getMessage());
+                    // Continue with payment even if address save fails
+                }
+            }
+
+            // Validate Razorpay credentials
+            if (empty($this->razorpayId) || empty($this->razorpayKey)) {
+                Log::error('Razorpay credentials not configured', [
+                    'key_present' => !empty($this->razorpayId),
+                    'secret_present' => !empty($this->razorpayKey)
+                ]);
+                return response()->json(['error' => 'Payment system not configured. Please contact support.'], 500);
+            }
+
+            // Create Razorpay order with error handling
+            $api = new Api($this->razorpayId, $this->razorpayKey);
+            
+            $orderData = [
+                'receipt'         => 'order_' . uniqid() . '_' . Auth::id(),
+                'amount'          => (int) ($totals['total'] * 100), // Convert to paise and ensure integer
+                'currency'        => 'INR',
+                'payment_capture' => 1
+            ];
+
+            Log::info('Creating Razorpay order', [
+                'user_id' => Auth::id(),
+                'amount' => $orderData['amount'],
+                'receipt' => $orderData['receipt']
+            ]);
+
+            $razorpayOrder = $api->order->create($orderData);
+
+            if (!$razorpayOrder || !isset($razorpayOrder['id'])) {
+                Log::error('Failed to create Razorpay order', ['response' => $razorpayOrder]);
+                return response()->json(['error' => 'Failed to initialize payment. Please try again.'], 500);
+            }
+
+            // Store order details in session for later use
+            session([
+                'checkout_data' => [
+                    'address' => $address,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'pincode' => $request->pincode,
+                    'items' => $items->toArray(),
+                    'totals' => $totals,
+                    'razorpay_order_id' => $razorpayOrder['id']
+                ]
+            ]);
+
+            Log::info('Razorpay order created successfully', [
+                'order_id' => $razorpayOrder['id'],
+                'amount' => $orderData['amount'],
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'order_id' => $razorpayOrder['id'],
+                'amount' => $orderData['amount'],
+                'currency' => 'INR',
+                'name' => config('app.name', 'GrabBaskets'),
+                'description' => 'Payment for order - ' . count($items) . ' items',
+                'prefill' => [
+                    'name' => Auth::user()->name,
+                    'email' => Auth::user()->email,
+                    'contact' => Auth::user()->phone ?? '',
+                ]
+            ]);
+
+        } catch (\Razorpay\Api\Errors\Error $e) {
+            Log::error('Razorpay API Error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'error_code' => $e->getCode()
+            ]);
+            return response()->json(['error' => 'Payment initialization failed. Please try again or contact support.'], 500);
+            
+        } catch (\Exception $e) {
+            Log::error('Payment creation error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'An error occurred while processing your request. Please try again.'], 500);
         }
-
-        // Create Razorpay order
-        $api = new Api($this->razorpayId, $this->razorpayKey);
-        
-        $orderData = [
-            'receipt'         => 'order_' . uniqid(),
-            'amount'          => $totals['total'] * 100, // Convert to paise
-            'currency'        => 'INR',
-            'payment_capture' => 1
-        ];
-
-        $razorpayOrder = $api->order->create($orderData);
-
-        // Store order details in session for later use
-        session([
-            'checkout_data' => [
-                'address' => $address,
-                'city' => $request->city,
-                'state' => $request->state,
-                'pincode' => $request->pincode,
-                'items' => $items->toArray(),
-                'totals' => $totals,
-                'razorpay_order_id' => $razorpayOrder['id']
-            ]
-        ]);
-
-        return response()->json([
-            'order_id' => $razorpayOrder['id'],
-            'amount' => $totals['total'] * 100,
-            'currency' => 'INR',
-            'name' => config('app.name'),
-            'description' => 'Payment for order',
-            'prefill' => [
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-            ]
-        ]);
     }
 
     public function verifyPayment(Request $request)

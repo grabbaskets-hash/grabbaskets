@@ -1,37 +1,179 @@
-<div class="bg-white rounded-xl shadow p-4 mb-6">
-    <h3 class="text-xl font-bold text-indigo-700 mb-4">Browse Categories</h3>
-    <div class="flex flex-col gap-4">
-        @foreach($categories as $cat)
-            <div class="bg-gradient-to-br from-indigo-50 via-pink-50 to-purple-50 rounded-xl shadow p-4 flex flex-col hover:scale-105 transition" style="cursor:pointer;">
-                <!-- Main Category Link -->
-                <a href="{{ route('buyer.productsByCategory', $cat->id) }}" class="flex items-center mb-2 text-decoration-none">
-                    @php
-                        $sampleImages = [
-                            'FASHION & CLOTHING' => 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=80&q=80',
-                            'ELECTRONICS' => 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=80&q=80',
-                            'HOME' => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80',
-                            'BEAUTY' => 'https://images.unsplash.com/photo-1515378791036-0c623066013b?auto=format&fit=crop&w=80&q=80',
-                            'SPORTS' => 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=80&q=80',
-                        ];
-                        $img = $cat->image ?? ($sampleImages[strtoupper($cat->name)] ?? 'https://via.placeholder.com/80');
-                    @endphp
-                    <img src="{{ $img }}" alt="{{ $cat->name }}" class="rounded-lg shadow mr-3" style="width:56px;height:56px;object-fit:cover;">
-                    <span class="font-bold text-lg text-indigo-700">{{ $cat->name }}</span>
-                </a>
 
-                <!-- Subcategories -->
-                @if($cat->subcategories && $cat->subcategories->count())
-                    <div class="mt-2 flex flex-col gap-2">
-                        @foreach($cat->subcategories as $subcat)
-                            <a href="{{ route('buyer.productsBySubcategory', $subcat->id) }}"
-                               class="block px-3 py-2 rounded-lg bg-white hover:bg-pink-100 text-gray-700 font-medium shadow transition flex items-center">
-                                <span class="material-icons text-pink-400 mr-2">subdirectory_arrow_right</span>
-                                {{ $subcat->name }}
-                            </a>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        @endforeach
+@php
+  $categories = $categories ?? app('App\Services\CategoryService')->getCategories();
+@endphp
+
+<div class="categories-3d-container">
+  @foreach($categories as $cat)
+    <div class="category-3d-card" data-category="{{ $cat->name }}" style="opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <a href="{{ route('buyer.productsByCategory', $cat->id) }}" class="category-3d-link">
+        <div class="category-3d-content">
+          @php
+            $emoji = $cat->emoji;
+            if (!$emoji) {
+              $normalized = strtoupper(trim(preg_replace('/[^A-Z0-9]/', '', $cat->name)));
+              $emojiMap = [
+                'ELECTRONICS' => '🖥️', 'CLOTHING' => '🧥', 'FASHIONCLOTHING' => '👗', 'BOOKS' => '📖',
+                'HOMEKITCHEN' => '🍽️', 'HOME' => '🏠', 'BEAUTY' => '�', 'SPORTS' => '🏀', 'KIDS' => '🧸',
+                'FOOD' => '🍕', 'JEWELLERY' => '💍', 'GROCERY' => '🛒', 'TOYS' => '🪁', 'FURNITURE' => '🛋️',
+                'MOBILE' => '📱', 'LAPTOPS' => '💻', 'SHOES' => '👟', 'WATCHES' => '⌚', 'BAGS' => '🧳',
+                'ACCESSORIES' => '🕶️', 'HEALTH' => '🩺', 'AUTOMOTIVE' => '🚙', 'MENSFASHION' => '👔',
+                'WOMENSFASHION' => '👗', 'BEAUTYCARE' => '💄', 'SPORTSNAME' => '🏃‍♂️', 'BOOKSEDUCATION' => '📚',
+                'KIDSTOYS' => '🧸', 'HEALTHWELLNESS' => '🏥', 'JEWELRYACCESSORIES' => '💎', 'GROCERYFOOD' => '🥬',
+                'GARDENOUTDOOR' => '🌸', 'PETSUPPLIES' => '🐾', 'BABYPRODUCTS' => '👶',
+              ];
+              $emoji = $emojiMap[$normalized] ?? '🛍️';
+            }
+          @endphp
+          <div class="category-emoji-3d">{{ $emoji }}</div>
+          <div class="category-name-3d">{{ strtoupper($cat->name) }}</div>
+          <div class="category-glow"></div>
+        </div>
+      </a>
     </div>
+  @endforeach
 </div>
+
+<style>
+  .category-3d-card {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    height: 250px;
+  }
+
+  .category-3d-card:hover {
+    transform: rotateX(10deg) rotateY(15deg) scale(1.1);
+    z-index: 10;
+  }
+
+  .category-3d-link {
+    display: block;
+    text-decoration: none;
+    height: 100%;
+  }
+
+  .category-3d-content {
+    position: relative;
+    height: 100%;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 1px 8px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .category-3d-card:hover .category-3d-content {
+    background: linear-gradient(135deg, #ff9900 0%, #1CA9C9 50%, #F43397 100%);
+    box-shadow: 
+      0 20px 60px rgba(255, 153, 0, 0.3),
+      0 10px 30px rgba(28, 169, 201, 0.2),
+      0 5px 15px rgba(244, 51, 151, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .category-emoji-3d {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+  }
+
+  .category-3d-card:hover .category-emoji-3d {
+    transform: rotateY(20deg) rotateX(-10deg) scale(1.2);
+    filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.8));
+  }
+
+  .category-name-3d {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: center;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
+  }
+
+  .category-3d-card:hover .category-name-3d {
+    color: #ffffff;
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 10px rgba(255, 255, 255, 0.5);
+    transform: translateZ(10px);
+  }
+
+  .category-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 153, 0, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    animation: rotate-glow 8s linear infinite;
+  }
+
+  .category-3d-card:hover .category-glow {
+    opacity: 1;
+  }
+
+  @keyframes rotate-glow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .category-3d-card {
+      height: 200px;
+    }
+    
+    .category-emoji-3d {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    
+    .category-name-3d {
+      font-size: 1rem;
+    }
+    
+    .category-3d-content {
+      padding: 15px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .category-3d-card {
+      height: 150px;
+    }
+    
+    .category-emoji-3d {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+    
+    .category-name-3d {
+      font-size: 0.9rem;
+    }
+    
+    .category-3d-content {
+      padding: 10px;
+    }
+  }
+</style>

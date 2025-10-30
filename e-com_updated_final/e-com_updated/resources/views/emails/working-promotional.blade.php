@@ -37,7 +37,7 @@
             </div>
             
             <div style="text-align: center;">
-                <a href="http://127.0.0.1:8000" class="btn">🛒 Shop Now & Save Big!</a>
+                <a href="{{ config('app.url') }}" class="btn">🛒 Shop Now & Save Big!</a>
             </div>
             
             <p><strong>Why Choose GRAB BASKETS?</strong></p>

@@ -85,6 +85,71 @@
       color: #ff6b00;
       text-decoration: underline;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+        margin: 0.5rem;
+      }
+
+      .brand {
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .btn-primary {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.95rem;
+      }
+
+      .col-md-6 {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+      }
+
+      .card {
+        padding: 1.25rem;
+        border-radius: 15px;
+      }
+
+      .brand {
+        font-size: 1.2rem;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+      }
+
+      .form-control,
+      .input-group-text {
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -176,5 +241,49 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Login form optimization for faster submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.querySelector('form');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        // Prevent multiple submissions and show loading state
+        loginForm.addEventListener('submit', function(e) {
+            // Disable button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Signing in...';
+            
+            // Re-enable after 5 seconds as fallback
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 5000);
+        });
+        
+        // Prefill form validation for faster processing
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        
+        [loginInput, passwordInput].forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const feedback = this.parentElement.nextElementSibling;
+                if (feedback && feedback.classList.contains('text-danger')) {
+                    feedback.style.display = 'none';
+                }
+            });
+        });
+        
+        // Auto-submit on Enter key for faster login
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && loginInput.value && passwordInput.value) {
+                e.preventDefault();
+                loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        });
+    });
+  </script>
 </body>
 </html>

@@ -114,7 +114,7 @@
         <p>You can track your order status and view details in your account.</p>
         
         <p style="margin-top: 30px;">
-            <a href="{{ route('orders.track') }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Track Your Order</a>
+            <a href="{{ config('app.url') . route('orders.track', [], false) }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Track Your Order</a>
         </p>
     </div>
     

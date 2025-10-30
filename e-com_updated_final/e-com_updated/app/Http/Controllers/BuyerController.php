@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
 use App\Models\Blog;
+use App\Models\Seller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class BuyerController extends Controller
@@ -14,39 +16,344 @@ public function index()
 {
     $categories = Category::with('subcategories')->get();
 
-    $carouselProducts = Product::with('category')->inRandomOrder()->take(10)->get();
-    $products = Product::with('category')->latest()->paginate(12);
+    // Carousel products with higher discounts for banner
+    $carouselProducts = Product::with('category')
+        ->whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('discount', '>=', 20) // Only show products with 20% or higher discount in carousel
+        ->orderBy('discount', 'desc') // Order by highest discount first
+        ->take(10)
+        ->get();
+        
+    // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY RELEVANT IMAGES
+    $cookingCategory = Category::where('name', 'COOKING')->first();
+    $beautyCategory = Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
+    $dentalCategory = Category::where('name', 'DENTAL CARE')->first();
+    
+    $mixedProducts = collect();
+    
+    // Get products from each category
+    if ($cookingCategory) {
+        $cookingProducts = Product::where('category_id', $cookingCategory->id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->take(8)
+            ->get();
+        $mixedProducts = $mixedProducts->merge($cookingProducts);
+    }
+    
+    if ($beautyCategory) {
+        $beautyProducts = Product::where('category_id', $beautyCategory->id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+        $mixedProducts = $mixedProducts->merge($beautyProducts);
+    }
+    
+    if ($dentalCategory) {
+        $dentalProducts = Product::where('category_id', $dentalCategory->id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+        $mixedProducts = $mixedProducts->merge($dentalProducts);
+    }
+    
+    // Shuffle the mixed products and paginate
+    $shuffledProducts = $mixedProducts->shuffle();
+    $products = new \Illuminate\Pagination\LengthAwarePaginator(
+        $shuffledProducts->forPage(1, 12),
+        $shuffledProducts->count(),
+        12,
+        1,
+        ['path' => request()->url()]
+    );
     // 🔥 Trending items (fetch 5 random products)
-    $trending = Product::inRandomOrder()->take(5)->get();
- $lookbookProduct = Product::inRandomOrder()->first();
-$blogProducts = Product::inRandomOrder()->take(3)->get();
-    // ✅ Deals of the day (all products or special filtered ones)
-    // $deals = Product::latest()->take(10)->get();
+    $trending = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->inRandomOrder()
+        ->take(5)
+        ->get();
+ $lookbookProduct = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->inRandomOrder()
+        ->first();
+$blogProducts = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->inRandomOrder()
+        ->take(3)
+        ->get();
+    // ✅ Deals of the day - products with discounts
+    $deals = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('discount', '>', 0)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
+    
+    // 🔥 Flash Sale - products with high discounts (>20%)
+    $flashSale = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('discount', '>', 20)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
+    
+    // 🚚 Free Delivery - products with no delivery charge
+    $freeDelivery = Product::whereNotNull('image')
+        ->where('image', '!=', '')
+        ->where('image', 'NOT LIKE', '%unsplash%')
+        ->where('image', 'NOT LIKE', '%placeholder%')
+        ->where('image', 'NOT LIKE', '%via.placeholder%')
+        ->where('delivery_charge', 0)
+        ->inRandomOrder()
+        ->take(12)
+        ->get();
 
-    return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts',));
+    return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts','deals','flashSale','freeDelivery'));
 }
 
 
 
 public function search(Request $request)
 {
-    $query = Product::query();
+    try {
+        $searchQuery = $request->input('q', '');
+        $matchedStores = collect();
+        
+        $query = Product::with(['category', 'subcategory'])
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
 
-    if ($request->filled('q')) {
-        $query->where('name', 'like', "%{$request->q}%")
-              ->orWhere('description', 'like', "%{$request->q}%");
+        if ($request->filled('q')) {
+            $search = trim($searchQuery);
+            
+            // Search for matching stores - CASE INSENSITIVE and works with 2+ characters
+            // Using DB::raw with LOWER() for case-insensitive search in MySQL
+            $matchedStores = Seller::where(function($query) use ($search) {
+                    // Case-insensitive search on name
+                    $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                          // Case-insensitive search on store_name
+                          ->orWhereRaw('LOWER(store_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                          // Also search by email (case-insensitive)
+                          ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+                })
+                ->with(['user' => function($query) {
+                    $query->select('id', 'email');
+                }])
+                ->get()
+                ->map(function($seller) {
+                    // Get user ID for this seller
+                    $user = User::where('email', $seller->email)->first();
+                    if ($user) {
+                        $seller->user_id = $user->id;
+                        // Count products for this seller
+                        $seller->product_count = Product::where('seller_id', $user->id)->count();
+                    }
+                    return $seller;
+                });
+            
+            $query->where(function ($q) use ($search) {
+                // Search in product fields - CASE INSENSITIVE
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(unique_id) LIKE ?', ['%' . strtolower($search) . '%'])
+                  // Search in category (case-insensitive)
+                  ->orWhereHas('category', function($query) use ($search) {
+                      $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%']);
+                  })
+                  // Search in subcategory (case-insensitive)
+                  ->orWhereHas('subcategory', function($query) use ($search) {
+                      $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%']);
+                  });
+                  
+                // Search in sellers table (match seller emails to user emails, then to product seller_id)
+                // Case-insensitive search
+                $sellerEmails = Seller::where(function($query) use ($search) {
+                        $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                              ->orWhereRaw('LOWER(store_name) LIKE ?', ['%' . strtolower($search) . '%']);
+                    })
+                    ->pluck('email');
+                    
+                if ($sellerEmails->isNotEmpty()) {
+                    // Get user IDs that match these seller emails
+                    $userIds = User::whereIn('email', $sellerEmails)->pluck('id');
+                    if ($userIds->isNotEmpty()) {
+                        $q->orWhereIn('seller_id', $userIds);
+                    }
+                }
+            });
+        }
+
+        // Add sorting
+        $sort = $request->input('sort', 'relevance');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('view_count', 'desc');
+                break;
+            case 'discount':
+                $query->orderBy('discount', 'desc');
+                break;
+            default: // relevance
+                if ($request->filled('q')) {
+                    // When searching, prioritize exact matches - CASE INSENSITIVE
+                    $query->orderByRaw("CASE 
+                        WHEN LOWER(name) LIKE ? THEN 1
+                        WHEN LOWER(description) LIKE ? THEN 2
+                        ELSE 3
+                    END", ['%' . strtolower($search) . '%', '%' . strtolower($search) . '%'])
+                    ->orderBy('created_at', 'desc');
+                } else {
+                    $query->latest();
+                }
+        }
+
+        $products = $query->paginate(24)->appends($request->query());
+        
+        // Get search statistics
+        $totalResults = $products->total();
+        
+        // Prepare filters array for the view
+        $filters = [
+            'price_min' => $request->input('price_min'),
+            'price_max' => $request->input('price_max'),
+            'discount_min' => $request->input('discount_min'),
+            'free_delivery' => $request->boolean('free_delivery'),
+            'sort' => $request->input('sort', 'relevance')
+        ];
+        
+        // Log search query for analytics
+        if ($request->filled('q')) {
+            \Illuminate\Support\Facades\Log::info('Search Query', [
+                'query' => $searchQuery,
+                'results' => $totalResults,
+                'user_id' => auth()->id(),
+                'ip' => $request->ip()
+            ]);
+        }
+
+        return view('buyer.products', compact('products', 'searchQuery', 'totalResults', 'matchedStores', 'filters'));
+        
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Search Error', [
+            'query' => $request->input('q'),
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        // Return empty paginated result instead of collection
+        $emptyProducts = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect([]),
+            0,
+            24,
+            1,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        
+        return view('buyer.products', [
+            'products' => $emptyProducts,
+            'searchQuery' => $request->input('q', ''),
+            'totalResults' => 0,
+            'matchedStores' => collect([]),
+            'filters' => [],
+            'error' => 'An error occurred while searching. Please try again.'
+        ]);
     }
-
-    $products = $query->paginate(12);
-
-    return view('buyer.products', compact('products'));
 }
 
+
+    public function storeCatalog(Request $request, $seller_id)
+    {
+        // Get seller information
+        $user = User::findOrFail($seller_id);
+        $seller = Seller::where('email', $user->email)->first();
+        
+        if (!$seller) {
+            abort(404, 'Store not found');
+        }
+        
+        // Get all products from this seller
+        $query = Product::where('seller_id', $seller_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
+        
+        // Add sorting
+        $sort = $request->input('sort', 'newest');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'discount':
+                $query->orderBy('discount', 'desc');
+                break;
+            default: // newest
+                $query->orderBy('created_at', 'desc');
+        }
+        
+        $products = $query->paginate(24)->appends($request->query());
+        $totalProducts = $query->count();
+        
+        return view('buyer.store-catalog', compact('seller', 'products', 'totalProducts'));
+    }
 
     public function productsByCategory(Request $request, $category_id)
     {
         $category = Category::findOrFail($category_id);
-        $query = Product::where('category_id', $category_id);
+        $query = Product::where('category_id', $category_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
 
         // Filters
         if ($request->filled('price_min')) {
@@ -103,8 +410,19 @@ public function search(Request $request)
     public function productsBySubcategory(Request $request, $subcategory_id)
     {
          $subcategory = Subcategory::with('category')->findOrFail($subcategory_id);
-          $products = Product::where('subcategory_id', $subcategory_id)->paginate(10);
-        $query = Product::where('subcategory_id', $subcategory_id);
+          $products = Product::where('subcategory_id', $subcategory_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%')
+            ->paginate(10);
+        $query = Product::where('subcategory_id', $subcategory_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('image', 'NOT LIKE', '%unsplash%')
+            ->where('image', 'NOT LIKE', '%placeholder%')
+            ->where('image', 'NOT LIKE', '%via.placeholder%');
 
         // Filters
         if ($request->filled('price_min')) {

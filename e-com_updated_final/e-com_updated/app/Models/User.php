@@ -30,6 +30,7 @@ class User extends Authenticatable
         'password',
         'dob',
         'default_address',
+        'profile_picture',
     ];
 
     /**

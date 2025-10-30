@@ -41,6 +41,122 @@
             justify-content: center;
             font-size: 1.5rem;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            /* Header adjustments */
+            .dashboard-header {
+                padding: 1.5rem 0;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-header p {
+                font-size: 0.9rem;
+            }
+
+            /* Navbar mobile */
+            .navbar .container-fluid {
+                flex-wrap: wrap;
+            }
+
+            .navbar form {
+                width: 100% !important;
+                margin-top: 10px;
+                order: 3;
+            }
+
+            .navbar .d-flex.align-items-center {
+                flex-wrap: wrap;
+                gap: 8px !important;
+            }
+
+            /* Stat cards in single column */
+            .row.g-4 .col-md-3,
+            .row.g-4 .col-md-4,
+            .row.g-4 .col-md-6,
+            .row.g-4 .col-md-8 {
+                width: 100%;
+            }
+
+            /* Reduce stat icon size */
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            /* Button sizing */
+            .btn-sm {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            /* Quick action buttons */
+            .btn.w-100.py-3 {
+                padding: 1rem !important;
+                font-size: 0.9rem;
+            }
+
+            /* Profile card adjustments */
+            .rounded-circle {
+                width: 60px !important;
+                height: 60px !important;
+                font-size: 1.5rem !important;
+            }
+
+            /* Container padding */
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            /* Extra small devices */
+            .dashboard-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .navbar img[alt="Logo"] {
+                width: 140px !important;
+            }
+
+            /* Hide some text on very small screens */
+            .btn-outline-warning span:not(.bi) {
+                display: none;
+            }
+
+            .btn-outline-warning {
+                padding: 0.375rem 0.5rem;
+            }
+
+            /* Stack quick actions vertically */
+            .quick-actions .col-md-6 {
+                width: 100%;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Touch-friendly targets */
+        @media (hover: none) and (pointer: coarse) {
+            .btn,
+            .dropdown-toggle {
+                min-height: 44px;
+                padding: 0.5rem 1rem;
+            }
+
+            .card-body a {
+                padding: 0.6rem 1rem;
+            }
+        }
     </style>
 </head>
 

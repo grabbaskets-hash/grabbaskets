@@ -46,4 +46,8 @@ return [
         'sender' => env('INFOBIP_SENDER', 'GrabBasket'),
     ],
 
+    'google' => [
+        'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
 ];

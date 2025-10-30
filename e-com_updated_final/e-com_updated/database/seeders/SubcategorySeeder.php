@@ -23,12 +23,19 @@ class SubcategorySeeder extends Seeder
                 ['name' => 'Gaming', 'unique_id' => 'GAM', 'description' => 'Gaming consoles and accessories'],
                 ['name' => 'Wearables', 'unique_id' => 'WEA', 'description' => 'Smartwatches and fitness trackers'],
             ],
-            'FASHION & CLOTHING' => [
-                ['name' => 'Men\'s Clothing', 'unique_id' => 'MEN', 'description' => 'Clothing for men'],
-                ['name' => 'Women\'s Clothing', 'unique_id' => 'WOM', 'description' => 'Clothing for women'],
-                ['name' => 'Footwear', 'unique_id' => 'FOO', 'description' => 'Shoes and sandals'],
-                ['name' => 'Bags & Luggage', 'unique_id' => 'BAG', 'description' => 'Handbags, backpacks, and luggage'],
-                ['name' => 'Watches', 'unique_id' => 'WAT', 'description' => 'Fashion watches and timepieces'],
+            'MEN\'S FASHION' => [
+                ['name' => 'Men\'s Shirts', 'unique_id' => 'MSH', 'description' => 'Casual and formal shirts for men'],
+                ['name' => 'Men\'s Pants', 'unique_id' => 'MPA', 'description' => 'Trousers, jeans, and pants for men'],
+                ['name' => 'Men\'s Shoes', 'unique_id' => 'MSO', 'description' => 'Formal and casual shoes for men'],
+                ['name' => 'Men\'s Accessories', 'unique_id' => 'MAC', 'description' => 'Wallets, belts, and accessories for men'],
+                ['name' => 'Men\'s Watches', 'unique_id' => 'MWA', 'description' => 'Watches and timepieces for men'],
+            ],
+            'WOMEN\'S FASHION' => [
+                ['name' => 'Women\'s Dresses', 'unique_id' => 'WDR', 'description' => 'Casual and formal dresses for women'],
+                ['name' => 'Women\'s Tops', 'unique_id' => 'WTO', 'description' => 'Blouses, shirts, and tops for women'],
+                ['name' => 'Women\'s Bottoms', 'unique_id' => 'WBO', 'description' => 'Skirts, pants, and bottoms for women'],
+                ['name' => 'Women\'s Shoes', 'unique_id' => 'WSO', 'description' => 'Heels, flats, and shoes for women'],
+                ['name' => 'Handbags', 'unique_id' => 'HAN', 'description' => 'Purses, bags, and handbags'],
             ],
             'HOME & KITCHEN' => [
                 ['name' => 'Kitchen Appliances', 'unique_id' => 'KIT', 'description' => 'Kitchen appliances and tools'],
@@ -54,11 +61,12 @@ class SubcategorySeeder extends Seeder
                 ['name' => 'Textbooks', 'unique_id' => 'TEX', 'description' => 'Academic and educational textbooks'],
                 ['name' => 'Children\'s Books', 'unique_id' => 'CHI', 'description' => 'Books for children'],
             ],
-            'TOYS & GAMES' => [
+            'KIDS & TOYS' => [
                 ['name' => 'Action Figures', 'unique_id' => 'ACT', 'description' => 'Action figures and collectibles'],
                 ['name' => 'Board Games', 'unique_id' => 'BOA', 'description' => 'Board games and puzzles'],
                 ['name' => 'Educational Toys', 'unique_id' => 'EDU', 'description' => 'Educational and learning toys'],
                 ['name' => 'Outdoor Toys', 'unique_id' => 'OTO', 'description' => 'Outdoor play equipment'],
+                ['name' => 'Kids Clothing', 'unique_id' => 'KCL', 'description' => 'Clothing for children'],
             ],
             'AUTOMOTIVE' => [
                 ['name' => 'Car Accessories', 'unique_id' => 'CAR', 'description' => 'Car accessories and parts'],
@@ -98,9 +106,9 @@ class SubcategorySeeder extends Seeder
                 ['name' => 'Cat Supplies', 'unique_id' => 'CAT', 'description' => 'Supplies for cats'],
                 ['name' => 'Pet Food', 'unique_id' => 'PFO', 'description' => 'Pet food and treats'],
             ],
-            'BABY & KIDS' => [
+            'BABY PRODUCTS' => [
                 ['name' => 'Baby Care', 'unique_id' => 'BBC', 'description' => 'Baby care products'],
-                ['name' => 'Kids Clothing', 'unique_id' => 'KCL', 'description' => 'Clothing for children'],
+                ['name' => 'Baby Clothing', 'unique_id' => 'BCL', 'description' => 'Clothing for babies'],
                 ['name' => 'Baby Gear', 'unique_id' => 'BGE', 'description' => 'Baby strollers, car seats, etc.'],
             ],
         ];

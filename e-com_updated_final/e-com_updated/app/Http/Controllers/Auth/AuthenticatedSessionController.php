@@ -29,35 +29,21 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
+        
         $user = Auth::user();
-        $role = $user->role ?? $request->input('role');
+        $role = $user->role ?? 'buyer';
         
-        // Gender-based greeting
-        $greeting = $this->getGenderBasedGreeting($user->sex ?? 'other', $user->name);
-
-        // Send login email notification
-        if ($user->email) {
-            $subject = 'Login Notification';
-            $message = $role === 'seller'
-                ? "Dear {$user->name}, you have successfully logged in as a seller."
-                : "Dear {$user->name}, you have successfully logged in as a buyer.";
-            Mail::raw($message, function ($mail) use ($user, $subject) {
-                $mail->to($user->email)
-                    ->subject($subject);
-            });
-        }
+        // Simple greeting message (faster processing)
+        $greeting = "வணக்கம் {$user->name}! Welcome back to GrabBasket!";
         
-        if ($role === 'seller') {
-            return redirect()->route('seller.dashboard')->with('success', $greeting);
-        }
-        if ($role === 'buyer') {
-            return redirect()->route('home')->with('success', $greeting);
-        }
-        return redirect()->intended(route('dashboard', absolute: false));
-
+        // Streamlined redirect logic
+        $redirectRoute = $role === 'seller' ? 'seller.dashboard' : 'home';
         
+        return redirect()->route($redirectRoute)->with([
+            'success' => $greeting,
+            'login_success' => true
+        ]);
     }
 
     /**
@@ -93,13 +79,13 @@ class AuthenticatedSessionController extends Controller
     {
         switch ($gender) {
             case 'male':
-                return "Welcome back, Mr. {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             case 'female':
-                return "Welcome back, Ms or Mrs. {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             case 'other':
-                return "Welcome back, {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
             default:
-                return "Welcome back, {$name}!";
+                return "வணக்கம் {$name}! Welcome back to GrabBasket!";
         }
     }
 }

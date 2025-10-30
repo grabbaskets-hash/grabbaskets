@@ -159,7 +159,14 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="images" class="form-label">Product Images (filenames must match product unique_id, e.g., UID001.jpg)</label>
+                    <label for="images_zip" class="form-label">Images ZIP (optional)</label>
+                    <input class="form-control" type="file" id="images_zip" name="images_zip" accept=".zip">
+                    <div class="form-text">
+                        Place product images inside the ZIP. Filenames should match the Excel image column or the product unique_id (case-insensitive). Example: ABC123.jpg matches unique_id ABC123.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="images" class="form-label">Or select individual images (optional)</label>
                     <input class="form-control" type="file" id="images" name="images[]" accept="image/*" multiple webkitdirectory directory>
                 </div>
                 <button type="submit" class="btn btn-primary">Upload Products</button>

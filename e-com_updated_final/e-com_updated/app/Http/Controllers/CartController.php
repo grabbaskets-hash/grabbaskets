@@ -25,28 +25,72 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'nullable|integer|min:1|max:10',
+            'delivery_type' => 'nullable|in:express_10min,standard',
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
-        $qty = max(1, (int) $request->input('quantity', 1));
+        // Check stock availability
+        if ($product->stock_quantity !== null && $product->stock_quantity <= 0) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product is out of stock'
+                ], 400);
+            }
+            return back()->with('error', 'Product is out of stock');
+        }
 
-        $item = CartItem::firstOrNew([
+        $qty = max(1, (int) $request->input('quantity', 1));
+        $deliveryType = $request->input('delivery_type', 'standard');
+
+        // Check if user already has this product in cart
+        $item = CartItem::where([
             'user_id' => Auth::id(),
             'product_id' => $product->id,
-        ]);
-        if ($item->exists) {
-            $item->quantity += $qty;
+        ])->first();
+
+        if ($item) {
+            // Check if total quantity would exceed stock
+            $newQuantity = $item->quantity + $qty;
+            if ($product->stock_quantity !== null && $newQuantity > $product->stock_quantity) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Not enough stock available. Available: ' . $product->stock_quantity . ', In cart: ' . $item->quantity
+                    ], 400);
+                }
+                return back()->with('error', 'Not enough stock available');
+            }
+            $item->quantity = $newQuantity;
         } else {
+            // Create new cart item
+            $item = new CartItem();
+            $item->user_id = Auth::id();
+            $item->product_id = $product->id;
             $item->seller_id = $product->seller_id;
             $item->price = $product->price;
             $item->discount = $product->discount ?? 0;
             $item->delivery_charge = $product->delivery_charge ?? 0;
             $item->quantity = $qty;
+            $item->delivery_type = $deliveryType;
         }
+        
         $item->save();
 
-        return redirect()->route('cart.index')->with('Sucess');
+        $successMessage = 'Item added to ' . ($deliveryType === 'express_10min' ? '10-min' : 'standard') . ' cart!';
+
+        // Return JSON response for AJAX requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMessage,
+                'cart_item' => $item->load('product'),
+                'cart_count' => CartItem::where('user_id', Auth::id())->sum('quantity')
+            ]);
+        }
+
+        return redirect()->route('cart.index')->with('success', $successMessage);
     }
 
     public function update(Request $request, CartItem $cartItem)
@@ -141,6 +185,60 @@ class CartController extends Controller
         CartItem::where('user_id', Auth::id())->delete();
 
         return redirect()->route('cart.index')->with('success', 'Order placed! Payment ' . ($payment_status === 'paid' ? 'successful' : 'pending for COD'));
+    }
+
+    /**
+     * Show new checkout page with separate carts for express and standard delivery
+     */
+    public function showCheckoutNew()
+    {
+        $expressCartItems = CartItem::with('product')
+            ->where('user_id', Auth::id())
+            ->where('delivery_type', 'express_10min')
+            ->get();
+
+        $standardCartItems = CartItem::with('product')
+            ->where('user_id', Auth::id())
+            ->where('delivery_type', 'standard')
+            ->get();
+
+        if ($expressCartItems->isEmpty() && $standardCartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('info', 'Your cart is empty');
+        }
+
+        // Calculate totals
+        $expressTotal = $expressCartItems->sum(function ($item) {
+            return $this->lineAmount($item);
+        });
+
+        $standardTotal = $standardCartItems->sum(function ($item) {
+            return $this->lineAmount($item);
+        });
+
+        return view('cart.checkout-new', compact(
+            'expressCartItems',
+            'standardCartItems',
+            'expressTotal',
+            'standardTotal'
+        ));
+    }
+
+    /**
+     * Switch item delivery type
+     */
+    public function switchDeliveryType(Request $request, CartItem $cartItem)
+    {
+        if ($cartItem->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'delivery_type' => 'required|in:express_10min,standard',
+        ]);
+
+        $cartItem->update(['delivery_type' => $request->delivery_type]);
+
+        return back()->with('success', 'Delivery type updated!');
     }
 
     private function calculateTotals($items)
