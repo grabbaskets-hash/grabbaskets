@@ -584,8 +584,14 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Public product search - Anyone can search
-Route::get('/products', [BuyerController::class, 'search'])->name('products.index');
+// Public product search - Anyone can search (optimized for guests)
+Route::get('/products', [App\Http\Controllers\OptimizedBuyerController::class, 'guestSearch'])->name('products.index');
+
+// Search suggestions API for autocomplete (guest-friendly)
+Route::get('/api/search/suggestions', [App\Http\Controllers\OptimizedBuyerController::class, 'getSearchSuggestions'])->name('search.suggestions');
+
+// Fallback to original search if needed
+Route::get('/products/legacy', [BuyerController::class, 'search'])->name('products.legacy');
 
 // Store/Seller catalog - View all products from a specific store
 Route::get('/store/{seller_id}/catalog', [BuyerController::class, 'storeCatalog'])->name('store.catalog');
