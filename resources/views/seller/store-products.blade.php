@@ -246,17 +246,32 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
-        /* 🖼️ Product Image Fix */
+        /* 🛍️ Product Card Layout */
+        .product-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 🖼️ Image Styling */
         .product-img {
             width: 100%;
-            height: 230px;
-            /* Fixed image height for all cards */
-            object-fit: contain;
-            /* 🔥 shows full image inside without cropping */
-            background-color: #f8f9fa;
-            /* light background for transparent images */
-            padding: 10px;
-            /* optional, to avoid tight image edges */
+            height: 180px;
+            /* Rectangle shape for desktop */
+            object-fit: cover;
+            /* fills area without white space */
             transition: transform 0.3s ease, filter 0.3s ease;
         }
 
@@ -265,13 +280,74 @@
             filter: brightness(0.95);
         }
 
-        /* Card body alignment */
+        /* Card body content */
         .card-body {
             text-align: center;
-            padding: 1.2rem;
-            flex-grow: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
+        /* Product title and price */
+        .product-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ff5722;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Buy Now button */
+        .btn-view {
+            background-color: #ff5722;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background-color: #e64a19;
+        }
+
+        /* 📱 Responsive Adjustments */
+        @media (max-width: 576px) {
+
+            /* 2 cards per row */
+            .col-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* Rectangle image smaller on mobile */
+            .product-img {
+                height: 150px;
+                object-fit: cover;
+            }
+
+            .product-title {
+                font-size: 0.9rem;
+            }
+
+            .product-price {
+                font-size: 0.85rem;
+            }
+
+            .btn-view {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+        }
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
@@ -362,25 +438,28 @@
     <!-- 🛒 Main Products Section -->
     <div class="container py-5">
         @if($products->count())
-        <div class="row g-4" id="productGrid">
-            @foreach($products as $p)
-            <div class="col-4 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
-                <div class="card product-card">
+        <div class="row g-3">
+            @foreach ($products as $p)
+            <div class="col-6 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
+                <div class="card product-card h-100">
                     @if($p->image || $p->image_data)
                     <img src="{{ $p->image_url }}" alt="{{ $p->name }}" class="product-img">
                     @endif
-                    <div class="card-body">
-                        <h5 class="product-title">{{ $p->name }}</h5>
-                        <div class="product-price">₹{{ number_format($p->price, 2) }}</div>
-                        <a href="{{ route('product.details', $p->id) }}" class="btn btn-view">
+
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="product-title">{{ $p->name }}</h5>
+                            <div class="product-price">₹{{ number_format($p->price, 2) }}</div>
+                        </div>
+                        <a href="{{ route('product.details', $p->id) }}" class="btn btn-view mt-auto">
                             <i class="bi bi-bag-heart-fill"></i> Buy Now
                         </a>
                     </div>
                 </div>
             </div>
-
             @endforeach
         </div>
+
         @else
         <div class="text-center py-5">
             <h4 class="text-muted">No products found for this store.</h4>
