@@ -538,8 +538,14 @@
 
       /* HIDE CATEGORIES BANNER ON MOBILE - Keep for desktop only */
       .zepto-cat-section,
-      section:has(.zepto-cat-section) {
+      section:has(.zepto-cat-section),
+      #categoryBannerSection {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
       }
 
       /* Keep mobile category menu popup visible and positioned correctly */
@@ -561,6 +567,21 @@
         padding: 20px;
         margin-top: 60px; /* Space from top */
         box-shadow: 0 -2px 20px rgba(0,0,0,0.2);
+      }
+
+      /* Force hide any category-related elements that might interfere on mobile */
+      .zepto-cat-header,
+      .zepto-cat-nav,
+      .zepto-cat-track,
+      .zepto-cat-item {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      /* Ensure mobile layout is clean and unobstructed */
+      .hero-section {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
       }
     }
 
@@ -636,8 +657,14 @@
 
       /* SHOW CATEGORIES BANNER ON DESKTOP ONLY */
       .zepto-cat-section,
-      section:has(.zepto-cat-section) {
+      section:has(.zepto-cat-section),
+      #categoryBannerSection {
         display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        margin: initial !important;
+        padding: initial !important;
+        overflow: visible !important;
       }
     }
 
