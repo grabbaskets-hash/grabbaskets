@@ -48,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'delivery_partners',
         ],
+        'hotel_owner' => [
+            'driver' => 'session',
+            'provider' => 'hotel_owners',
+        ],
     ],
 
     /*
@@ -79,6 +83,10 @@ return [
         'delivery_partners' => [
             'driver' => 'eloquent',
             'model' => App\Models\DeliveryPartner::class,
+        ],
+        'hotel_owners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\HotelOwner::class,
         ],
 
         // 'users' => [

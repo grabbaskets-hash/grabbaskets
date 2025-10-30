@@ -237,7 +237,7 @@
       border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 72px;
-      z-index: 999;
+      z-index: 100; /* Lower z-index to not interfere with modals */
     }
 
     .category-scroll {
@@ -503,43 +503,64 @@
         display: none !important;
       }
 
-      /* Fix z-index issues for mobile modals and mini windows */
-      .modal,
-      .modal-backdrop,
-      .dropdown-menu,
-      .popover,
-      .tooltip {
-        z-index: 9999 !important;
-      }
-
       /* Hide delivery banner and category pills on mobile to prevent layout disruption */
       .delivery-banner-modern,
       .category-pills-modern {
         display: none !important;
       }
+    }
 
-      /* Ensure other elements don't interfere with modals on mobile */
-      .promo-tiles,
-      section[style*="background"] {
-        z-index: 1 !important;
-      }
+    /* ============================================
+       Z-INDEX HIERARCHY (Global - Both Desktop & Mobile)
+       ============================================ */
+    /* Base content: 1-99 */
+    .promo-tiles,
+    section[style*="background"] {
+      z-index: 1;
+    }
 
-      /* Mobile search suggestions should be above banners */
-      .zepto-suggestions,
-      #search-suggestions,
-      .search-suggestions {
-        z-index: 8888 !important;
-      }
+    /* Sticky elements: 100-999 */
+    .navbar-modern {
+      z-index: 1000;
+    }
 
-      /* Mobile category popup above everything except modals */
-      .mobile-category-popup {
-        z-index: 8000 !important;
-      }
+    .category-pills-modern {
+      z-index: 100; /* Lower than navbar, won't interfere with modals */
+    }
 
-      /* Fix mobile location modal z-index */
-      .location-modal {
-        z-index: 9000 !important;
-      }
+    /* Popups and suggestions: 1000-8999 */
+    .zepto-suggestions,
+    #search-suggestions,
+    .search-suggestions {
+      z-index: 2000;
+    }
+
+    .mobile-category-popup,
+    .modern-category-popup {
+      z-index: 3000;
+    }
+
+    .mobile-profile-popup {
+      z-index: 3500;
+    }
+
+    /* Important modals: 9000-9999 */
+    .location-modal,
+    .location-modal-overlay {
+      z-index: 9000;
+    }
+
+    /* System modals (highest priority): 10000+ */
+    .modal,
+    .modal-backdrop,
+    .dropdown-menu,
+    .popover,
+    .tooltip {
+      z-index: 10000 !important;
+    }
+
+    /* Mobile specific adjustments */
+    @media (max-width: 768px) {
 
       /* Category banner completely removed from page */
 
@@ -3738,12 +3759,22 @@ li a{
   <!-- Delivery Banner -->
   <div class="delivery-banner-modern">
     <div class="container">
-      <h3>
-        <i class="bi bi-lightning-charge-fill"></i>
-        Get 10-Minute Delivery on Groceries & Essentials
-        <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.8rem; margin-left: 8px;">Within 5km</span>
-      </h3>
-      <p>Free delivery on orders above ₹499 • Same-day delivery available nationwide</p>
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h3>
+            <i class="bi bi-lightning-charge-fill"></i>
+            Get 10-Minute Delivery on Groceries & Essentials
+            <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.8rem; margin-left: 8px;">Within 5km</span>
+          </h3>
+          <p>Free delivery on orders above ₹499 • Same-day delivery available nationwide</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <a href="{{ route('food.index') }}" class="btn btn-light btn-sm" style="background: rgba(255,255,255,0.9); color: var(--primary-color); font-weight: 600; padding: 8px 16px; border-radius: 20px; text-decoration: none;">
+            <i class="bi bi-cup-hot-fill me-1"></i>
+            Order Food Now
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3754,8 +3785,11 @@ li a{
         <a href="{{ route('home') }}" class="category-pill active">
           <i class="bi bi-house-fill me-1"></i> All
         </a>
+        <a href="{{ route('food.index') }}" class="category-pill" style="background: #FF6B35; color: white; border-color: #FF6B35;">
+          <i class="bi bi-cup-hot-fill me-1"></i> Food Delivery
+        </a>
         @if(!empty($categories) && $categories->count())
-          @foreach($categories->take(15) as $category)
+          @foreach($categories->take(14) as $category)
             <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="category-pill">
               {{ $category->emoji }} {{ $category->name }}
             </a>

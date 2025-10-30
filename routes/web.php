@@ -1532,3 +1532,61 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:d
     // Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
     //     ->name('support.submit');
 });
+
+// ============================================
+// HOTEL OWNER ROUTES (Food Delivery System)
+// ============================================
+
+// Hotel Owner Authentication Routes
+Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
+    // Guest routes (not authenticated)
+    Route::middleware('guest:hotel_owner')->group(function () {
+        Route::get('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'showLoginForm'])
+            ->name('login');
+        Route::post('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'login']);
+        
+        Route::get('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'showRegistrationForm'])
+            ->name('register');
+        Route::post('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'register']);
+    });
+
+    // Authenticated routes
+    Route::middleware('auth:hotel_owner')->group(function () {
+        Route::post('/logout', [App\Http\Controllers\HotelOwner\AuthController::class, 'logout'])
+            ->name('logout');
+
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\HotelOwner\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Profile Management
+        Route::get('/profile', [App\Http\Controllers\HotelOwner\DashboardController::class, 'profile'])
+            ->name('profile');
+        Route::put('/profile', [App\Http\Controllers\HotelOwner\DashboardController::class, 'updateProfile'])
+            ->name('profile.update');
+
+        // Food Items Management
+        Route::resource('food-items', App\Http\Controllers\HotelOwner\FoodItemController::class);
+
+        // Orders Management
+        Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
+            ->name('orders');
+        Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
+            ->name('orders.show');
+        Route::patch('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
+            ->name('orders.update-status');
+
+        // Analytics and Reports
+        Route::get('/analytics', [App\Http\Controllers\HotelOwner\AnalyticsController::class, 'index'])
+            ->name('analytics');
+    });
+});
+
+// Food Delivery Routes (Customer-facing)
+Route::prefix('food')->name('food.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Food\FoodController::class, 'index'])->name('index');
+    Route::get('/restaurants', [App\Http\Controllers\Food\FoodController::class, 'restaurants'])->name('restaurants');
+    Route::get('/restaurant/{hotelOwner}', [App\Http\Controllers\Food\FoodController::class, 'restaurant'])->name('restaurant');
+    Route::get('/category/{category}', [App\Http\Controllers\Food\FoodController::class, 'category'])->name('category');
+    Route::post('/add-to-cart', [App\Http\Controllers\Food\FoodController::class, 'addToCart'])->name('add-to-cart');
+});
