@@ -621,6 +621,113 @@
     }
 
     /* ============================================
+       MOBILE PROFILE MENU STYLES
+       ============================================ */
+    .mobile-profile-popup {
+      position: fixed;
+      bottom: 80px; /* Above mobile nav */
+      right: 20px;
+      left: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.25);
+      padding: 0;
+      z-index: 1600;
+      max-height: 70vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mobile-profile-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .mobile-profile-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 20px;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+    }
+
+    .mobile-profile-avatar {
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .mobile-profile-menu {
+      padding: 0;
+    }
+
+    .mobile-profile-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      text-decoration: none;
+      color: var(--text-dark);
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-profile-item:hover {
+      background: #f8f9fa;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .mobile-profile-item:last-child {
+      border-bottom: none;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .mobile-profile-item i {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 1.1rem;
+      color: var(--primary-color);
+    }
+
+    .mobile-profile-item.logout {
+      color: #dc3545;
+    }
+
+    .mobile-profile-item.logout i {
+      color: #dc3545;
+    }
+
+    .mobile-profile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-profile-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ============================================
        RESPONSIVE UTILITIES
        ============================================ */
     @media (max-width: 768px) {
@@ -6082,6 +6189,41 @@ li a{
       }
     });
 
+    // Mobile Profile Menu Functions
+    function toggleMobileProfileMenu() {
+      const popup = document.getElementById('mobileProfilePopup');
+      const overlay = document.getElementById('mobileProfileOverlay');
+      
+      if (popup && overlay) {
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    }
+
+    // Close mobile profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const popup = document.getElementById('mobileProfilePopup');
+      const overlay = document.getElementById('mobileProfileOverlay');
+      const accountButton = event.target.closest('[onclick="toggleMobileProfileMenu()"]');
+      
+      if (popup && popup.classList.contains('show') && !popup.contains(event.target) && !accountButton) {
+        popup.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
     // Add hover effects to mobile category cards
     document.addEventListener('DOMContentLoaded', function() {
       const categoryCards = document.querySelectorAll('.category-mobile-card');
@@ -6414,10 +6556,10 @@ li a{
     </a>
     
     @auth
-      <a href="{{ route('profile.show') }}" class="mobile-nav-item">
+      <div class="mobile-nav-item" onclick="toggleMobileProfileMenu()" style="cursor: pointer;">
         <i class="bi bi-person-circle"></i>
         <span>Account</span>
-      </a>
+      </div>
     @else
       <a href="{{ route('login') }}" class="mobile-nav-item">
         <i class="bi bi-box-arrow-in-right"></i>
@@ -6467,6 +6609,57 @@ li a{
       </div>
     </div>
   </div>
+
+  <!-- Mobile Profile Menu Popup -->
+  @auth
+  <div class="mobile-profile-overlay" id="mobileProfileOverlay" onclick="toggleMobileProfileMenu()"></div>
+  <div class="mobile-profile-popup" id="mobileProfilePopup">
+    <div class="mobile-profile-header">
+      <div class="mobile-profile-avatar">
+        <i class="bi bi-person-fill" style="font-size: 2rem; color: white;"></i>
+      </div>
+      <h5 class="mb-1">{{ Auth::user()->name ?? 'User' }}</h5>
+      <p class="mb-0 opacity-75" style="font-size: 0.9rem;">{{ Auth::user()->email }}</p>
+    </div>
+    <div class="mobile-profile-menu">
+      <a href="{{ route('profile.show') }}" class="mobile-profile-item">
+        <i class="bi bi-person-circle"></i>
+        <span>My Profile</span>
+      </a>
+      <a href="{{ route('orders.index') }}" class="mobile-profile-item">
+        <i class="bi bi-box-seam"></i>
+        <span>My Orders</span>
+      </a>
+      <a href="{{ route('wishlist.index') }}" class="mobile-profile-item">
+        <i class="bi bi-heart"></i>
+        <span>My Wishlist</span>
+      </a>
+      <a href="{{ route('cart.index') }}" class="mobile-profile-item">
+        <i class="bi bi-cart3"></i>
+        <span>My Cart</span>
+      </a>
+      <a href="{{ route('notifications.index') }}" class="mobile-profile-item">
+        <i class="bi bi-bell"></i>
+        <span>Notifications</span>
+      </a>
+      <a href="#" class="mobile-profile-item">
+        <i class="bi bi-headset"></i>
+        <span>Help & Support</span>
+      </a>
+      <a href="#" class="mobile-profile-item">
+        <i class="bi bi-gear"></i>
+        <span>Settings</span>
+      </a>
+      <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+        @csrf
+        <button type="submit" class="mobile-profile-item logout" style="width: 100%; background: none; border: none; text-align: left;">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </button>
+      </form>
+    </div>
+  </div>
+  @endauth
 
   <!-- Location Detection Modal -->
   <div class="location-modal-overlay" id="locationModalOverlay" onclick="closeLocationModal()"></div>
