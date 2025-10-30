@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -22,7 +23,8 @@ use Exception;
 #use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
-class SellerController extends Controller {
+class SellerController extends Controller
+{
     // ...existing code...
 
     // Bulk product upload: CSV + images
@@ -69,13 +71,13 @@ class SellerController extends Controller {
                 $img = $imageMap[$uid];
                 // Store under products/ to keep URL generation consistent
                 $folder = "products/seller/{$sellerId}/{$data['category_id']}/{$data['subcategory_id']}";
-                
+
                 // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
                 $r2Path = null;
                 $publicPath = null;
                 $r2Success = false;
                 $publicSuccess = false;
-                
+
                 // Try AWS R2 first
                 try {
                     $r2Path = $img->store($folder, 'r2');
@@ -86,7 +88,7 @@ class SellerController extends Controller {
                         'unique_id' => $uid
                     ]);
                 }
-                
+
                 // Then save to Git storage (public disk)
                 try {
                     $publicPath = $img->store($folder, 'public');
@@ -97,14 +99,14 @@ class SellerController extends Controller {
                         'unique_id' => $uid
                     ]);
                 }
-                
+
                 // Use whichever path was successful (prefer R2)
                 $finalPath = $r2Success ? $r2Path : $publicPath;
-                
+
                 if ($finalPath) {
                     $product->image = $finalPath;
                     $updatedImages++;
-                    
+
                     Log::info('Bulk product image stored with dual storage redundancy', [
                         'unique_id' => $uid,
                         'path' => $finalPath,
@@ -147,14 +149,26 @@ class SellerController extends Controller {
         }
         if ($product->image) {
             // Try delete from both disks, ignore errors
-            try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
-            try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
+            try {
+                Storage::disk('r2')->delete($product->image);
+            } catch (\Throwable $e) {
+            }
+            try {
+                Storage::disk('public')->delete($product->image);
+            } catch (\Throwable $e) {
+            }
         }
 
         // Delete all product images
         foreach ($product->productImages as $productImage) {
-            try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
-            try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+            try {
+                Storage::disk('r2')->delete($productImage->image_path);
+            } catch (\Throwable $e) {
+            }
+            try {
+                Storage::disk('public')->delete($productImage->image_path);
+            } catch (\Throwable $e) {
+            }
             $productImage->delete();
         }
 
@@ -271,8 +285,14 @@ class SellerController extends Controller {
         }
 
         // Delete from storage
-        try { Storage::disk('r2')->delete($productImage->image_path); } catch (\Throwable $e) {}
-        try { Storage::disk('public')->delete($productImage->image_path); } catch (\Throwable $e) {}
+        try {
+            Storage::disk('r2')->delete($productImage->image_path);
+        } catch (\Throwable $e) {
+        }
+        try {
+            Storage::disk('public')->delete($productImage->image_path);
+        } catch (\Throwable $e) {
+        }
 
         $productImage->delete();
 
@@ -310,24 +330,23 @@ class SellerController extends Controller {
     {
         // Get the User ID from the seller's email (products.seller_id references users.id, not sellers.id)
         $user = User::where('email', $seller->email)->first();
-        
+
         if (!$user) {
             // If no matching user found, return empty products
-            $products = Product::with(['category', 'subcategory'])
-                ->whereNull('id') // Force empty result
-                ->paginate(12);
+            $products = collect(); // empty collection instead of paginate
             return view('seller.store-products', compact('seller', 'products'));
         }
-        
-        // Find products by the user ID
+
+        // Find all products by the user ID (no pagination)
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', $user->id)
             ->whereNotNull('image') // Only show products with images
             ->latest()
-            ->paginate(12);
-            
+            ->get(); // ✅ replaced paginate(12) with get()
+
         return view('seller.store-products', compact('seller', 'products'));
     }
+
     public function updateProfile(Request $request)
     {
         try {
@@ -341,50 +360,50 @@ class SellerController extends Controller {
             ]);
 
             $user = Auth::user();
-            
+
             if (!$user) {
                 Log::error('updateProfile: User not authenticated');
-                
+
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Please log in to update your profile.'
                     ], 401);
                 }
-                
+
                 return redirect()->route('login')->with('error', 'Please log in to update your profile.');
             }
-            
+
             $seller = \App\Models\Seller::where('email', $user->email)->first();
-            
+
             if (!$seller) {
                 Log::error('updateProfile: Seller not found', [
                     'user_id' => $user->id,
                     'email' => $user->email
                 ]);
-                
+
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Seller profile not found.'
                     ], 404);
                 }
-                
+
                 return redirect()->back()->with('error', 'Seller profile not found.');
             }
-            
+
             // Handle avatar/emoji URL (simpler than file upload)
             if ($request->has('avatar_url')) {
                 $avatarUrl = $request->input('avatar_url');
-                
+
                 // Update user's profile picture with avatar URL
                 \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
-                
+
                 Log::info('Profile avatar updated successfully', [
                     'user_id' => $user->id,
                     'avatar_url' => $avatarUrl
                 ]);
-                
+
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => true,
@@ -392,10 +411,10 @@ class SellerController extends Controller {
                         'photo_url' => $avatarUrl
                     ]);
                 }
-                
+
                 return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
             }
-            
+
             // Update seller information
             $seller->update($request->only([
                 'store_name',
@@ -408,23 +427,23 @@ class SellerController extends Controller {
             if ($request->hasFile('profile_photo')) {
                 try {
                     $photo = $request->file('profile_photo');
-                    
+
                     // Generate unique filename
                     $filename = 'profile_photos/' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-                    
+
                     // Upload to R2 storage
                     Storage::disk('r2')->put($filename, file_get_contents($photo->getPathname()));
-                    
+
                     // Construct the public URL (Laravel Cloud R2 public URL)
                     $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
                     $photoUrl = $r2PublicUrl . '/' . $filename;
-                    
+
                     // Delete old profile photo if exists
                     if ($user->profile_picture) {
                         try {
                             // Extract filename from full URL
                             $oldFilename = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
-                            
+
                             // Only delete if it's a profile photo (starts with profile_photos/)
                             if (str_starts_with($oldFilename, 'profile_photos/')) {
                                 Storage::disk('r2')->delete($oldFilename);
@@ -437,19 +456,19 @@ class SellerController extends Controller {
                             ]);
                         }
                     }
-                    
+
                     // Update user's profile picture in database
                     \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
-                    
+
                     // Reload user from database to get fresh data
                     $user = \App\Models\User::find($user->id);
-                    
+
                     Log::info('Profile photo updated successfully', [
                         'user_id' => $user->id,
                         'filename' => $filename,
                         'photo_url' => $photoUrl
                     ]);
-                    
+
                     // Check if AJAX request (for WhatsApp-style upload)
                     if ($request->ajax() || $request->wantsJson()) {
                         return response()->json([
@@ -458,14 +477,14 @@ class SellerController extends Controller {
                             'photo_url' => $photoUrl
                         ]);
                     }
-                    
+
                     return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
                 } catch (\Exception $e) {
                     Log::error('Profile photo upload failed', [
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString()
                     ]);
-                    
+
                     // Check if AJAX request
                     if ($request->ajax() || $request->wantsJson()) {
                         return response()->json([
@@ -473,13 +492,12 @@ class SellerController extends Controller {
                             'message' => 'Upload failed: ' . $e->getMessage()
                         ], 500);
                     }
-                    
+
                     return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
                 }
             }
 
             return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
-            
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator)
@@ -493,7 +511,7 @@ class SellerController extends Controller {
             return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
         }
     }
-  public function dashboard(Request $request)
+    public function dashboard(Request $request)
     {
         $search = $request->input('search');
 
@@ -528,98 +546,98 @@ class SellerController extends Controller {
         set_time_limit(0); // No time limit
         ini_set('memory_limit', '1G');
         ignore_user_abort(true); // Continue processing even if user closes browser
-        
+
         // Log the start of upload attempt
         Log::info('Bulk image upload started', [
             'user_id' => Auth::id(),
             'memory_limit' => ini_get('memory_limit'),
             'upload_max_filesize' => ini_get('upload_max_filesize'),
         ]);
-        
+
         try {
             $request->validate([
                 'images_zip' => 'required|file|mimes:zip|max:102400', // 100MB max
             ]);
 
             $zipFile = $request->file('images_zip');
-            
+
             if (!$zipFile || !$zipFile->isValid()) {
                 throw new \Exception('Invalid ZIP file uploaded');
             }
-            
+
             $fileSize = $zipFile->getSize();
             Log::info('Processing ZIP file', [
                 'filename' => $zipFile->getClientOriginalName(),
                 'size_mb' => round($fileSize / 1024 / 1024, 2),
             ]);
-            
+
             $zipPath = $zipFile->store('temp', 'local');
             $fullZipPath = storage_path('app/' . $zipPath);
-            
+
             if (!file_exists($fullZipPath)) {
                 throw new \Exception('Failed to save ZIP file');
             }
-            
+
             $zip = new \ZipArchive();
             $updated = 0;
             $errors = [];
             $processed = 0;
-            
+
             if ($zip->open($fullZipPath) === TRUE) {
                 $totalFiles = $zip->numFiles;
                 Log::info('ZIP opened successfully', ['total_files' => $totalFiles]);
-                
+
                 // Process all files but with better error handling
                 for ($i = 0; $i < $totalFiles; $i++) {
                     $processed++;
-                    
+
                     // Log progress every 10 files
                     if ($processed % 10 == 0) {
                         Log::info("Processing file $processed of $totalFiles");
                         // Force garbage collection every 10 files
                         gc_collect_cycles();
                     }
-                    
+
                     $filename = $zip->getNameIndex($i);
                     if (empty($filename) || strpos($filename, '__MACOSX') !== false || substr($filename, -1) === '/') {
                         continue; // Skip system files and directories
                     }
-                    
+
                     $basename = pathinfo($filename, PATHINFO_BASENAME);
                     $uniqueId = pathinfo($basename, PATHINFO_FILENAME);
-                    
+
                     try {
                         $imageContent = $zip->getFromIndex($i);
-                        
+
                         if ($imageContent === false || empty($imageContent)) {
                             $errors[] = "Could not extract: $basename";
                             continue;
                         }
-                        
+
                         // Check individual image size (10MB max)
                         if (strlen($imageContent) > 10 * 1024 * 1024) {
                             $errors[] = "Image too large (>10MB): $basename";
                             continue;
                         }
-                        
+
                         // Validate image content
                         $finfo = new \finfo(FILEINFO_MIME_TYPE);
                         $mimeType = $finfo->buffer($imageContent);
-                        
+
                         if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
                             $errors[] = "Invalid image type for $uniqueId: $mimeType";
                             continue;
                         }
-                        
+
                         // Try to find product by unique_id - improve matching
                         $product = Product::where('seller_id', Auth::id())
-                            ->where(function($query) use ($uniqueId) {
+                            ->where(function ($query) use ($uniqueId) {
                                 $query->where('unique_id', $uniqueId)
-                                      ->orWhere('unique_id', 'LIKE', "%{$uniqueId}%")
-                                      ->orWhere('name', 'LIKE', "%{$uniqueId}%");
+                                    ->orWhere('unique_id', 'LIKE', "%{$uniqueId}%")
+                                    ->orWhere('name', 'LIKE', "%{$uniqueId}%");
                             })
                             ->first();
-                            
+
                         if ($product) {
                             $extension = pathinfo($basename, PATHINFO_EXTENSION) ?: 'jpg';
                             $uniqueName = Str::random(40) . '.' . $extension;
@@ -663,8 +681,14 @@ class SellerController extends Controller {
                             if ($savedR2 || $savedPublic) {
                                 // Delete old legacy image if exists
                                 if ($product->image) {
-                                    try { Storage::disk('r2')->delete($product->image); } catch (\Throwable $e) {}
-                                    try { Storage::disk('public')->delete($product->image); } catch (\Throwable $e) {}
+                                    try {
+                                        Storage::disk('r2')->delete($product->image);
+                                    } catch (\Throwable $e) {
+                                    }
+                                    try {
+                                        Storage::disk('public')->delete($product->image);
+                                    } catch (\Throwable $e) {
+                                    }
                                 }
 
                                 // Update legacy image field
@@ -706,7 +730,6 @@ class SellerController extends Controller {
                         } else {
                             $errors[] = "No product found for unique_id: $uniqueId";
                         }
-                        
                     } catch (\Exception $e) {
                         $errors[] = "Error processing $basename: " . $e->getMessage();
                         Log::error("Error processing bulk image file", [
@@ -720,12 +743,12 @@ class SellerController extends Controller {
             } else {
                 throw new \Exception('Could not open ZIP file. Please ensure it is a valid ZIP file.');
             }
-            
+
             // Clean up temp file
             if (file_exists($fullZipPath)) {
                 Storage::disk('local')->delete($zipPath);
             }
-            
+
             // Log completion
             Log::info('Bulk image upload completed', [
                 'updated' => $updated,
@@ -733,7 +756,7 @@ class SellerController extends Controller {
                 'errors' => count($errors),
                 'final_memory_mb' => round(memory_get_usage(true) / 1024 / 1024, 2)
             ]);
-            
+
             $msg = "$updated product images updated successfully.";
             if ($errors) {
                 $errorMsg = implode(' | ', array_slice($errors, 0, 5)); // Show first 5 errors
@@ -742,22 +765,21 @@ class SellerController extends Controller {
                 }
                 $msg .= ' Issues: ' . $errorMsg;
             }
-            
+
             return redirect()->route('seller.dashboard')->with('bulk_upload_success', $msg);
-            
         } catch (\Throwable $e) {
             // Clean up temp file on error
             if (isset($zipPath) && Storage::disk('local')->exists($zipPath)) {
                 Storage::disk('local')->delete($zipPath);
             }
-            
+
             Log::error('Bulk image upload failed', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'memory_mb' => round(memory_get_usage(true) / 1024 / 1024, 2)
             ]);
-            
+
             $errorMessage = 'Upload failed: ';
             if (strpos($e->getMessage(), 'memory') !== false) {
                 $errorMessage .= 'Not enough memory. Try uploading smaller ZIP files.';
@@ -768,7 +790,7 @@ class SellerController extends Controller {
             } else {
                 $errorMessage .= $e->getMessage();
             }
-            
+
             return redirect()->back()->with('error', $errorMessage);
         }
     }
@@ -798,56 +820,55 @@ class SellerController extends Controller {
         return view('seller.create-category-subcategory', compact('categories'));
     }
 
-public function storeCategorySubcategory(Request $request)
-{
-    // If new category is provided
-    if ($request->filled('category_name') && $request->filled('category_unique_id')) {
-        $request->validate([
-            'category_name' => 'required|string|max:255',
-            'category_unique_id' => 'required|string|max:3|unique:categories,unique_id',
-            'subcategory_name' => 'required|string|max:255',
+    public function storeCategorySubcategory(Request $request)
+    {
+        // If new category is provided
+        if ($request->filled('category_name') && $request->filled('category_unique_id')) {
+            $request->validate([
+                'category_name' => 'required|string|max:255',
+                'category_unique_id' => 'required|string|max:3|unique:categories,unique_id',
+                'subcategory_name' => 'required|string|max:255',
+            ]);
+
+            // Create new category
+            $category = Category::create([
+                'name' => strtoupper($request->category_name),
+                'unique_id' => strtoupper($request->category_unique_id),
+            ]);
+        }
+        // If existing category selected
+        elseif ($request->filled('existing_category')) {
+            $request->validate([
+                'existing_category' => 'required|exists:categories,id',
+                'subcategory_name' => 'required|string|max:255',
+            ]);
+
+            $category = Category::findOrFail($request->existing_category);
+        } else {
+            return back()->withErrors(['error' => 'Please select or create a category.']);
+        }
+
+        // Convert subcategory name to uppercase
+        $subcategoryName = strtoupper($request->subcategory_name);
+
+        // Check if subcategory already exists for this category
+        $existingSubcategory = Subcategory::where('category_id', $category->id)
+            ->where('name', $subcategoryName)
+            ->first();
+
+        if ($existingSubcategory) {
+            return back()->with('error', 'This subcategory already exists for the selected category!');
+        }
+
+        // Add subcategory if not exists
+        Subcategory::create([
+            'name' => $subcategoryName,
+            'category_id' => $category->id,
+            'unique_id' => strtoupper(Str::random(3)), // Example: random 3-letter code
         ]);
 
-        // Create new category
-        $category = Category::create([
-            'name' => strtoupper($request->category_name),
-            'unique_id' => strtoupper($request->category_unique_id),
-        ]);
+        return redirect('seller/dashboard')->with('success', 'Subcategory added successfully!');
     }
-    // If existing category selected
-    elseif ($request->filled('existing_category')) {
-        $request->validate([
-            'existing_category' => 'required|exists:categories,id',
-            'subcategory_name' => 'required|string|max:255',
-        ]);
-
-        $category = Category::findOrFail($request->existing_category);
-    } else {
-        return back()->withErrors(['error' => 'Please select or create a category.']);
-    }
-
-    // Convert subcategory name to uppercase
-    $subcategoryName = strtoupper($request->subcategory_name);
-
-    // Check if subcategory already exists for this category
-    $existingSubcategory = Subcategory::where('category_id', $category->id)
-        ->where('name', $subcategoryName)
-        ->first();
-
-    if ($existingSubcategory) {
-        return back()->with('error', 'This subcategory already exists for the selected category!');
-    }
-
-    // Add subcategory if not exists
-    Subcategory::create([
-        'name' => $subcategoryName,
-        'category_id' => $category->id,
-        'unique_id' => strtoupper(Str::random(3)), // Example: random 3-letter code
-    ]);
-
-    return redirect('seller/dashboard')->with('success', 'Subcategory added successfully!');
-
-}
 
 
     // Category Form
@@ -871,7 +892,7 @@ public function storeCategorySubcategory(Request $request)
             'all_files' => $request->allFiles(),
             'input_keys' => array_keys($request->all())
         ]);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -884,7 +905,7 @@ public function storeCategorySubcategory(Request $request)
             'gift_option' => 'required|in:yes,no',
             'stock' => 'required|integer|min:0',
         ]);
-        
+
         // Use database storage method
         return $this->storeProductWithDatabaseImage($request);
     }
@@ -894,7 +915,7 @@ public function storeCategorySubcategory(Request $request)
     {
         try {
             $seller = Auth::user();
-            
+
             // Ensure seller_id is valid
             if (!$seller || !$seller->id) {
                 Log::error('Product creation failed: Invalid seller', [
@@ -905,9 +926,9 @@ public function storeCategorySubcategory(Request $request)
                     ->withInput()
                     ->with('error', 'Authentication error. Please logout and login again.');
             }
-            
+
             $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
-            
+
             // Create the product with all required fields
             $product = Product::create([
                 'name' => $request->name,
@@ -924,190 +945,189 @@ public function storeCategorySubcategory(Request $request)
                 'status' => 'active', // Ensure product is active
                 'is_active' => true, // Ensure product is visible
             ]);
-            
+
             Log::info('Product created successfully', [
                 'product_id' => $product->id,
                 'seller_id' => $product->seller_id,
                 'name' => $product->name,
                 'hasFile' => $request->hasFile('image')
             ]);
-        
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $sellerId = Auth::id();
-            
-            // Use seller-specific folder structure (same as uploadProductImages)
-            $folder = 'products/seller-' . $sellerId;
-            
-            // Preserve original filename without timestamp for easier retrieval
-            $ext = $image->getClientOriginalExtension();
-            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $filename = Str::slug($originalName) . '.' . $ext;
-            
-            $imageUploaded = false;
-            $imagePath = null;
-            
-            // Determine if we're on Laravel Cloud (using helper method)
-            $isLaravelCloud = $this->isLaravelCloud();
-            
-            // Environment-aware storage strategy
-            try {
-                $publicSuccess = false;
-                $r2Success = false;
-                
-                // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
-                if ($isLaravelCloud) {
-                    try {
-                        $r2Path = $image->storeAs($folder, $filename, 'r2');
-                        
-                        if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
-                            $r2Success = true;
-                            $imagePath = $r2Path;
-                            
-                            Log::info('R2 upload SUCCESS on Laravel Cloud (create)', [
-                                'path' => $r2Path,
-                                'size' => $image->getSize(),
-                                'bucket' => config('filesystems.disks.r2.bucket')
-                            ]);
-                        } else {
-                            Log::error('R2 upload returned path but file not found', [
-                                'returned_path' => $r2Path,
-                                'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
-                            ]);
-                        }
-                    } catch (\Throwable $r2Ex) {
-                        Log::error('R2 upload FAILED on Laravel Cloud (create)', [
-                            'error' => $r2Ex->getMessage(),
-                            'error_class' => get_class($r2Ex),
-                            'trace' => $r2Ex->getTraceAsString(),
-                            'bucket' => config('filesystems.disks.r2.bucket'),
-                            'endpoint' => config('filesystems.disks.r2.endpoint'),
-                            'has_key' => !empty(config('filesystems.disks.r2.key')),
-                            'has_secret' => !empty(config('filesystems.disks.r2.secret'))
-                        ]);
-                    }
-                    
-                    if (!$r2Success) {
-                        Log::error('Image upload to R2 failed on Laravel Cloud', [
-                            'product_name' => $request->name,
-                            'seller_id' => Auth::id(),
-                            'filename' => $filename
-                        ]);
-                        return redirect()->back()
-                            ->withInput()
-                            ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
-                    }
-                    
-                    $imageUploaded = $r2Success;
-                }
-                // Strategy 2: Local - Public disk primary, R2 backup
-                else {
-                    // Save to public disk FIRST (primary storage locally)
-                    try {
-                        // Ensure directory exists
-                        $folderPath = storage_path('app/public/' . $folder);
-                        if (!file_exists($folderPath)) {
-                            mkdir($folderPath, 0755, true);
-                            Log::info('Created folder', ['path' => $folderPath]);
-                        }
-                        
-                        // Save using Laravel's storeAs method
-                        $publicPath = $image->storeAs($folder, $filename, 'public');
-                        
-                        if ($publicPath && Storage::disk('public')->exists($publicPath)) {
-                            $publicSuccess = true;
-                            $imagePath = $publicPath;
-                            
-                            Log::info('Public disk upload SUCCESS (local create)', [
-                                'path' => $publicPath,
-                                'size' => Storage::disk('public')->size($publicPath),
-                                'full_path' => storage_path('app/public/' . $publicPath)
-                            ]);
-                        } else {
-                            Log::error('Public disk upload returned false or file not found', [
-                                'returned_path' => $publicPath,
-                                'exists' => Storage::disk('public')->exists($publicPath ?? '')
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $sellerId = Auth::id();
+
+                // Use seller-specific folder structure (same as uploadProductImages)
+                $folder = 'products/seller-' . $sellerId;
+
+                // Preserve original filename without timestamp for easier retrieval
+                $ext = $image->getClientOriginalExtension();
+                $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $filename = Str::slug($originalName) . '.' . $ext;
+
+                $imageUploaded = false;
+                $imagePath = null;
+
+                // Determine if we're on Laravel Cloud (using helper method)
+                $isLaravelCloud = $this->isLaravelCloud();
+
+                // Environment-aware storage strategy
+                try {
+                    $publicSuccess = false;
+                    $r2Success = false;
+
+                    // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
+                    if ($isLaravelCloud) {
+                        try {
+                            $r2Path = $image->storeAs($folder, $filename, 'r2');
+
+                            if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
+                                $r2Success = true;
+                                $imagePath = $r2Path;
+
+                                Log::info('R2 upload SUCCESS on Laravel Cloud (create)', [
+                                    'path' => $r2Path,
+                                    'size' => $image->getSize(),
+                                    'bucket' => config('filesystems.disks.r2.bucket')
+                                ]);
+                            } else {
+                                Log::error('R2 upload returned path but file not found', [
+                                    'returned_path' => $r2Path,
+                                    'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
+                                ]);
+                            }
+                        } catch (\Throwable $r2Ex) {
+                            Log::error('R2 upload FAILED on Laravel Cloud (create)', [
+                                'error' => $r2Ex->getMessage(),
+                                'error_class' => get_class($r2Ex),
+                                'trace' => $r2Ex->getTraceAsString(),
+                                'bucket' => config('filesystems.disks.r2.bucket'),
+                                'endpoint' => config('filesystems.disks.r2.endpoint'),
+                                'has_key' => !empty(config('filesystems.disks.r2.key')),
+                                'has_secret' => !empty(config('filesystems.disks.r2.secret'))
                             ]);
                         }
-                    } catch (\Throwable $publicEx) {
-                        Log::error('Public disk upload EXCEPTION', [
-                            'error' => $publicEx->getMessage(),
-                            'trace' => $publicEx->getTraceAsString(),
-                            'file' => $publicEx->getFile(),
-                            'line' => $publicEx->getLine()
-                        ]);
-                    }
-                    
-                    // Also save to R2 as backup (non-blocking)
-                    try {
-                        $r2Path = $image->storeAs($folder, $filename, 'r2');
-                        $r2Success = !empty($r2Path);
-                        
-                        if ($r2Success) {
-                            Log::info('R2 backup upload SUCCESS (local create)', ['path' => $r2Path]);
+
+                        if (!$r2Success) {
+                            Log::error('Image upload to R2 failed on Laravel Cloud', [
+                                'product_name' => $request->name,
+                                'seller_id' => Auth::id(),
+                                'filename' => $filename
+                            ]);
+                            return redirect()->back()
+                                ->withInput()
+                                ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
                         }
-                    } catch (\Throwable $r2Ex) {
-                        // R2 failure is not critical on local
-                        Log::warning('R2 backup upload failed (non-critical)', [
-                            'error' => $r2Ex->getMessage()
-                        ]);
+
+                        $imageUploaded = $r2Success;
                     }
-                    
-                    $imageUploaded = $publicSuccess;
-                }
-                
-                if ($imageUploaded) {
-                    $product->update(['image' => $imagePath]);
-                    
-                    // Also create a ProductImage record for the new gallery system
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'image_path' => $imagePath,
-                        'original_name' => $image->getClientOriginalName(),
-                        'mime_type' => $image->getMimeType(),
-                        'file_size' => $image->getSize(),
-                        'sort_order' => 1,
-                        'is_primary' => true, // First image is primary
+                    // Strategy 2: Local - Public disk primary, R2 backup
+                    else {
+                        // Save to public disk FIRST (primary storage locally)
+                        try {
+                            // Ensure directory exists
+                            $folderPath = storage_path('app/public/' . $folder);
+                            if (!file_exists($folderPath)) {
+                                mkdir($folderPath, 0755, true);
+                                Log::info('Created folder', ['path' => $folderPath]);
+                            }
+
+                            // Save using Laravel's storeAs method
+                            $publicPath = $image->storeAs($folder, $filename, 'public');
+
+                            if ($publicPath && Storage::disk('public')->exists($publicPath)) {
+                                $publicSuccess = true;
+                                $imagePath = $publicPath;
+
+                                Log::info('Public disk upload SUCCESS (local create)', [
+                                    'path' => $publicPath,
+                                    'size' => Storage::disk('public')->size($publicPath),
+                                    'full_path' => storage_path('app/public/' . $publicPath)
+                                ]);
+                            } else {
+                                Log::error('Public disk upload returned false or file not found', [
+                                    'returned_path' => $publicPath,
+                                    'exists' => Storage::disk('public')->exists($publicPath ?? '')
+                                ]);
+                            }
+                        } catch (\Throwable $publicEx) {
+                            Log::error('Public disk upload EXCEPTION', [
+                                'error' => $publicEx->getMessage(),
+                                'trace' => $publicEx->getTraceAsString(),
+                                'file' => $publicEx->getFile(),
+                                'line' => $publicEx->getLine()
+                            ]);
+                        }
+
+                        // Also save to R2 as backup (non-blocking)
+                        try {
+                            $r2Path = $image->storeAs($folder, $filename, 'r2');
+                            $r2Success = !empty($r2Path);
+
+                            if ($r2Success) {
+                                Log::info('R2 backup upload SUCCESS (local create)', ['path' => $r2Path]);
+                            }
+                        } catch (\Throwable $r2Ex) {
+                            // R2 failure is not critical on local
+                            Log::warning('R2 backup upload failed (non-critical)', [
+                                'error' => $r2Ex->getMessage()
+                            ]);
+                        }
+
+                        $imageUploaded = $publicSuccess;
+                    }
+
+                    if ($imageUploaded) {
+                        $product->update(['image' => $imagePath]);
+
+                        // Also create a ProductImage record for the new gallery system
+                        ProductImage::create([
+                            'product_id' => $product->id,
+                            'image_path' => $imagePath,
+                            'original_name' => $image->getClientOriginalName(),
+                            'mime_type' => $image->getMimeType(),
+                            'file_size' => $image->getSize(),
+                            'sort_order' => 1,
+                            'is_primary' => true, // First image is primary
+                        ]);
+
+                        Log::info('Product image stored successfully', [
+                            'product_id' => $product->id,
+                            'path' => $imagePath,
+                            'r2_backup' => $r2Success,
+                            'public_primary' => $publicSuccess,
+                            'size' => $image->getSize(),
+                            'original_name' => $image->getClientOriginalName()
+                        ]);
+                    } else {
+                        Log::error('Public disk storage failed for image upload', [
+                            'product_id' => $product->id,
+                            'public_success' => $publicSuccess,
+                            'r2_success' => $r2Success
+                        ]);
+                        return redirect()->back()->withInput()->with('error', 'Image upload failed. Please check storage permissions.');
+                    }
+                } catch (\Throwable $ex) {
+                    Log::error('Exception during image upload', [
+                        'error' => $ex->getMessage(),
+                        'trace' => $ex->getTraceAsString(),
+                        'product_id' => $product->id
                     ]);
-                    
-                    Log::info('Product image stored successfully', [
-                        'product_id' => $product->id,
-                        'path' => $imagePath,
-                        'r2_backup' => $r2Success,
-                        'public_primary' => $publicSuccess,
-                        'size' => $image->getSize(),
-                        'original_name' => $image->getClientOriginalName()
-                    ]);
-                } else {
-                    Log::error('Public disk storage failed for image upload', [
-                        'product_id' => $product->id,
-                        'public_success' => $publicSuccess,
-                        'r2_success' => $r2Success
-                    ]);
-                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Please check storage permissions.');
+                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Error: ' . $ex->getMessage());
                 }
-            } catch (\Throwable $ex) {
-                Log::error('Exception during image upload', [
-                    'error' => $ex->getMessage(),
-                    'trace' => $ex->getTraceAsString(),
-                    'product_id' => $product->id
-                ]);
-                return redirect()->back()->withInput()->with('error', 'Image upload failed. Error: ' . $ex->getMessage());
+            } else {
+                Log::info('No image file uploaded with product', ['product_id' => $product->id]);
             }
-        } else {
-            Log::info('No image file uploaded with product', ['product_id' => $product->id]);
-        }
-        
-        $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
-        return redirect()->route('seller.dashboard')->with('success', $successMessage);
-        
+
+            $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
+            return redirect()->route('seller.dashboard')->with('success', $successMessage);
         } catch (\Exception $e) {
             Log::error('Product creation failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->except(['image'])
             ]);
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create product: ' . $e->getMessage());
@@ -1186,18 +1206,18 @@ public function storeCategorySubcategory(Request $request)
         // Handle image from library (URL provided)
         if ($request->filled('library_image_url') && !$request->hasFile('image')) {
             $libraryImageUrl = $request->library_image_url;
-            
+
             // Extract path from R2 URL
             $r2BaseUrl = config('filesystems.disks.r2.url');
             if (str_starts_with($libraryImageUrl, $r2BaseUrl)) {
                 $imagePath = str_replace($r2BaseUrl . '/', '', $libraryImageUrl);
-                
+
                 // Verify it's from the seller's library
                 $sellerId = Auth::id();
                 if (str_starts_with($imagePath, 'library/seller-' . $sellerId)) {
                     // Delete old image records
                     $product->productImages()->delete();
-                    
+
                     // Create new ProductImage pointing to library image
                     ProductImage::create([
                         'product_id' => $product->id,
@@ -1208,10 +1228,10 @@ public function storeCategorySubcategory(Request $request)
                         'sort_order' => 1,
                         'is_primary' => true,
                     ]);
-                    
+
                     // Update legacy field
                     $data['image'] = $imagePath;
-                    
+
                     Log::info('Product image updated from library', [
                         'product_id' => $product->id,
                         'library_path' => $imagePath
@@ -1230,16 +1250,16 @@ public function storeCategorySubcategory(Request $request)
             $finalPath = null;
             $publicSuccess = false;
             $r2Success = false;
-            
+
             // Determine if we're on Laravel Cloud (using helper method)
             $isLaravelCloud = $this->isLaravelCloud();
-            
+
             try {
                 // Remove all old ProductImage records and files before uploading new image
                 // Get old paths for deletion (do after upload succeeds)
                 $oldImagePaths = $product->productImages->pluck('image_path')->toArray();
                 $oldLegacyPath = $product->image;
-                
+
                 // Delete database records first
                 $product->productImages()->delete();
 
@@ -1247,11 +1267,11 @@ public function storeCategorySubcategory(Request $request)
                 if ($isLaravelCloud) {
                     try {
                         $r2Path = $image->storeAs($folder, $filename, 'r2');
-                        
+
                         if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
                             $r2Success = true;
                             $finalPath = $r2Path;
-                            
+
                             Log::info('R2 upload SUCCESS on Laravel Cloud (update)', [
                                 'path' => $r2Path,
                                 'size' => $image->getSize(),
@@ -1275,7 +1295,7 @@ public function storeCategorySubcategory(Request $request)
                             'has_secret' => !empty(config('filesystems.disks.r2.secret'))
                         ]);
                     }
-                    
+
                     if (!$r2Success) {
                         Log::error('Image upload to R2 failed on Laravel Cloud (update)', [
                             'product_id' => $product->id,
@@ -1296,13 +1316,13 @@ public function storeCategorySubcategory(Request $request)
                         if (!file_exists($folderPath)) {
                             mkdir($folderPath, 0755, true);
                         }
-                        
+
                         $publicPath = $image->storeAs($folder, $filename, 'public');
-                        
+
                         if ($publicPath && Storage::disk('public')->exists($publicPath)) {
                             $publicSuccess = true;
                             $finalPath = $publicPath;
-                            
+
                             Log::info('Public disk upload SUCCESS (local update)', [
                                 'path' => $publicPath,
                                 'size' => Storage::disk('public')->size($publicPath)
@@ -1315,12 +1335,12 @@ public function storeCategorySubcategory(Request $request)
                             'trace' => $publicEx->getTraceAsString()
                         ]);
                     }
-                    
+
                     // BACKUP: Also save to R2 (optional on local)
                     try {
                         $r2Path = $image->storeAs($folder, $filename, 'r2');
                         $r2Success = !empty($r2Path);
-                        
+
                         if ($r2Success) {
                             Log::info('R2 backup upload SUCCESS (local update)', ['path' => $r2Path]);
                         }
@@ -1360,16 +1380,28 @@ public function storeCategorySubcategory(Request $request)
                     'r2_success' => $r2Success,
                     'is_laravel_cloud' => $isLaravelCloud ?? false,
                 ]);
-                
+
                 // Clean up old files AFTER successful upload (non-blocking)
-                dispatch(function() use ($oldImagePaths, $oldLegacyPath) {
+                dispatch(function () use ($oldImagePaths, $oldLegacyPath) {
                     foreach ($oldImagePaths as $path) {
-                        try { Storage::disk('public')->delete($path); } catch (\Throwable $e) {}
-                        try { Storage::disk('r2')->delete($path); } catch (\Throwable $e) {}
+                        try {
+                            Storage::disk('public')->delete($path);
+                        } catch (\Throwable $e) {
+                        }
+                        try {
+                            Storage::disk('r2')->delete($path);
+                        } catch (\Throwable $e) {
+                        }
                     }
                     if (!empty($oldLegacyPath)) {
-                        try { Storage::disk('public')->delete($oldLegacyPath); } catch (\Throwable $e) {}
-                        try { Storage::disk('r2')->delete($oldLegacyPath); } catch (\Throwable $e) {}
+                        try {
+                            Storage::disk('public')->delete($oldLegacyPath);
+                        } catch (\Throwable $e) {
+                        }
+                        try {
+                            Storage::disk('r2')->delete($oldLegacyPath);
+                        } catch (\Throwable $e) {
+                        }
                     }
                 })->afterResponse();
             } catch (\Throwable $ex) {
@@ -1389,15 +1421,15 @@ public function storeCategorySubcategory(Request $request)
     {
         try {
             $user = Auth::user();
-            
+
             if (!$user) {
                 Log::error('myProfile: User not authenticated');
                 return redirect()->route('login')->with('error', 'Please log in to view your profile.');
             }
-            
+
             // Resolve Seller model by email or create a bridge if needed
             $seller = \App\Models\Seller::where('email', $user->email)->first();
-            
+
             if (!$seller) {
                 Log::error('myProfile: Seller not found', [
                     'user_id' => $user->id,
@@ -1405,19 +1437,18 @@ public function storeCategorySubcategory(Request $request)
                 ]);
                 abort(404, 'Seller profile not found');
             }
-            
+
             $products = Product::with(['category', 'subcategory'])
                 ->where('seller_id', $user->id)
                 ->latest()->get();
-                
+
             return view('seller.profile', compact('seller', 'products'));
-            
         } catch (\Exception $e) {
             Log::error('myProfile error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return redirect()->route('seller.dashboard')
                 ->with('error', 'Unable to load profile page. Please try again.');
         }
@@ -1481,8 +1512,14 @@ public function storeCategorySubcategory(Request $request)
                 $import = new \App\Imports\ProductsImport($zipPath, Auth::id());
                 \Maatwebsite\Excel\Facades\Excel::import($import, $excelFile);
                 // Best-effort accumulate; suppress if methods unavailable
-                try { $totalSuccess += (int) $import->getSuccessCount(); } catch (\Throwable $e) {}
-                try { $allErrors = array_merge($allErrors, (array) $import->getErrors()); } catch (\Throwable $e) {}
+                try {
+                    $totalSuccess += (int) $import->getSuccessCount();
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $allErrors = array_merge($allErrors, (array) $import->getErrors());
+                } catch (\Throwable $e) {
+                }
             }
 
             // Clean up temporary zip file
@@ -1546,19 +1583,22 @@ public function storeCategorySubcategory(Request $request)
         // Create the export class
         $export = new class($sampleData) implements FromArray, WithHeadings {
             protected $data;
-            
-            public function __construct($data) {
+
+            public function __construct($data)
+            {
                 $this->data = $data;
             }
-            
-            public function array(): array {
+
+            public function array(): array
+            {
                 return $this->data;
             }
-            
-            public function headings(): array {
+
+            public function headings(): array
+            {
                 return [
                     'NAME',
-                    'UNIQUE-ID', 
+                    'UNIQUE-ID',
                     'CATEGORY ID',
                     'CATEGORY NAME',
                     'SUBCATEGORY ID',
@@ -1582,18 +1622,17 @@ public function storeCategorySubcategory(Request $request)
     {
         try {
             $categories = Category::all();
-            
+
             // Simplified query to avoid potential issues
             $productsNeedingImages = Product::where('seller_id', Auth::id())
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->whereNull('image')
-                          ->orWhere('image', '');
+                        ->orWhere('image', '');
                 })
                 ->orderBy('created_at', 'desc')
                 ->get();
 
             return view('seller.bulk-image-reupload-simple', compact('categories', 'productsNeedingImages'));
-            
         } catch (\Exception $e) {
             Log::error('Bulk image reupload page error: ' . $e->getMessage());
             return redirect()->route('seller.dashboard')->with('error', 'Unable to load bulk upload page: ' . $e->getMessage());
@@ -1612,55 +1651,55 @@ public function storeCategorySubcategory(Request $request)
             $zipFile = $request->file('zip_file');
             $matchingMethod = $request->matching_method;
             $categoryId = $request->category_id;
-            
+
             // Create temporary directory for extraction
             $tempDir = storage_path('app/temp/bulk_images_' . time());
             mkdir($tempDir, 0755, true);
-            
+
             // Extract zip file
             $zip = new \ZipArchive;
             if ($zip->open($zipFile->getPathname()) !== TRUE) {
                 throw new \Exception('Unable to open zip file');
             }
-            
+
             $zip->extractTo($tempDir);
             $zip->close();
-            
+
             // Get seller's products that need images
             $query = Product::where('seller_id', Auth::id())
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->whereNull('image')
-                      ->orWhere('image', '')
-                      ->orWhere('description', 'LIKE', '%⚠️ Image needs to be re-uploaded%');
+                        ->orWhere('image', '')
+                        ->orWhere('description', 'LIKE', '%⚠️ Image needs to be re-uploaded%');
                 })
                 ->whereNull('image_data');
-                
+
             if ($categoryId) {
                 $query->where('category_id', $categoryId);
             }
-            
+
             $productsNeedingImages = $query->get();
-            
+
             // Find image files in extracted directory
             $imageFiles = $this->findImageFiles($tempDir);
-            
+
             // Match images to products
             $matches = $this->matchImagesToProducts($imageFiles, $productsNeedingImages, $matchingMethod);
-            
+
             // Process matches and upload to cloud storage
             $uploadedCount = 0;
             $errors = [];
-            
+
             foreach ($matches['matched'] as $productId => $imagePath) {
                 try {
                     $product = Product::find($productId);
                     if ($product && $product->seller_id === Auth::id()) {
-                        
+
                         // Generate unique filename for cloud storage
                         $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
                         $cloudFileName = $product->unique_id . '_' . time() . '.' . $extension;
                         $cloudPath = 'products/' . $cloudFileName;
-                        
+
                         // Upload to cloud storage
                         $imageContent = file_get_contents($imagePath);
                         // Try cloud first, fallback to local/public
@@ -1673,7 +1712,7 @@ public function storeCategorySubcategory(Request $request)
                         if (!$uploaded) {
                             $uploaded = Storage::disk('public')->put($cloudPath, $imageContent);
                         }
-                        
+
                         if ($uploaded) {
                             // Update product
                             $product->update([
@@ -1681,7 +1720,7 @@ public function storeCategorySubcategory(Request $request)
                                 'description' => str_replace("\n\n⚠️ Image needs to be re-uploaded by seller.", '', $product->description)
                             ]);
                             $uploadedCount++;
-                            
+
                             Log::info('Bulk image uploaded', [
                                 'product_id' => $product->id,
                                 'cloud_path' => $cloudPath,
@@ -1693,24 +1732,23 @@ public function storeCategorySubcategory(Request $request)
                     $errors[] = "Failed to upload image for product {$productId}: " . $e->getMessage();
                 }
             }
-            
+
             // Clean up temporary directory
             $this->deleteDirectory($tempDir);
-            
+
             // Prepare response message
             $message = "Successfully uploaded {$uploadedCount} images.";
-            
+
             if (count($matches['unmatched']) > 0) {
                 $message .= " " . count($matches['unmatched']) . " images could not be matched to products.";
             }
-            
+
             if (!empty($errors)) {
                 $message .= " " . count($errors) . " errors occurred during upload.";
                 Log::warning('Bulk image upload errors', $errors);
             }
-            
+
             return redirect()->route('seller.bulkImageReupload')->with('success', $message);
-            
         } catch (\Exception $e) {
             Log::error('Bulk image upload failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage());
@@ -1721,11 +1759,11 @@ public function storeCategorySubcategory(Request $request)
     {
         $imageFiles = [];
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-        
+
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory)
         );
-        
+
         foreach ($iterator as $file) {
             if ($file->isFile()) {
                 $extension = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
@@ -1734,7 +1772,7 @@ public function storeCategorySubcategory(Request $request)
                 }
             }
         }
-        
+
         return $imageFiles;
     }
 
@@ -1742,34 +1780,34 @@ public function storeCategorySubcategory(Request $request)
     {
         $matched = [];
         $unmatched = [];
-        
+
         foreach ($imageFiles as $imagePath) {
             $fileName = pathinfo($imagePath, PATHINFO_FILENAME);
             $bestMatch = null;
             $bestScore = 0;
-            
+
             foreach ($products as $product) {
                 $score = 0;
-                
+
                 if ($matchingMethod === 'name' || $matchingMethod === 'both') {
                     // Match by product name
                     $nameScore = $this->calculateSimilarity($fileName, $product->name);
                     $score = max($score, $nameScore);
                 }
-                
+
                 if ($matchingMethod === 'unique_id' || $matchingMethod === 'both') {
                     // Match by unique ID
                     if (stripos($fileName, $product->unique_id) !== false) {
                         $score = max($score, 0.9); // High score for ID match
                     }
                 }
-                
+
                 if ($score > $bestScore && $score > 0.6) { // Minimum 60% similarity
                     $bestScore = $score;
                     $bestMatch = $product;
                 }
             }
-            
+
             if ($bestMatch) {
                 $matched[$bestMatch->id] = $imagePath;
             } else {
@@ -1779,7 +1817,7 @@ public function storeCategorySubcategory(Request $request)
                 ];
             }
         }
-        
+
         return [
             'matched' => $matched,
             'unmatched' => $unmatched
@@ -1791,7 +1829,7 @@ public function storeCategorySubcategory(Request $request)
         // Normalize strings
         $str1 = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str1));
         $str2 = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str2));
-        
+
         // Calculate similarity
         similar_text($str1, $str2, $percent);
         return $percent / 100;
@@ -1800,7 +1838,7 @@ public function storeCategorySubcategory(Request $request)
     private function deleteDirectory($dir)
     {
         if (!is_dir($dir)) return;
-        
+
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
             $path = $dir . DIRECTORY_SEPARATOR . $file;
@@ -1810,7 +1848,7 @@ public function storeCategorySubcategory(Request $request)
     }
 
     // ====== IMAGE LIBRARY MANAGEMENT ======
-    
+
     /**
      * Show seller's image library
      */
@@ -1823,10 +1861,10 @@ public function storeCategorySubcategory(Request $request)
         try {
             // Get images from R2
             $files = Storage::disk('r2')->files($libraryFolder);
-            
+
             foreach ($files as $filePath) {
                 $filename = basename($filePath);
-                
+
                 // Skip non-image files
                 if (!preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $filename)) {
                     continue;
@@ -1841,10 +1879,9 @@ public function storeCategorySubcategory(Request $request)
             }
 
             // Sort by name
-            usort($images, function($a, $b) {
+            usort($images, function ($a, $b) {
                 return strcmp($a['name'], $b['name']);
             });
-
         } catch (\Throwable $e) {
             Log::error('Failed to load image library', [
                 'error' => $e->getMessage(),
@@ -1878,7 +1915,7 @@ public function storeCategorySubcategory(Request $request)
 
                 // Upload to R2
                 $path = $image->storeAs($libraryFolder, $filename, 'r2');
-                
+
                 if ($path) {
                     $uploadedCount++;
                     Log::info('Image uploaded to library', [
@@ -1917,10 +1954,10 @@ public function storeCategorySubcategory(Request $request)
 
         try {
             $files = Storage::disk('r2')->files($libraryFolder);
-            
+
             foreach ($files as $filePath) {
                 $filename = basename($filePath);
-                
+
                 if (!preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $filename)) {
                     continue;
                 }
@@ -1932,7 +1969,6 @@ public function storeCategorySubcategory(Request $request)
                     'size' => Storage::disk('r2')->size($filePath)
                 ];
             }
-
         } catch (\Throwable $e) {
             Log::error('Failed to get library images', ['error' => $e->getMessage()]);
         }
@@ -1962,7 +1998,7 @@ public function storeCategorySubcategory(Request $request)
 
         try {
             Storage::disk('r2')->delete($path);
-            
+
             Log::info('Image deleted from library', [
                 'seller_id' => $sellerId,
                 'path' => $path
@@ -1996,7 +2032,7 @@ public function storeCategorySubcategory(Request $request)
                 return rtrim($r2BaseUrl, '/') . '/' . ltrim($path, '/');
             }
         }
-        
+
         return url('serve-image/' . str_replace('library/', 'library/', $path));
     }
 
@@ -2024,21 +2060,22 @@ public function storeCategorySubcategory(Request $request)
         if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
             return true;
         }
-        
+
         // Priority 2: Check if actually running on Laravel Cloud infrastructure
         // (not just having APP_URL set to laravel.cloud)
-        if (app()->environment('production') && 
-            isset($_SERVER['SERVER_NAME']) && 
-            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+        if (
+            app()->environment('production') &&
+            isset($_SERVER['SERVER_NAME']) &&
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')
+        ) {
             return true;
         }
-        
+
         // Priority 3: Vapor environment (Laravel Cloud uses Vapor)
         if (env('VAPOR_ENVIRONMENT') !== null) {
             return true;
         }
-        
+
         return false;
     }
-
 }
