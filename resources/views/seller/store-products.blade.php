@@ -162,11 +162,7 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
-        .product-img {
-            height: 250px;
-            object-fit: cover;
-            transition: all 0.4s ease;
-        }
+       
 
         .product-card:hover .product-img {
             transform: scale(1.1);
@@ -270,7 +266,7 @@
             width: 100%;
             height: 180px;
             /* Rectangle shape for desktop */
-            object-fit: cover;
+            object-fit: contain;
             /* fills area without white space */
             transition: transform 0.3s ease, filter 0.3s ease;
         }
