@@ -536,17 +536,7 @@
         z-index: 9000 !important;
       }
 
-      /* HIDE CATEGORIES BANNER ON MOBILE - Keep for desktop only */
-      .zepto-cat-section,
-      section:has(.zepto-cat-section),
-      #categoryBannerSection {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-      }
+      /* Category banner completely removed from page */
 
       /* Keep mobile category menu popup visible and positioned correctly */
       .mobile-category-popup {
@@ -569,14 +559,7 @@
         box-shadow: 0 -2px 20px rgba(0,0,0,0.2);
       }
 
-      /* Force hide any category-related elements that might interfere on mobile */
-      .zepto-cat-header,
-      .zepto-cat-nav,
-      .zepto-cat-track,
-      .zepto-cat-item {
-        display: none !important;
-        visibility: hidden !important;
-      }
+      /* Category elements completely removed from page */
 
       /* Ensure mobile layout is clean and unobstructed */
       .hero-section {
@@ -762,17 +745,7 @@
         display: none !important;
       }
 
-      /* SHOW CATEGORIES BANNER ON DESKTOP ONLY */
-      .zepto-cat-section,
-      section:has(.zepto-cat-section),
-      #categoryBannerSection {
-        display: block !important;
-        visibility: visible !important;
-        height: auto !important;
-        margin: initial !important;
-        padding: initial !important;
-        overflow: visible !important;
-      }
+      /* Category banner removed from all screen sizes */
     }
 
     /* ============================================
@@ -2908,127 +2881,13 @@ li a{
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* Zepto-like category strip below banner */
-    .zepto-cat-section {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(35, 47, 62, 0.08);
-      margin-top: -16px;
-      padding: 14px 8px 6px;
-      position: relative;
-      z-index: 2;
-    }
+    /* Category section CSS removed - no longer needed */
 
-    .zepto-cat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 8px 8px;
-    }
+    /* Category banner CSS removed */
 
-    .zepto-cat-header h2 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #232f3e;
-      margin: 0;
-    }
-
-    .zepto-cat-track {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: 86px;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 6px 36px 10px; /* leave room for nav buttons */
-      scroll-snap-type: x proximity;
-    }
-
-    .zepto-cat-track::-webkit-scrollbar { height: 8px; }
-    .zepto-cat-track::-webkit-scrollbar-thumb { background: rgba(35,47,62,0.18); border-radius: 8px; }
-
-    .zepto-cat-item { scroll-snap-align: start; text-align: center; }
-
-    .zepto-cat-link {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #232f3e;
-      gap: 6px;
-    }
-
-    .zepto-cat-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: linear-gradient(135deg,#fafafa,#fff);
-      border: 1px solid rgba(139,69,19,0.12);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 4px 14px rgba(35,47,62,0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      overflow: hidden;
-    }
-
-    .zepto-cat-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .zepto-cat-emoji { font-size: 1.4rem; }
-
-    .zepto-cat-link:hover .zepto-cat-icon { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(35,47,62,0.16); }
-
-    .zepto-cat-name {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #2c3e50;
-      line-height: 1.1;
-      max-width: 80px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .zepto-cat-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      display: grid;
-      place-items: center;
-      background: #232f3e;
+    /* More category banner CSS removed */
       color: #ff9900;
-      box-shadow: 0 4px 12px rgba(35,47,62,0.25);
-      z-index: 3;
-    }
-    .zepto-cat-prev { left: 8px; }
-    .zepto-cat-next { right: 8px; }
-
-    @media (min-width: 768px) {
-      .zepto-cat-section { margin-top: -24px; padding: 18px 10px 8px; }
-      .zepto-cat-track { grid-auto-columns: 96px; gap: 12px; }
-      .zepto-cat-icon { width: 72px; height: 72px; }
-      .zepto-cat-name { font-size: 0.82rem; max-width: 92px; }
-    }
-
-    /* ============ BLINKIT-STYLE MOBILE 3×3 GRID ============ */
-    @media (max-width: 767px) {
-      /* Hide desktop scrolling navigation */
-      .zepto-cat-nav {
-        display: none !important;
-      }
-
-      /* Convert horizontal scroll to 3×3 grid */
-      .zepto-cat-track {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-auto-flow: row;
-        grid-auto-columns: auto;
-        gap: 16px;
-        overflow-x: visible;
-        overflow-y: visible;
-        padding: 12px 16px 16px;
-        scroll-snap-type: none;
+    /* All category banner CSS removed */
       }
 
       /* Show only first 9 items in mobile grid */
@@ -4101,53 +3960,7 @@ li a{
     </div>
   </section>
 
-  <!-- Zepto-like Category Strip (below banner) -->
-  <section class="py-2" id="categoryBannerSection">
-    <div class="container">
-      <div class="zepto-cat-section" aria-label="Shop by category">
-        <div class="zepto-cat-header">
-          <h2>Shop by category</h2>
-          <a href="{{ route('buyer.dashboard') }}" class="text-decoration-none" style="font-weight:600;color:#8B4513;">View all</a>
-        </div>
-
-        <button class="zepto-cat-nav zepto-cat-prev d-none d-md-grid" type="button" onclick="scrollZeptoCats(-1)">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <div id="zeptoCatTrack" class="zepto-cat-track">
-          @if(!empty($categories) && $categories->count())
-            @foreach($categories->take(24) as $category)
-              <div class="zepto-cat-item">
-                <a class="zepto-cat-link" href="{{ route('buyer.productsByCategory', $category->id) }}" title="{{ $category->name }}">
-                  <span class="zepto-cat-icon position-relative" style="background: linear-gradient(135deg,#fffbe6,#ffe4b5); border: 2px solid #ff9900;">
-                    @php $cImg = $category->image_url ?? $category->image ?? null; $emoji = $category->emoji ?? '🛍️'; @endphp
-                    @if(!empty($cImg))
-                      <img src="{{ $cImg }}" alt="{{ $category->name }}" style="z-index:2;position:relative;" onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.classList.remove('d-none');">
-                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle d-none" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
-                    @else
-                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
-                    @endif
-                  </span>
-                  <span class="zepto-cat-name">{{ Str::limit($category->name, 12) }}</span>
-                </a>
-              </div>
-            @endforeach
-          @else
-            <div class="text-center text-muted" style="grid-column:1/-1;padding:10px 0;">No categories available</div>
-          @endif
-        </div>
-        <button class="zepto-cat-nav zepto-cat-next d-none d-md-grid" type="button" onclick="scrollZeptoCats(1)">
-          <i class="bi bi-chevron-right"></i>
-        </button>
-      </div>
-
-      <!-- Mobile "View All Categories" Button -->
-      <div class="d-md-none text-center mt-3 px-3">
-        <a href="{{ route('buyer.dashboard') }}" class="btn btn-outline-primary w-100" style="border-radius: 12px; padding: 12px; font-weight: 600; border: 2px solid #667eea;">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>View All Categories
-        </a>
-      </div>
-    </div>
-  </section>
+  <!-- Category Banner Removed: Categories accessible via mobile menu and desktop navigation -->
 
   <!-- Delivery Partner Promotional Section -->
   <section class="py-4" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">
@@ -4465,12 +4278,7 @@ li a{
   </style>
   
   <script>
-    function scrollZeptoCats(dir) {
-      const track = document.getElementById('zeptoCatTrack');
-      if (!track) return;
-      const itemWidth = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width : 100;
-      track.scrollBy({ left: dir * (itemWidth * 3), behavior: 'smooth' });
-    }
+    // Category scrolling function removed
   </script>
 
   <!-- Hero Banners Section - Admin Managed -->
