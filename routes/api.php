@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
 
     // Public product data
     Route::get('categories', [CategoryController::class, 'index']);
+    Route::get('categories/{id}/subcategories', [CategoryController::class, 'getSubcategories']);
     Route::get('products', [ProductController::class, 'index']);
     Route::get('products/{id}', [ProductController::class, 'show']);
     Route::get('products/featured', [ProductController::class, 'featured']);

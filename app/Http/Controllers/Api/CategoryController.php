@@ -46,6 +46,37 @@ class CategoryController extends Controller
     }
 
     /**
+     * Get subcategories for a specific category
+     */
+    public function getSubcategories($id)
+    {
+        $category = Category::with(['subcategories' => function ($query) {
+            $query->select('id', 'name', 'category_id', 'emoji')
+                  ->orderBy('name');
+        }])->find($id);
+
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'category_id' => $category->id,
+            'category_name' => $category->name,
+            'subcategories' => $category->subcategories->map(function ($subcategory) {
+                return [
+                    'id' => $subcategory->id,
+                    'name' => $subcategory->name,
+                    'emoji' => $subcategory->emoji ?? '📦',
+                ];
+            }),
+        ]);
+    }
+
+    /**
      * Get category details with products
      */
     public function show(Request $request, $id)

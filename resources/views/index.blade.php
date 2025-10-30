@@ -604,6 +604,186 @@
     }
 
     /* ============================================
+       MODERN MOBILE CATEGORY MENU (Meesho/Blinkit Style)
+       ============================================ */
+    .modern-category-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      z-index: 2000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modern-category-popup.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .category-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .category-header h4 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .category-close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .category-content {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 68px);
+    }
+
+    .category-sidebar {
+      width: 140px;
+      background: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      overflow-y: auto;
+    }
+
+    .category-item {
+      padding: 16px 12px;
+      border-bottom: 1px solid #e9ecef;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: white;
+      margin: 0;
+    }
+
+    .category-item:hover,
+    .category-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .category-item .category-emoji {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .category-item .category-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .subcategory-panel {
+      flex: 1;
+      background: white;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .subcategory-header {
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+
+    .subcategory-header h5 {
+      margin: 0;
+      color: #333;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .subcategory-list {
+      padding: 16px 20px;
+    }
+
+    .subcategory-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+      text-decoration: none;
+      color: #333;
+      transition: all 0.2s ease;
+    }
+
+    .subcategory-item:hover {
+      color: #667eea;
+      text-decoration: none;
+      background: #f8f9ff;
+      margin: 0 -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .subcategory-item:last-child {
+      border-bottom: none;
+    }
+
+    .subcategory-icon {
+      width: 36px;
+      height: 36px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 1.2rem;
+    }
+
+    .subcategory-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .all-products-item {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      margin: 16px 20px;
+      padding: 16px;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      font-weight: 600;
+    }
+
+    .all-products-item:hover {
+      color: white;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    /* ============================================
        MOBILE PROFILE MENU STYLES
        ============================================ */
     .mobile-profile-popup {
@@ -5937,18 +6117,75 @@ li a{
       }
     });
 
-    // Mobile Category Menu Function
+    // Modern Mobile Category Menu Functions
     function toggleMobileCategoryMenu() {
       const menu = document.getElementById('mobileCategoryMenu');
-      const isVisible = menu.style.display === 'block';
+      const overlay = document.getElementById('mobileMenuOverlay');
       
-      if (isVisible) {
-        menu.style.display = 'none';
+      if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        if (overlay) overlay.style.display = 'none';
         document.body.style.overflow = '';
       } else {
-        menu.style.display = 'block';
+        menu.classList.add('show');
+        if (overlay) overlay.style.display = 'block';
         document.body.style.overflow = 'hidden';
       }
+    }
+
+    function showSubcategories(categoryId, categoryName, element) {
+      // Update active state
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+      
+      // Update header
+      document.getElementById('selectedCategoryName').textContent = categoryName;
+      
+      // Update view all link
+      const viewAllLink = document.getElementById('viewAllLink');
+      viewAllLink.href = '/buyer/category/' + categoryId + '/products';
+      
+      // Show loading state
+      const subcategoryItems = document.getElementById('subcategoryItems');
+      subcategoryItems.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div><p class="mt-2 mb-0 text-muted">Loading...</p></div>';
+      
+      // Fetch subcategories via AJAX
+      fetch(`/api/categories/${categoryId}/subcategories`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.subcategories && data.subcategories.length > 0) {
+            let html = '';
+            data.subcategories.forEach(subcategory => {
+              html += `
+                <a href="/buyer/subcategory/${subcategory.id}/products" class="subcategory-item">
+                  <div class="subcategory-icon">
+                    ${subcategory.emoji || '📦'}
+                  </div>
+                  <span class="subcategory-name">${subcategory.name}</span>
+                </a>
+              `;
+            });
+            subcategoryItems.innerHTML = html;
+          } else {
+            subcategoryItems.innerHTML = `
+              <div class="text-center py-4 text-muted">
+                <i class="bi bi-box-seam" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                <p>No subcategories available</p>
+              </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching subcategories:', error);
+          subcategoryItems.innerHTML = `
+            <div class="text-center py-4 text-muted">
+              <i class="bi bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+              <p>Failed to load subcategories</p>
+            </div>
+          `;
+        });
     }
 
     // Mobile Chatbot Function
@@ -6376,44 +6613,77 @@ li a{
     @endauth
   </div>
 
-  <!-- Mobile Category Menu Popup -->
-  <div id="mobileCategoryMenu" class="mobile-category-popup" style="display: none;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0"><i class="bi bi-chat-dots-fill me-2"></i>Help & Categories</h5>
-      <button onclick="toggleMobileCategoryMenu()" class="btn-close" aria-label="Close"></button>
+  <!-- Modern Mobile Category Menu (Meesho/Blinkit Style) -->
+  <div id="mobileCategoryMenu" class="modern-category-popup">
+    <!-- Header -->
+    <div class="category-header">
+      <h4><i class="bi bi-grid-3x3-gap me-2"></i>Categories</h4>
+      <button class="category-close-btn" onclick="toggleMobileCategoryMenu()">
+        <i class="bi bi-x"></i>
+      </button>
     </div>
-    
-    <!-- Chatbot Section -->
-    <div class="mb-4">
-      <div class="card" style="border-radius: 12px; border: 2px solid #ff6b35; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
-        <div class="card-body text-center text-white p-3">
-          <i class="bi bi-chat-dots-fill fs-2 mb-2"></i>
-          <h6 class="mb-2">Need Help?</h6>
-          <button onclick="openMobileChatbot()" class="btn btn-light btn-sm fw-bold">
-            <i class="bi bi-chat-square-text me-1"></i>Start Chat
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Categories Section -->
-    <div class="mb-3">
-      <h6 class="text-muted mb-3"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Shop by Category</h6>
-      <div class="row g-2">
-        @foreach($categories as $category)
-          <div class="col-4">
-            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
-              <div class="card h-100 text-center p-2 category-mobile-card" style="border-radius: 12px; transition: all 0.3s;">
-                <div class="card-body p-1">
-                  <div style="font-size: 1.5rem; margin-bottom: 8px;">{!! $category->emoji !!}</div>
-                  <div style="font-size: 0.8rem; font-weight: 600; color: #232f3e; line-height: 1.2;">
-                    {{ Str::limit($category->name, 12) }}
-                  </div>
-                </div>
-              </div>
-            </a>
+
+    <!-- Main Content -->
+    <div class="category-content">
+      <!-- Left Sidebar - Categories -->
+      <div class="category-sidebar">
+        @if(!empty($categories) && $categories->count())
+          @foreach($categories as $index => $category)
+            <div class="category-item {{ $index === 0 ? 'active' : '' }}" 
+                 data-category-id="{{ $category->id }}" 
+                 onclick="showSubcategories({{ $category->id }}, '{{ $category->name }}', this)">
+              <span class="category-emoji">{!! $category->emoji ?? '🛍️' !!}</span>
+              <span class="category-name">{{ Str::limit($category->name, 10) }}</span>
+            </div>
+          @endforeach
+        @else
+          <div class="category-item">
+            <span class="category-emoji">🛍️</span>
+            <span class="category-name">No Categories</span>
           </div>
-        @endforeach
+        @endif
+      </div>
+
+      <!-- Right Panel - Subcategories -->
+      <div class="subcategory-panel">
+        <div class="subcategory-header">
+          <h5 id="selectedCategoryName">
+            @if(!empty($categories) && $categories->count())
+              {{ $categories->first()->name }}
+            @else
+              Select Category
+            @endif
+          </h5>
+        </div>
+        
+        <div class="subcategory-list" id="subcategoryList">
+          <!-- View All Products for selected category -->
+          <a href="#" class="all-products-item" id="viewAllLink">
+            <i class="bi bi-eye me-2"></i>View All Products
+          </a>
+          
+          <!-- Subcategories will be loaded here -->
+          <div id="subcategoryItems">
+            @if(!empty($categories) && $categories->count())
+              @php $firstCategory = $categories->first(); @endphp
+              @if($firstCategory->subcategories && $firstCategory->subcategories->count())
+                @foreach($firstCategory->subcategories as $subcategory)
+                  <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="subcategory-item">
+                    <div class="subcategory-icon">
+                      {!! $subcategory->emoji ?? '📦' !!}
+                    </div>
+                    <span class="subcategory-name">{{ $subcategory->name }}</span>
+                  </a>
+                @endforeach
+              @else
+                <div class="text-center py-4 text-muted">
+                  <i class="bi bi-box-seam" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                  <p>No subcategories available</p>
+                </div>
+              @endif
+            @endif
+          </div>
+        </div>
       </div>
     </div>
   </div>
