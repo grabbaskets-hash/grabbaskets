@@ -95,7 +95,7 @@
 
         .product-img {
             height: 200px;
-            object-fit: cover;
+            object-fit: contain;
             width: 100%;
         }
 
