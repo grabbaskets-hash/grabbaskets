@@ -487,6 +487,42 @@
       body {
         padding-bottom: 80px; /* Increased from 70px for better spacing */
       }
+
+      /* HIDE FLOATING ELEMENTS IN MOBILE VIEW - Keep category menu near login */
+      .floating-actions {
+        display: none !important; /* Hide the large floating category menu on mobile */
+      }
+
+      /* Hide the simple menu button floating element */
+      .btn.position-fixed[data-bs-toggle="modal"] {
+        display: none !important;
+      }
+
+      /* Hide other fixed position elements that interfere with mobile UX */
+      .position-fixed.btn:not(.mobile-category-toggle):not(.mobile-bottom-nav *) {
+        display: none !important;
+      }
+
+      /* Keep mobile category menu popup visible and positioned correctly */
+      .mobile-category-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 80px; /* Above mobile nav */
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1500;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .mobile-category-popup > div:first-child {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 60px; /* Space from top */
+        box-shadow: 0 -2px 20px rgba(0,0,0,0.2);
+      }
     }
 
     .mobile-nav-item {
@@ -4159,21 +4195,36 @@ li a{
 
     /* Mobile specific styles for floating button */
     @media (max-width: 768px) {
-      /* Hide ALL floating elements on mobile - Comprehensive */
+      /* Hide desktop floating elements on mobile */
       #floatingActionsContainer,
       #showFabBtn,
       .floating-actions,
       .fab-main,
       .fab-hide-btn,
       #fabMainBtn,
-      #fabHideBtn,
-      .floating-menu-popup,
-      #floatingMenu {
+      #fabHideBtn {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         pointer-events: none !important;
         z-index: -9999 !important;
+      }
+      
+      /* Mobile category menu popup */
+      .mobile-category-popup {
+        position: fixed !important;
+        bottom: 80px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 95% !important;
+        max-width: 400px !important;
+        background: #fff !important;
+        border-radius: 20px !important;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.3) !important;
+        padding: 20px !important;
+        z-index: 9999 !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
       }
 
       /* Hide chatbot widget on mobile */
@@ -5870,6 +5921,46 @@ li a{
         floatingMenu.style.display = 'none';
       }
     });
+
+    // Mobile Category Menu Function
+    function toggleMobileCategoryMenu() {
+      const menu = document.getElementById('mobileCategoryMenu');
+      const isVisible = menu.style.display === 'block';
+      
+      if (isVisible) {
+        menu.style.display = 'none';
+        document.body.style.overflow = '';
+      } else {
+        menu.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    // Close mobile category menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('mobileCategoryMenu');
+      const menuButton = event.target.closest('.mobile-nav-item');
+      
+      if (menu && menu.style.display === 'block' && !menu.contains(event.target) && !menuButton) {
+        menu.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Add hover effects to mobile category cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const categoryCards = document.querySelectorAll('.category-mobile-card');
+      categoryCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-2px)';
+          this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+        });
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = '';
+        });
+      });
+    });
   </script>
 
   @if(session('tamil_greeting') && auth()->check())
@@ -6187,6 +6278,12 @@ li a{
         <span class="badge">{{ count(session('cart')) }}</span>
       @endif
     </a>
+    <!-- Mobile Category Menu Button -->
+    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <span>Menu</span>
+    </div>
+    
     @auth
       <a href="{{ route('profile.show') }}" class="mobile-nav-item">
         <i class="bi bi-person-circle"></i>
@@ -6198,6 +6295,30 @@ li a{
         <span>Login</span>
       </a>
     @endauth
+  </div>
+
+  <!-- Mobile Category Menu Popup -->
+  <div id="mobileCategoryMenu" class="mobile-category-popup" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Shop by Category</h5>
+      <button onclick="toggleMobileCategoryMenu()" class="btn-close" aria-label="Close"></button>
+    </div>
+    <div class="row g-2">
+      @foreach($categories as $category)
+        <div class="col-4">
+          <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
+            <div class="card h-100 text-center p-2 category-mobile-card" style="border-radius: 12px; transition: all 0.3s;">
+              <div class="card-body p-1">
+                <div style="font-size: 1.5rem; margin-bottom: 8px;">{!! $category->emoji !!}</div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #232f3e; line-height: 1.2;">
+                  {{ Str::limit($category->name, 12) }}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      @endforeach
+    </div>
   </div>
 
   <!-- Location Detection Modal -->
