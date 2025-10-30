@@ -219,7 +219,7 @@ class ZeptoStyleSearch {
             
             data.categories.forEach(category => {
                 html += `
-                    <div class="suggestion-item" onclick="window.location.href='${category.url}'">
+                    <div class="suggestion-item" onclick="window.zeptoSearch.navigateToProduct('${category.url}', event)">
                         <span class="category-emoji">${category.emoji}</span>
                         <span>${this.highlightMatch(category.name, query)}</span>
                     </div>`;
@@ -245,7 +245,7 @@ class ZeptoStyleSearch {
                     '<span class="stock-status out-stock">Out of Stock</span>';
                 
                 html += `
-                    <div class="product-suggestion" onclick="window.location.href='${product.url}'">
+                    <div class="product-suggestion" onclick="window.zeptoSearch.navigateToProduct('${product.url}', event)">
                         <div class="product-image">
                             <img src="${product.image}" alt="${product.name}" 
                                  onerror="this.src='/images/placeholder.png'">
@@ -315,11 +315,21 @@ class ZeptoStyleSearch {
     }
     
     viewAllResults(query) {
+        // Hide suggestions first
+        this.hideSuggestions();
+        
+        // Add loading state
+        document.body.style.cursor = 'wait';
+        
         if (this.searchForm) {
             this.searchInput.value = query;
-            this.searchForm.submit();
+            setTimeout(() => {
+                this.searchForm.submit();
+            }, 100);
         } else {
-            window.location.href = `/products?q=${encodeURIComponent(query)}`;
+            setTimeout(() => {
+                window.location.href = `/products?q=${encodeURIComponent(query)}`;
+            }, 100);
         }
     }
     
@@ -393,6 +403,25 @@ class ZeptoStyleSearch {
         event.preventDefault();
         this.viewAllResults(this.searchInput.value.trim());
     }
+    
+    // Smooth navigation method to prevent jumping
+    navigateToProduct(url, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        // Hide suggestions first
+        this.hideSuggestions();
+        
+        // Add loading state
+        document.body.style.cursor = 'wait';
+        
+        // Navigate after a small delay to prevent jumping
+        setTimeout(() => {
+            window.location.href = url;
+        }, 100);
+    }
 }
 
 // Add Zepto-style CSS
@@ -454,14 +483,21 @@ style.textContent = `
         display: flex;
         align-items: center;
         gap: 12px;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, transform 0.1s;
         border-radius: 8px;
         margin: 4px 8px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
     
     .product-suggestion:hover,
     .product-suggestion.active {
         background-color: #f8f9fa;
+        transform: translateY(-1px);
+    }
+    
+    .product-suggestion:active {
+        transform: translateY(0);
     }
     
     .product-image {

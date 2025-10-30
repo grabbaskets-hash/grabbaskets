@@ -88,6 +88,7 @@ class SimpleSearchController extends Controller
                         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                         transition: all 0.3s ease;
                         overflow: hidden;
+                        position: relative;
                     }
                     .product-card:hover {
                         transform: translateY(-5px);
@@ -141,6 +142,27 @@ class SimpleSearchController extends Controller
                         padding: 30px 0;
                         margin-bottom: 30px;
                         border-radius: 0 0 25px 25px;
+                        position: relative;
+                        z-index: 10;
+                    }
+                    
+                    /* Mobile optimizations */
+                    @media (max-width: 768px) {
+                        .product-card {
+                            border-radius: 12px;
+                            margin-bottom: 15px;
+                        }
+                        .product-image {
+                            height: 180px;
+                        }
+                        .search-header {
+                            padding: 20px 0;
+                            margin-bottom: 20px;
+                        }
+                        /* Ensure search results are not covered by banners */
+                        body {
+                            padding-top: 0 !important;
+                        }
                     }
                 </style>
             </head>
@@ -163,13 +185,15 @@ class SimpleSearchController extends Controller
                     <div class='row'>";
             
             foreach ($products as $product) {
-                $productImage = $product->image ? $product->image : '/images/placeholder.png';
+                // Properly handle image URLs
+                $productImage = $product->image_url ?? $product->image ?? '/images/placeholder.png';
                 $discountPercent = $product->discount ? round($product->discount, 0) : 0;
                 
                 $html .= "
                     <div class='col-lg-3 col-md-4 col-sm-6 mb-4'>
                         <div class='card product-card h-100'>
-                            <div class='position-relative'>";
+                            <a href='/products/{$product->id}' class='text-decoration-none text-dark'>
+                            <div class='position-relative'";
                 
                 // Discount badge
                 if ($discountPercent > 0) {
@@ -222,6 +246,7 @@ class SimpleSearchController extends Controller
                 
                 $html .= "
                                 </div>
+                            </a>
                             </div>
                         </div>
                     </div>";
@@ -386,7 +411,7 @@ class SimpleSearchController extends Controller
                             'name' => $product->name,
                             'price' => $product->price,
                             'discount' => $product->discount,
-                            'image' => $product->image,
+                            'image' => $product->image_url ?? $product->image ?? '/images/placeholder.png',
                             'in_stock' => $product->stock_quantity === null || $product->stock_quantity > 0,
                             'url' => "/products/{$product->id}"
                         ];

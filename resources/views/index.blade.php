@@ -3968,7 +3968,7 @@ li a{
   </section>
 
   <!-- Zepto-like Category Strip (below banner) -->
-  <section class="py-2">
+  <section class="py-2" id="categoryBannerSection">
     <div class="container">
       <div class="zepto-cat-section" aria-label="Shop by category">
         <div class="zepto-cat-header">
