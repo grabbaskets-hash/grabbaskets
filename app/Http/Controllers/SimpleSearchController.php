@@ -192,7 +192,7 @@ class SimpleSearchController extends Controller
                 $html .= "
                     <div class='col-lg-3 col-md-4 col-sm-6 mb-4'>
                         <div class='card product-card h-100'>
-                            <a href='/products/{$product->id}' class='text-decoration-none text-dark'>
+                            <a href='/product/{$product->id}' class='text-decoration-none text-dark'>
                             <div class='position-relative'";
                 
                 // Discount badge
@@ -413,7 +413,7 @@ class SimpleSearchController extends Controller
                             'discount' => $product->discount,
                             'image' => $product->image_url ?? $product->image ?? '/images/placeholder.png',
                             'in_stock' => $product->stock_quantity === null || $product->stock_quantity > 0,
-                            'url' => "/products/{$product->id}"
+                            'url' => "/product/{$product->id}"
                         ];
                     });
                 
