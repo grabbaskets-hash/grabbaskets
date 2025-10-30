@@ -208,19 +208,7 @@
             transform: scale(1.05);
         }
 
-        /* Pagination */
-        .pagination {
-            margin-top: 2.5rem;
-        }
 
-        .pagination .page-link {
-            border-radius: 50px;
-            margin: 0 5px;
-            border: none;
-            color: #0a1a3f;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
 
         /* Increase store info text size */
         .store-info h5.sellername {
@@ -238,9 +226,52 @@
             color: #fff;
         }
 
-        .pagination .page-link:hover {
-            background: #e8eaf6;
+        /* 🛍️ Product Card Uniform Layout */
+        .product-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            /* Make all cards same height */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background: #fff;
         }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 🖼️ Product Image Fix */
+        .product-img {
+            width: 100%;
+            height: 230px;
+            /* Fixed image height for all cards */
+            object-fit: contain;
+            /* 🔥 shows full image inside without cropping */
+            background-color: #f8f9fa;
+            /* light background for transparent images */
+            padding: 10px;
+            /* optional, to avoid tight image edges */
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+            filter: brightness(0.95);
+        }
+
+        /* Card body alignment */
+        .card-body {
+            text-align: center;
+            padding: 1.2rem;
+            flex-grow: 1;
+        }
+
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
@@ -333,7 +364,7 @@
         @if($products->count())
         <div class="row g-4" id="productGrid">
             @foreach($products as $p)
-            <div class="col-6 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
+            <div class="col-4 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
                 <div class="card product-card">
                     @if($p->image || $p->image_data)
                     <img src="{{ $p->image_url }}" alt="{{ $p->name }}" class="product-img">
@@ -347,6 +378,7 @@
                     </div>
                 </div>
             </div>
+
             @endforeach
         </div>
         @else
