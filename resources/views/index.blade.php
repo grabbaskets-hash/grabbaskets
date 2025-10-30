@@ -512,8 +512,13 @@
         z-index: 9999 !important;
       }
 
-      /* Ensure banners don't interfere with modals on mobile */
+      /* Hide delivery banner and category pills on mobile to prevent layout disruption */
       .delivery-banner-modern,
+      .category-pills-modern {
+        display: none !important;
+      }
+
+      /* Ensure other elements don't interfere with modals on mobile */
       .promo-tiles,
       section[style*="background"] {
         z-index: 1 !important;
@@ -6583,15 +6588,15 @@ li a{
       <i class="bi bi-house-fill"></i>
       <span>Home</span>
     </a>
-    <a href="{{ route('products.index') }}" class="mobile-nav-item">
+    <!-- Mobile Category Menu Button -->
+    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
-    </a>
-    <!-- Mobile Category Menu Button with Chatbot -->
-    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
-      <i class="bi bi-chat-dots-fill"></i>
-      <span>Help</span>
     </div>
+    <a href="{{ route('products.index') }}" class="mobile-nav-item">
+      <i class="bi bi-search"></i>
+      <span>Search</span>
+    </a>
     <a href="{{ route('cart.index') }}" class="mobile-nav-item">
       <i class="bi bi-cart3"></i>
       <span>Cart</span>
