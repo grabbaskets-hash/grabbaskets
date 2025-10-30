@@ -166,7 +166,40 @@ Grabbasket Team
             }
         }
 
-        return back()->with('success', 'Tracking information updated and buyer notified with tracking details!');
+        return back()->with('success', 'Tracking information updated successfully.');
+    }
+
+    // Show all orders for authenticated user
+    public function index()
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                return redirect()->route('login')
+                    ->with('error', 'Please login to view your orders.');
+            }
+
+            $orders = Order::where('buyer_id', $user->id)
+                ->with(['orderItems.product', 'sellerUser'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            return view('orders.index', compact('orders'));
+        } catch (\Exception $e) {
+            Log::error('Orders Index Error: ' . $e->getMessage());
+            
+            return view('orders.index', [
+                'orders' => new \Illuminate\Pagination\LengthAwarePaginator(
+                    collect([]),
+                    0,
+                    10,
+                    1,
+                    ['path' => request()->url()]
+                ),
+                'error' => 'Unable to load orders. Please try again later.'
+            ]);
+        }
     }
 
     /**

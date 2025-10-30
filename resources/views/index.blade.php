@@ -600,9 +600,15 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      padding: 10px 8px; /* Increased padding */
+      padding: 12px 8px; /* Increased padding for better touch */
       color: var(--text-light);
       text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation; /* Improve touch responsiveness */
+      -webkit-touch-callout: none; /* Disable callout */
+      -webkit-user-select: none; /* Disable text selection */
+      user-select: none;
+      transition: all 0.2s ease;
       font-size: 0.75rem;
       transition: all 0.3s ease;
       position: relative;
@@ -1432,6 +1438,41 @@
       box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
       color: white;
       text-decoration: none;
+    }
+
+    /* Enhanced Menu Styling */
+    .mega-menu-wrapper {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform: translateY(-15px);
+    }
+
+    .mega-menu-wrapper.show {
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    
+    /* Prevent Bootstrap dropdown conflicts */
+    .mega-menu-wrapper.dropdown-menu {
+      display: block !important;
+    }
+    
+    /* Enhanced nav link styling */
+    .nav-link {
+      transition: color 0.2s ease, background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    .nav-link:hover,
+    .nav-link:focus {
+      color: inherit !important;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
     }
 
     /* Mobile Responsiveness */
@@ -5890,37 +5931,75 @@ li a{
       const genderTabs = document.querySelectorAll('.gender-tab');
       const categoryCards = document.querySelectorAll('.mega-category-card');
 
+      // Ensure elements exist before adding event listeners
+      if (!navbar || !megaMenuToggle || !megaMenu) {
+        console.warn('Navigation elements not found');
+        return;
+      }
+
       // Navbar scroll effect
       window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-          navbar.classList.add('scrolled');
-        } else {
-          navbar.classList.remove('scrolled');
+        try {
+          if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+          } else {
+            navbar.classList.remove('scrolled');
+          }
+        } catch (error) {
+          console.error('Error in scroll handler:', error);
         }
       });
 
-      // Mega menu hover functionality
+      // Disable Bootstrap dropdown functionality for mega menu to prevent conflicts
+      megaMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+
+      // Enhanced mega menu hover functionality with better touch support
       let hoverTimeout;
+      let isMenuOpen = false;
       
-      megaMenuToggle.addEventListener('mouseenter', function() {
-        clearTimeout(hoverTimeout);
-        megaMenu.classList.add('show');
-      });
-
-      megaMenuToggle.parentElement.addEventListener('mouseleave', function() {
-        hoverTimeout = setTimeout(() => {
-          megaMenu.classList.remove('show');
-        }, 300);
-      });
-
+      function showMegaMenu() {
+        try {
+          clearTimeout(hoverTimeout);
+          megaMenu.classList.add('show');
+          isMenuOpen = true;
+          console.log('Mega menu opened'); // Debug log
+        } catch (error) {
+          console.error('Error showing mega menu:', error);
+        }
+      }
+      
+      function hideMegaMenu() {
+        try {
+          hoverTimeout = setTimeout(() => {
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+            console.log('Mega menu closed'); // Debug log
+          }, 300);
+        } catch (error) {
+          console.error('Error hiding mega menu:', error);
+        }
+      }
+      
+      // Mouse events for desktop
+      megaMenuToggle.addEventListener('mouseenter', showMegaMenu);
+      megaMenuToggle.parentElement.addEventListener('mouseleave', hideMegaMenu);
       megaMenu.addEventListener('mouseenter', function() {
         clearTimeout(hoverTimeout);
       });
-
-      megaMenu.addEventListener('mouseleave', function() {
-        hoverTimeout = setTimeout(() => {
-          megaMenu.classList.remove('show');
-        }, 300);
+      megaMenu.addEventListener('mouseleave', hideMegaMenu);
+      
+      // Touch events for mobile
+      megaMenuToggle.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        if (isMenuOpen) {
+          hideMegaMenu();
+        } else {
+          showMegaMenu();
+        }
       });
 
       // Gender filter functionality
@@ -5952,20 +6031,31 @@ li a{
         });
       });
 
-      // Close mega menu on outside click
+      // Enhanced outside click handling
       document.addEventListener('click', function(e) {
-        if (!megaMenuToggle.parentElement.contains(e.target)) {
-          megaMenu.classList.remove('show');
+        try {
+          if (!megaMenuToggle.parentElement.contains(e.target) && !megaMenu.contains(e.target)) {
+            clearTimeout(hoverTimeout);
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+          }
+        } catch (error) {
+          console.error('Error in outside click handler:', error);
         }
       });
-
-      // Mobile mega menu handling
-      if (window.innerWidth <= 768) {
-        megaMenuToggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          megaMenu.classList.toggle('show');
-        });
-      }
+      
+      // Touch-friendly outside touch handling
+      document.addEventListener('touchstart', function(e) {
+        try {
+          if (isMenuOpen && !megaMenuToggle.parentElement.contains(e.target) && !megaMenu.contains(e.target)) {
+            clearTimeout(hoverTimeout);
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+          }
+        } catch (error) {
+          console.error('Error in outside touch handler:', error);
+        }
+      });
 
       // Animate category cards on load
       setTimeout(() => {
@@ -6158,17 +6248,28 @@ li a{
 
     // Modern Mobile Category Menu Functions
     function toggleMobileCategoryMenu() {
-      const menu = document.getElementById('mobileCategoryMenu');
-      const overlay = document.getElementById('mobileMenuOverlay');
-      
-      if (menu.classList.contains('show')) {
-        menu.classList.remove('show');
-        if (overlay) overlay.style.display = 'none';
-        document.body.style.overflow = '';
-      } else {
-        menu.classList.add('show');
-        if (overlay) overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+      try {
+        const menu = document.getElementById('mobileCategoryMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        
+        console.log('Toggle mobile category menu called'); // Debug log
+        
+        if (!menu) {
+          console.error('Mobile category menu not found');
+          return;
+        }
+        
+        if (menu.classList.contains('show')) {
+          menu.classList.remove('show');
+          if (overlay) overlay.style.display = 'none';
+          document.body.style.overflow = '';
+        } else {
+          menu.classList.add('show');
+          if (overlay) overlay.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile category menu:', error);
       }
     }
 
@@ -6275,10 +6376,22 @@ li a{
 
     // Mobile Profile Menu Functions
     function toggleMobileProfileMenu() {
-      const popup = document.getElementById('mobileProfilePopup');
-      const overlay = document.getElementById('mobileProfileOverlay');
-      
-      if (popup && overlay) {
+      try {
+        const popup = document.getElementById('mobileProfilePopup');
+        const overlay = document.getElementById('mobileProfileOverlay');
+        
+        console.log('Toggle mobile profile menu called'); // Debug log
+        
+        if (!popup) {
+          console.error('Mobile profile popup not found');
+          return;
+        }
+        
+        if (!overlay) {
+          console.error('Mobile profile overlay not found');
+          return;
+        }
+        
         const isOpen = popup.classList.contains('show');
         
         if (isOpen) {
@@ -6292,6 +6405,8 @@ li a{
           overlay.classList.add('show');
           document.body.style.overflow = 'hidden';
         }
+      } catch (error) {
+        console.error('Error toggling mobile profile menu:', error);
       }
     }
 

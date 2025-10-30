@@ -574,7 +574,7 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 
 // ===== PUBLIC BUYER ROUTES (Guest + Authenticated users can access) =====
 // Buyer dashboard & browsing - Anyone can view products
-Route::get('/buyer/dashboard', [BuyerController::class, 'index'])->name('buyer.dashboard');
+Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
@@ -1568,17 +1568,17 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
         // Food Items Management
         Route::resource('food-items', App\Http\Controllers\HotelOwner\FoodItemController::class);
 
-        // Orders Management
-        Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
-            ->name('orders');
-        Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
-            ->name('orders.show');
-        Route::patch('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
-            ->name('orders.update-status');
+        // Orders Management - Commented out until HotelOwner\OrderController is created
+        // Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
+        //     ->name('orders');
+        // Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
+        //     ->name('orders.show');
+        // Route::patch('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
+        //     ->name('orders.update-status');
 
-        // Analytics and Reports
-        Route::get('/analytics', [App\Http\Controllers\HotelOwner\AnalyticsController::class, 'index'])
-            ->name('analytics');
+        // Analytics and Reports - Commented out until AnalyticsController is created  
+        // Route::get('/analytics', [App\Http\Controllers\HotelOwner\AnalyticsController::class, 'index'])
+        //     ->name('analytics');
     });
 });
 

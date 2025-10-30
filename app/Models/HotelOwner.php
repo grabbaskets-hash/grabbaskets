@@ -62,10 +62,8 @@ class HotelOwner extends Authenticatable
         return $this->hasMany(FoodItem::class);
     }
 
-    public function orders()
-    {
-        return $this->hasMany(Order::class, 'hotel_owner_id');
-    }
+    // Note: Food delivery orders will be implemented later with a separate FoodOrder model
+    // For now, we'll use placeholder relationships for dashboard compatibility
 
     // Helper methods
     public function isOpen()

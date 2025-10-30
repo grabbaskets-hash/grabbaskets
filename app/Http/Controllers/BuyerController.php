@@ -9,12 +9,15 @@ use App\Models\Blog;
 use App\Models\Seller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BuyerController extends Controller
 {
 public function index()
 {
-    $categories = Category::with('subcategories')->get();
+    $categories = Category::with(['subcategories' => function($query) {
+        $query->withCount('products');
+    }])->withCount('products')->get();
 
     // Carousel products with higher discounts for banner
     $carouselProducts = Product::with('category')
@@ -142,6 +145,24 @@ $blogProducts = Product::whereNotNull('image')
         ->get();
 
     return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts','deals','flashSale','freeDelivery'));
+}
+
+public function dashboard()
+{
+    try {
+        $categories = Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->withCount('products')->get();
+
+        return view('buyer.dashboard', compact('categories'));
+    } catch (\Exception $e) {
+        Log::error('Buyer Dashboard Error: ' . $e->getMessage());
+        
+        return view('buyer.dashboard', [
+            'categories' => collect([]),
+            'error' => 'Unable to load categories. Please try again later.'
+        ]);
+    }
 }
 
 
