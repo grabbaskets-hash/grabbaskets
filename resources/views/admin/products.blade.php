@@ -16,6 +16,74 @@
             background-color: #f4f6f9;
         }
 
+        .sidebar .logo img {
+            margin-top: 60px;
+            position: relative;
+            left: 30px;
+            transition: transform 0.2s;
+        }
+
+        /* === SCROLLABLE SIDEBAR CONTENT === */
+        .sidebar {
+            /* Ensure the sidebar itself doesn't scroll, only its content */
+            overflow: hidden;
+            /* Keep your existing height */
+            height: 100vh;
+        }
+
+        .sidebar-content {
+            /* This is the key: make only this part scrollable */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Add some padding at the bottom so the logout button isn't stuck to the edge */
+            padding-bottom: 20px;
+            /* This ensures the scrollbar appears inside the sidebar */
+            height: calc(100vh - 180px);
+            /* Adjust '180px' if your logo/header height changes */
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        /* Optional: Style the scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: #2d2d40;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        /* === SIDEBAR LOGO BOX === */
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            height: 100px;
+        }
+
+        .sidebar .logo img {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            margin-top: -3px;
+            /* Pull up slightly to counter height increase */
+            margin-bottom: -50px;
+        }
+
         /* ===== OLD-STYLE SIDEBAR (FLAT DARK) ===== */
         .sidebar {
             position: fixed;
@@ -89,84 +157,46 @@
             }
         }
 
-        .sidebar .logo img {
-            margin-top: 60px;
-            position: relative;
-            left: 30px;
-            transition: transform 0.2s;
-        }
-
-        /* === SCROLLABLE SIDEBAR CONTENT === */
-        .sidebar {
-            /* Ensure the sidebar itself doesn't scroll, only its content */
-            overflow: hidden;
-            /* Keep your existing height */
-            height: 100vh;
-        }
-
-        .sidebar-content {
-            /* This is the key: make only this part scrollable */
-            overflow-y: auto;
-            overflow-x: hidden;
-            /* Add some padding at the bottom so the logout button isn't stuck to the edge */
-            padding-bottom: 20px;
-            /* This ensures the scrollbar appears inside the sidebar */
-            height: calc(100vh - 180px);
-            /* Adjust '180px' if your logo/header height changes */
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        /* Optional: Style the scrollbar for WebKit browsers (Chrome, Edge, Safari) */
-        .sidebar-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar-content::-webkit-scrollbar-track {
-            background: #2d2d40;
-            border-radius: 10px;
-        }
-
-        .sidebar-content::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 10px;
-        }
-
-        .sidebar-content::-webkit-scrollbar-thumb:hover {
-            background: #777;
-        }
-
-        /* === SIDEBAR LOGO BOX === */
-        .sidebar .logo {
+        /* ===== MENU TOGGLE BUTTON ===== */
+        .menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #1e1e2f;
+            z-index: 1200;
+            background: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
-            height: 100px;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
 
-        .sidebar .logo img {
-            width: 150px;
-            height: 200px;
-            object-fit: cover;
-            /* Pull up slightly to counter height increase */
-            /* margin-bottom: -50px; */
+        .menu-toggle:hover {
+            background: #007bff;
+            color: white;
+            transform: rotate(90deg);
         }
 
         .content {
-            margin-left: 230px;
+            margin-left: 250px;
             padding: 20px;
             transition: margin-left 0.3s ease-in-out;
+            min-height: 100vh;
         }
 
         @media (max-width: 768px) {
             .content {
                 margin-left: 0;
+                padding: 20px 15px;
             }
         }
+
 
         .menu-toggle {
             position: fixed;
@@ -178,7 +208,15 @@
             z-index: 1200;
         }
 
-        
+        .img {
+            position: relative;
+            margin-top: -40px;
+            margin-left: -50px;
+        }
+
+
+
+
 
         .filter-controls {
             background: #fff;
@@ -197,11 +235,18 @@
             margin-top: 50px;
         }
 
-        .sidebar .logo img {
-            margin-top: 60px;
-            position: relative;
-            left: 30px;
-            transition: transform 0.2s;
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
@@ -220,7 +265,7 @@
             <ul class="nav nav-pills flex-column">
                 <li><a class="nav-link " href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
                         Dashboard</a></li>
-                <li><a class="nav-link active" href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
+                <li><a class="nav-link active " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
                         Products</a></li>
                 <li><a class="nav-link" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Orders</a></li>
                 <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
@@ -399,10 +444,20 @@
                         </tbody>
                     </table>
 
-                    {{-- Pagination --}}
-                    <div class="d-flex justify-content-center mt-3">
-                        {{ $products->links() }}
+
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3">
+                        <!-- <div class="text-secondary small mb-2 mb-md-0 text-center text-md-start">
+                            Showing <strong>{{ $products->firstItem() }}</strong> to
+                            <strong>{{ $products->lastItem() }}</strong> of
+                            <strong>{{ $products->total() }}</strong> results
+                        </div> -->
+
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $products->links('pagination::bootstrap-5') }}
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
