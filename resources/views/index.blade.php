@@ -503,6 +503,45 @@
         display: none !important;
       }
 
+      /* Fix z-index issues for mobile modals and mini windows */
+      .modal,
+      .modal-backdrop,
+      .dropdown-menu,
+      .popover,
+      .tooltip {
+        z-index: 9999 !important;
+      }
+
+      /* Ensure banners don't interfere with modals on mobile */
+      .delivery-banner-modern,
+      .promo-tiles,
+      section[style*="background"] {
+        z-index: 1 !important;
+      }
+
+      /* Mobile search suggestions should be above banners */
+      .zepto-suggestions,
+      #search-suggestions,
+      .search-suggestions {
+        z-index: 8888 !important;
+      }
+
+      /* Mobile category popup above everything except modals */
+      .mobile-category-popup {
+        z-index: 8000 !important;
+      }
+
+      /* Fix mobile location modal z-index */
+      .location-modal {
+        z-index: 9000 !important;
+      }
+
+      /* HIDE CATEGORIES BANNER ON MOBILE - Keep for desktop only */
+      .zepto-cat-section,
+      section:has(.zepto-cat-section) {
+        display: none !important;
+      }
+
       /* Keep mobile category menu popup visible and positioned correctly */
       .mobile-category-popup {
         position: fixed;
@@ -593,6 +632,12 @@
     @media (min-width: 769px) {
       .mobile-only {
         display: none !important;
+      }
+
+      /* SHOW CATEGORIES BANNER ON DESKTOP ONLY */
+      .zepto-cat-section,
+      section:has(.zepto-cat-section) {
+        display: block !important;
       }
     }
 
@@ -3242,17 +3287,44 @@ li a{
        ============================================ */
     .mobile-login-card {
       background: white;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 28px 24px;
       margin: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      animation: slideInUp 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       display: none;
+      position: relative;
+      z-index: 1000;
+      border: 1px solid rgba(12, 131, 31, 0.1);
     }
 
     @media (max-width: 768px) {
       .mobile-login-card.show {
         display: block;
+        animation: bounceIn 0.5s ease-out;
+      }
+      
+      .mobile-login-card {
+        margin: 12px;
+        border-radius: 16px;
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
       }
     }
 
@@ -5385,9 +5457,10 @@ li a{
 
 
 
-  <!-- Chatbot Widget -->
-
-  <x-chatbot-widget />
+  <!-- Chatbot Widget - Desktop Only -->
+  <div class="d-none d-md-block">
+    <x-chatbot-widget />
+  </div>
 
   <!-- Premium Footer -->
   <footer class="mt-5" style="background:linear-gradient(135deg,#232f3e 60%,#8B4513 100%);color:#fff;padding:48px 0 24px 0;border-radius:24px 24px 0 0;box-shadow:0 -2px 16px rgba(35,47,62,0.12);">
@@ -5936,6 +6009,41 @@ li a{
       }
     }
 
+    // Mobile Chatbot Function
+    function openMobileChatbot() {
+      // Close the mobile menu first
+      const menu = document.getElementById('mobileCategoryMenu');
+      menu.style.display = 'none';
+      document.body.style.overflow = '';
+      
+      // Open chatbot widget programmatically
+      // Try to find and trigger the chatbot widget
+      const chatbotTrigger = document.querySelector('[data-chatbot-trigger]') || 
+                           document.querySelector('.chatbot-trigger') ||
+                           document.querySelector('#chatbot-button');
+      
+      if (chatbotTrigger) {
+        chatbotTrigger.click();
+      } else {
+        // If no specific trigger found, try to find the chatbot widget and show it
+        const chatbotWidget = document.querySelector('x-chatbot-widget') ||
+                             document.querySelector('.chatbot-widget') ||
+                             document.querySelector('[class*="chatbot"]');
+        
+        if (chatbotWidget) {
+          // Show the chatbot widget
+          chatbotWidget.style.display = 'block';
+          chatbotWidget.style.position = 'fixed';
+          chatbotWidget.style.bottom = '80px';
+          chatbotWidget.style.right = '20px';
+          chatbotWidget.style.zIndex = '9999';
+        } else {
+          // Fallback: Show an alert or redirect to contact
+          alert('Chat support will be available soon! Please contact us at grabbaskets@gmail.com for immediate assistance.');
+        }
+      }
+    }
+
     // Close mobile category menu when clicking outside
     document.addEventListener('click', function(event) {
       const menu = document.getElementById('mobileCategoryMenu');
@@ -6265,12 +6373,11 @@ li a{
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
     </a>
-    <!-- Delivery Partner Button - Prominent on Mobile -->
-    <a href="{{ route('delivery-partner.register') }}" class="mobile-nav-item" 
-       style="background: linear-gradient(135deg, #FF6B00, #FF9900); color: white; border-radius: 12px; margin: 0 4px; box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);">
-      <i class="bi bi-scooter" style="font-size: 1.2rem;"></i>
-      <span style="font-weight: 600;">Partner</span>
-    </a>
+    <!-- Mobile Category Menu Button with Chatbot -->
+    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
+      <i class="bi bi-chat-dots-fill"></i>
+      <span>Help</span>
+    </div>
     <a href="{{ route('cart.index') }}" class="mobile-nav-item">
       <i class="bi bi-cart3"></i>
       <span>Cart</span>
@@ -6278,11 +6385,6 @@ li a{
         <span class="badge">{{ count(session('cart')) }}</span>
       @endif
     </a>
-    <!-- Mobile Category Menu Button -->
-    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
-      <i class="bi bi-grid-3x3-gap-fill"></i>
-      <span>Menu</span>
-    </div>
     
     @auth
       <a href="{{ route('profile.show') }}" class="mobile-nav-item">
@@ -6300,24 +6402,42 @@ li a{
   <!-- Mobile Category Menu Popup -->
   <div id="mobileCategoryMenu" class="mobile-category-popup" style="display: none;">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Shop by Category</h5>
+      <h5 class="mb-0"><i class="bi bi-chat-dots-fill me-2"></i>Help & Categories</h5>
       <button onclick="toggleMobileCategoryMenu()" class="btn-close" aria-label="Close"></button>
     </div>
-    <div class="row g-2">
-      @foreach($categories as $category)
-        <div class="col-4">
-          <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
-            <div class="card h-100 text-center p-2 category-mobile-card" style="border-radius: 12px; transition: all 0.3s;">
-              <div class="card-body p-1">
-                <div style="font-size: 1.5rem; margin-bottom: 8px;">{!! $category->emoji !!}</div>
-                <div style="font-size: 0.8rem; font-weight: 600; color: #232f3e; line-height: 1.2;">
-                  {{ Str::limit($category->name, 12) }}
+    
+    <!-- Chatbot Section -->
+    <div class="mb-4">
+      <div class="card" style="border-radius: 12px; border: 2px solid #ff6b35; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
+        <div class="card-body text-center text-white p-3">
+          <i class="bi bi-chat-dots-fill fs-2 mb-2"></i>
+          <h6 class="mb-2">Need Help?</h6>
+          <button onclick="openMobileChatbot()" class="btn btn-light btn-sm fw-bold">
+            <i class="bi bi-chat-square-text me-1"></i>Start Chat
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Categories Section -->
+    <div class="mb-3">
+      <h6 class="text-muted mb-3"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Shop by Category</h6>
+      <div class="row g-2">
+        @foreach($categories as $category)
+          <div class="col-4">
+            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
+              <div class="card h-100 text-center p-2 category-mobile-card" style="border-radius: 12px; transition: all 0.3s;">
+                <div class="card-body p-1">
+                  <div style="font-size: 1.5rem; margin-bottom: 8px;">{!! $category->emoji !!}</div>
+                  <div style="font-size: 0.8rem; font-weight: 600; color: #232f3e; line-height: 1.2;">
+                    {{ Str::limit($category->name, 12) }}
+                  </div>
                 </div>
               </div>
-            </div>
-          </a>
-        </div>
-      @endforeach
+            </a>
+          </div>
+        @endforeach
+      </div>
     </div>
   </div>
 
@@ -6555,86 +6675,157 @@ li a{
         },
         { 
           enableHighAccuracy: true, 
-          timeout: 10000, 
-          maximumAge: 0 
+          timeout: 15000, // Increased timeout for better accuracy
+          maximumAge: 60000 // Cache for 1 minute to improve performance
         }
       );
     }
 
-    // Reverse geocode using Google Maps API
+    // Enhanced reverse geocode using Google Maps API with improved accuracy
     function reverseGeocode(lat, lng, callback) {
       if (!googleMapsLoaded) {
         console.error('Google Maps not loaded yet');
+        // Fallback to native browser geocoding if available
+        reverseGeocodeNative(lat, lng, callback);
         return;
       }
 
       const apiKey = '{{ config("services.google.maps_api_key") }}';
-      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+      
+      // Use Google Maps Geocoding API with enhanced parameters for better accuracy
+      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}&result_type=street_address|subpremise|premise|sublocality&location_type=ROOFTOP|RANGE_INTERPOLATED`;
 
-      fetch(geocodeUrl)
-        .then(response => response.json())
+      // Add timeout for faster response
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+      fetch(geocodeUrl, { signal: controller.signal })
+        .then(response => {
+          clearTimeout(timeoutId);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
         .then(data => {
           if (data.status === 'OK' && data.results.length > 0) {
+            // Use the most accurate result (first one is usually best)
             const result = data.results[0];
             
-            // Extract address components
+            // Extract address components with improved parsing
             let area = '';
+            let subarea = '';
             let city = '';
             let state = '';
             let pincode = '';
             let country = '';
+            let streetNumber = '';
+            let route = '';
             
             result.address_components.forEach(component => {
-              if (component.types.includes('sublocality') || component.types.includes('sublocality_level_1')) {
+              const types = component.types;
+              
+              if (types.includes('street_number')) {
+                streetNumber = component.long_name;
+              }
+              if (types.includes('route')) {
+                route = component.long_name;
+              }
+              if (types.includes('sublocality_level_2') || types.includes('neighborhood')) {
+                subarea = component.long_name;
+              }
+              if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
                 area = component.long_name;
               }
-              if (component.types.includes('locality')) {
+              if (types.includes('locality') || types.includes('administrative_area_level_2')) {
                 city = component.long_name;
               }
-              if (component.types.includes('administrative_area_level_1')) {
+              if (types.includes('administrative_area_level_1')) {
                 state = component.long_name;
               }
-              if (component.types.includes('postal_code')) {
+              if (types.includes('postal_code')) {
                 pincode = component.long_name;
               }
-              if (component.types.includes('country')) {
+              if (types.includes('country')) {
                 country = component.long_name;
               }
             });
+
+            // Build detailed address
+            let detailedAddress = '';
+            if (streetNumber && route) {
+              detailedAddress = `${streetNumber} ${route}`;
+            }
+            if (subarea) {
+              detailedAddress += detailedAddress ? `, ${subarea}` : subarea;
+            }
+            if (area) {
+              detailedAddress += detailedAddress ? `, ${area}` : area;
+            }
+            if (city) {
+              detailedAddress += detailedAddress ? `, ${city}` : city;
+            }
 
             const fullAddress = result.formatted_address;
             
             callback({
               fullAddress: fullAddress,
-              area: area,
+              detailedAddress: detailedAddress || fullAddress,
+              area: area || subarea || city,
+              subarea: subarea,
               city: city,
               state: state,
               pincode: pincode,
-              country: country
+              country: country,
+              accuracy: result.geometry.location_type || 'APPROXIMATE',
+              placeId: result.place_id
             });
+            
+            console.log('📍 Geocoding success:', {
+              accuracy: result.geometry.location_type,
+              types: result.types,
+              components: result.address_components.length
+            });
+            
           } else {
-            console.error('Geocoding failed:', data.status);
-            callback({
-              fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-              area: 'Unknown',
-              city: 'Unknown',
-              state: '',
-              pincode: '',
-              country: ''
-            });
+            console.warn('Geocoding failed:', data.status, data.error_message);
+            // Fallback to coordinates display
+            reverseGeocodeNative(lat, lng, callback);
           }
         })
         .catch(error => {
+          clearTimeout(timeoutId);
           console.error('Geocoding error:', error);
-          callback({
-            fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-            area: 'Unknown',
-            city: 'Unknown',
-            state: '',
-            pincode: '',
-            country: ''
-          });
+          // Fallback to native geocoding
+          reverseGeocodeNative(lat, lng, callback);
         });
+    }
+
+    // Fallback native reverse geocoding (browser-based)
+    function reverseGeocodeNative(lat, lng, callback) {
+      // Simple fallback - just show coordinates with approximate area
+      const fallbackAddress = {
+        fullAddress: `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`,
+        detailedAddress: `Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+        area: 'Current Location',
+        subarea: '',
+        city: 'Unknown City',
+        state: '',
+        pincode: '',
+        country: '',
+        accuracy: 'APPROXIMATE',
+        placeId: null
+      };
+      
+      // Try to get country/region from browser if available
+      if (navigator.language) {
+        const locale = navigator.language;
+        if (locale.includes('IN') || locale.includes('in')) {
+          fallbackAddress.country = 'India';
+        }
+      }
+      
+      callback(fallbackAddress);
     }
 
     // Confirm location

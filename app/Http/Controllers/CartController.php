@@ -30,16 +30,44 @@ class CartController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
+        // Check stock availability
+        if ($product->stock_quantity !== null && $product->stock_quantity <= 0) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product is out of stock'
+                ], 400);
+            }
+            return back()->with('error', 'Product is out of stock');
+        }
+
         $qty = max(1, (int) $request->input('quantity', 1));
         $deliveryType = $request->input('delivery_type', 'standard');
 
-        $item = CartItem::firstOrNew([
+        // Check if user already has this product in cart
+        $item = CartItem::where([
             'user_id' => Auth::id(),
             'product_id' => $product->id,
-        ]);
-        if ($item->exists) {
-            $item->quantity += $qty;
+        ])->first();
+
+        if ($item) {
+            // Check if total quantity would exceed stock
+            $newQuantity = $item->quantity + $qty;
+            if ($product->stock_quantity !== null && $newQuantity > $product->stock_quantity) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Not enough stock available. Available: ' . $product->stock_quantity . ', In cart: ' . $item->quantity
+                    ], 400);
+                }
+                return back()->with('error', 'Not enough stock available');
+            }
+            $item->quantity = $newQuantity;
         } else {
+            // Create new cart item
+            $item = new CartItem();
+            $item->user_id = Auth::id();
+            $item->product_id = $product->id;
             $item->seller_id = $product->seller_id;
             $item->price = $product->price;
             $item->discount = $product->discount ?? 0;
@@ -47,9 +75,22 @@ class CartController extends Controller
             $item->quantity = $qty;
             $item->delivery_type = $deliveryType;
         }
+        
         $item->save();
 
-        return redirect()->route('cart.index')->with('success', 'Item added to ' . ($deliveryType === 'express_10min' ? '10-min' : 'standard') . ' cart!');
+        $successMessage = 'Item added to ' . ($deliveryType === 'express_10min' ? '10-min' : 'standard') . ' cart!';
+
+        // Return JSON response for AJAX requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMessage,
+                'cart_item' => $item->load('product'),
+                'cart_count' => CartItem::where('user_id', Auth::id())->sum('quantity')
+            ]);
+        }
+
+        return redirect()->route('cart.index')->with('success', $successMessage);
     }
 
     public function update(Request $request, CartItem $cartItem)

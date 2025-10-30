@@ -584,14 +584,20 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Public product search - Anyone can search (simple test)
+// Public product search - Anyone can search (Zepto/Blinkit style)
 Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
+
+// Instant search API for real-time suggestions (Zepto/Blinkit style)
+Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
+
+// Auto-complete suggestions API (Zepto/Blinkit style)
+Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');
 
 // Optimized search route (for testing)
 Route::get('/products/optimized', [App\Http\Controllers\OptimizedBuyerController::class, 'guestSearch'])->name('products.optimized');
 
-// Search suggestions API for autocomplete (guest-friendly)  
-Route::get('/api/search/suggestions', [App\Http\Controllers\OptimizedBuyerController::class, 'getSearchSuggestions'])->name('search.suggestions');
+// Legacy search suggestions API (fallback)  
+Route::get('/api/search/suggestions/legacy', [App\Http\Controllers\OptimizedBuyerController::class, 'getSearchSuggestions'])->name('search.suggestions.legacy');
 
 // Legacy search route
 Route::get('/products/legacy', [BuyerController::class, 'search'])->name('products.legacy');
