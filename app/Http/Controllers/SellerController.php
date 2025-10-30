@@ -333,21 +333,20 @@ class SellerController extends Controller
 
         if (!$user) {
             // If no matching user found, return empty products
-            $products = Product::with(['category', 'subcategory'])
-                ->whereNull('id') // Force empty result
-                ->paginate(12);
+            $products = collect(); // empty collection instead of paginate
             return view('seller.store-products', compact('seller', 'products'));
         }
 
-        // Find products by the user ID
+        // Find all products by the user ID (no pagination)
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', $user->id)
             ->whereNotNull('image') // Only show products with images
             ->latest()
-            ->paginate(12);
+            ->get(); // ✅ replaced paginate(12) with get()
 
         return view('seller.store-products', compact('seller', 'products'));
     }
+
     public function updateProfile(Request $request)
     {
         try {
@@ -886,25 +885,29 @@ class SellerController extends Controller
         return view('seller.create-product', compact('categories', 'subcategories'));
     }
 
-    public function storeProducts(\App\Models\Seller $seller)
+    public function storeProduct(Request $request)
     {
-        // Get the User ID from the seller's email (products.seller_id references users.id, not sellers.id)
-        $user = User::where('email', $seller->email)->first();
+        Log::info('storeProduct called', [
+            'has_image_file' => $request->hasFile('image'),
+            'all_files' => $request->allFiles(),
+            'input_keys' => array_keys($request->all())
+        ]);
 
-        if (!$user) {
-            // If no matching user found, return empty products
-            $products = collect(); // empty collection instead of paginate
-            return view('seller.store-products', compact('seller', 'products'));
-        }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'delivery_charge' => 'nullable|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'gift_option' => 'required|in:yes,no',
+            'stock' => 'required|integer|min:0',
+        ]);
 
-        // Find all products by the user ID (no pagination)
-        $products = Product::with(['category', 'subcategory'])
-            ->where('seller_id', $user->id)
-            ->whereNotNull('image') // Only show products with images
-            ->latest()
-            ->get(); // ✅ replaced paginate(12) with get()
-
-        return view('seller.store-products', compact('seller', 'products'));
+        // Use database storage method
+        return $this->storeProductWithDatabaseImage($request);
     }
 
     // New method for cloud-compatible image storage
