@@ -34,6 +34,16 @@ class SimpleSearchController extends Controller
                 });
             }
 
+            // Apply category filter (Zepto/Blinkit style)
+            if ($request->filled('category_id')) {
+                $query->where('category_id', $request->input('category_id'));
+            }
+
+            // Apply subcategory filter
+            if ($request->filled('subcategory_id')) {
+                $query->where('subcategory_id', $request->input('subcategory_id'));
+            }
+
             // Apply basic filters
             if ($request->filled('price_min')) {
                 $query->where('price', '>=', (float)$request->input('price_min'));
@@ -66,10 +76,21 @@ class SimpleSearchController extends Controller
             
             // Prepare response data
             $totalResults = $products->total();
-            $filters = $request->only(['price_min', 'price_max', 'discount_min', 'sort']);
+            $filters = $request->only(['price_min', 'price_max', 'discount_min', 'sort', 'category_id', 'subcategory_id']);
             
             // Check if user is authenticated
             $isAuthenticated = Auth::check();
+
+            // If this is a regular web request (not AJAX), return the view
+            if (!$request->ajax() && !$request->expectsJson()) {
+                return view('buyer.products', [
+                    'products' => $products,
+                    'filters' => $filters,
+                    'matchedStores' => collect(), // Empty for now
+                    'searchQuery' => $searchQuery,
+                    'totalResults' => $totalResults
+                ]);
+            }
             
             // Return enhanced HTML response with images and cart functionality
             $html = "

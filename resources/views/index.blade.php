@@ -4153,7 +4153,7 @@ li a{
   </div>
 
   <!-- Mobile Location Bar -->
-  <div class="mobile-location-bar below-nav" onclick="openLocationModal()">
+  <div class="mobile-location-bar below-nav" id="mobileLocationBar">
     <div class="mobile-location-content">
       <i class="bi bi-geo-alt-fill mobile-location-icon"></i>
       <div class="mobile-location-text">
@@ -4168,7 +4168,7 @@ li a{
   @guest
   <div class="mobile-location-section">
     <div class="mobile-login-card show" id="mobileLoginCard">
-      <button class="mobile-login-close" onclick="closeMobileLoginCard()">
+      <button class="mobile-login-close" id="mobileLoginCloseBtn">
         <i class="bi bi-x"></i>
       </button>
       
@@ -4705,7 +4705,7 @@ li a{
     <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive with Hide/Show -->
     <div id="floatingActionsContainer" class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;transition:transform 0.3s ease, opacity 0.3s ease;">
       <!-- Hide Button (small, always visible on mobile) -->
-      <button class="fab-hide-btn" id="fabHideBtn" onclick="hideFloatingButton()" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:6px;box-shadow:0 3px 10px rgba(220,53,69,0.3);font-size:0.9rem;position:absolute;top:-38px;right:8px;width:32px;height:32px;cursor:pointer;transition:all 0.3s;opacity:0.9;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.9';this.style.transform='scale(1)'">
+      <button class="fab-hide-btn" id="fabHideBtn" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:6px;box-shadow:0 3px 10px rgba(220,53,69,0.3);font-size:0.9rem;position:absolute;top:-38px;right:8px;width:32px;height:32px;cursor:pointer;transition:all 0.3s;opacity:0.9;touch-action:manipulation;"
         <span style="font-weight:bold;line-height:1;">✕</span>
       </button>
       
@@ -4750,7 +4750,7 @@ li a{
     </div>
 
     <!-- Show FAB Button (appears when FAB is hidden) -->
-    <button id="showFabBtn" onclick="showFloatingButton()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1199;background:linear-gradient(135deg,#28a745,#20c997);color:#fff;border:none;border-radius:50%;padding:10px;box-shadow:0 4px 15px rgba(40,167,69,0.3);font-size:1.3rem;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;animation:pulse 2s infinite;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <button id="showFabBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1199;background:linear-gradient(135deg,#28a745,#20c997);color:#fff;border:none;border-radius:50%;padding:10px;box-shadow:0 4px 15px rgba(40,167,69,0.3);font-size:1.3rem;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;animation:pulse 2s infinite;touch-action:manipulation;">
       <span>👁️</span>
     </button>
   </section>
@@ -4928,7 +4928,7 @@ li a{
           <span class="ms-auto d-none d-md-inline-block text-white-50" style="font-size:1.1rem;">🔥 Ends Soon</span>
         </div>
         <div class="shelf" style="border:2px solid #ff0033;box-shadow:0 4px 24px rgba(255,0,51,0.08);background:linear-gradient(90deg,#fff6f6 60%,#fffbe6 100%);">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('flash',-1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-left"></i></button>
+          <button class="nav-btn nav-prev" id="flashPrevBtn" style="background:#ff0033;color:#fff;touch-action:manipulation;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-flash" class="shelf-track">
             @foreach($flashSale as $product)
             <div class="shelf-item">
@@ -4986,7 +4986,7 @@ li a{
             </div>
             @endforeach
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('flash',1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" id="flashNextBtn" style="background:#ff0033;color:#fff;touch-action:manipulation;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
       @endif
@@ -5154,7 +5154,7 @@ li a{
       <div class="mb-4">
         <h2 class="mb-3">Free Delivery Picks</h2>
         <div class="shelf">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('free',-1)"><i class="bi bi-chevron-left"></i></button>
+          <button class="nav-btn nav-prev" id="freePrevBtn" style="touch-action:manipulation;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-free" class="shelf-track">
             @forelse($freeDelivery as $product)
             <div class="shelf-item">
@@ -5213,7 +5213,7 @@ li a{
             <div class="text-muted">No free delivery picks right now.</div>
             @endforelse
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('free',1)"><i class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" id="freeNextBtn" style="touch-action:manipulation;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
     </div>
@@ -5785,7 +5785,7 @@ li a{
       <!-- Products Slider -->
       <div class="trending-slider-wrapper position-relative">
         <!-- Previous Button -->
-        <button class="slider-nav slider-prev" onclick="slideTrending(-1)" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+        <button class="slider-nav slider-prev" id="trendingPrevBtn" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); touch-action: manipulation;">
           <i class="bi bi-chevron-left" style="font-size: 1.5rem;"></i>
         </button>
 
@@ -7133,14 +7133,38 @@ li a{
       // Add event listeners for mobile navigation without onclick attributes
       const categoryNavBtn = document.getElementById('categoryNav');
       if (categoryNavBtn) {
-        categoryNavBtn.addEventListener('click', function(e) {
+        // Add touch-action CSS for better mobile performance
+        categoryNavBtn.style.touchAction = 'manipulation';
+        
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        categoryNavBtn.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        categoryNavBtn.addEventListener('touchend', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          toggleMobileCategoryMenu();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          // Only trigger if it's a tap (not a scroll)
+          if (touchDuration < 500 && touchDistance < 10) {
+            toggleMobileCategoryMenu();
+          }
         });
         
-        // Add touch support
-        categoryNavBtn.addEventListener('touchend', function(e) {
+        categoryNavBtn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           toggleMobileCategoryMenu();
@@ -7150,13 +7174,36 @@ li a{
       // Profile menu button
       const profileNavBtn = document.getElementById('profileNav');
       if (profileNavBtn) {
-        profileNavBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleMobileProfileMenu();
-        });
+        profileNavBtn.style.touchAction = 'manipulation';
+        
+        let profileTouchStartTime = 0;
+        let profileTouchStartY = 0;
+        
+        profileNavBtn.addEventListener('touchstart', function(e) {
+          profileTouchStartTime = Date.now();
+          profileTouchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
         
         profileNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - profileTouchStartTime;
+          const touchDistance = Math.abs(touchEndY - profileTouchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            toggleMobileProfileMenu();
+          }
+        });
+        
+        profileNavBtn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           toggleMobileProfileMenu();
@@ -7311,7 +7358,11 @@ li a{
       const overlay = document.createElement('div');
       overlay.id = 'mobileAuthOverlay';
       overlay.className = 'mobile-popup-overlay';
-      overlay.onclick = toggleMobileAuthMenu;
+      overlay.addEventListener('click', toggleMobileAuthMenu);
+      overlay.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        toggleMobileAuthMenu();
+      });
       
       const popup = document.createElement('div');
       popup.id = 'mobileAuthPopup';
@@ -7319,7 +7370,7 @@ li a{
       popup.innerHTML = 
         '<div class="mobile-popup-header">' +
           '<h5><i class="bi bi-person-circle me-2"></i>Join GrabBaskets</h5>' +
-          '<button onclick="toggleMobileAuthMenu()" class="mobile-popup-close">' +
+          '<button id="mobileAuthCloseBtn" class="mobile-popup-close" style="touch-action: manipulation;">' +
             '<i class="bi bi-x"></i>' +
           '</button>' +
         '</div>' +
@@ -7366,6 +7417,21 @@ li a{
       document.body.appendChild(overlay);
       document.body.appendChild(popup);
       
+      // Add event listener to close button after DOM insertion
+      const authCloseBtn = document.getElementById('mobileAuthCloseBtn');
+      if (authCloseBtn) {
+        authCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+        authCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+      }
+      
       // Show the popup
       setTimeout(() => {
         popup.classList.add('show');
@@ -7409,7 +7475,11 @@ li a{
       const overlay = document.createElement('div');
       overlay.id = 'mobileFoodOverlay';
       overlay.className = 'mobile-popup-overlay';
-      overlay.onclick = toggleMobileFoodMenu;
+      overlay.addEventListener('click', toggleMobileFoodMenu);
+      overlay.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        toggleMobileFoodMenu();
+      });
       
       const popup = document.createElement('div');
       popup.id = 'mobileFoodPopup';
@@ -7417,7 +7487,7 @@ li a{
       popup.innerHTML = 
         '<div class="mobile-popup-header" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">' +
           '<h5><i class="bi bi-bicycle me-2"></i>Food Delivery</h5>' +
-          '<button onclick="toggleMobileFoodMenu()" class="mobile-popup-close">' +
+          '<button id="mobileFoodCloseBtn" class="mobile-popup-close" style="touch-action: manipulation;">' +
             '<i class="bi bi-x"></i>' +
           '</button>' +
         '</div>' +
@@ -7463,6 +7533,21 @@ li a{
       
       document.body.appendChild(overlay);
       document.body.appendChild(popup);
+      
+      // Add event listener to close button after DOM insertion
+      const foodCloseBtn = document.getElementById('mobileFoodCloseBtn');
+      if (foodCloseBtn) {
+        foodCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+        foodCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+      }
       
       // Show the popup
       setTimeout(() => {
@@ -8784,6 +8869,143 @@ li a{
       });
       
       console.log('🛡️ Comprehensive Focus Lock Prevention System Activated');
+      
+      // Mobile button event listeners to replace onclick attributes
+      
+      // Mobile location bar
+      const mobileLocationBar = document.getElementById('mobileLocationBar');
+      if (mobileLocationBar) {
+        mobileLocationBar.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+        mobileLocationBar.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+      }
+      
+      // Mobile login close button
+      const mobileLoginCloseBtn = document.getElementById('mobileLoginCloseBtn');
+      if (mobileLoginCloseBtn) {
+        mobileLoginCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobileLoginCard();
+        });
+        mobileLoginCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobileLoginCard();
+        });
+      }
+      
+      // FAB hide button
+      const fabHideBtn = document.getElementById('fabHideBtn');
+      if (fabHideBtn) {
+        fabHideBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          hideFloatingButton();
+        });
+        fabHideBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          hideFloatingButton();
+        });
+      }
+      
+      // Show FAB button
+      const showFabBtn = document.getElementById('showFabBtn');
+      if (showFabBtn) {
+        showFabBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showFloatingButton();
+        });
+        showFabBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showFloatingButton();
+        });
+      }
+      
+      // Flash sale navigation buttons
+      const flashPrevBtn = document.getElementById('flashPrevBtn');
+      if (flashPrevBtn) {
+        flashPrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', -1);
+        });
+        flashPrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', -1);
+        });
+      }
+      
+      const flashNextBtn = document.getElementById('flashNextBtn');
+      if (flashNextBtn) {
+        flashNextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', 1);
+        });
+        flashNextBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', 1);
+        });
+      }
+      
+      // Free delivery navigation buttons
+      const freePrevBtn = document.getElementById('freePrevBtn');
+      if (freePrevBtn) {
+        freePrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', -1);
+        });
+        freePrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', -1);
+        });
+      }
+      
+      const freeNextBtn = document.getElementById('freeNextBtn');
+      if (freeNextBtn) {
+        freeNextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', 1);
+        });
+        freeNextBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', 1);
+        });
+      }
+      
+      // Trending navigation buttons
+      const trendingPrevBtn = document.getElementById('trendingPrevBtn');
+      if (trendingPrevBtn) {
+        trendingPrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          slideTrending(-1);
+        });
+        trendingPrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          slideTrending(-1);
+        });
+      }
+      
+      console.log('📱 Mobile Button Event Listeners Activated');
     });
   </script>
 
