@@ -141,304 +141,10 @@ Route::get('/test-index-debug', function () {
     }
 });
 
-Route::get('/home-test', function () {
-    // Simple test first - return basic HTML
-    if (request()->has('simple')) {
-        return '<h1>Simple Test Working</h1><p>Time: ' . now() . '</p>';
-    }
-    
-    // Test with minimal template
-    if (request()->has('minimal')) {
-        try {
-            $categories = \App\Models\Category::with('subcategories')->get();
-            
-        // Load active banners
-        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
-            
-        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
-        $categoryProducts = [];
-        foreach ($categories as $category) {
-            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6) // Increased to show more realistic products
-                ->get();
-        }
-        
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
-        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
-        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
-        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
-        
-        $mixedProducts = collect();
-        
-        // Get products from each category
-        if ($cookingCategory) {
-            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($cookingProducts);
-        }
-        
-        if ($beautyCategory) {
-            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($beautyProducts);
-        }
-        
-        if ($dentalCategory) {
-            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($dentalProducts);
-        }
-        
-        // Shuffle the mixed products and paginate
-        $shuffledProducts = $mixedProducts->shuffle();
-        $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $shuffledProducts->forPage(1, 12),
-            $shuffledProducts->count(),
-            12,
-            1,
-            ['path' => request()->url()]
-        );
-            $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(8)
-                ->get(); // Increased for better showcase
-            $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->first();
-            $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6)
-                ->get(); // Increased for variety
+// Removed conflicting closure route - using HomeController instead
 
-            return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Minimal template test failed',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ], 500);
-        }
-    }
-    
-    try {
-        // Load active banners
-        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
-        
-        // Force fresh data by adding a timestamp parameter that changes the cache key
-        $categories = \App\Models\Category::with('subcategories')->get();
-        
-        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
-        $categoryProducts = [];
-        foreach ($categories as $category) {
-            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6) // Increased to show more realistic products
-                ->get();
-        }
-        
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
-        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
-        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
-        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
-        
-        $mixedProducts = collect();
-        
-        // Get products from each category
-        if ($cookingCategory) {
-            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(8)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($cookingProducts);
-        }
-        
-        if ($beautyCategory) {
-            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(4)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($beautyProducts);
-        }
-        
-        if ($dentalCategory) {
-            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($dentalProducts);
-        }
-        
-        // Shuffle the mixed products and paginate
-        $shuffledProducts = $mixedProducts->shuffle();
-        $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $shuffledProducts->forPage(1, 15),
-            $shuffledProducts->count(),
-            15,
-            1,
-            ['path' => request()->url()]
-        );
-        $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->take(12)
-            ->get(); // Increased for better showcase
-        $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->first();
-        $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->take(8)
-            ->get(); // Increased for variety
-
-        // Load index page settings from config (set by admin in Index Page Editor)
-        $settings = config('index-page', [
-            'hero_title' => 'Welcome to GrabBaskets',
-            'hero_subtitle' => 'Your one-stop shop for all your needs',
-            'show_categories' => true,
-            'show_featured_products' => true,
-            'show_trending' => true,
-            'featured_section_title' => 'Featured Products',
-            'trending_section_title' => 'Trending Now',
-            'products_per_row' => 4,
-            'show_banners' => true,
-            'show_newsletter' => true,
-            'newsletter_title' => 'Subscribe to Our Newsletter',
-            'newsletter_subtitle' => 'Get updates on new products and special offers',
-            'theme_color' => '#FF6B00',
-            'secondary_color' => '#FFD700',
-        ]);
-
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts', 'banners', 'settings'));
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        Log::error('Database error on homepage: ' . $e->getMessage());
-        
-        // For debugging, show the actual error
-        if (config('app.debug')) {
-            return response()->json([
-                'error' => 'Index page error',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-        
-        // Return a graceful fallback with empty data
-        return view('index', [
-            'categories' => collect([]),
-            'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12),
-            'trending' => collect([]),
-            'lookbookProduct' => null,
-            'blogProducts' => collect([]),
-            'banners' => collect([]),
-            'categoryProducts' => [],
-            'settings' => config('index-page', [
-                'hero_title' => 'Welcome to GrabBaskets',
-                'hero_subtitle' => 'Your one-stop shop for all your needs',
-                'show_categories' => true,
-                'show_featured_products' => true,
-                'show_trending' => true,
-                'show_banners' => true,
-                'show_newsletter' => true,
-                'products_per_row' => 4,
-                'theme_color' => '#FF6B00',
-                'secondary_color' => '#FFD700',
-            ]),
-            'database_error' => 'Unable to load products at this time. Please try again later.'
-        ]);
-    }
-})->name('home_old');
-
-// ABSOLUTE EMERGENCY - Raw HTML to bypass all framework issues
-Route::get('/', function () {
-    return response('<html><head><title>GrabBaskets</title><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm"><div class="container"><a class="navbar-brand" href="/"><strong>🛍️ GrabBaskets</strong></a><div><a href="/login" class="btn btn-outline-primary me-2">👤 Buyer Login</a><a href="/register" class="btn btn-primary">📝 Register</a></div></div></nav><div class="container mt-5 text-center"><h1 class="display-4 mb-4">🛍️ Welcome to GrabBaskets</h1><p class="lead">Your complete shopping and business solution</p><div class="input-group input-group-lg mb-5 mx-auto" style="max-width:500px;"><input type="text" class="form-control" placeholder="Search products..." id="searchInput"><button class="btn btn-warning" onclick="window.location.href=\'/products?q=\'+document.getElementById(\'searchInput\').value">🔍</button></div><div class="row mt-5"><div class="col-md-4 mb-4"><div class="card h-100"><div class="card-body text-center"><h5>🚚 Delivery Partner</h5><p class="text-muted">Earn by delivering orders</p><a href="/delivery-partner/login" class="btn btn-outline-primary me-2">Login</a><a href="/delivery-partner/register" class="btn btn-primary">Register</a></div></div></div><div class="col-md-4 mb-4"><div class="card h-100"><div class="card-body text-center"><h5>🍴 Restaurant Owner</h5><p class="text-muted">Manage your restaurant</p><a href="/hotel-owner/login" class="btn btn-outline-success me-2">Login</a><a href="/hotel-owner/register" class="btn btn-success">Register</a></div></div></div><div class="col-md-4 mb-4"><div class="card h-100"><div class="card-body text-center"><h5>🛒 Seller/Buyer</h5><p class="text-muted">Buy & sell products</p><a href="/login" class="btn btn-outline-info me-2">Login</a><a href="/register" class="btn btn-info">Register</a></div></div></div></div><div class="alert alert-success mt-4"><strong>✅ SITE FULLY OPERATIONAL!</strong> All authentication systems restored. Choose your login type above.</div></div></body></html>');
-})->name('home');
+// New simplified home route using controller
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
     $user_id = $request->query('user_id');
@@ -455,9 +161,9 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
 });
 
 // Test route without middleware
-Route::get('/test-seller-dashboard', function (Request $request) {
+Route::get('/test-seller-dashboard', function () {
     $controller = new App\Http\Controllers\SellerController();
-    return $controller->dashboard($request);
+    return $controller->dashboard();
 });
 
 // Verified user routes (buyer + seller)
@@ -636,77 +342,6 @@ Route::get('/buyer/dashboard/debug', function() {
     return response($output, 200)->header('Content-Type', 'text/plain');
 })->name('buyer.dashboard.debug');
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
-
-// Debug route for category issues
-Route::get('/buyer/category/{category_id}/debug', function($category_id) {
-    try {
-        $category = \App\Models\Category::find($category_id);
-        if (!$category) {
-            return response()->json(['error' => 'Category not found', 'category_id' => $category_id]);
-        }
-        
-        $productsCount = \App\Models\Product::where('category_id', $category_id)->count();
-        $productsWithImages = \App\Models\Product::where('category_id', $category_id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->count();
-            
-        return response()->json([
-            'category' => $category,
-            'products_total' => $productsCount,
-            'products_with_images' => $productsWithImages,
-            'debug' => 'OK'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ]);
-    }
-})->name('buyer.categoryDebug');
-
-// Debug route for products search
-Route::get('/products/debug', function(\Illuminate\Http\Request $request) {
-    try {
-        $query = $request->input('q', '');
-        $productsCount = \App\Models\Product::whereNotNull('image')
-            ->where('image', '!=', '')
-            ->count();
-        
-        $categoriesCount = \App\Models\Category::count();
-        
-        // Test basic query
-        $testQuery = \App\Models\Product::whereNotNull('image')
-            ->where('image', '!=', '');
-        
-        if (!empty($query)) {
-            $testQuery->where(function ($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%")
-                  ->orWhere('description', 'LIKE', "%{$query}%");
-            });
-        }
-        
-        $testResults = $testQuery->count();
-        
-        return response()->json([
-            'query' => $query,
-            'total_products_with_images' => $productsCount,
-            'total_categories' => $categoriesCount,
-            'search_results' => $testResults,
-            'controller_exists' => class_exists(\App\Http\Controllers\SimpleSearchController::class),
-            'view_exists' => view()->exists('buyer.products'),
-            'debug' => 'OK'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->name('products.debug');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
 // Product details & reviews - Anyone can view
@@ -715,10 +350,8 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Modern AJAX-based products search page - MINIMAL VERSION
-Route::get('/products', function(\Illuminate\Http\Request $request) {
-    return view('buyer.products-minimal');
-})->name('products.search');
+// Public product search - Anyone can search (Zepto/Blinkit style)
+Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
 
 // Food delivery products route
 Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
@@ -726,11 +359,9 @@ Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchControll
 // Food delivery main page route (alias for convenience)
 Route::get('/food', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('food.index');
 
-// Instant search API for real-time suggestions (Zepto/Blinkit style)
-Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
-
-// Auto-complete suggestions API (Zepto/Blinkit style)
-Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');
+// AJAX search routes disabled per user request
+// Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
+// Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');
 
 // Optimized search route (for testing)
 Route::get('/products/optimized', [App\Http\Controllers\OptimizedBuyerController::class, 'guestSearch'])->name('products.optimized');
@@ -1759,27 +1390,3 @@ Route::prefix('food')->name('food.')->group(function () {
     Route::get('/category/{category}', [App\Http\Controllers\Food\FoodController::class, 'category'])->name('category');
     Route::post('/add-to-cart', [App\Http\Controllers\Food\FoodController::class, 'addToCart'])->name('add-to-cart');
 });
-
-// Debug route for testing SimpleSearchController
-Route::get('/debug-search', function () {
-    try {
-        $controller = new \App\Http\Controllers\SimpleSearchController();
-        $request = \Illuminate\Http\Request::create('/products?q=', 'GET');
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'SimpleSearchController instantiated successfully'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-});
-
-// WORKING AJAX SEARCH PAGE - ALTERNATIVE ROUTE
-Route::get('/search-products', function(\Illuminate\Http\Request $request) {
-    return view('buyer.products-minimal');
-})->name('search.products');

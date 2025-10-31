@@ -241,157 +241,6 @@
             color: #fff;
         }
 
-        /* Zepto/Blinkit Style Category Sidebar */
-        .category-sidebar {
-            border-radius: 12px;
-            background: #fff;
-        }
-        
-        .category-item {
-            border-bottom: 1px solid #f0f0f0;
-            transition: all 0.2s ease;
-        }
-        
-        .category-item:last-child {
-            border-bottom: none;
-        }
-        
-        .category-item:hover {
-            background: #f8f9ff;
-        }
-        
-        .category-item.active {
-            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-            border-left: 4px solid #2196f3;
-        }
-        
-        .category-link {
-            color: #333;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        
-        .category-link:hover {
-            color: #2196f3;
-        }
-        
-        .category-emoji {
-            font-size: 1.2rem;
-            width: 30px;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        .category-name {
-            flex: 1;
-        }
-        
-        .product-count {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-        }
-        
-        /* Subcategories */
-        .subcategories-container {
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        .subcategory-item {
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .subcategory-item:last-child {
-            border-bottom: none;
-        }
-        
-        .subcategory-item:hover {
-            background: #e9ecef;
-        }
-        
-        .subcategory-item.active {
-            background: #d1ecf1;
-            border-left: 3px solid #17a2b8;
-        }
-        
-        .subcategory-link {
-            color: #666;
-            font-size: 0.85rem;
-            font-weight: 400;
-        }
-        
-        .subcategory-link:hover {
-            color: #17a2b8;
-        }
-        
-        .subcategory-name {
-            flex: 1;
-        }
-        
-        /* Mobile optimizations for sidebar */
-        @media (max-width: 991px) {
-            .category-sidebar {
-                max-height: 300px;
-                margin-bottom: 20px;
-                border: 1px solid #dee2e6;
-                border-radius: 12px;
-                background: #fff;
-            }
-            
-            .category-item,
-            .subcategory-item {
-                border-radius: 8px;
-                margin-bottom: 2px;
-            }
-            
-            .category-link,
-            .subcategory-link {
-                padding: 12px 15px !important;
-            }
-            
-            .sticky-top {
-                position: relative !important;
-            }
-            
-            /* Mobile category toggle */
-            .mobile-category-toggle {
-                display: block;
-                width: 100%;
-                background: linear-gradient(135deg, #007bff, #0056b3);
-                color: white;
-                border: none;
-                padding: 15px;
-                border-radius: 12px;
-                font-weight: 600;
-                margin-bottom: 15px;
-                transition: all 0.3s ease;
-            }
-            
-            .mobile-category-toggle:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-            }
-            
-            .mobile-category-toggle i {
-                transition: transform 0.3s ease;
-            }
-            
-            .mobile-category-toggle.collapsed i {
-                transform: rotate(180deg);
-            }
-            
-            .category-sidebar.mobile-collapsed {
-                display: none;
-            }
-        }
-        
-        /* Desktop - hide mobile toggle */
-        @media (min-width: 992px) {
-            .mobile-category-toggle {
-                display: none;
-            }
-        }
-
         .follow {
             position: relative;
             left: -40px;
@@ -535,9 +384,9 @@
             <!-- Navbar Content -->
             <div class="collapse navbar-collapse" id="navbarContent">
                 <!-- Search Bar -->
-                <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
-                    <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
-                        aria-label="Search">
+                <form class="d-flex mx-lg-auto my-3 my-lg-0" method="GET" action="{{ route('products.index') }}" role="search" style="max-width: 600px; width: 100%;">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Search products, brands and more..."
+                        aria-label="Search" value="{{ request('query') }}">
                     <button class="btn btn-outline-warning" type="submit">Search</button>
                 </form>
 
@@ -580,92 +429,32 @@
     <!-- Main Container -->
     <div class="container my-4">
         <div class="row">
-            <!-- Zepto/Blinkit Style Category Sidebar -->
+            <!-- Sidebar Filters -->
             <div class="col-lg-3">
-                <!-- Mobile Category Toggle -->
-                <button class="mobile-category-toggle d-lg-none" type="button" id="mobileCategoryToggle">
-                    <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                    Browse Categories
-                    <i class="bi bi-chevron-down ms-auto"></i>
-                </button>
-                
-                <!-- Categories Section -->
-                <div class="filter-card sticky-top" style="top: 20px;">
-                    <h5 class="d-none d-lg-block"><i class="bi bi-grid-3x3-gap-fill"></i> Categories</h5>
-                    <div class="category-sidebar mobile-collapsed" id="categorySidebar" style="max-height: 70vh; overflow-y: auto;">
-                        @php
-                            // Use categories passed from controller, with fallback
-                            $categories = $categories ?? collect();
-                            $selectedCategory = request('category_id');
-                            $selectedSubcategory = request('subcategory_id');
-                        @endphp
-                        
-                        <!-- All Products Option -->
-                        <div class="category-item {{ !$selectedCategory ? 'active' : '' }}" data-category-id="">
-                            <a href="{{ route('products.index', request()->except(['category_id', 'subcategory_id'])) }}" 
-                               class="d-flex align-items-center justify-content-between text-decoration-none p-3 category-link">
-                                <div class="d-flex align-items-center">
-                                    <span class="category-emoji me-2">🛍️</span>
-                                    <span class="category-name">All Products</span>
-                                </div>
-                                <span class="product-count badge bg-secondary">{{ $totalResults ?? 0 }}</span>
-                            </a>
-                        </div>
-                        
-                        @foreach($categories ?? [] as $category)
-                        @if($category && $category->id && $category->name)
-                        <div class="category-item {{ $selectedCategory == $category->id ? 'active' : '' }}" data-category-id="{{ $category->id }}">
-                            <a href="{{ route('products.index', array_merge(request()->except(['subcategory_id']), ['category_id' => $category->id])) }}" 
-                               class="d-flex align-items-center justify-content-between text-decoration-none p-3 category-link">
-                                <div class="d-flex align-items-center">
-                                    <span class="category-emoji me-2">{{ $category->emoji ?? '📦' }}</span>
-                                    <span class="category-name">{{ $category->name ?? 'Category' }}</span>
-                                </div>
-                                <span class="product-count badge bg-primary">{{ $category->products_count ?? 0 }}</span>
-                            </a>
-                            
-                            <!-- Subcategories (show when parent is selected) -->
-                            @if($selectedCategory == $category->id && $category->subcategories && $category->subcategories->count() > 0)
-                            <div class="subcategories-container">
-                                @foreach($category->subcategories ?? [] as $subcategory)
-                                <div class="subcategory-item {{ $selectedSubcategory == $subcategory->id ? 'active' : '' }}">
-                                    <a href="{{ route('products.index', array_merge(request()->query(), ['category_id' => $category->id, 'subcategory_id' => $subcategory->id])) }}" 
-                                       class="d-flex align-items-center justify-content-between text-decoration-none p-2 ps-5 subcategory-link">
-                                        <span class="subcategory-name">{{ $subcategory->name ?? 'Subcategory' }}</span>
-                                        <span class="product-count badge bg-info">{{ optional($subcategory->products)->count() ?? 0 }}</span>
-                                    </a>
-                                </div>
-                                @endforeach
-                            </div>
-                            @endif
-                        </div>
-                        @endif
-                        @endforeach
-                    </div>
-                </div>
-                
-                <!-- Price Filters -->
-                <div class="filter-card mt-3">
-                    <h6><i class="bi bi-funnel"></i> Price Filter</h6>
+                <div class="filter-card">
+                    <h5>Filters</h5>
                     <form method="GET">
-                        @foreach(request()->query() as $key => $value)
-                            @if(!in_array($key, ['price_min', 'price_max']))
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                            @endif
-                        @endforeach
                         <div class="mb-3">
-                            <label class="form-label small">Min Price</label>
-                            <input type="number" step="0.01" name="price_min" class="form-control form-control-sm"
-                                value="{{ request('price_min') }}" placeholder="₹0">
+                            <label>Min Price</label>
+                            <input type="number" step="0.01" name="price_min" class="form-control"
+                                value="{{ $filters['price_min'] ?? '' }}">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small">Max Price</label>
-                            <input type="number" step="0.01" name="price_max" class="form-control form-control-sm"
-                                value="{{ request('price_max') }}" placeholder="₹10000">
+                            <label>Max Price</label>
+                            <input type="number" step="0.01" name="price_max" class="form-control"
+                                value="{{ $filters['price_max'] ?? '' }}">
                         </div>
-                        <button class="btn btn-primary btn-sm w-100 mb-2">Apply</button>
-                        <a href="{{ route('products.index', request()->except(['price_min', 'price_max'])) }}" 
-                           class="btn btn-outline-secondary btn-sm w-100">Clear Price</a>
+                        <div class="mb-3">
+                            <label>Min Discount (%)</label>
+                            <input type="number" min="0" name="discount_min" class="form-control"
+                                value="{{ $filters['discount_min'] ?? '' }}">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" name="free_delivery" value="1" {{ !empty($filters['free_delivery']) ? 'checked' : '' }}>
+                            <label class="form-check-label">Free Delivery</label>
+                        </div>
+                        <button class="btn btn-primary w-100 mb-2">Apply Filters</button>
+                        <a href="{{ url()->current() }}" class="btn btn-danger w-100">Clear</a>
                     </form>
                 </div>
             </div>
@@ -673,67 +462,21 @@
             <!-- Product Listing -->
             <div class="col-lg-9">
 
-                <!-- Search Results Header (Zepto/Blinkit Style) -->
+                <!-- Search Results Header -->
+                @if(request('search'))
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
                         <div>
-                            {{-- Using passed variables from controller instead of database queries --}}
-                            
                             <h4 class="fw-bold mb-1">
-                                @if(isset($currentSubcategory) && $currentSubcategory && $currentSubcategory->name)
-                                    <span class="category-emoji me-2">{{ (isset($currentCategory) && $currentCategory) ? ($currentCategory->emoji ?? '📦') : '📦' }}</span>
-                                    {{ $currentSubcategory->name }}
-                                @elseif(isset($currentCategory) && $currentCategory && $currentCategory->name)
-                                    <span class="category-emoji me-2">{{ $currentCategory->emoji ?? '📦' }}</span>
-                                    {{ $currentCategory->name }}
-                                @elseif(request('q'))
-                                    <i class="bi bi-search"></i> Search Results
-                                @else
-                                    <i class="bi bi-grid-3x3-gap-fill"></i> All Products
-                                @endif
+                                <i class="bi bi-search"></i> Search Results
                             </h4>
-                            
-                            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                @if(isset($currentCategory) && $currentCategory && $currentCategory->name && (!isset($currentSubcategory) || !$currentSubcategory))
-                                    <span class="badge bg-primary">{{ $currentCategory->name }}</span>
-                                @elseif(isset($currentSubcategory) && $currentSubcategory && $currentSubcategory->name)
-                                    @if(isset($currentCategory) && $currentCategory && $currentCategory->name)
-                                        <span class="badge bg-primary">{{ $currentCategory->name }}</span>
-                                        <i class="bi bi-chevron-right text-muted"></i>
-                                    @endif
-                                    <span class="badge bg-info">{{ $currentSubcategory->name }}</span>
-                                @endif
-                                
-                                @if(request('q'))
-                                    <span class="badge bg-warning">Search: "{{ request('q') }}"</span>
-                                @endif
-                                
-                                @if(request('price_min') || request('price_max'))
-                                    <span class="badge bg-success">
-                                        Price: ₹{{ request('price_min', 0) }} - ₹{{ request('price_max', '∞') }}
-                                    </span>
-                                @endif
-                            </div>
-                            
                             <p class="text-muted mb-0">
-                                Found <strong>{{ $products->total() }}</strong> product{{ $products->total() !== 1 ? 's' : '' }}
-                                @if(request('q'))
-                                    for "<strong>{{ request('q') }}</strong>"
-                                @endif
+                                Found <strong>{{ $products->total() }}</strong> result{{ $products->total() !== 1 ? 's' : '' }} for "<strong>{{ request('search') }}</strong>"
                             </p>
                         </div>
-                        
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- Clear filters button -->
-                            @if(request()->hasAny(['category_id', 'subcategory_id', 'q', 'price_min', 'price_max']))
-                                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="bi bi-x-circle"></i> Clear All
-                                </a>
-                            @endif
-                            
-                            <!-- Sort dropdown -->
-                            <select class="form-select form-select-sm" onchange="window.location.href = this.value;" style="min-width: 150px;">
-                                <option value="{{ request()->fullUrlWithQuery(['sort' => '']) }}">Sort by Relevance</option>
+                        <div>
+                            <select class="form-select" onchange="window.location.href = this.value;">
+                                <option value="">Sort by Relevance</option>
                                 <option value="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
                                 <option value="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
                                 <option value="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -742,6 +485,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- Gender-Based Product Suggestions -->
                 @php
@@ -1318,165 +1062,6 @@
                             // Optionally show error message
                         });
                 });
-            });
-        });
-
-        // Category sidebar interaction (Zepto/Blinkit style)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scrolling for category selection
-            const categoryItems = document.querySelectorAll('.category-item');
-            
-            categoryItems.forEach(item => {
-                const link = item.querySelector('.category-link');
-                if (link) {
-                    link.addEventListener('click', function(e) {
-                        // Add loading state
-                        const loadingSpinner = document.createElement('div');
-                        loadingSpinner.className = 'spinner-border spinner-border-sm ms-2';
-                        loadingSpinner.setAttribute('role', 'status');
-                        this.appendChild(loadingSpinner);
-                        
-                        // Remove loading state after a short delay (for UX)
-                        setTimeout(() => {
-                            if (loadingSpinner.parentNode) {
-                                loadingSpinner.remove();
-                            }
-                        }, 500);
-                    });
-                }
-            });
-
-            // Subcategory smooth loading
-            const subcategoryItems = document.querySelectorAll('.subcategory-item');
-            
-            subcategoryItems.forEach(item => {
-                const link = item.querySelector('.subcategory-link');
-                if (link) {
-                    link.addEventListener('click', function(e) {
-                        // Add loading state
-                        const loadingSpinner = document.createElement('div');
-                        loadingSpinner.className = 'spinner-border spinner-border-sm ms-2';
-                        loadingSpinner.setAttribute('role', 'status');
-                        this.appendChild(loadingSpinner);
-                        
-                        // Remove loading state after a short delay
-                        setTimeout(() => {
-                            if (loadingSpinner.parentNode) {
-                                loadingSpinner.remove();
-                            }
-                        }, 500);
-                    });
-                }
-            });
-
-            // Add search functionality to category sidebar
-            const addCategorySearch = () => {
-                const sidebar = document.querySelector('.category-sidebar');
-                if (sidebar && !document.querySelector('.category-search')) {
-                    const searchDiv = document.createElement('div');
-                    searchDiv.className = 'category-search p-3 border-bottom';
-                    searchDiv.innerHTML = `
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" placeholder="Search categories..." id="categorySearchInput">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                    `;
-                    sidebar.insertBefore(searchDiv, sidebar.firstChild);
-
-                    // Add search functionality
-                    const searchInput = document.getElementById('categorySearchInput');
-                    searchInput.addEventListener('input', function() {
-                        const searchTerm = this.value.toLowerCase();
-                        const categoryItems = document.querySelectorAll('.category-item');
-                        
-                        categoryItems.forEach(item => {
-                            const categoryName = item.querySelector('.category-name').textContent.toLowerCase();
-                            if (categoryName.includes(searchTerm) || searchTerm === '') {
-                                item.style.display = 'block';
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        });
-                    });
-                }
-            };
-
-            // Add category search on desktop only
-            if (window.innerWidth > 991) {
-                addCategorySearch();
-            }
-
-            // Mobile category toggle functionality
-            const mobileCategoryToggle = document.getElementById('mobileCategoryToggle');
-            const categorySidebar = document.getElementById('categorySidebar');
-            
-            if (mobileCategoryToggle && categorySidebar) {
-                mobileCategoryToggle.addEventListener('click', function() {
-                    const isCollapsed = categorySidebar.classList.contains('mobile-collapsed');
-                    
-                    if (isCollapsed) {
-                        // Show categories
-                        categorySidebar.classList.remove('mobile-collapsed');
-                        categorySidebar.style.display = 'block';
-                        this.classList.remove('collapsed');
-                        this.innerHTML = `
-                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                            Hide Categories
-                            <i class="bi bi-chevron-up ms-auto"></i>
-                        `;
-                    } else {
-                        // Hide categories
-                        categorySidebar.classList.add('mobile-collapsed');
-                        categorySidebar.style.display = 'none';
-                        this.classList.add('collapsed');
-                        this.innerHTML = `
-                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                            Browse Categories
-                            <i class="bi bi-chevron-down ms-auto"></i>
-                        `;
-                    }
-                });
-            }
-
-            // Auto-hide categories on mobile after selection
-            const mobileMediaQuery = window.matchMedia('(max-width: 991px)');
-            const categoryLinks = document.querySelectorAll('.category-link, .subcategory-link');
-            
-            categoryLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    if (mobileMediaQuery.matches && categorySidebar && mobileCategoryToggle) {
-                        // Hide category sidebar after selection on mobile
-                        setTimeout(() => {
-                            categorySidebar.classList.add('mobile-collapsed');
-                            categorySidebar.style.display = 'none';
-                            mobileCategoryToggle.classList.add('collapsed');
-                            mobileCategoryToggle.innerHTML = `
-                                <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                                Browse Categories
-                                <i class="bi bi-chevron-down ms-auto"></i>
-                            `;
-                        }, 100);
-                    }
-                });
-            });
-
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 991) {
-                    // Desktop: always show categories
-                    if (categorySidebar) {
-                        categorySidebar.classList.remove('mobile-collapsed');
-                        categorySidebar.style.display = 'block';
-                    }
-                } else {
-                    // Mobile: start with categories hidden
-                    if (categorySidebar && !categorySidebar.classList.contains('mobile-collapsed')) {
-                        categorySidebar.classList.add('mobile-collapsed');
-                        categorySidebar.style.display = 'none';
-                    }
-                }
             });
         });
     </script>
