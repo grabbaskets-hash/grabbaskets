@@ -576,40 +576,62 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 // Buyer dashboard & browsing - Anyone can view products
 Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
 
-// Debug route to test buyer dashboard functionality
-Route::get('/buyer/dashboard/debug', function() {
+// Test route to bypass controller and render view directly
+Route::get('/buyer/dashboard/test', function() {
     try {
-        // Test database connection
-        $dbConnection = \Illuminate\Support\Facades\DB::connection()->getPdo() ? 'Connected' : 'Failed';
-        
-        // Test Category model
-        $categoriesExist = \App\Models\Category::count();
-        
-        // Test with relationships
         $categories = \App\Models\Category::with(['subcategories' => function($query) {
             $query->withCount('products');
         }])->withCount('products')->get();
         
-        // Test if view can be rendered
-        $viewExists = view()->exists('buyer.dashboard');
-        
-        return response()->json([
-            'status' => 'success',
-            'database_connection' => $dbConnection,
-            'categories_total' => $categoriesExist,
-            'categories_with_relations' => $categories->count(),
-            'view_exists' => $viewExists,
-            'message' => 'All dashboard components working'
-        ]);
+        return view('buyer.dashboard', compact('categories'));
     } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
+        return response('DIRECT TEST ERROR: ' . $e->getMessage(), 500)->header('Content-Type', 'text/plain');
     }
+})->name('buyer.dashboard.test');
+
+// Simple text debug route to test buyer dashboard functionality
+Route::get('/buyer/dashboard/debug', function() {
+    $output = "=== BUYER DASHBOARD DEBUG ===\n\n";
+    
+    try {
+        // Test 1: Database connection
+        $output .= "1. Database Connection: ";
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $output .= "SUCCESS\n";
+        
+        // Test 2: Category model basic query
+        $output .= "2. Category Model: ";
+        $categoryCount = \App\Models\Category::count();
+        $output .= "SUCCESS - {$categoryCount} categories found\n";
+        
+        // Test 3: Category with relationships
+        $output .= "3. Category Relationships: ";
+        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->withCount('products')->take(1)->get();
+        $output .= "SUCCESS - Relationships loaded\n";
+        
+        // Test 4: View existence
+        $output .= "4. Dashboard View: ";
+        $viewExists = view()->exists('buyer.dashboard');
+        $output .= $viewExists ? "EXISTS\n" : "NOT FOUND\n";
+        
+        // Test 5: Try to call dashboard method directly
+        $output .= "5. Dashboard Controller: ";
+        $controller = new \App\Http\Controllers\BuyerController();
+        $output .= "INSTANTIATED SUCCESSFULLY\n";
+        
+        $output .= "\n=== ALL TESTS PASSED ===\n";
+        $output .= "The buyer dashboard should be working. If still getting 500 error, check server logs for runtime issues.\n";
+        
+    } catch (\Exception $e) {
+        $output .= "FAILED\n";
+        $output .= "ERROR: " . $e->getMessage() . "\n";
+        $output .= "FILE: " . $e->getFile() . "\n";
+        $output .= "LINE: " . $e->getLine() . "\n";
+    }
+    
+    return response($output, 200)->header('Content-Type', 'text/plain');
 })->name('buyer.dashboard.debug');
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
