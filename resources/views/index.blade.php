@@ -463,7 +463,7 @@
     }
 
     /* ============================================
-       MOBILE BOTTOM NAV (Blinkit/Zepto Style)
+       MOBILE BOTTOM NAV (Improved Food Delivery Style)
        ============================================ */
     .mobile-bottom-nav {
       display: none;
@@ -472,9 +472,10 @@
       left: 0;
       right: 0;
       background: white;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
       z-index: 1000;
-      padding: 8px 0;
+      padding: 12px 8px 8px 8px;
+      border-top: 1px solid #E5E5E5;
     }
 
     @media (max-width: 768px) {
@@ -485,28 +486,30 @@
       }
 
       body {
-        padding-bottom: 80px; /* Increased from 70px for better spacing */
+        padding-bottom: 85px; /* Increased for better spacing */
       }
 
-      /* HIDE FLOATING ELEMENTS IN MOBILE VIEW - Keep category menu near login */
+      /* Clean mobile experience - hide conflicting elements */
       .floating-actions {
-        display: none !important; /* Hide the large floating category menu on mobile */
+        display: none !important;
       }
 
-      /* Hide the simple menu button floating element */
       .btn.position-fixed[data-bs-toggle="modal"] {
         display: none !important;
       }
 
-      /* Hide other fixed position elements that interfere with mobile UX */
       .position-fixed.btn:not(.mobile-category-toggle):not(.mobile-bottom-nav *) {
         display: none !important;
       }
 
-      /* Hide delivery banner and category pills on mobile to prevent layout disruption */
-      .delivery-banner-modern,
+      /* Simplify mobile layout */
+      .delivery-banner-modern {
+        padding: 8px 0 !important;
+        font-size: 0.8rem !important;
+      }
+      
       .category-pills-modern {
-        display: none !important;
+        padding: 8px 0 !important;
       }
     }
 
@@ -599,40 +602,63 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 4px;
-      padding: 12px 8px; /* Increased padding for better touch */
+      padding: 14px 8px 10px 8px; /* Better touch target */
       color: var(--text-light);
       text-decoration: none;
       cursor: pointer;
-      touch-action: manipulation; /* Improve touch responsiveness */
-      -webkit-touch-callout: none; /* Disable callout */
-      -webkit-user-select: none; /* Disable text selection */
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
       user-select: none;
-      transition: all 0.2s ease;
-      font-size: 0.75rem;
       transition: all 0.3s ease;
+      font-size: 0.7rem;
+      font-weight: 600;
       position: relative;
-      cursor: pointer;
+      border-radius: 12px;
+      min-height: 60px; /* Consistent height */
+      background: transparent;
+      -webkit-tap-highlight-color: rgba(12, 131, 31, 0.1);
     }
 
     .mobile-nav-item.active,
-    .mobile-nav-item:hover {
+    .mobile-nav-item:hover,
+    .mobile-nav-item:active {
       color: var(--primary-color);
+      background: rgba(12, 131, 31, 0.08);
+      transform: translateY(-1px);
     }
 
     .mobile-nav-item i {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
+      margin-bottom: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .mobile-nav-item:active i {
+      transform: scale(0.9);
+    }
+
+    .mobile-nav-item span {
+      line-height: 1.1;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .mobile-nav-item .badge {
       position: absolute;
-      top: 4px;
+      top: 10px;
       right: 20%;
       background: var(--danger-color);
       color: white;
-      border-radius: 10px;
-      padding: 2px 5px;
-      font-size: 0.65rem;
+      border-radius: 12px;
+      padding: 3px 6px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      min-width: 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
     }
 
     /* ============================================
@@ -838,6 +864,205 @@
     .mobile-profile-popup.show {
       transform: translateY(0);
       opacity: 1;
+    }
+
+    /* ============================================
+       MOBILE AUTH POPUP STYLES  
+       ============================================ */
+    .mobile-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-popup {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 24px 24px 0 0;
+      z-index: 1600;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 70vh;
+      overflow: hidden;
+    }
+
+    .mobile-popup.show {
+      transform: translateY(0);
+    }
+
+    .mobile-popup-header {
+      background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-popup-header h5 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .mobile-popup-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .mobile-popup-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .mobile-popup-content {
+      padding: 0;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .mobile-popup-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      text-decoration: none;
+      color: var(--text-dark);
+      border-bottom: 1px solid #F0F0F0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .mobile-popup-item:hover {
+      background: #F8F9FA;
+      color: var(--text-dark);
+    }
+
+    .mobile-popup-item:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-popup-item.featured {
+      background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%);
+      color: white;
+      margin: 8px 12px;
+      border-radius: 12px;
+      border-bottom: none;
+    }
+
+    .mobile-popup-item.featured:hover {
+      background: linear-gradient(135deg, #0A6B19 0%, #0D8220 100%);
+      color: white;
+    }
+
+    .mobile-popup-item i:first-child {
+      font-size: 1.5rem;
+      margin-right: 16px;
+      width: 32px;
+      text-align: center;
+    }
+
+    .mobile-popup-item .item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .mobile-popup-item .item-subtitle {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .mobile-popup-item i:last-child {
+      margin-left: auto;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    .mobile-popup-divider {
+      height: 8px;
+      background: #F8F9FA;
+      margin: 8px 0;
+    }
+
+    /* ============================================
+       MOBILE FOOD DELIVERY FAB
+       ============================================ */
+    .mobile-food-delivery-fab {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      right: 16px;
+      z-index: 1400;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-food-delivery-fab {
+        display: block;
+      }
+    }
+
+    .food-delivery-btn {
+      background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: rgba(255, 107, 0, 0.2);
+      animation: pulse-delivery 3s infinite;
+    }
+
+    .food-delivery-btn:hover,
+    .food-delivery-btn:active {
+      background: linear-gradient(135deg, #E55A00 0%, #E68A00 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 0, 0.5);
+    }
+
+    .food-delivery-btn i {
+      font-size: 1.2rem;
+    }
+
+    @keyframes pulse-delivery {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+      }
+      50% {
+        box-shadow: 0 8px 30px rgba(255, 107, 0, 0.6);
+        transform: scale(1.05);
+      }
     }
 
     .mobile-profile-header {
@@ -3743,9 +3968,16 @@ li a{
 
         <!-- Nav Icons -->
         <div class="nav-icons desktop-only">
+          <!-- Hotel Owner Registration - Prominent -->
+          <a href="{{ route('hotel-owner.register') }}" class="nav-icon-btn" 
+             style="background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(12, 131, 31, 0.3); margin-right: 8px;">
+            <i class="bi bi-shop" style="font-size: 1.3rem;"></i>
+            <span>List Restaurant</span>
+          </a>
+          
           <!-- Delivery Partner Button - Prominent -->
           <a href="{{ route('delivery-partner.register') }}" class="nav-icon-btn" 
-             style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); animation: pulse 2s infinite;">
+             style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);">
             <i class="bi bi-scooter" style="font-size: 1.3rem;"></i>
             <span>Partner with us</span>
           </a>
@@ -6410,6 +6642,230 @@ li a{
       }
     }
 
+    // Mobile Authentication Menu Function
+    function toggleMobileAuthMenu() {
+      try {
+        const popup = document.getElementById('mobileAuthPopup');
+        const overlay = document.getElementById('mobileAuthOverlay');
+        
+        if (!popup || !overlay) {
+          // Create mobile auth popup if it doesn't exist
+          createMobileAuthPopup();
+          return;
+        }
+        
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile auth menu:', error);
+      }
+    }
+
+    // Create Mobile Auth Popup
+    function createMobileAuthPopup() {
+      const overlay = document.createElement('div');
+      overlay.id = 'mobileAuthOverlay';
+      overlay.className = 'mobile-popup-overlay';
+      overlay.onclick = toggleMobileAuthMenu;
+      
+      const popup = document.createElement('div');
+      popup.id = 'mobileAuthPopup';
+      popup.className = 'mobile-popup';
+      popup.innerHTML = 
+        '<div class="mobile-popup-header">' +
+          '<h5><i class="bi bi-person-circle me-2"></i>Join GrabBaskets</h5>' +
+          '<button onclick="toggleMobileAuthMenu()" class="mobile-popup-close">' +
+            '<i class="bi bi-x"></i>' +
+          '</button>' +
+        '</div>' +
+        '<div class="mobile-popup-content">' +
+          '<a href="{{ route('login') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-box-arrow-in-right text-primary"></i>' +
+            '<div>' +
+              '<div class="item-title">Customer Login</div>' +
+              '<div class="item-subtitle">Access your account & orders</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-person-plus text-success"></i>' +
+            '<div>' +
+              '<div class="item-title">Customer Sign Up</div>' +
+              '<div class="item-subtitle">Create new account</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<div class="mobile-popup-divider"></div>' +
+          
+          '<a href="{{ route('hotel-owner.register') }}" class="mobile-popup-item featured">' +
+            '<i class="bi bi-shop text-white"></i>' +
+            '<div>' +
+              '<div class="item-title">List Your Restaurant</div>' +
+              '<div class="item-subtitle">Join our food delivery network</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right text-white"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('delivery-partner.register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-scooter text-warning"></i>' +
+            '<div>' +
+              '<div class="item-title">Become Delivery Partner</div>' +
+              '<div class="item-subtitle">Earn money delivering orders</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+        '</div>';
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(popup);
+      
+      // Show the popup
+      setTimeout(() => {
+        popup.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }, 10);
+    }
+
+    // Mobile Food Delivery Menu Function
+    function toggleMobileFoodMenu() {
+      try {
+        const popup = document.getElementById('mobileFoodPopup');
+        const overlay = document.getElementById('mobileFoodOverlay');
+        
+        if (!popup || !overlay) {
+          // Create mobile food delivery popup if it doesn't exist
+          createMobileFoodPopup();
+          return;
+        }
+        
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile food menu:', error);
+      }
+    }
+
+    // Create Mobile Food Delivery Popup
+    function createMobileFoodPopup() {
+      const overlay = document.createElement('div');
+      overlay.id = 'mobileFoodOverlay';
+      overlay.className = 'mobile-popup-overlay';
+      overlay.onclick = toggleMobileFoodMenu;
+      
+      const popup = document.createElement('div');
+      popup.id = 'mobileFoodPopup';
+      popup.className = 'mobile-popup';
+      popup.innerHTML = 
+        '<div class="mobile-popup-header" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">' +
+          '<h5><i class="bi bi-bicycle me-2"></i>Food Delivery</h5>' +
+          '<button onclick="toggleMobileFoodMenu()" class="mobile-popup-close">' +
+            '<i class="bi bi-x"></i>' +
+          '</button>' +
+        '</div>' +
+        '<div class="mobile-popup-content">' +
+          '<a href="{{ route('products.index') }}?category=food" class="mobile-popup-item">' +
+            '<i class="bi bi-search text-primary"></i>' +
+            '<div>' +
+              '<div class="item-title">Browse Restaurants</div>' +
+              '<div class="item-subtitle">Find food from local restaurants</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('cart.index') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-cart3 text-success"></i>' +
+            '<div>' +
+              '<div class="item-title">Your Cart</div>' +
+              '<div class="item-subtitle">Review and checkout your order</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<div class="mobile-popup-divider"></div>' +
+          
+          '<a href="{{ route('hotel-owner.register') }}" class="mobile-popup-item featured">' +
+            '<i class="bi bi-shop text-white"></i>' +
+            '<div>' +
+              '<div class="item-title">List Your Restaurant</div>' +
+              '<div class="item-subtitle">Start selling food on GrabBaskets</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right text-white"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('delivery-partner.register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-scooter text-warning"></i>' +
+            '<div>' +
+              '<div class="item-title">Become Delivery Partner</div>' +
+              '<div class="item-subtitle">Deliver food and earn money</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+        '</div>';
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(popup);
+      
+      // Show the popup
+      setTimeout(() => {
+        popup.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }, 10);
+    }
+
+    // Close mobile auth menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const authPopup = document.getElementById('mobileAuthPopup');
+      const authOverlay = document.getElementById('mobileAuthOverlay');
+      const authButton = event.target.closest('[onclick="toggleMobileAuthMenu()"]');
+      
+      if (authPopup && authOverlay && authPopup.classList.contains('show') && 
+          !authPopup.contains(event.target) && !authButton) {
+        authPopup.classList.remove('show');
+        authOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close mobile food menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const foodPopup = document.getElementById('mobileFoodPopup');
+      const foodOverlay = document.getElementById('mobileFoodOverlay');
+      const foodButton = event.target.closest('[onclick="toggleMobileFoodMenu()"]');
+      
+      if (foodPopup && foodOverlay && foodPopup.classList.contains('show') && 
+          !foodPopup.contains(event.target) && !foodButton) {
+        foodPopup.classList.remove('show');
+        foodOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
     // Close mobile profile menu when clicking outside
     document.addEventListener('click', function(event) {
       const popup = document.getElementById('mobileProfilePopup');
@@ -6733,20 +7189,23 @@ li a{
 
   <!-- Mobile Bottom Navigation  -->
   <div class="mobile-bottom-nav">
-    <a href="{{ route('home') }}" class="mobile-nav-item active">
+    <a href="{{ route('home') }}" class="mobile-nav-item active" id="homeNav">
       <i class="bi bi-house-fill"></i>
       <span>Home</span>
     </a>
+    
     <!-- Mobile Category Menu Button -->
-    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
+    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" id="categoryNav">
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
     </div>
-    <a href="{{ route('products.index') }}" class="mobile-nav-item">
+    
+    <a href="{{ route('products.index') }}" class="mobile-nav-item" id="searchNav">
       <i class="bi bi-search"></i>
       <span>Search</span>
     </a>
-    <a href="{{ route('cart.index') }}" class="mobile-nav-item">
+    
+    <a href="{{ route('cart.index') }}" class="mobile-nav-item" id="cartNav">
       <i class="bi bi-cart3"></i>
       <span>Cart</span>
       @if(session('cart') && count(session('cart')) > 0)
@@ -6755,16 +7214,24 @@ li a{
     </a>
     
     @auth
-      <div class="mobile-nav-item" onclick="toggleMobileProfileMenu()" style="cursor: pointer;">
+      <div class="mobile-nav-item" onclick="toggleMobileProfileMenu()" id="profileNav">
         <i class="bi bi-person-circle"></i>
         <span>Account</span>
       </div>
     @else
-      <a href="{{ route('login') }}" class="mobile-nav-item">
+      <div class="mobile-nav-item" onclick="toggleMobileAuthMenu()" id="authNav">
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Login</span>
-      </a>
+      </div>
     @endauth
+  </div>
+
+  <!-- Mobile Food Delivery Quick Action Button -->
+  <div class="mobile-food-delivery-fab" id="mobileFoodFab">
+    <button class="food-delivery-btn" onclick="toggleMobileFoodMenu()">
+      <i class="bi bi-bicycle"></i>
+      <span>Food Delivery</span>
+    </button>
   </div>
 
   <!-- Modern Mobile Category Menu (Meesho/Blinkit Style) -->
