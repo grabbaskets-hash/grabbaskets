@@ -150,38 +150,33 @@ $blogProducts = Product::whereNotNull('image')
 public function dashboard()
 {
     try {
-        // Log dashboard access attempt
-        Log::info('Buyer Dashboard: Access attempt started');
+        // Simplified approach with fallbacks
+        Log::info('Buyer Dashboard: Starting dashboard load');
         
-        // Test database connection first
-        $dbTest = \Illuminate\Support\Facades\DB::select('SELECT 1 as test');
-        Log::info('Buyer Dashboard: Database connection successful');
+        // Try to load categories with minimal complexity first
+        $categories = collect();
         
-        // Load categories with error handling
-        $categories = Category::with(['subcategories' => function($query) {
-            $query->withCount('products');
-        }])->withCount('products')->get();
-        
-        Log::info('Buyer Dashboard: Categories loaded successfully', ['count' => $categories->count()]);
-
-        // Test view exists
-        if (!view()->exists('buyer.dashboard')) {
-            throw new \Exception('Dashboard view not found');
+        try {
+            $categories = Category::select('id', 'name', 'emoji')->limit(50)->get();
+            Log::info('Buyer Dashboard: Basic categories loaded', ['count' => $categories->count()]);
+        } catch (\Exception $categoryError) {
+            Log::warning('Buyer Dashboard: Category loading failed, using empty collection', [
+                'error' => $categoryError->getMessage()
+            ]);
+            $categories = collect();
         }
         
-        return view('buyer.dashboard', compact('categories'));
+        // Return view with minimal data
+        return view('buyer.dashboard', ['categories' => $categories]);
         
     } catch (\Exception $e) {
-        Log::error('Buyer Dashboard Error: ' . $e->getMessage(), [
+        Log::error('Buyer Dashboard Critical Error: ' . $e->getMessage(), [
             'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString()
+            'line' => $e->getLine()
         ]);
         
-        // Return error view or redirect with error
-        return response()->view('errors.500', [
-            'error' => 'Dashboard temporarily unavailable. Error: ' . $e->getMessage()
-        ], 500);
+        // Ultimate fallback - simple response
+        return response('<h1>Dashboard Loading...</h1><p>Please refresh the page. If the problem persists, contact support.</p><script>setTimeout(() => window.location.reload(), 3000);</script>', 500);
     }
 }
 
