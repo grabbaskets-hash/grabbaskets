@@ -434,28 +434,24 @@ class SimpleSearchController extends Controller
                     'error' => 'Search temporarily unavailable. Please try again.'
                 ]);
             } catch (\Exception $viewError) {
-                // Ultimate fallback - simple HTML
-                $html = "
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Search Error - GrabBaskets</title>
-                    <meta name='viewport' content='width=device-width, initial-scale=1'>
-                    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
-                </head>
-                <body>
-                    <div class='container mt-4'>
-                        <div class='alert alert-warning'>
-                            <h4>⚠️ Search Temporarily Unavailable</h4>
-                            <p>We're experiencing technical difficulties. Please try again later.</p>
-                            <p><small>Error: " . htmlspecialchars($e->getMessage()) . "</small></p>
-                            <a href='/' class='btn btn-primary'>Return to Homepage</a>
-                        </div>
-                    </div>
-                </body>
-                </html>";
+                // Ultimate fallback - redirect to instant search or homepage
+                Log::error('SimpleSearch: Even fallback view failed', [
+                    'original_error' => $e->getMessage(),
+                    'fallback_error' => $viewError->getMessage()
+                ]);
                 
-                return response($html, 503);
+                // If it's an AJAX request, return JSON
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'suggestions' => [],
+                        'products' => [],
+                        'categories' => [],
+                        'error' => 'Search temporarily unavailable'
+                    ]);
+                }
+                
+                // For web requests, redirect to homepage with error message
+                return redirect('/')->with('search_error', 'Search is temporarily unavailable. Please try again later.');
             }
         }
     }
