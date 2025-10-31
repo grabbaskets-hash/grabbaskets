@@ -414,6 +414,97 @@ Route::get('/debug-clear-cache', function() {
     }
 });
 
+// Debug route for delivery partner data
+Route::get('/debug-delivery-partners', function() {
+    try {
+        $partners = \App\Models\DeliveryPartner::select(['id', 'name', 'email', 'phone', 'status'])
+            ->limit(5)
+            ->get();
+            
+        $totalCount = \App\Models\DeliveryPartner::count();
+        
+        return response()->json([
+            'total_partners' => $totalCount,
+            'sample_partners' => $partners,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
+// Debug route to create a test delivery partner
+Route::get('/debug-create-delivery-partner', function() {
+    try {
+        // Check if test partner already exists
+        $existing = \App\Models\DeliveryPartner::where('email', 'test@delivery.com')->first();
+        if ($existing) {
+            return response()->json([
+                'message' => 'Test delivery partner already exists',
+                'partner' => [
+                    'id' => $existing->id,
+                    'name' => $existing->name,
+                    'email' => $existing->email,
+                    'phone' => $existing->phone,
+                    'status' => $existing->status
+                ],
+                'login_credentials' => [
+                    'email' => 'test@delivery.com',
+                    'phone' => '9999999999',
+                    'password' => 'password123'
+                ],
+                'status' => 'exists'
+            ]);
+        }
+        
+        // Create test partner
+        $partner = \App\Models\DeliveryPartner::create([
+            'name' => 'Test Delivery Partner',
+            'email' => 'test@delivery.com',
+            'phone' => '9999999999',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'address' => 'Test Address',
+            'city' => 'Test City',
+            'state' => 'Test State',
+            'pincode' => '123456',
+            'vehicle_type' => 'bike',
+            'status' => 'active',
+            'is_verified' => true,
+            'is_online' => true,
+            'is_available' => true
+        ]);
+        
+        return response()->json([
+            'message' => 'Test delivery partner created successfully',
+            'partner' => [
+                'id' => $partner->id,
+                'name' => $partner->name,
+                'email' => $partner->email,
+                'phone' => $partner->phone,
+                'status' => $partner->status
+            ],
+            'login_credentials' => [
+                'email' => 'test@delivery.com',
+                'phone' => '9999999999', 
+                'password' => 'password123'
+            ],
+            'status' => 'created'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
