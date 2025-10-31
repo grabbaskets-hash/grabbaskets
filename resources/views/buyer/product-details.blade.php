@@ -465,11 +465,11 @@
       <p>{{ $product->description ?? 'No description available.' }}</p>
     </div>
     <div class="tab-pane fade" id="store-info">
-      @if($seller && $seller->id > 0)
-      <h4>{{ $seller->store_name ?? 'N/A' }}</h4>
-      <p><strong>Shop Name:</strong> {{ $seller->store_name ?? 'N/A' }}</p>
-      <p><strong>Address:</strong> {{ $seller->store_address ?? 'N/A' }}</p>
-      <p><strong>Contact:</strong> {{ $seller->store_contact ?? 'N/A' }}</p>
+       @if($seller->profile_picture)
+      <img src="{{ $seller->profile_picture }}" alt="Seller Image">
+      @elseif($seller->user && $seller->user->profile_picture)
+      <img src="{{ $seller->user->profile_picture }}" alt="User Image">
+      @endif
       <a href="{{ route('store.products', $seller->id) }}" class="btn btn-outline-dark">View Store Products</a>
       @else
       <div class="alert alert-warning mb-0">
