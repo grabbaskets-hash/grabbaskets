@@ -393,6 +393,27 @@ Route::get('/debug-controller-category/{id}', function($id) {
     }
 });
 
+// Debug route to force cache clearing (for deployment issues)
+Route::get('/debug-clear-cache', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        
+        return response()->json([
+            'message' => 'All caches cleared successfully',
+            'timestamp' => now(),
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
