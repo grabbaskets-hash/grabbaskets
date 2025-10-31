@@ -4647,7 +4647,7 @@ li a{
       </button>
       
       <!-- Main FAB Button -->
-      <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-no-focus-trap="true">
+      <button class="fab-main" id="fabMainBtn" type="button" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-no-focus-trap="true">
         <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
       </button>
       
@@ -6049,6 +6049,9 @@ li a{
   <script>
     // Fix focus lock issues with floating menu
     document.addEventListener('DOMContentLoaded', function() {
+      // Global focus lock prevention
+      let isFloatingMenuOpen = false;
+      
       // Prevent focus traps from interfering with custom menus
       document.addEventListener('keydown', function(e) {
         // If floating menu is open and Escape is pressed, close it
@@ -6057,30 +6060,80 @@ li a{
           if (floatingMenu && floatingMenu.style.display === 'block') {
             floatingMenu.style.display = 'none';
             document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+            isFloatingMenuOpen = false;
             e.preventDefault();
             e.stopPropagation();
+            
+            // Force blur any active element
+            if (document.activeElement && document.activeElement !== document.body) {
+              document.activeElement.blur();
+            }
           }
         }
       });
 
-      // Prevent Bootstrap modal focus management from affecting floating menu
+      // Monitor floating menu state
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            const floatingMenu = document.getElementById('floatingMenu');
+            if (floatingMenu) {
+              isFloatingMenuOpen = floatingMenu.style.display === 'block';
+            }
+          }
+        });
+      });
+
+      // Start observing
+      const floatingMenu = document.getElementById('floatingMenu');
+      if (floatingMenu) {
+        observer.observe(floatingMenu, { attributes: true });
+      }
+
+      // Add click event listener to FAB button to avoid onclick conflicts
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+      }
+
+      // Prevent Bootstrap modal focus management conflicts
       document.addEventListener('focusin', function(e) {
-        const floatingMenu = document.getElementById('floatingMenu');
-        if (floatingMenu && floatingMenu.style.display === 'block') {
-          // Allow focus within floating menu
-          if (floatingMenu.contains(e.target) || e.target.hasAttribute('data-no-focus-trap')) {
+        if (isFloatingMenuOpen) {
+          const floatingMenu = document.getElementById('floatingMenu');
+          const fabContainer = document.getElementById('floatingActionsContainer');
+          
+          // Allow focus within floating menu and FAB container
+          if (floatingMenu && (floatingMenu.contains(e.target) || 
+                              fabContainer.contains(e.target) ||
+                              e.target.hasAttribute('data-no-focus-trap'))) {
             return;
           }
+          
+          // Prevent focus trap by other libraries
+          e.preventDefault();
+          e.stopPropagation();
         }
       });
 
-      // Global fix for focus lock issues  
+      // Global emergency cleanup
       window.addEventListener('beforeunload', function() {
-        // Clear any potential focus locks
-        if (document.activeElement) {
+        if (document.activeElement && document.activeElement !== document.body) {
           document.activeElement.blur();
         }
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
       });
+
+      // Periodic cleanup for stuck focus states
+      setInterval(function() {
+        const floatingMenu = document.getElementById('floatingMenu');
+        if (!floatingMenu || floatingMenu.style.display !== 'block') {
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        }
+      }, 5000);
     });
 
     // Trending Slider Navigation
@@ -6428,40 +6481,75 @@ li a{
           return;
         }
         
-        // Clear any existing focus traps or locks
-        document.activeElement.blur();
+        // Prevent any focus lock issues
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
         
-        if (menu.style.display === 'none' || menu.style.display === '') {
+        // Clear any existing event listeners first
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
+        const isMenuVisible = menu.style.display === 'block';
+        
+        if (!isMenuVisible) {
+          // Open menu
           menu.style.display = 'block';
           if (subcategoryArea) {
             subcategoryArea.style.display = 'none';
           }
           
-          // Add event listener to close menu when clicking outside
+          // Add event listener with a small delay to avoid immediate closing
           setTimeout(() => {
-            document.addEventListener('click', closeFloatingMenuOnOutsideClick);
-          }, 100);
+            document.addEventListener('click', closeFloatingMenuOnOutsideClick, { once: false });
+          }, 150);
         } else {
+          // Close menu
           menu.style.display = 'none';
-          // Remove event listener
           document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
         }
       } catch (error) {
         console.error('Error toggling floating menu:', error);
-        // Fallback: ensure menu is closed and focus is released
+        // Emergency cleanup
         const menu = document.getElementById('floatingMenu');
-        if (menu) menu.style.display = 'none';
-        document.activeElement.blur();
+        if (menu) {
+          menu.style.display = 'none';
+        }
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        // Force blur all active elements
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
       }
     }
 
     // Function to close floating menu when clicking outside
     function closeFloatingMenuOnOutsideClick(event) {
-      const menu = document.getElementById('floatingMenu');
-      const fabButton = document.getElementById('fabMainBtn');
-      
-      if (menu && !menu.contains(event.target) && !fabButton.contains(event.target)) {
-        menu.style.display = 'none';
+      try {
+        const menu = document.getElementById('floatingMenu');
+        const fabButton = document.getElementById('fabMainBtn');
+        const fabContainer = document.getElementById('floatingActionsContainer');
+        
+        // Check if click is outside menu and FAB elements
+        if (menu && 
+            !menu.contains(event.target) && 
+            !fabButton.contains(event.target) && 
+            !fabContainer.contains(event.target)) {
+          
+          menu.style.display = 'none';
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+          
+          // Clear any focus issues
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+        }
+      } catch (error) {
+        console.error('Error in closeFloatingMenuOnOutsideClick:', error);
+        // Emergency cleanup
+        const menu = document.getElementById('floatingMenu');
+        if (menu) {
+          menu.style.display = 'none';
+        }
         document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
       }
     }
