@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
@@ -333,184 +332,328 @@ class SellerController extends Controller
 
         if (!$user) {
             // If no matching user found, return empty products
-            $products = collect(); // empty collection instead of paginate
+            $products = Product::with(['category', 'subcategory'])
+                ->whereNull('id') // Force empty result
+                ->paginate(12);
             return view('seller.store-products', compact('seller', 'products'));
         }
 
-        // Find all products by the user ID (no pagination)
+        // Find products by the user ID
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', $user->id)
             ->whereNotNull('image') // Only show products with images
             ->latest()
-            ->get(); // ✅ replaced paginate(12) with get()
+            ->paginate(12);
 
         return view('seller.store-products', compact('seller', 'products'));
     }
+public function updateProfile(Request $request)
+{
+    try {
+        $request->validate([
+            'store_name' => 'nullable|string|max:255',
+            'gst_number' => 'nullable|string|max:255',
+            'store_address' => 'nullable|string|max:500',
+            'store_contact' => 'nullable|string|max:255',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
+            'avatar_url' => 'nullable|string|url|max:500', // For avatar/emoji URLs
+        ]);
 
-    public function updateProfile(Request $request)
-    {
-        try {
-            $request->validate([
-                'store_name' => 'nullable|string|max:255',
-                'gst_number' => 'nullable|string|max:255',
-                'store_address' => 'nullable|string|max:500',
-                'store_contact' => 'nullable|string|max:255',
-                'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
-                'avatar_url' => 'nullable|string|url|max:500', // For avatar/emoji URLs
+        $user = Auth::user();
+
+        if (!$user) {
+            Log::error('updateProfile: User not authenticated');
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please log in to update your profile.'
+                ], 401);
+            }
+
+            return redirect()->route('login')->with('error', 'Please log in to update your profile.');
+        }
+
+        $seller = \App\Models\Seller::where('email', $user->email)->first();
+
+        if (!$seller) {
+            Log::error('updateProfile: Seller not found', [
+                'user_id' => $user->id,
+                'email' => $user->email
             ]);
 
-            $user = Auth::user();
-
-            if (!$user) {
-                Log::error('updateProfile: User not authenticated');
-
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Please log in to update your profile.'
-                    ], 401);
-                }
-
-                return redirect()->route('login')->with('error', 'Please log in to update your profile.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seller profile not found.'
+                ], 404);
             }
 
-            $seller = \App\Models\Seller::where('email', $user->email)->first();
+            return redirect()->back()->with('error', 'Seller profile not found.');
+        }
 
-            if (!$seller) {
-                Log::error('updateProfile: Seller not found', [
-                    'user_id' => $user->id,
-                    'email' => $user->email
+        // Handle avatar/emoji URL (simpler than file upload)
+        if ($request->has('avatar_url')) {
+            $avatarUrl = $request->input('avatar_url');
+
+            // Update user's profile picture with avatar URL
+            \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
+
+            Log::info('Profile avatar updated successfully', [
+                'user_id' => $user->id,
+                'avatar_url' => $avatarUrl
+            ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Avatar updated successfully!',
+                    'photo_url' => $avatarUrl
                 ]);
-
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Seller profile not found.'
-                    ], 404);
-                }
-
-                return redirect()->back()->with('error', 'Seller profile not found.');
             }
 
-            // Handle avatar/emoji URL (simpler than file upload)
-            if ($request->has('avatar_url')) {
-                $avatarUrl = $request->input('avatar_url');
+            return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
+        }
 
-                // Update user's profile picture with avatar URL
-                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
+        // Update seller information
+        $seller->update($request->only([
+            'store_name',
+            'gst_number',
+            'store_address',
+            'store_contact'
+        ]));
 
-                Log::info('Profile avatar updated successfully', [
+        // Handle profile photo upload with dual storage (R2 + public)
+        if ($request->hasFile('profile_photo')) {
+            try {
+                $photo = $request->file('profile_photo');
+
+                // Generate unique filename
+                $originalName = $photo->getClientOriginalName();
+                $originalNameSlug = \Illuminate\Support\Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+                $ext = $photo->getClientOriginalExtension();
+                $filename = $originalNameSlug . '-' . time() . '-' . \Illuminate\Support\Str::random(4) . '.' . $ext;
+                $folder = 'profile_photos/' . $user->id;
+
+                $r2Path = null;
+                $publicPath = null;
+                $r2Success = false;
+                $publicSuccess = false;
+                $finalPath = null;
+
+                // Try AWS R2 first
+                try {
+                    $r2Path = $photo->storeAs($folder, $filename, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    \Log::warning('AWS R2 profile photo upload failed', [
+                        'error' => $r2Ex->getMessage(),
+                        'user_id' => $user->id,
+                        'original_name' => $originalName
+                    ]);
+                }
+
+                // Then try public disk (local/Git storage)
+                try {
+                    $publicPath = $photo->storeAs($folder, $filename, 'public');
+                    $publicSuccess = !empty($publicPath);
+                } catch (\Throwable $publicEx) {
+                    \Log::warning('Public disk profile photo upload failed', [
+                        'error' => $publicEx->getMessage(),
+                        'user_id' => $user->id,
+                        'original_name' => $originalName
+                    ]);
+                }
+
+                // Prefer R2 if available, otherwise fall back to public
+                $finalPath = $r2Success ? $r2Path : $publicPath;
+
+                if (!$finalPath) {
+                    throw new \Exception('Both AWS R2 and public storage failed to save the profile photo.');
+                }
+
+                // Build public URL — FIXED: removed trailing space!
+                $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud'; // ← NO TRAILING SPACE
+                $photoUrl = $r2Success 
+                    ? $r2PublicUrl . '/' . $finalPath 
+                            // : Storage::disk('public')->url($finalPath);
+                    :asset('storage/' . $finalPath);
+                    
+                // Delete old profile photo if it exists
+                if ($user->profile_picture) {
+                    try {
+                        // Only delete if it's a managed profile photo (not an external avatar URL)
+                        if (str_starts_with($user->profile_picture, $r2PublicUrl) || str_contains($user->profile_picture, '/storage/')) {
+                            // Extract path for R2
+                            if (str_starts_with($user->profile_picture, $r2PublicUrl)) {
+                                $oldPath = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
+                                if (str_starts_with($oldPath, 'profile_photos/')) {
+                                    Storage::disk('r2')->delete($oldPath);
+                                    \Log::info('Deleted old R2 profile photo', ['path' => $oldPath]);
+                                }
+                            }
+                            // Extract path for public disk
+                            elseif (str_contains($user->profile_picture, '/storage/')) {
+                                $oldPath = str_replace('/storage/', '', $user->profile_picture);
+                                if (str_starts_with($oldPath, 'profile_photos/')) {
+                                    Storage::disk('public')->delete($oldPath);
+                                    \Log::info('Deleted old public profile photo', ['path' => $oldPath]);
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::warning('Failed to delete old profile photo', [
+                            'error' => $e->getMessage(),
+                            'old_url' => $user->profile_picture
+                        ]);
+                    }
+                }
+
+                // Update user's profile picture
+                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
+
+                \Log::info('Profile photo updated with dual storage', [
                     'user_id' => $user->id,
-                    'avatar_url' => $avatarUrl
+                    'photo_url' => $photoUrl,
+                    'r2_success' => $r2Success,
+                    'public_success' => $publicSuccess
                 ]);
 
+                // Return response based on request type
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => true,
-                        'message' => 'Avatar updated successfully!',
-                        'photo_url' => $avatarUrl
-                    ]);
-                }
-
-                return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
-            }
-
-            // Update seller information
-            $seller->update($request->only([
-                'store_name',
-                'gst_number',
-                'store_address',
-                'store_contact'
-            ]));
-
-            // Handle profile photo upload
-            if ($request->hasFile('profile_photo')) {
-                try {
-                    $photo = $request->file('profile_photo');
-
-                    // Generate unique filename
-                    $filename = 'profile_photos/' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-
-                    // Upload to R2 storage
-                    Storage::disk('r2')->put($filename, file_get_contents($photo->getPathname()));
-
-                    // Construct the public URL (Laravel Cloud R2 public URL)
-                    $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
-                    $photoUrl = $r2PublicUrl . '/' . $filename;
-
-                    // Delete old profile photo if exists
-                    if ($user->profile_picture) {
-                        try {
-                            // Extract filename from full URL
-                            $oldFilename = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
-
-                            // Only delete if it's a profile photo (starts with profile_photos/)
-                            if (str_starts_with($oldFilename, 'profile_photos/')) {
-                                Storage::disk('r2')->delete($oldFilename);
-                                Log::info('Deleted old profile photo', ['filename' => $oldFilename]);
-                            }
-                        } catch (\Exception $e) {
-                            Log::warning('Failed to delete old profile photo', [
-                                'error' => $e->getMessage(),
-                                'old_url' => $user->profile_picture
-                            ]);
-                        }
-                    }
-
-                    // Update user's profile picture in database
-                    \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
-
-                    // Reload user from database to get fresh data
-                    $user = \App\Models\User::find($user->id);
-
-                    Log::info('Profile photo updated successfully', [
-                        'user_id' => $user->id,
-                        'filename' => $filename,
+                        'message' => 'Profile photo updated successfully!',
                         'photo_url' => $photoUrl
                     ]);
-
-                    // Check if AJAX request (for WhatsApp-style upload)
-                    if ($request->ajax() || $request->wantsJson()) {
-                        return response()->json([
-                            'success' => true,
-                            'message' => 'Profile photo updated successfully!',
-                            'photo_url' => $photoUrl
-                        ]);
-                    }
-
-                    return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
-                } catch (\Exception $e) {
-                    Log::error('Profile photo upload failed', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-
-                    // Check if AJAX request
-                    if ($request->ajax() || $request->wantsJson()) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Upload failed: ' . $e->getMessage()
-                        ], 500);
-                    }
-
-                    return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
                 }
-            }
 
-            return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->validator)
-                ->withInput()
-                ->with('error', 'Please fix the validation errors.');
-        } catch (\Exception $e) {
-            Log::error('updateProfile error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
+                return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
+
+            } catch (\Exception $e) {
+                \Log::error('Profile photo upload failed', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Upload failed: ' . $e->getMessage()
+                    ], 500);
+                }
+
+                return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
+            }
         }
+
+        // Final return when only seller info was updated (no avatar, no file)
+        return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return redirect()->back()
+            ->withErrors($e->validator)
+            ->withInput()
+            ->with('error', 'Please fix the validation errors.');
+    } catch (\Exception $e) {
+        Log::error('updateProfile error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
     }
+}
+
+// The following block is your original commented-out code (preserved as requested):
+/*
+//         // Handle profile photo upload
+//         if ($request->hasFile('profile_photo')) {
+//             try {
+//                 $photo = $request->file('profile_photo');
+
+//                 // Generate unique filename
+//                 $filename = 'profile_photos/' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
+
+//                 // Upload to R2 storage
+//                 Storage::disk('r2')->put($filename, file_get_contents($photo->getPathname()));
+
+//                 // Construct the public URL (Laravel Cloud R2 public URL)
+//                 $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud  ';
+//                 $photoUrl = $r2PublicUrl . '/' . $filename;
+
+//                 // Delete old profile photo if exists
+//                 if ($user->profile_picture) {
+//                     try {
+//                         // Extract filename from full URL
+//                         $oldFilename = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
+
+//                         // Only delete if it's a profile photo (starts with profile_photos/)
+//                         if (str_starts_with($oldFilename, 'profile_photos/')) {
+//                             Storage::disk('r2')->delete($oldFilename);
+//                             Log::info('Deleted old profile photo', ['filename' => $oldFilename]);
+//                         }
+//                     } catch (\Exception $e) {
+//                         Log::warning('Failed to delete old profile photo', [
+//                             'error' => $e->getMessage(),
+//                             'old_url' => $user->profile_picture
+//                         ]);
+//                     }
+//                 }
+
+//                 // Update user's profile picture in database
+//                 \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
+
+//                 // Reload user from database to get fresh data
+//                 $user = \App\Models\User::find($user->id);
+
+//                 Log::info('Profile photo updated successfully', [
+//                     'user_id' => $user->id,
+//                     'filename' => $filename,
+//                     'photo_url' => $photoUrl
+//                 ]);
+
+//                 // Check if AJAX request (for WhatsApp-style upload)
+//                 if ($request->ajax() || $request->wantsJson()) {
+//                     return response()->json([
+//                         'success' => true,
+//                         'message' => 'Profile photo updated successfully!',
+//                         'photo_url' => $photoUrl
+//                     ]);
+//                 }
+
+//                 return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
+//             } catch (\Exception $e) {
+//                 Log::error('Profile photo upload failed', [
+//                     'error' => $e->getMessage(),
+//                     'trace' => $e->getTraceAsString()
+//                 ]);
+
+//                 // Check if AJAX request
+//                 if ($request->ajax() || $request->wantsJson()) {
+//                     return response()->json([
+//                         'success' => false,
+//                         'message' => 'Upload failed: ' . $e->getMessage()
+//                     ], 500);
+//                 }
+
+//                 return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
+//             }
+//         }
+
+//         return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
+//     } catch (\Illuminate\Validation\ValidationException $e) {
+//         return redirect()->back()
+//             ->withErrors($e->validator)
+//             ->withInput()
+//             ->with('error', 'Please fix the validation errors.');
+//     } catch (\Exception $e) {
+//         Log::error('updateProfile error', [
+//             'error' => $e->getMessage(),
+//             'trace' => $e->getTraceAsString()
+//         ]);
+//         return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
+//     }
+// */
     public function dashboard(Request $request)
     {
         $search = $request->input('search');

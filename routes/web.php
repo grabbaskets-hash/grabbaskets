@@ -141,7 +141,7 @@ Route::get('/test-index-debug', function () {
     }
 });
 
-Route::get('/', function () {
+Route::get('/home-test', function () {
     // Simple test first - return basic HTML
     if (request()->has('simple')) {
         return '<h1>Simple Test Working</h1><p>Time: ' . now() . '</p>';
@@ -435,8 +435,57 @@ Route::get('/', function () {
     }
 })->name('home_old');
 
-// New simplified home route using controller
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// WORKING HOME ROUTE - Simplified for debugging
+Route::get('/', function () {
+    try {
+        // Load basic data with comprehensive error handling
+        $categories = \App\Models\Category::take(10)->get();
+        $products = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->whereNotNull('seller_id')
+            ->take(8)
+            ->get();
+        
+        // Simplified banner loading
+        $banners = collect([]);
+        try {
+            $banners = \App\Models\Banner::where('is_active', true)
+                ->where('position', 'hero')
+                ->get();
+        } catch (\Exception $e) {
+            // Ignore banner errors for now
+        }
+        
+        return view('index', [
+            'categories' => $categories,
+            'products' => $products,
+            'trending' => $products->take(6),
+            'lookbookProduct' => $products->first(),
+            'blogProducts' => $products->take(4),
+            'categoryProducts' => [],
+            'banners' => $banners,
+            'settings' => [
+                'hero_title' => 'Welcome to GrabBaskets',
+                'hero_subtitle' => 'Your one-stop shop for everything',
+                'show_categories' => true,
+                'show_featured_products' => true,
+                'theme_color' => '#FF6B00',
+            ]
+        ]);
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Homepage critical error: ' . $e->getMessage());
+        
+        // Return minimal working page
+        return '<!DOCTYPE html>
+<html><head><title>GrabBaskets</title></head>
+<body style="font-family:Arial;margin:40px;text-align:center;">
+<h1>🛍️ GrabBaskets</h1>
+<p>Site temporarily under maintenance</p>
+<p><strong>Error:</strong> ' . $e->getMessage() . '</p>
+<a href="/home-test?simple=1" style="background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Test Simple Page</a>
+</body></html>';
+    }
+})->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
     $user_id = $request->query('user_id');
