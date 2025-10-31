@@ -797,6 +797,9 @@
       text-align: center;
       background: white;
       margin: 0;
+      min-height: 80px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
     }
 
     .category-item:hover,
@@ -6608,21 +6611,44 @@ li a{
           return;
         }
         
-        // Immediate focus lock prevention
-        if (document.activeElement && document.activeElement.blur) {
-          document.activeElement.blur();
+        // AGGRESSIVE focus lock prevention for desktop
+        function forceBlurEverything() {
+          try {
+            // Blur absolutely everything that could hold focus
+            document.querySelectorAll('*:focus, [tabindex], button, input, select, textarea, a').forEach(el => {
+              if (el.blur && typeof el.blur === 'function') {
+                el.blur();
+              }
+              el.removeAttribute('tabindex');
+              el.removeAttribute('data-bs-focus');
+              el.removeAttribute('aria-modal');
+            });
+            
+            // Force focus to window
+            window.focus();
+            setTimeout(() => {
+              if (document.activeElement && document.activeElement !== document.body) {
+                document.activeElement.blur();
+              }
+              document.body.focus();
+              setTimeout(() => document.body.blur(), 10);
+            }, 10);
+            
+            // Clear any Bootstrap modal states
+            document.body.classList.remove('modal-open');
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            
+          } catch (e) {
+            // Last resort: blur the window itself
+            window.blur();
+            setTimeout(() => window.focus(), 50);
+          }
         }
         
-        // Clear Bootstrap focus management
-        document.querySelectorAll('[data-bs-focus]').forEach(el => {
-          el.removeAttribute('data-bs-focus');
-        });
+        // Immediate aggressive blur
+        forceBlurEverything();
         
-        // Remove any focus trap attributes
-        menu.removeAttribute('tabindex');
-        menu.removeAttribute('aria-modal');
-        
-        // Clear any existing event listeners first
+        // Clear any existing event listeners
         document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
         
         const isMenuVisible = menu.style.display === 'block';
@@ -6634,30 +6660,46 @@ li a{
             subcategoryArea.style.display = 'none';
           }
           
-          // Add event listener with a small delay to avoid immediate closing
+          // Add click outside listener with aggressive focus prevention
           setTimeout(() => {
-            document.addEventListener('click', closeFloatingMenuOnOutsideClick, { 
+            function safeOutsideClickHandler(event) {
+              forceBlurEverything();
+              if (menu && !menu.contains(event.target) && 
+                  !event.target.closest('#fabMainBtn') && 
+                  !event.target.closest('#floatingActionsContainer')) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', safeOutsideClickHandler);
+                forceBlurEverything();
+              }
+            }
+            
+            document.addEventListener('click', safeOutsideClickHandler, { 
               once: false,
-              passive: true 
+              passive: true,
+              capture: true 
             });
-          }, 200);
+          }, 300);
         } else {
           // Close menu
           menu.style.display = 'none';
           document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
         }
         
-        // Periodic focus check to prevent locks
-        if (!window.focusLockCleanupInterval) {
-          window.focusLockCleanupInterval = setInterval(() => {
-            if (document.activeElement && 
-                document.activeElement.tagName && 
-                document.activeElement !== document.body &&
-                !document.querySelector('#floatingMenu:not([style*="display: none"])') &&
-                !document.querySelector('#mobileCategoryMenu.show')) {
-              document.activeElement.blur();
+        // Post-action cleanup
+        setTimeout(() => {
+          forceBlurEverything();
+        }, 100);
+        
+        // Emergency cleanup every 2 seconds when menu is open
+        if (!window.desktopFocusCleanup && isMenuVisible === false) {
+          window.desktopFocusCleanup = setInterval(() => {
+            if (document.getElementById('floatingMenu')?.style.display === 'block') {
+              forceBlurEverything();
+            } else {
+              clearInterval(window.desktopFocusCleanup);
+              window.desktopFocusCleanup = null;
             }
-          }, 1000);
+          }, 2000);
         }
         
       } catch (error) {
@@ -8562,9 +8604,44 @@ li a{
         });
       }
       
-      // Enhanced mobile category navigation
+      // Enhanced mobile category navigation with better touch handling
       const categoryNav = document.getElementById('categoryNav');
       if (categoryNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        // Touch start handler
+        categoryNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        // Touch end handler
+        categoryNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          // Reset visual feedback
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          // Only trigger if it's a quick tap (not a scroll)
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileCategoryMenu();
+            }, 50);
+          }
+        });
+        
+        // Click handler for non-touch devices
         categoryNav.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -8576,9 +8653,39 @@ li a{
         });
       }
       
-      // Enhanced mobile profile navigation
+      // Enhanced mobile profile navigation with better touch handling
       const profileNav = document.getElementById('profileNav');
       if (profileNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        profileNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        profileNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileProfileMenu();
+            }, 50);
+          }
+        });
+        
         profileNav.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -8590,9 +8697,39 @@ li a{
         });
       }
       
-      // Enhanced auth navigation
+      // Enhanced auth navigation with better touch handling
       const authNav = document.getElementById('authNav');
       if (authNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        authNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        authNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileAuthMenu();
+            }, 50);
+          }
+        });
+        
         authNav.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();

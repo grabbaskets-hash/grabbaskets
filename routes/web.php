@@ -590,6 +590,9 @@ Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'se
 // Food delivery products route
 Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
 
+// Food delivery main page route (alias for convenience)
+Route::get('/food', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('food.index');
+
 // Instant search API for real-time suggestions (Zepto/Blinkit style)
 Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
 
