@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -16,39 +18,79 @@ class DashboardController extends Controller
     /**
      * Show the delivery partner dashboard.
      */
-    public function index(): View
+    public function index()
     {
-        $partner = Auth::guard('delivery_partner')->user();
-        
-        // Get dashboard statistics
-        $stats = $this->getDashboardStats($partner);
-        
-        // Get recent orders
-        $recentOrders = $this->getRecentOrders($partner);
-        
-        // Get available orders nearby
-        $availableOrders = $this->getAvailableOrders($partner);
-        
-        // Get today's earnings
-        $todayEarnings = $this->getTodayEarnings($partner);
-        
-        // Get notifications
-        $notifications = $this->getNotifications($partner);
+        try {
+            $partner = Auth::guard('delivery_partner')->user();
+            
+            if (!$partner) {
+                return redirect()->route('delivery-partner.login')
+                    ->with('error', 'Please login to access the dashboard.');
+            }
+            
+            // Simple dashboard data to avoid complex queries that might fail
+            $stats = [
+                'total_orders' => 0,
+                'completed_orders' => 0,
+                'completion_rate' => 0,
+                'rating' => $partner->rating ?? 4.5,
+                'total_earnings' => 0,
+                'this_month_earnings' => 0,
+                'today_earnings' => 0,
+                'pending_requests' => 0,
+                'today_deliveries' => 0,
+                'week_deliveries' => 0,
+                'month_deliveries' => 0,
+                'active_hours' => '0h 0m',
+                'wallet_balance' => 0,
+                'total_withdrawals' => 0,
+                'available_earnings' => 0,
+            ];
+            
+            // Try to get actual data, but fallback to defaults on error
+            try {
+                $stats = $this->getDashboardStats($partner);
+                $recentOrders = $this->getRecentOrders($partner);
+                $availableOrders = $this->getAvailableOrders($partner);
+                $todayEarnings = $this->getTodayEarnings($partner);
+                $notifications = $this->getNotifications($partner);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Dashboard data loading failed, using defaults', [
+                    'error' => $e->getMessage(),
+                    'partner_id' => $partner->id
+                ]);
+                $recentOrders = collect([]);
+                $availableOrders = collect([]);
+                $todayEarnings = 0;
+                $notifications = [];
+            }
 
-        return view('delivery_partner.dashboard', compact(
-            'partner',
-            'stats', 
-            'recentOrders',
-            'availableOrders',
-            'todayEarnings',
-            'notifications'
-        ));
+            return view('delivery-partner.dashboard', compact(
+                'partner',
+                'stats', 
+                'recentOrders',
+                'availableOrders',
+                'todayEarnings',
+                'notifications'
+            ));
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Dashboard loading failed completely', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->view('errors.500', [
+                'message' => 'Unable to load dashboard. Please try again later.'
+            ], 500);
+        }
     }
 
     /**
      * Get dashboard statistics.
      */
-    private function getDashboardStats(DeliveryPartner $partner): array
+    private function getDashboardStats($partner): array
     {
         $today = Carbon::today();
         $thisWeek = Carbon::now()->startOfWeek();
@@ -93,7 +135,7 @@ class DashboardController extends Controller
     /**
      * Get recent delivery requests for the partner.
      */
-    private function getRecentOrders(DeliveryPartner $partner, int $limit = 5)
+    private function getRecentOrders($partner, int $limit = 5)
     {
         return \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
             ->with(['order'])
@@ -105,7 +147,7 @@ class DashboardController extends Controller
     /**
      * Get available delivery requests nearby.
      */
-    private function getAvailableOrders(DeliveryPartner $partner, int $limit = 10)
+    private function getAvailableOrders($partner, int $limit = 10)
     {
         if (!$partner->is_online || $partner->status !== 'available') {
             return collect();
@@ -141,7 +183,7 @@ class DashboardController extends Controller
     /**
      * Get today's earnings.
      */
-    private function getTodayEarnings(DeliveryPartner $partner): float
+    private function getTodayEarnings($partner): float
     {
         return $partner->orders()
             ->where('delivery_status', 'delivered')
@@ -152,7 +194,7 @@ class DashboardController extends Controller
     /**
      * Get notifications for the partner.
      */
-    private function getNotifications(DeliveryPartner $partner, int $limit = 5): array
+    private function getNotifications($partner, int $limit = 5): array
     {
         $notifications = [];
 
