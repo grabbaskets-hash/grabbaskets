@@ -713,22 +713,10 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Public product search - Anyone can search (Zepto/Blinkit style)
-// Temporary: Redirect to working instant search API until view issues are resolved
+// Modern AJAX-based products search page (updated)
 Route::get('/products', function(\Illuminate\Http\Request $request) {
-    // If it's an AJAX request, use the instant search
-    if ($request->ajax() || $request->expectsJson()) {
-        return app(\App\Http\Controllers\SimpleSearchController::class)->instantSearch($request);
-    }
-    
-    // For web requests, redirect to homepage with search query
-    $searchQuery = $request->input('q', '');
-    if ($searchQuery) {
-        return redirect('/?search=' . urlencode($searchQuery))->with('info', 'Search functionality is being optimized. Results below:');
-    }
-    
-    return redirect('/')->with('info', 'Browse our products on the homepage while we optimize search.');
-})->name('products.index');
+    return view('test-products');
+})->name('products.ajax');
 
 // Food delivery products route
 Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
@@ -1788,3 +1776,8 @@ Route::get('/debug-search', function () {
         ]);
     }
 });
+
+// FINAL WORKING PRODUCTS ROUTE - AJAX BASED
+Route::get('/products-new', function(\Illuminate\Http\Request $request) {
+    return view('test-products');
+})->name('products.new');

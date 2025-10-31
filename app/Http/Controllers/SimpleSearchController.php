@@ -463,83 +463,186 @@ class SimpleSearchController extends Controller
     {
         try {
             $query = trim($request->input('q', ''));
+            $categoryId = $request->input('category', '');
+            $page = max(1, (int)$request->input('page', 1));
+            $perPage = 12;
             
-            if (strlen($query) < 2) {
-                return response()->json([
-                    'suggestions' => [],
-                    'products' => [],
-                    'categories' => []
-                ]);
+            Log::info('Enhanced instant search called', [
+                'query' => $query, 
+                'category' => $categoryId, 
+                'page' => $page
+            ]);
+            
+            // For empty query and no category, return popular products
+            if (empty($query) && empty($categoryId)) {
+                $products = Product::with(['category', 'seller'])
+                    ->whereNotNull('image')
+                    ->where('image', '!=', '')
+                    ->whereNotNull('seller_id')
+                    ->where('status', 'active')
+                    ->orderBy('updated_at', 'desc')
+                    ->skip(($page - 1) * $perPage)
+                    ->take($perPage)
+                    ->get();
+                
+                $totalProducts = Product::whereNotNull('image')
+                    ->where('image', '!=', '')
+                    ->whereNotNull('seller_id')
+                    ->where('status', 'active')
+                    ->count();
+            } else {
+                // Build search query
+                $productsQuery = Product::with(['category', 'seller'])
+                    ->whereNotNull('image')
+                    ->where('image', '!=', '')
+                    ->whereNotNull('seller_id')
+                    ->where('status', 'active');
+                
+                if (!empty($query)) {
+                    $productsQuery->where(function ($q) use ($query) {
+                        $q->where('name', 'LIKE', "%{$query}%")
+                          ->orWhere('description', 'LIKE', "%{$query}%")
+                          ->orWhereHas('category', function($categoryQuery) use ($query) {
+                              $categoryQuery->where('name', 'LIKE', "%{$query}%");
+                          });
+                    });
+                }
+                
+                if (!empty($categoryId)) {
+                    $productsQuery->where('category_id', $categoryId);
+                }
+                
+                $totalProducts = $productsQuery->count();
+                
+                $products = $productsQuery
+                    ->orderBy('updated_at', 'desc')
+                    ->skip(($page - 1) * $perPage)
+                    ->take($perPage)
+                    ->get();
             }
             
-            // Cache key for suggestions
-            $cacheKey = 'instant_search_' . md5($query);
-            
-            return Cache::remember($cacheKey, 300, function() use ($query) { // 5 minute cache
-                
-                // Get top matching products (limit to 6 for instant display)
-                $products = Product::whereNotNull('image')
-                    ->where('image', '!=', '')
-                    ->where(function ($q) use ($query) {
-                        $q->where('name', 'LIKE', "%{$query}%")
-                          ->orWhere('description', 'LIKE', "%{$query}%");
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->limit(6)
-                    ->get(['id', 'name', 'price', 'discount', 'image', 'stock_quantity'])
-                    ->map(function($product) {
-                        return [
-                            'id' => $product->id,
-                            'name' => $product->name,
-                            'price' => $product->price,
-                            'discount' => $product->discount,
-                            'image' => $product->image_url ?? $product->image ?? '/images/placeholder.png',
-                            'in_stock' => $product->stock_quantity === null || $product->stock_quantity > 0,
-                            'url' => "/product/{$product->id}"
-                        ];
-                    });
-                
-                // Get matching categories
-                $categories = Category::where('name', 'LIKE', "%{$query}%")
-                    ->limit(4)
-                    ->get(['id', 'name', 'emoji'])
-                    ->map(function($category) {
-                        return [
-                            'id' => $category->id,
-                            'name' => $category->name,
-                            'emoji' => $category->emoji,
-                            'url' => "/products?category_id={$category->id}"
-                        ];
-                    });
-                
-                // Popular search suggestions
-                $suggestions = [
-                    $query . ' products',
-                    $query . ' deals',
-                    $query . ' offers'
-                ];
-                
+            // Format products for JSON response
+            $formattedProducts = $products->map(function($product) {
                 return [
-                    'products' => $products,
-                    'categories' => $categories,
-                    'suggestions' => $suggestions,
-                    'query' => $query
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => number_format($product->price, 2),
+                    'discount' => $product->discount ?? 0,
+                    'image' => $this->getProductImageUrl($product),
+                    'stock_quantity' => $product->stock_quantity ?? 0,
+                    'category' => $product->category ? $product->category->name : null,
+                    'seller' => $product->seller ? $product->seller->name : null,
+                    'url' => route('product.show', $product->id)
                 ];
             });
             
+            // Get categories for filters (always include these)
+            $categories = Category::whereHas('products', function($q) {
+                $q->where('status', 'active')
+                  ->whereNotNull('seller_id')
+                  ->whereNotNull('image')
+                  ->where('image', '!=', '');
+            })
+            ->withCount(['products' => function($q) {
+                $q->where('status', 'active')
+                  ->whereNotNull('seller_id')
+                  ->whereNotNull('image')
+                  ->where('image', '!=', '');
+            }])
+            ->orderBy('products_count', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'emoji' => $category->emoji ?? '',
+                    'product_count' => $category->products_count,
+                    'url' => "/products?category={$category->id}"
+                ];
+            });
+            
+            // Generate suggestions for non-empty queries
+            $suggestions = [];
+            if (!empty($query) && strlen($query) >= 2) {
+                $productNames = Product::where('name', 'LIKE', "%{$query}%")
+                    ->where('status', 'active')
+                    ->whereNotNull('seller_id')
+                    ->distinct()
+                    ->pluck('name')
+                    ->take(5)
+                    ->toArray();
+                
+                $suggestions = array_merge($productNames, [
+                    $query . ' deals',
+                    $query . ' offers'
+                ]);
+                $suggestions = array_slice(array_unique($suggestions), 0, 5);
+            }
+            
+            $response = [
+                'products' => $formattedProducts,
+                'categories' => $categories,
+                'suggestions' => $suggestions,
+                'pagination' => [
+                    'current_page' => $page,
+                    'has_more' => ($page * $perPage) < $totalProducts,
+                    'total' => $totalProducts,
+                    'per_page' => $perPage
+                ],
+                'query' => $query,
+                'category_filter' => $categoryId
+            ];
+            
+            Log::info('Enhanced instant search response', [
+                'products_count' => count($formattedProducts),
+                'categories_count' => count($categories),
+                'total_products' => $totalProducts,
+                'has_more' => $response['pagination']['has_more']
+            ]);
+            
+            return response()->json($response);
+            
         } catch (\Exception $e) {
-            Log::error('Instant Search Error', [
+            Log::error('Enhanced Instant Search Error', [
                 'query' => $request->input('q'),
-                'error' => $e->getMessage()
+                'category' => $request->input('category'),
+                'page' => $request->input('page'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             return response()->json([
                 'products' => [],
                 'categories' => [],
                 'suggestions' => [],
+                'pagination' => ['current_page' => 1, 'has_more' => false, 'total' => 0],
                 'error' => 'Search temporarily unavailable'
             ], 500);
         }
+    }
+    
+    /**
+     * Get proper product image URL
+     */
+    private function getProductImageUrl($product)
+    {
+        if (empty($product->image)) {
+            return asset('images/no-image.png');
+        }
+        
+        // If it's already a full URL (like AWS S3)
+        if (filter_var($product->image, FILTER_VALIDATE_URL)) {
+            return $product->image;
+        }
+        
+        // Handle storage path
+        if (str_starts_with($product->image, 'storage/')) {
+            return asset($product->image);
+        }
+        
+        // Default storage path
+        return asset('storage/' . ltrim($product->image, '/'));
     }
     
     /**
