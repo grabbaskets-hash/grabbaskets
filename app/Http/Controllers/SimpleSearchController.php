@@ -510,4 +510,97 @@ class SimpleSearchController extends Controller
             return response()->json(['suggestions' => []], 500);
         }
     }
+
+    /**
+     * Food delivery products - filtered by food categories
+     */
+    public function foodDelivery(Request $request)
+    {
+        try {
+            // Get food-related categories
+            $foodCategories = Category::where(function($query) {
+                $query->where('name', 'LIKE', '%food%')
+                      ->orWhere('name', 'LIKE', '%restaurant%')
+                      ->orWhere('name', 'LIKE', '%meal%')
+                      ->orWhere('name', 'LIKE', '%snack%')
+                      ->orWhere('name', 'LIKE', '%beverage%')
+                      ->orWhere('name', 'LIKE', '%drink%')
+                      ->orWhere('name', 'LIKE', '%grocery%')
+                      ->orWhere('name', 'LIKE', '%kitchen%');
+            })->pluck('id');
+
+            // Query food products
+            $query = Product::whereNotNull('image')
+                ->where('image', '!=', '');
+
+            // Filter by food categories if found
+            if ($foodCategories->isNotEmpty()) {
+                $query->whereIn('category_id', $foodCategories);
+            }
+
+            // Search functionality
+            $searchQuery = trim($request->input('q', ''));
+            if (!empty($searchQuery) && strlen($searchQuery) >= 2) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('description', 'LIKE', "%{$searchQuery}%");
+                });
+            }
+
+            // Apply filters
+            if ($request->filled('price_min')) {
+                $query->where('price', '>=', (float)$request->input('price_min'));
+            }
+            if ($request->filled('price_max')) {
+                $query->where('price', '<=', (float)$request->input('price_max'));
+            }
+
+            // Sorting
+            $sort = $request->input('sort', 'newest');
+            switch ($sort) {
+                case 'price_asc':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'discount':
+                    $query->orderBy('discount', 'desc');
+                    break;
+                default:
+                    $query->orderBy('created_at', 'desc');
+            }
+
+            // Pagination
+            $perPage = $request->input('per_page', 20);
+            $products = $query->paginate($perPage);
+
+            // Get all categories for sidebar
+            $categories = Category::with('subcategories')->get();
+
+            return view('products.index', [
+                'products' => $products,
+                'categories' => $categories,
+                'searchQuery' => $searchQuery,
+                'currentSort' => $sort,
+                'pageTitle' => 'Food Delivery - Fast & Fresh',
+                'isFood' => true,
+                'filters' => [
+                    'price_min' => $request->input('price_min'),
+                    'price_max' => $request->input('price_max'),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Food Delivery Search Error', [
+                'error' => $e->getMessage(),
+                'query' => $request->input('q'),
+            ]);
+
+            return back()->with('error', 'Search temporarily unavailable. Please try again.');
+        }
+    }
 }

@@ -240,6 +240,66 @@
       z-index: 100; /* Lower z-index to not interfere with modals */
     }
 
+    /* ============================================
+       MOBILE CATEGORY ALIGNMENT IMPROVEMENTS
+       ============================================ */
+    @media (max-width: 768px) {
+      .category-card-emoji-design {
+        min-height: 280px !important;
+        margin: 0 auto;
+        max-width: 100%;
+      }
+      
+      .category-card-emoji-design .emoji-circle {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 2.8rem !important;
+      }
+      
+      .category-card-emoji-design h5 {
+        font-size: 1rem !important;
+        line-height: 1.3;
+        margin-bottom: 15px !important;
+      }
+      
+      .category-card-emoji-design .badge {
+        font-size: 0.75rem !important;
+        padding: 4px 12px !important;
+      }
+      
+      /* Food delivery special styling for mobile */
+      .food-delivery-special {
+        background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%) !important;
+        border: 2px solid rgba(255, 107, 0, 0.4) !important;
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4) !important;
+      }
+      
+      .food-delivery-special:hover {
+        transform: translateY(-5px) scale(1.01) !important;
+        box-shadow: 0 10px 30px rgba(255, 107, 0, 0.6) !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .category-card-emoji-design {
+        padding: 20px 15px !important;
+        min-height: 260px !important;
+        border-radius: 15px !important;
+      }
+      
+      .category-card-emoji-design .emoji-circle {
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 2.5rem !important;
+        margin-bottom: 10px !important;
+      }
+      
+      .category-card-emoji-design h5 {
+        font-size: 0.95rem !important;
+        margin-bottom: 12px !important;
+      }
+    }
+
     .category-scroll {
       display: flex;
       gap: 12px;
@@ -5171,11 +5231,78 @@ li a{
         <p class="text-muted">Special Offers on Every Category!</p>
       </div>
 
-      <!-- Category Grid with Emojis -->
-      <div class="row g-4 mb-5">
+      <!-- Category Grid with Emojis - Improved Mobile Alignment -->
+      <div class="row g-3 mb-5">
         @if(!empty($categories) && $categories->count())
+          <!-- Food Delivery Special Category -->
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-6">
+            <a href="{{ route('products.food-delivery') }}" class="text-decoration-none">
+              <div class="category-card-emoji-design food-delivery-special" style="
+                background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);
+                border-radius: 20px;
+                padding: 25px 20px;
+                border: 2px solid rgba(255, 107, 0, 0.3);
+                transition: all 0.3s ease;
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3), 0 0 20px rgba(255, 107, 0, 0.2);
+              " onmouseover="
+                this.style.transform='translateY(-10px) scale(1.02)';
+                this.style.boxShadow='0 15px 40px rgba(255, 107, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.3)';
+                this.style.borderColor='rgba(255, 107, 0, 0.6)';
+              " onmouseout="
+                this.style.transform='translateY(0) scale(1)';
+                this.style.boxShadow='0 4px 15px rgba(255, 107, 0, 0.3), 0 0 20px rgba(255, 107, 0, 0.2)';
+                this.style.borderColor='rgba(255, 107, 0, 0.3)';
+              ">
+                
+                <!-- Emoji Circle with Orange Glow -->
+                <div class="text-center mb-3">
+                  <div style="
+                    width: 100px;
+                    height: 100px;
+                    margin: 0 auto;
+                    background: rgba(255,255,255,0.2);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 3.5rem;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+                    border: 3px solid rgba(255, 255, 255, 0.4);
+                  " class="emoji-circle">
+                    🚴‍♂️
+                  </div>
+                </div>
+                
+                <!-- Category Name -->
+                <h5 class="text-center fw-bold mb-2" style="color: white; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">
+                  Food Delivery
+                </h5>
+                
+                <!-- Special Badge -->
+                <div class="text-center">
+                  <span class="badge" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    font-size: 0.85rem;
+                    padding: 6px 15px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                  ">
+                    🔥 Hot & Fast
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+          
           @foreach($categories as $category)
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-6">
               <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
                 <div class="category-card-emoji-design" style="
                   background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%);
@@ -6481,10 +6608,19 @@ li a{
           return;
         }
         
-        // Prevent any focus lock issues
+        // Immediate focus lock prevention
         if (document.activeElement && document.activeElement.blur) {
           document.activeElement.blur();
         }
+        
+        // Clear Bootstrap focus management
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+        
+        // Remove any focus trap attributes
+        menu.removeAttribute('tabindex');
+        menu.removeAttribute('aria-modal');
         
         // Clear any existing event listeners first
         document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
@@ -6500,25 +6636,62 @@ li a{
           
           // Add event listener with a small delay to avoid immediate closing
           setTimeout(() => {
-            document.addEventListener('click', closeFloatingMenuOnOutsideClick, { once: false });
-          }, 150);
+            document.addEventListener('click', closeFloatingMenuOnOutsideClick, { 
+              once: false,
+              passive: true 
+            });
+          }, 200);
         } else {
           // Close menu
           menu.style.display = 'none';
           document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
         }
+        
+        // Periodic focus check to prevent locks
+        if (!window.focusLockCleanupInterval) {
+          window.focusLockCleanupInterval = setInterval(() => {
+            if (document.activeElement && 
+                document.activeElement.tagName && 
+                document.activeElement !== document.body &&
+                !document.querySelector('#floatingMenu:not([style*="display: none"])') &&
+                !document.querySelector('#mobileCategoryMenu.show')) {
+              document.activeElement.blur();
+            }
+          }, 1000);
+        }
+        
       } catch (error) {
         console.error('Error toggling floating menu:', error);
-        // Emergency cleanup
+        emergencyFloatingMenuCleanup();
+      }
+    }
+
+    // Emergency cleanup for floating menu
+    function emergencyFloatingMenuCleanup() {
+      try {
         const menu = document.getElementById('floatingMenu');
         if (menu) {
           menu.style.display = 'none';
+          menu.removeAttribute('tabindex');
+          menu.removeAttribute('aria-modal');
+          menu.removeAttribute('data-bs-focus');
         }
+        
         document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
         // Force blur all active elements
         if (document.activeElement && document.activeElement !== document.body) {
           document.activeElement.blur();
         }
+        
+        // Clear Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+        
+        console.log('Emergency floating menu cleanup completed');
+      } catch (error) {
+        console.error('Emergency floating menu cleanup failed:', error);
       }
     }
 
@@ -6657,7 +6830,7 @@ li a{
       }
     });
 
-    // Modern Mobile Category Menu Functions
+    // Modern Mobile Category Menu Functions - Enhanced with Focus Lock Prevention
     function toggleMobileCategoryMenu() {
       try {
         const menu = document.getElementById('mobileCategoryMenu');
@@ -6669,18 +6842,116 @@ li a{
           console.error('Mobile category menu not found');
           return;
         }
+
+        // Prevent any focus lock issues immediately
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+
+        // Clear any Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+
+        // Remove any existing focus event listeners
+        document.removeEventListener('focusin', preventFocusLock);
+        document.removeEventListener('keydown', handleEscapeKey);
         
         if (menu.classList.contains('show')) {
+          // Closing menu
           menu.classList.remove('show');
           if (overlay) overlay.style.display = 'none';
           document.body.style.overflow = '';
+          
+          // Release focus locks
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
         } else {
+          // Opening menu
           menu.classList.add('show');
           if (overlay) overlay.style.display = 'block';
           document.body.style.overflow = 'hidden';
+          
+          // Add focus management
+          setTimeout(() => {
+            document.addEventListener('focusin', preventFocusLock);
+            document.addEventListener('keydown', handleEscapeKey);
+          }, 100);
         }
       } catch (error) {
         console.error('Error toggling mobile category menu:', error);
+        // Emergency cleanup
+        emergencyCleanupFocus();
+      }
+    }
+
+    // Prevent focus lock function
+    function preventFocusLock(event) {
+      try {
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu && menu.classList.contains('show')) {
+          // Allow focus within the menu
+          if (menu.contains(event.target)) {
+            return;
+          }
+          // Redirect focus to menu if trying to focus outside
+          event.preventDefault();
+          const firstFocusable = menu.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (firstFocusable) {
+            firstFocusable.focus();
+          }
+        }
+      } catch (error) {
+        console.error('Focus prevention error:', error);
+        emergencyCleanupFocus();
+      }
+    }
+
+    // Handle escape key to close menu
+    function handleEscapeKey(event) {
+      if (event.key === 'Escape') {
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu && menu.classList.contains('show')) {
+          toggleMobileCategoryMenu();
+        }
+      }
+    }
+
+    // Emergency cleanup function
+    function emergencyCleanupFocus() {
+      try {
+        // Remove all focus-related event listeners
+        document.removeEventListener('focusin', preventFocusLock);
+        document.removeEventListener('keydown', handleEscapeKey);
+        
+        // Close any open menus
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu) {
+          menu.classList.remove('show');
+        }
+        
+        const overlay = document.getElementById('mobileMenuOverlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
+        
+        // Restore body overflow
+        document.body.style.overflow = '';
+        
+        // Force blur all elements
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
+        
+        // Clear Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+        
+        console.log('Emergency focus cleanup completed');
+      } catch (error) {
+        console.error('Emergency cleanup failed:', error);
       }
     }
 
@@ -6774,15 +7045,157 @@ li a{
       }
     }
 
-    // Close mobile category menu when clicking outside
+    // Enhanced mobile menu click handling with touch support
     document.addEventListener('click', function(event) {
       const menu = document.getElementById('mobileCategoryMenu');
       const menuButton = event.target.closest('.mobile-nav-item');
       
-      if (menu && menu.style.display === 'block' && !menu.contains(event.target) && !menuButton) {
-        menu.style.display = 'none';
+      if (menu && menu.classList.contains('show') && !menu.contains(event.target) && !menuButton) {
+        toggleMobileCategoryMenu();
         document.body.style.overflow = '';
       }
+    });
+
+    // Enhanced touch event handling for mobile devices
+    document.addEventListener('touchstart', function(event) {
+      const menu = document.getElementById('mobileCategoryMenu');
+      const floatingMenu = document.getElementById('floatingMenu');
+      
+      // Handle mobile category menu
+      if (menu && menu.classList.contains('show')) {
+        const menuButton = event.target.closest('.mobile-nav-item');
+        if (!menu.contains(event.target) && !menuButton) {
+          event.preventDefault();
+          toggleMobileCategoryMenu();
+        }
+      }
+      
+      // Handle floating menu
+      if (floatingMenu && floatingMenu.style.display === 'block') {
+        const fabButton = event.target.closest('.fab-main');
+        const fabContainer = event.target.closest('#floatingActionsContainer');
+        if (!floatingMenu.contains(event.target) && !fabButton && !fabContainer) {
+          event.preventDefault();
+          toggleFloatingMenu();
+        }
+      }
+    }, { passive: false });
+
+    // Add global focus management and mobile navigation event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Clean up any existing focus locks on page load
+      if (typeof emergencyCleanupFocus === 'function') {
+        emergencyCleanupFocus();
+      }
+      
+      // Add event listeners for mobile navigation without onclick attributes
+      const categoryNavBtn = document.getElementById('categoryNav');
+      if (categoryNavBtn) {
+        categoryNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+        
+        // Add touch support
+        categoryNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+      }
+      
+      // Profile menu button
+      const profileNavBtn = document.getElementById('profileNav');
+      if (profileNavBtn) {
+        profileNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileProfileMenu();
+        });
+        
+        profileNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileProfileMenu();
+        });
+      }
+      
+      // Auth menu button
+      const authNavBtn = document.getElementById('authNav');
+      if (authNavBtn) {
+        authNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+        
+        authNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+      }
+      
+      // Food delivery button
+      const foodDeliveryBtn = document.querySelector('.food-delivery-btn');
+      if (foodDeliveryBtn) {
+        foodDeliveryBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+        
+        foodDeliveryBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+      }
+      
+      // Floating action button
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+        
+        fabMainBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+      }
+      
+      // Category close button
+      const categoryCloseBtn = document.getElementById('categoryCloseBtn');
+      if (categoryCloseBtn) {
+        categoryCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+        
+        categoryCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+      }
+      
+      // Periodic cleanup every 5 seconds
+      setInterval(() => {
+        const hasOpenMenus = document.querySelector('#mobileCategoryMenu.show') || 
+                           document.querySelector('#floatingMenu:not([style*="display: none"])');
+        
+        if (!hasOpenMenus && document.activeElement && 
+            document.activeElement !== document.body &&
+            !document.activeElement.closest('input, textarea, select')) {
+          document.activeElement.blur();
+        }
+      }, 5000);
     });
 
     // Mobile Profile Menu Functions
@@ -7374,7 +7787,7 @@ li a{
     </a>
     
     <!-- Mobile Category Menu Button -->
-    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" id="categoryNav">
+    <div class="mobile-nav-item" id="categoryNav">
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
     </div>
@@ -7393,12 +7806,12 @@ li a{
     </a>
     
     @auth
-      <div class="mobile-nav-item" onclick="toggleMobileProfileMenu()" id="profileNav">
+      <div class="mobile-nav-item" id="profileNav">
         <i class="bi bi-person-circle"></i>
         <span>Account</span>
       </div>
     @else
-      <div class="mobile-nav-item" onclick="toggleMobileAuthMenu()" id="authNav">
+      <div class="mobile-nav-item" id="authNav">
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Login</span>
       </div>
@@ -7407,7 +7820,7 @@ li a{
 
   <!-- Mobile Food Delivery Quick Action Button -->
   <div class="mobile-food-delivery-fab" id="mobileFoodFab">
-    <button class="food-delivery-btn" onclick="toggleMobileFoodMenu()">
+    <button class="food-delivery-btn">
       <i class="bi bi-bicycle"></i>
       <span>Food Delivery</span>
     </button>
@@ -7418,7 +7831,7 @@ li a{
     <!-- Header -->
     <div class="category-header">
       <h4><i class="bi bi-grid-3x3-gap me-2"></i>Categories</h4>
-      <button class="category-close-btn" onclick="toggleMobileCategoryMenu()">
+      <button class="category-close-btn" id="categoryCloseBtn">
         <i class="bi bi-x"></i>
       </button>
     </div>

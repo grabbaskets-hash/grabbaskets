@@ -587,6 +587,9 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
 // Public product search - Anyone can search (Zepto/Blinkit style)
 Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
 
+// Food delivery products route
+Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
+
 // Instant search API for real-time suggestions (Zepto/Blinkit style)
 Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
 
@@ -615,6 +618,36 @@ Route::prefix('api/tracking')->group(function () {
     Route::post('/track', [CourierTrackingController::class, 'apiTrack'])->name('api.tracking.track');
     Route::get('/detect/{trackingNumber}', [CourierTrackingController::class, 'apiDetectCourier'])->name('api.tracking.detect');
 });
+
+// API route for mobile category menu subcategories
+Route::get('/api/categories/{category}/subcategories', function($categoryId) {
+    try {
+        $category = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->findOrFail($categoryId);
+        
+        $subcategories = $category->subcategories->map(function($subcat) {
+            return [
+                'id' => $subcat->id,
+                'name' => $subcat->name,
+                'emoji' => $subcat->emoji ?? '📦',
+                'products_count' => $subcat->products_count,
+                'url' => route('buyer.productsBySubcategory', $subcat->id)
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'subcategories' => $subcategories,
+            'category_name' => $category->name
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Category not found'
+        ], 404);
+    }
+})->name('api.categories.subcategories');
 
 // API Health Check for diagnostics
 Route::get('/api/health-check', function () {
