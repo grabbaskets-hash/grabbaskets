@@ -435,56 +435,9 @@ Route::get('/home-test', function () {
     }
 })->name('home_old');
 
-// WORKING HOME ROUTE - Simplified for debugging
+// EMERGENCY HOMEPAGE - Using simple view
 Route::get('/', function () {
-    try {
-        // Load basic data with comprehensive error handling
-        $categories = \App\Models\Category::take(10)->get();
-        $products = \App\Models\Product::whereNotNull('image')
-            ->where('image', '!=', '')
-            ->whereNotNull('seller_id')
-            ->take(8)
-            ->get();
-        
-        // Simplified banner loading
-        $banners = collect([]);
-        try {
-            $banners = \App\Models\Banner::where('is_active', true)
-                ->where('position', 'hero')
-                ->get();
-        } catch (\Exception $e) {
-            // Ignore banner errors for now
-        }
-        
-        return view('index', [
-            'categories' => $categories,
-            'products' => $products,
-            'trending' => $products->take(6),
-            'lookbookProduct' => $products->first(),
-            'blogProducts' => $products->take(4),
-            'categoryProducts' => [],
-            'banners' => $banners,
-            'settings' => [
-                'hero_title' => 'Welcome to GrabBaskets',
-                'hero_subtitle' => 'Your one-stop shop for everything',
-                'show_categories' => true,
-                'show_featured_products' => true,
-                'theme_color' => '#FF6B00',
-            ]
-        ]);
-    } catch (\Exception $e) {
-        \Illuminate\Support\Facades\Log::error('Homepage critical error: ' . $e->getMessage());
-        
-        // Return minimal working page
-        return '<!DOCTYPE html>
-<html><head><title>GrabBaskets</title></head>
-<body style="font-family:Arial;margin:40px;text-align:center;">
-<h1>🛍️ GrabBaskets</h1>
-<p>Site temporarily under maintenance</p>
-<p><strong>Error:</strong> ' . $e->getMessage() . '</p>
-<a href="/home-test?simple=1" style="background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Test Simple Page</a>
-</body></html>';
-    }
+    return view('emergency-home');
 })->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
@@ -502,9 +455,9 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
 });
 
 // Test route without middleware
-Route::get('/test-seller-dashboard', function () {
+Route::get('/test-seller-dashboard', function (Request $request) {
     $controller = new App\Http\Controllers\SellerController();
-    return $controller->dashboard();
+    return $controller->dashboard($request);
 });
 
 // Verified user routes (buyer + seller)
