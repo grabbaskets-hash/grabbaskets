@@ -713,10 +713,10 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
-// Modern AJAX-based products search page (updated)
+// Modern AJAX-based products search page - MINIMAL VERSION
 Route::get('/products', function(\Illuminate\Http\Request $request) {
-    return view('test-products');
-})->name('products.ajax');
+    return view('buyer.products-minimal');
+})->name('products.search');
 
 // Food delivery products route
 Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
@@ -1777,7 +1777,7 @@ Route::get('/debug-search', function () {
     }
 });
 
-// FINAL WORKING PRODUCTS ROUTE - AJAX BASED
-Route::get('/products-new', function(\Illuminate\Http\Request $request) {
-    return view('test-products');
-})->name('products.new');
+// WORKING AJAX SEARCH PAGE - ALTERNATIVE ROUTE
+Route::get('/search-products', function(\Illuminate\Http\Request $request) {
+    return view('buyer.products-minimal');
+})->name('search.products');
