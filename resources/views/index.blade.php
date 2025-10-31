@@ -4009,8 +4009,7 @@ li a{
         <!-- Delivery Location (Desktop) -->
         <div class="desktop-only" 
              id="locationDisplay"
-             onclick="openLocationModal()"
-             style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px; transition: all 0.2s;">
+             style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px; transition: all 0.2s; touch-action: manipulation;">
           <i class="bi bi-geo-alt-fill" style="color: var(--primary-color);"></i>
           <div style="line-height: 1.2;">
             <div style="font-size: 0.75rem; color: var(--text-light);" id="locationLabel">Delivery in 10 mins</div>
@@ -5050,7 +5049,7 @@ li a{
 
                 <!-- Add to Cart Button -->
                 @auth
-                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-{{ $product->id }}').submit();">
+                  <button class="add-to-cart-modern flash-add-to-cart" data-product-id="{{ $product->id }}" style="touch-action: manipulation;">
                     <i class="bi bi-cart-plus"></i>
                     Add to Cart
                   </button>
@@ -5060,7 +5059,7 @@ li a{
                     <input type="hidden" name="quantity" value="1">
                   </form>
                 @else
-                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
+                  <button class="add-to-cart-modern flash-login-redirect" style="touch-action: manipulation;">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Login to Buy
                   </button>
@@ -5130,7 +5129,7 @@ li a{
 
                 <!-- Add to Cart Button -->
                 @auth
-                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-trend-{{ $product->id }}').submit();">
+                  <button class="add-to-cart-modern trend-add-to-cart" data-product-id="{{ $product->id }}" style="touch-action: manipulation;">
                     <i class="bi bi-cart-plus"></i>
                     Add to Cart
                   </button>
@@ -5140,7 +5139,7 @@ li a{
                     <input type="hidden" name="quantity" value="1">
                   </form>
                 @else
-                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
+                  <button class="add-to-cart-modern trend-login-redirect" style="touch-action: manipulation;">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Login to Buy
                   </button>
@@ -9006,6 +9005,91 @@ li a{
       }
       
       console.log('📱 Mobile Button Event Listeners Activated');
+      
+      // Desktop location display
+      const locationDisplay = document.getElementById('locationDisplay');
+      if (locationDisplay) {
+        locationDisplay.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+        locationDisplay.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+      }
+      
+      // Flash sale add to cart buttons
+      const flashAddToCartBtns = document.querySelectorAll('.flash-add-to-cart');
+      flashAddToCartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const productId = this.getAttribute('data-product-id');
+          const form = document.getElementById('quick-add-' + productId);
+          if (form) form.submit();
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const productId = this.getAttribute('data-product-id');
+          const form = document.getElementById('quick-add-' + productId);
+          if (form) form.submit();
+        });
+      });
+      
+      // Flash sale login redirect buttons
+      const flashLoginRedirectBtns = document.querySelectorAll('.flash-login-redirect');
+      flashLoginRedirectBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '/login';
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '/login';
+        });
+      });
+      
+      // Trending products add to cart buttons
+      const trendAddToCartBtns = document.querySelectorAll('.trend-add-to-cart');
+      trendAddToCartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const productId = this.getAttribute('data-product-id');
+          const form = document.getElementById('quick-add-trend-' + productId);
+          if (form) form.submit();
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const productId = this.getAttribute('data-product-id');
+          const form = document.getElementById('quick-add-trend-' + productId);
+          if (form) form.submit();
+        });
+      });
+      
+      // Trending products login redirect buttons
+      const trendLoginRedirectBtns = document.querySelectorAll('.trend-login-redirect');
+      trendLoginRedirectBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '/login';
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '/login';
+        });
+      });
+      
+      console.log('🛒 Product Action Button Event Listeners Activated');
     });
   </script>
 

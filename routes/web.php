@@ -634,6 +634,35 @@ Route::get('/buyer/dashboard/debug', function() {
     return response($output, 200)->header('Content-Type', 'text/plain');
 })->name('buyer.dashboard.debug');
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
+
+// Debug route for category issues
+Route::get('/buyer/category/{category_id}/debug', function($category_id) {
+    try {
+        $category = \App\Models\Category::find($category_id);
+        if (!$category) {
+            return response()->json(['error' => 'Category not found', 'category_id' => $category_id]);
+        }
+        
+        $productsCount = \App\Models\Product::where('category_id', $category_id)->count();
+        $productsWithImages = \App\Models\Product::where('category_id', $category_id)
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->count();
+            
+        return response()->json([
+            'category' => $category,
+            'products_total' => $productsCount,
+            'products_with_images' => $productsWithImages,
+            'debug' => 'OK'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+    }
+})->name('buyer.categoryDebug');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
 // Product details & reviews - Anyone can view

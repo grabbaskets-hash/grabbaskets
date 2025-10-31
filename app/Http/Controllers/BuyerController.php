@@ -306,7 +306,7 @@ public function search(Request $request)
             \Illuminate\Support\Facades\Log::info('Search Query', [
                 'query' => $searchQuery,
                 'results' => $totalResults,
-                'user_id' => auth()->id(),
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
                 'ip' => $request->ip()
             ]);
         }
@@ -383,13 +383,22 @@ public function search(Request $request)
 
     public function productsByCategory(Request $request, $category_id)
     {
-        $category = Category::findOrFail($category_id);
-        $query = Product::where('category_id', $category_id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%');
+        try {
+            Log::info('Buyer productsByCategory: Starting', ['category_id' => $category_id]);
+            
+            // Check if category exists first
+            $category = Category::find($category_id);
+            if (!$category) {
+                Log::warning('Buyer productsByCategory: Category not found', ['category_id' => $category_id]);
+                abort(404, 'Category not found');
+            }
+            
+            $query = Product::where('category_id', $category_id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%');
 
         // Filters
         if ($request->filled('price_min')) {
@@ -429,18 +438,63 @@ public function search(Request $request)
                 $query->latest();
         }
 
-        $products = $query->paginate(12)->appends($request->query());
-        $allCategories = Category::orderBy('name')->get();
-        $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
-        return view('buyer.products', [
-            'category' => $category,
-            'products' => $products,
-            'categories' => $allCategories,
-            'subsByCategory' => $subsByCategory,
-            'activeCategoryId' => (int)$category_id,
-            'activeSubcategoryId' => null,
-            'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
-        ]);
+            $products = $query->paginate(12)->appends($request->query());
+            
+            // Load categories with error handling
+            $allCategories = collect();
+            $subsByCategory = collect();
+            
+            try {
+                $allCategories = Category::orderBy('name')->get();
+                $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
+            } catch (\Exception $categoryError) {
+                Log::warning('Buyer productsByCategory: Categories loading failed', [
+                    'error' => $categoryError->getMessage()
+                ]);
+            }
+            
+            Log::info('Buyer productsByCategory: Success', [
+                'category_id' => $category_id,
+                'products_count' => $products->count()
+            ]);
+            
+            return view('buyer.products', [
+                'category' => $category,
+                'products' => $products,
+                'categories' => $allCategories,
+                'subsByCategory' => $subsByCategory,
+                'activeCategoryId' => (int)$category_id,
+                'activeSubcategoryId' => null,
+                'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Buyer productsByCategory Error: ' . $e->getMessage(), [
+                'category_id' => $category_id,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            // Return with fallback data
+            $emptyProducts = new \Illuminate\Pagination\LengthAwarePaginator(
+                collect([]),
+                0,
+                12,
+                1,
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+            
+            return view('buyer.products', [
+                'category' => (object)['id' => $category_id, 'name' => 'Category #' . $category_id],
+                'products' => $emptyProducts,
+                'categories' => collect(),
+                'subsByCategory' => collect(),
+                'activeCategoryId' => (int)$category_id,
+                'activeSubcategoryId' => null,
+                'filters' => [],
+                'error' => 'Error loading category products. Please try again.'
+            ]);
+        }
     }
 
     public function productsBySubcategory(Request $request, $subcategory_id)
