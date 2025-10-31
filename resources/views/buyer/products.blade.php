@@ -594,7 +594,8 @@
                     <h5 class="d-none d-lg-block"><i class="bi bi-grid-3x3-gap-fill"></i> Categories</h5>
                     <div class="category-sidebar mobile-collapsed" id="categorySidebar" style="max-height: 70vh; overflow-y: auto;">
                         @php
-                            $categories = \App\Models\Category::with('subcategories')->withCount('products')->get();
+                            // Use categories passed from controller, with fallback
+                            $categories = $categories ?? collect();
                             $selectedCategory = request('category_id');
                             $selectedSubcategory = request('subcategory_id');
                         @endphp
@@ -607,36 +608,38 @@
                                     <span class="category-emoji me-2">🛍️</span>
                                     <span class="category-name">All Products</span>
                                 </div>
-                                <span class="product-count badge bg-secondary">{{ \App\Models\Product::count() }}</span>
+                                <span class="product-count badge bg-secondary">{{ $totalResults ?? 0 }}</span>
                             </a>
                         </div>
                         
-                        @foreach($categories as $category)
+                        @foreach($categories ?? [] as $category)
+                        @if($category && $category->id && $category->name)
                         <div class="category-item {{ $selectedCategory == $category->id ? 'active' : '' }}" data-category-id="{{ $category->id }}">
                             <a href="{{ route('products.index', array_merge(request()->except(['subcategory_id']), ['category_id' => $category->id])) }}" 
                                class="d-flex align-items-center justify-content-between text-decoration-none p-3 category-link">
                                 <div class="d-flex align-items-center">
                                     <span class="category-emoji me-2">{{ $category->emoji ?? '📦' }}</span>
-                                    <span class="category-name">{{ $category->name }}</span>
+                                    <span class="category-name">{{ $category->name ?? 'Category' }}</span>
                                 </div>
-                                <span class="product-count badge bg-primary">{{ $category->products_count }}</span>
+                                <span class="product-count badge bg-primary">{{ $category->products_count ?? 0 }}</span>
                             </a>
                             
                             <!-- Subcategories (show when parent is selected) -->
-                            @if($selectedCategory == $category->id && $category->subcategories->count() > 0)
+                            @if($selectedCategory == $category->id && $category->subcategories && $category->subcategories->count() > 0)
                             <div class="subcategories-container">
-                                @foreach($category->subcategories as $subcategory)
+                                @foreach($category->subcategories ?? [] as $subcategory)
                                 <div class="subcategory-item {{ $selectedSubcategory == $subcategory->id ? 'active' : '' }}">
                                     <a href="{{ route('products.index', array_merge(request()->query(), ['category_id' => $category->id, 'subcategory_id' => $subcategory->id])) }}" 
                                        class="d-flex align-items-center justify-content-between text-decoration-none p-2 ps-5 subcategory-link">
-                                        <span class="subcategory-name">{{ $subcategory->name }}</span>
-                                        <span class="product-count badge bg-info">{{ $subcategory->products->count() ?? 0 }}</span>
+                                        <span class="subcategory-name">{{ $subcategory->name ?? 'Subcategory' }}</span>
+                                        <span class="product-count badge bg-info">{{ optional($subcategory->products)->count() ?? 0 }}</span>
                                     </a>
                                 </div>
                                 @endforeach
                             </div>
                             @endif
                         </div>
+                        @endif
                         @endforeach
                     </div>
                 </div>
@@ -674,24 +677,13 @@
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
                         <div>
-                            @php
-                                $currentCategory = null;
-                                $currentSubcategory = null;
-                                
-                                if (request('category_id')) {
-                                    $currentCategory = \App\Models\Category::find(request('category_id'));
-                                }
-                                
-                                if (request('subcategory_id')) {
-                                    $currentSubcategory = \App\Models\Subcategory::find(request('subcategory_id'));
-                                }
-                            @endphp
+                            {{-- Using passed variables from controller instead of database queries --}}
                             
                             <h4 class="fw-bold mb-1">
-                                @if($currentSubcategory)
-                                    <span class="category-emoji me-2">{{ $currentCategory->emoji ?? '📦' }}</span>
+                                @if(isset($currentSubcategory) && $currentSubcategory && $currentSubcategory->name)
+                                    <span class="category-emoji me-2">{{ (isset($currentCategory) && $currentCategory) ? ($currentCategory->emoji ?? '📦') : '📦' }}</span>
                                     {{ $currentSubcategory->name }}
-                                @elseif($currentCategory)
+                                @elseif(isset($currentCategory) && $currentCategory && $currentCategory->name)
                                     <span class="category-emoji me-2">{{ $currentCategory->emoji ?? '📦' }}</span>
                                     {{ $currentCategory->name }}
                                 @elseif(request('q'))
@@ -702,11 +694,13 @@
                             </h4>
                             
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                @if($currentCategory && !$currentSubcategory)
+                                @if(isset($currentCategory) && $currentCategory && $currentCategory->name && (!isset($currentSubcategory) || !$currentSubcategory))
                                     <span class="badge bg-primary">{{ $currentCategory->name }}</span>
-                                @elseif($currentSubcategory)
-                                    <span class="badge bg-primary">{{ $currentCategory->name }}</span>
-                                    <i class="bi bi-chevron-right text-muted"></i>
+                                @elseif(isset($currentSubcategory) && $currentSubcategory && $currentSubcategory->name)
+                                    @if(isset($currentCategory) && $currentCategory && $currentCategory->name)
+                                        <span class="badge bg-primary">{{ $currentCategory->name }}</span>
+                                        <i class="bi bi-chevron-right text-muted"></i>
+                                    @endif
                                     <span class="badge bg-info">{{ $currentSubcategory->name }}</span>
                                 @endif
                                 

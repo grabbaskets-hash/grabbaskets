@@ -83,12 +83,52 @@ class SimpleSearchController extends Controller
 
             // If this is a regular web request (not AJAX), return the view
             if (!$request->ajax() && !$request->expectsJson()) {
+                // Load categories for the sidebar with enhanced error handling
+                try {
+                    $categories = Category::with('subcategories')->withCount('products')->get();
+                    
+                    // Filter out any null categories
+                    $categories = $categories->filter(function($category) {
+                        return $category && $category->name;
+                    });
+                } catch (\Exception $categoryError) {
+                    Log::warning('SimpleSearch: Categories loading failed', [
+                        'error' => $categoryError->getMessage()
+                    ]);
+                    $categories = collect();
+                }
+                
+                // Load current category and subcategory safely
+                $currentCategory = null;
+                $currentSubcategory = null;
+                
+                try {
+                    if ($request->filled('category_id')) {
+                        $currentCategory = Category::find($request->input('category_id'));
+                    }
+                    if ($request->filled('subcategory_id')) {
+                        $currentSubcategory = \App\Models\Subcategory::find($request->input('subcategory_id'));
+                    }
+                } catch (\Exception $catError) {
+                    Log::warning('SimpleSearch: Current category loading failed', [
+                        'error' => $catError->getMessage()
+                    ]);
+                }
+                
                 return view('buyer.products', [
                     'products' => $products,
                     'filters' => $filters,
                     'matchedStores' => collect(), // Empty for now
                     'searchQuery' => $searchQuery,
-                    'totalResults' => $totalResults
+                    'totalResults' => $totalResults,
+                    'categories' => $categories ?? collect(), // Add categories for sidebar with fallback
+                    'subsByCategory' => collect(), // Add empty subcategories for now
+                    'activeCategoryId' => $request->input('category_id'),
+                    'activeSubcategoryId' => $request->input('subcategory_id'),
+                    'currentCategory' => $currentCategory,
+                    'currentSubcategory' => $currentSubcategory,
+                    'selectedCategory' => $request->input('category_id'),
+                    'selectedSubcategory' => $request->input('subcategory_id')
                 ]);
             }
             
@@ -355,15 +395,18 @@ class SimpleSearchController extends Controller
             return response($html);
             
         } catch (\Exception $e) {
-            // Log error
+            // Log detailed error
             Log::error('Simple Search Error', [
                 'query' => $request->input('q'),
+                'category_id' => $request->input('category_id'),
+                'subcategory_id' => $request->input('subcategory_id'),
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            // Return empty result
+            // Return a safe fallback view
             $emptyProducts = new \Illuminate\Pagination\LengthAwarePaginator(
                 collect([]),
                 0,
@@ -372,26 +415,48 @@ class SimpleSearchController extends Controller
                 ['path' => $request->url(), 'query' => $request->query()]
             );
             
-            $html = "
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Search Error - GrabBaskets</title>
-                <meta name='viewport' content='width=device-width, initial-scale=1'>
-                <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
-            </head>
-            <body>
-                <div class='container mt-4'>
-                    <div class='alert alert-warning'>
-                        <h4>⚠️ Search Temporarily Unavailable</h4>
-                        <p>We're experiencing technical difficulties. Please try again later.</p>
-                        <p><small>Error: " . htmlspecialchars($e->getMessage()) . "</small></p>
+            // Try to return the view with safe defaults
+            try {
+                return view('buyer.products', [
+                    'products' => $emptyProducts,
+                    'filters' => [],
+                    'matchedStores' => collect(),
+                    'searchQuery' => $request->input('q', ''),
+                    'totalResults' => 0,
+                    'categories' => collect(),
+                    'subsByCategory' => collect(),
+                    'activeCategoryId' => null,
+                    'activeSubcategoryId' => null,
+                    'currentCategory' => null,
+                    'currentSubcategory' => null,
+                    'selectedCategory' => null,
+                    'selectedSubcategory' => null,
+                    'error' => 'Search temporarily unavailable. Please try again.'
+                ]);
+            } catch (\Exception $viewError) {
+                // Ultimate fallback - simple HTML
+                $html = "
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Search Error - GrabBaskets</title>
+                    <meta name='viewport' content='width=device-width, initial-scale=1'>
+                    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+                </head>
+                <body>
+                    <div class='container mt-4'>
+                        <div class='alert alert-warning'>
+                            <h4>⚠️ Search Temporarily Unavailable</h4>
+                            <p>We're experiencing technical difficulties. Please try again later.</p>
+                            <p><small>Error: " . htmlspecialchars($e->getMessage()) . "</small></p>
+                            <a href='/' class='btn btn-primary'>Return to Homepage</a>
+                        </div>
                     </div>
-                </div>
-            </body>
-            </html>";
-            
-            return response($html, 503);
+                </body>
+                </html>";
+                
+                return response($html, 503);
+            }
         }
     }
     

@@ -663,6 +663,48 @@ Route::get('/buyer/category/{category_id}/debug', function($category_id) {
         ]);
     }
 })->name('buyer.categoryDebug');
+
+// Debug route for products search
+Route::get('/products/debug', function(\Illuminate\Http\Request $request) {
+    try {
+        $query = $request->input('q', '');
+        $productsCount = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->count();
+        
+        $categoriesCount = \App\Models\Category::count();
+        
+        // Test basic query
+        $testQuery = \App\Models\Product::whereNotNull('image')
+            ->where('image', '!=', '');
+        
+        if (!empty($query)) {
+            $testQuery->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('description', 'LIKE', "%{$query}%");
+            });
+        }
+        
+        $testResults = $testQuery->count();
+        
+        return response()->json([
+            'query' => $query,
+            'total_products_with_images' => $productsCount,
+            'total_categories' => $categoriesCount,
+            'search_results' => $testResults,
+            'controller_exists' => class_exists(\App\Http\Controllers\SimpleSearchController::class),
+            'view_exists' => view()->exists('buyer.products'),
+            'debug' => 'OK'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+})->name('products.debug');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
 // Product details & reviews - Anyone can view
@@ -1712,4 +1754,23 @@ Route::prefix('food')->name('food.')->group(function () {
     Route::get('/restaurant/{hotelOwner}', [App\Http\Controllers\Food\FoodController::class, 'restaurant'])->name('restaurant');
     Route::get('/category/{category}', [App\Http\Controllers\Food\FoodController::class, 'category'])->name('category');
     Route::post('/add-to-cart', [App\Http\Controllers\Food\FoodController::class, 'addToCart'])->name('add-to-cart');
+});
+
+// Debug route for testing SimpleSearchController
+Route::get('/debug-search', function () {
+    try {
+        $controller = new \App\Http\Controllers\SimpleSearchController();
+        $request = \Illuminate\Http\Request::create('/products?q=', 'GET');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'SimpleSearchController instantiated successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
 });
