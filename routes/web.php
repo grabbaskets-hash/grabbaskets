@@ -341,6 +341,58 @@ Route::get('/buyer/dashboard/debug', function() {
     
     return response($output, 200)->header('Content-Type', 'text/plain');
 })->name('buyer.dashboard.debug');
+// Debug route for category testing
+Route::get('/debug-category/{id}', function($id) {
+    try {
+        $category = \App\Models\Category::find($id);
+        if (!$category) {
+            return "Category {$id} not found";
+        }
+        
+        $products = \App\Models\Product::where('category_id', $id)->count();
+        
+        return response()->json([
+            'category_id' => $id,
+            'category_name' => $category->name,
+            'products_count' => $products,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+
+// Debug route for controller testing
+Route::get('/debug-controller-category/{id}', function($id) {
+    try {
+        $request = new \Illuminate\Http\Request();
+        $controller = new \App\Http\Controllers\BuyerController();
+        
+        // Test data gathering first
+        $category = \App\Models\Category::findOrFail($id);
+        $products = \App\Models\Product::with(['category', 'subcategory'])
+            ->where('category_id', $id)->paginate(1);
+        
+        return response()->json([
+            'category_id' => $id,
+            'category_name' => $category->name,
+            'products_found' => $products->count(),
+            'controller_accessible' => true,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
