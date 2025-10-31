@@ -150,18 +150,38 @@ $blogProducts = Product::whereNotNull('image')
 public function dashboard()
 {
     try {
+        // Log dashboard access attempt
+        Log::info('Buyer Dashboard: Access attempt started');
+        
+        // Test database connection first
+        $dbTest = \Illuminate\Support\Facades\DB::select('SELECT 1 as test');
+        Log::info('Buyer Dashboard: Database connection successful');
+        
+        // Load categories with error handling
         $categories = Category::with(['subcategories' => function($query) {
             $query->withCount('products');
         }])->withCount('products')->get();
-
-        return view('buyer.dashboard', compact('categories'));
-    } catch (\Exception $e) {
-        Log::error('Buyer Dashboard Error: ' . $e->getMessage());
         
-        return view('buyer.dashboard', [
-            'categories' => collect([]),
-            'error' => 'Unable to load categories. Please try again later.'
+        Log::info('Buyer Dashboard: Categories loaded successfully', ['count' => $categories->count()]);
+
+        // Test view exists
+        if (!view()->exists('buyer.dashboard')) {
+            throw new \Exception('Dashboard view not found');
+        }
+        
+        return view('buyer.dashboard', compact('categories'));
+        
+    } catch (\Exception $e) {
+        Log::error('Buyer Dashboard Error: ' . $e->getMessage(), [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
         ]);
+        
+        // Return error view or redirect with error
+        return response()->view('errors.500', [
+            'error' => 'Dashboard temporarily unavailable. Error: ' . $e->getMessage()
+        ], 500);
     }
 }
 

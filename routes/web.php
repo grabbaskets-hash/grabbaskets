@@ -575,6 +575,42 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 // ===== PUBLIC BUYER ROUTES (Guest + Authenticated users can access) =====
 // Buyer dashboard & browsing - Anyone can view products
 Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
+
+// Debug route to test buyer dashboard functionality
+Route::get('/buyer/dashboard/debug', function() {
+    try {
+        // Test database connection
+        $dbConnection = \Illuminate\Support\Facades\DB::connection()->getPdo() ? 'Connected' : 'Failed';
+        
+        // Test Category model
+        $categoriesExist = \App\Models\Category::count();
+        
+        // Test with relationships
+        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->withCount('products')->get();
+        
+        // Test if view can be rendered
+        $viewExists = view()->exists('buyer.dashboard');
+        
+        return response()->json([
+            'status' => 'success',
+            'database_connection' => $dbConnection,
+            'categories_total' => $categoriesExist,
+            'categories_with_relations' => $categories->count(),
+            'view_exists' => $viewExists,
+            'message' => 'All dashboard components working'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+})->name('buyer.dashboard.debug');
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
