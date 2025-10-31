@@ -4647,15 +4647,15 @@ li a{
       </button>
       
       <!-- Main FAB Button -->
-      <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-no-focus-trap="true">
         <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
       </button>
       
       <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
-      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);">
+      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);" data-no-focus-trap="true">
         <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h6 style="margin:0;font-weight:700;color:#232f3e;font-size:1.1rem;">😊 Browse by Categories 🛍️</h6>
-          <button onclick="toggleFloatingMenu()" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.2)'" onmouseout="this.style.background='rgba(139,69,19,0.1)'">✕</button>
+          <button onclick="toggleFloatingMenu()" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.2)'" onmouseout="this.style.background='rgba(139,69,19,0.1)'" data-no-focus-trap="true">✕</button>
         </div>
         
         <!-- Enhanced Responsive Categories Grid -->
@@ -6047,6 +6047,42 @@ li a{
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Fix focus lock issues with floating menu
+    document.addEventListener('DOMContentLoaded', function() {
+      // Prevent focus traps from interfering with custom menus
+      document.addEventListener('keydown', function(e) {
+        // If floating menu is open and Escape is pressed, close it
+        if (e.key === 'Escape') {
+          const floatingMenu = document.getElementById('floatingMenu');
+          if (floatingMenu && floatingMenu.style.display === 'block') {
+            floatingMenu.style.display = 'none';
+            document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      });
+
+      // Prevent Bootstrap modal focus management from affecting floating menu
+      document.addEventListener('focusin', function(e) {
+        const floatingMenu = document.getElementById('floatingMenu');
+        if (floatingMenu && floatingMenu.style.display === 'block') {
+          // Allow focus within floating menu
+          if (floatingMenu.contains(e.target) || e.target.hasAttribute('data-no-focus-trap')) {
+            return;
+          }
+        }
+      });
+
+      // Global fix for focus lock issues  
+      window.addEventListener('beforeunload', function() {
+        // Clear any potential focus locks
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      });
+    });
+
     // Trending Slider Navigation
     function slideTrending(direction) {
       const grid = document.getElementById('trendingGrid');
@@ -6383,37 +6419,92 @@ li a{
     });
 
     function toggleFloatingMenu() {
+      try {
+        const menu = document.getElementById('floatingMenu');
+        const subcategoryArea = document.getElementById('subcategoryArea');
+        
+        if (!menu) {
+          console.error('Floating menu element not found');
+          return;
+        }
+        
+        // Clear any existing focus traps or locks
+        document.activeElement.blur();
+        
+        if (menu.style.display === 'none' || menu.style.display === '') {
+          menu.style.display = 'block';
+          if (subcategoryArea) {
+            subcategoryArea.style.display = 'none';
+          }
+          
+          // Add event listener to close menu when clicking outside
+          setTimeout(() => {
+            document.addEventListener('click', closeFloatingMenuOnOutsideClick);
+          }, 100);
+        } else {
+          menu.style.display = 'none';
+          // Remove event listener
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        }
+      } catch (error) {
+        console.error('Error toggling floating menu:', error);
+        // Fallback: ensure menu is closed and focus is released
+        const menu = document.getElementById('floatingMenu');
+        if (menu) menu.style.display = 'none';
+        document.activeElement.blur();
+      }
+    }
+
+    // Function to close floating menu when clicking outside
+    function closeFloatingMenuOnOutsideClick(event) {
       const menu = document.getElementById('floatingMenu');
-      const subcategoryArea = document.getElementById('subcategoryArea');
-      if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-        subcategoryArea.style.display = 'none';
-      } else {
+      const fabButton = document.getElementById('fabMainBtn');
+      
+      if (menu && !menu.contains(event.target) && !fabButton.contains(event.target)) {
         menu.style.display = 'none';
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
       }
     }
 
     function hideFloatingButton(saveState = true) {
-      const fabContainer = document.getElementById('floatingActionsContainer');
-      const showBtn = document.getElementById('showFabBtn');
-      const floatingMenu = document.getElementById('floatingMenu');
-      
-      // Close popup if open
-      floatingMenu.style.display = 'none';
-      
-      // Hide FAB
-      fabContainer.style.transform = 'translateX(150px)';
-      fabContainer.style.opacity = '0';
-      
-      // Show the show button
-      setTimeout(() => {
-        fabContainer.style.display = 'none';
-        showBtn.style.display = 'flex';
-      }, 300);
-      
-      // Save state to localStorage (mobile only)
-      if (saveState && window.innerWidth <= 768) {
-        localStorage.setItem('fabHidden', 'true');
+      try {
+        const fabContainer = document.getElementById('floatingActionsContainer');
+        const showBtn = document.getElementById('showFabBtn');
+        const floatingMenu = document.getElementById('floatingMenu');
+        
+        // Clear any focus lock
+        document.activeElement.blur();
+        
+        // Close popup if open
+        if (floatingMenu) {
+          floatingMenu.style.display = 'none';
+        }
+        
+        // Remove any event listeners
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
+        if (fabContainer) {
+          // Hide FAB
+          fabContainer.style.transform = 'translateX(150px)';
+          fabContainer.style.opacity = '0';
+          
+          // Show the show button
+          setTimeout(() => {
+            fabContainer.style.display = 'none';
+            if (showBtn) {
+              showBtn.style.display = 'flex';
+            }
+          }, 300);
+        }
+        
+        // Save state to localStorage (mobile only)
+        if (saveState && window.innerWidth <= 768) {
+          localStorage.setItem('fabHidden', 'true');
+        }
+      } catch (error) {
+        console.error('Error hiding floating button:', error);
+        // Ensure focus is released
+        document.activeElement.blur();
       }
     }
 
