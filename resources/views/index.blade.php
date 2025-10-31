@@ -4707,7 +4707,7 @@ li a{
       </button>
       
       <!-- Main FAB Button -->
-      <button class="fab-main" id="fabMainBtn" type="button" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-no-focus-trap="true">
+      <button class="fab-main" id="fabMainBtn" type="button" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" data-no-focus-trap="true">
         <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
       </button>
       
@@ -4715,7 +4715,7 @@ li a{
       <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);" data-no-focus-trap="true">
         <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h6 style="margin:0;font-weight:700;color:#232f3e;font-size:1.1rem;">😊 Browse by Categories 🛍️</h6>
-          <button onclick="toggleFloatingMenu()" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.2)'" onmouseout="this.style.background='rgba(139,69,19,0.1)'" data-no-focus-trap="true">✕</button>
+          <button id="floatingMenuCloseBtn" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" data-no-focus-trap="true">✕</button>
         </div>
         
         <!-- Enhanced Responsive Categories Grid -->
@@ -8441,6 +8441,212 @@ li a{
           }
         });
       }
+    });
+
+    // COMPREHENSIVE FOCUS LOCK PREVENTION SYSTEM
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // Global focus lock prevention
+      let focusLockActive = false;
+      let lastActiveElement = null;
+      
+      // Function to safely blur all elements
+      function emergencyBlurAll() {
+        try {
+          // Blur document active element
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+          
+          // Force blur on all potentially problematic elements
+          document.querySelectorAll('button, input, select, a, [tabindex]').forEach(el => {
+            try {
+              if (el.blur && typeof el.blur === 'function') {
+                el.blur();
+              }
+            } catch (e) {
+              // Ignore individual element errors
+            }
+          });
+          
+          // Reset focus to body
+          document.body.focus();
+          setTimeout(() => {
+            if (document.activeElement !== document.body) {
+              document.body.blur();
+            }
+          }, 50);
+          
+        } catch (error) {
+          console.log('Emergency blur completed with some errors (safe to ignore)');
+        }
+      }
+      
+      // Prevent focus lock on any click
+      document.addEventListener('click', function(e) {
+        // Emergency blur on any click that might cause focus lock
+        setTimeout(() => {
+          if (focusLockActive) {
+            emergencyBlurAll();
+            focusLockActive = false;
+          }
+        }, 100);
+      }, true);
+      
+      // Monitor for focus lock situations
+      document.addEventListener('focusin', function(e) {
+        lastActiveElement = e.target;
+        
+        // Check for potential focus lock
+        setTimeout(() => {
+          if (document.activeElement && 
+              document.activeElement.tagName && 
+              (document.activeElement.tagName.toLowerCase() === 'button' || 
+               document.activeElement.hasAttribute('data-bs-toggle'))) {
+            focusLockActive = true;
+            
+            // Prevent focus lock after a short delay
+            setTimeout(() => {
+              if (focusLockActive && document.activeElement === lastActiveElement) {
+                emergencyBlurAll();
+                focusLockActive = false;
+              }
+            }, 200);
+          }
+        }, 50);
+      });
+      
+      // Enhanced floating menu button handler
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleFloatingMenu();
+          }, 50);
+        });
+        
+        // Add hover effects back
+        fabMainBtn.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.05)';
+        });
+        
+        fabMainBtn.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+      }
+      
+      // Enhanced floating menu close button handler
+      const floatingMenuCloseBtn = document.getElementById('floatingMenuCloseBtn');
+      if (floatingMenuCloseBtn) {
+        floatingMenuCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleFloatingMenu();
+          }, 50);
+        });
+        
+        // Add hover effects
+        floatingMenuCloseBtn.addEventListener('mouseenter', function() {
+          this.style.background = 'rgba(139,69,19,0.2)';
+        });
+        
+        floatingMenuCloseBtn.addEventListener('mouseleave', function() {
+          this.style.background = 'rgba(139,69,19,0.1)';
+        });
+      }
+      
+      // Enhanced mobile category navigation
+      const categoryNav = document.getElementById('categoryNav');
+      if (categoryNav) {
+        categoryNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileCategoryMenu();
+          }, 50);
+        });
+      }
+      
+      // Enhanced mobile profile navigation
+      const profileNav = document.getElementById('profileNav');
+      if (profileNav) {
+        profileNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileProfileMenu();
+          }, 50);
+        });
+      }
+      
+      // Enhanced auth navigation
+      const authNav = document.getElementById('authNav');
+      if (authNav) {
+        authNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileAuthMenu();
+          }, 50);
+        });
+      }
+      
+      // Periodic focus lock detection and cleanup
+      setInterval(() => {
+        if (document.activeElement && 
+            document.activeElement.tagName && 
+            document.activeElement.hasAttribute('data-bs-toggle') &&
+            !document.querySelector('.show')) {
+          // Potential focus lock detected
+          emergencyBlurAll();
+        }
+      }, 1000);
+      
+      // Global escape key handler
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          emergencyBlurAll();
+          
+          // Close all menus
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu && mobileCategoryMenu.classList.contains('show')) {
+            toggleMobileCategoryMenu();
+          }
+          
+          const floatingMenu = document.getElementById('floatingMenu');
+          if (floatingMenu && floatingMenu.style.display === 'block') {
+            toggleFloatingMenu();
+          }
+        }
+      });
+      
+      // Enhanced visibility change handler
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+          // Page became visible again, ensure no focus lock
+          setTimeout(emergencyBlurAll, 100);
+        }
+      });
+      
+      // Window focus handler
+      window.addEventListener('focus', function() {
+        setTimeout(emergencyBlurAll, 100);
+      });
+      
+      console.log('🛡️ Comprehensive Focus Lock Prevention System Activated');
     });
   </script>
 
