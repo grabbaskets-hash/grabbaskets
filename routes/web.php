@@ -435,9 +435,9 @@ Route::get('/home-test', function () {
     }
 })->name('home_old');
 
-// EMERGENCY HOMEPAGE - Using simple view
+// ABSOLUTE EMERGENCY - Raw HTML to bypass all framework issues
 Route::get('/', function () {
-    return view('emergency-home');
+    return response('<html><head><title>GrabBaskets</title><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><nav class="navbar navbar-expand-lg navbar-light bg-white"><div class="container"><a class="navbar-brand" href="/"><strong>🛍️ GrabBaskets</strong></a><div><a href="/login" class="btn btn-outline-primary me-2">Login</a><a href="/register" class="btn btn-primary">Register</a></div></div></nav><div class="container mt-5 text-center"><h1 class="display-4 mb-4">🛍️ Welcome to GrabBaskets</h1><p class="lead">Your one-stop shopping destination</p><div class="row mt-5"><div class="col-md-4 mb-4"><div class="card"><div class="card-body"><h5>🚚 Delivery Partner</h5><a href="/delivery/login" class="btn btn-outline-primary">Login</a> <a href="/delivery/register" class="btn btn-primary">Register</a></div></div></div><div class="col-md-4 mb-4"><div class="card"><div class="card-body"><h5>🍴 Restaurant</h5><a href="/restaurant/login" class="btn btn-outline-success">Login</a> <a href="/restaurant/register" class="btn btn-success">Register</a></div></div></div><div class="col-md-4 mb-4"><div class="card"><div class="card-body"><h5>🛒 Seller</h5><a href="/seller/login" class="btn btn-outline-info">Login</a> <a href="/seller/register" class="btn btn-info">Register</a></div></div></div></div><div class="alert alert-info mt-4"><strong>Notice:</strong> Site under maintenance. Full functionality being restored.</div></div></body></html>');
 })->name('home');
 
 Route::get('/otp/verify-page', function (Request $request) {
