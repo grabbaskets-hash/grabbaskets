@@ -81,7 +81,10 @@ class PaymentController extends Controller
             if (empty($this->razorpayId) || empty($this->razorpayKey)) {
                 Log::error('Razorpay credentials not configured', [
                     'key_present' => !empty($this->razorpayId),
-                    'secret_present' => !empty($this->razorpayKey)
+                    'secret_present' => !empty($this->razorpayKey),
+                    'key_value' => $this->razorpayId ? substr($this->razorpayId, 0, 10) . '...' : 'null',
+                    'config_key' => config('services.razorpay.key') ? 'loaded' : 'null',
+                    'env_key' => env('RAZORPAY_KEY_ID') ? 'set' : 'not set'
                 ]);
                 return response()->json(['error' => 'Payment system not configured. Please contact support.'], 500);
             }
@@ -135,6 +138,7 @@ class PaymentController extends Controller
                 'currency' => 'INR',
                 'name' => config('app.name', 'GrabBaskets'),
                 'description' => 'Payment for order - ' . count($items) . ' items',
+                'key' => $this->razorpayId, // Add Razorpay key to response
                 'prefill' => [
                     'name' => Auth::user()->name,
                     'email' => Auth::user()->email,

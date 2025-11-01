@@ -2385,9 +2385,9 @@
           return;
         }
 
-        // Validate Razorpay key
-        const razorpayKey = '{{ config("services.razorpay.key") }}';
-        if (!razorpayKey) {
+        // Get Razorpay key from API response (more reliable than config)
+        const razorpayKey = data.key || '{{ config("services.razorpay.key") }}';
+        if (!razorpayKey || razorpayKey === '') {
           console.error('Razorpay key not configured');
           alert('Payment system not configured. Please contact support.');
           placeOrderBtn.disabled = false;
@@ -2396,7 +2396,7 @@
         }
 
         console.log('Initializing Razorpay with:', {
-          key: razorpayKey,
+          key: razorpayKey.substring(0, 15) + '...', // Log partial key for security
           amount: data.amount,
           order_id: data.order_id
         });
