@@ -37,6 +37,7 @@ class DashboardController extends Controller
                 'total_earnings' => 0,
                 'this_month_earnings' => 0,
                 'today_earnings' => 0,
+                'pending_orders' => 0,
                 'pending_requests' => 0,
                 'today_deliveries' => 0,
                 'week_deliveries' => 0,
@@ -65,7 +66,7 @@ class DashboardController extends Controller
                 $notifications = [];
             }
 
-            return view('delivery-partner.dashboard', compact(
+            return view('delivery-partner.dashboard.index', compact(
                 'partner',
                 'stats', 
                 'recentOrders',
@@ -115,6 +116,7 @@ class DashboardController extends Controller
             'total_earnings' => $wallet ? $wallet->balance : 0,
             'this_month_earnings' => $wallet ? $wallet->this_month_earnings : 0,
             'today_earnings' => $wallet ? $wallet->today_earnings : 0,
+            'pending_orders' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->active()->count(),
             'pending_requests' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->active()->count(),
             'today_deliveries' => $todayRequests,
             'week_deliveries' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
