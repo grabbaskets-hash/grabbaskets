@@ -4,8 +4,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'grabbasket') }}</title>
+        <meta name="description" content="SHOP GROCERIES ,FASHION AND FOOD DELIVERY  WITH 10-MINUTES DELIVERY FROM GRABBASKETS SERVING THENI ,DINDIGUL,MADURAI,CHENNAI AND ACROSS TAMILNADU ">
+        <meta name="keywords" content="grocery, fashion, food delivery, 10-minutes delivery, GrabBaskets, Tamil Nadu">
+        <meta name="robots"content="index,follow">
+        <title>GRABBASKETS- TAMIL NADU'S SMART SHOPPING PLATFORM{{ config('app.name', 'grabbasket') }}</title>
+        <link rel="canonical" href="https://grabBaskets.com/">
         <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbasket.jpg') }}">
 
         <!-- Fonts -->
