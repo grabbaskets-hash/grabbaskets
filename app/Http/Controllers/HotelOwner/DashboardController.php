@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:hotel_owner');
-    }
-
     public function index()
     {
         try {

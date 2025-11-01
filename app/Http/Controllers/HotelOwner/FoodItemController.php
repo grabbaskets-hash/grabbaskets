@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class FoodItemController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:hotel_owner');
-    }
-
     /**
      * Display a listing of the resource.
      */
