@@ -852,9 +852,11 @@
                 </div>
 
                 <!-- Pagination -->
+                @if(method_exists($products, 'links'))
                 <div class="mt-4">
                     {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
+                @endif
             </div>
         </div>
     </div>
