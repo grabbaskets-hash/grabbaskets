@@ -64,18 +64,18 @@
   <!-- Structured Data - Organization -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "Organization",
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
     "name": "GrabBaskets",
     "url": "{{ config('app.url') }}",
     "logo": "{{ asset('asset/images/logo-image.png') }}",
     "description": "Online grocery shopping and quick delivery service in India offering fresh fruits, vegetables, and daily essentials with 10-minute express delivery",
     "address": {
-      "@type": "PostalAddress",
+      "@@type": "PostalAddress",
       "addressCountry": "IN"
     },
     "contactPoint": {
-      "@type": "ContactPoint",
+      "@@type": "ContactPoint",
       "contactType": "Customer Service",
       "areaServed": "IN",
       "availableLanguage": ["English", "Hindi"]
@@ -86,12 +86,12 @@
   <!-- Structured Data - WebSite -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
     "name": "GrabBaskets",
     "url": "{{ config('app.url') }}",
     "potentialAction": {
-      "@type": "SearchAction",
+      "@@type": "SearchAction",
       "target": "{{ config('app.url') }}/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
@@ -5299,7 +5299,6 @@ li a{
             </div>
             @empty
             <div class="text-muted">No free delivery picks right now.</div>
-            @endempty
             @endforelse
           </div>
           <button class="nav-btn nav-next" id="freeNextBtn" style="touch-action:manipulation;"><i class="bi bi-chevron-right"></i></button>
