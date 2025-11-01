@@ -228,6 +228,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     // Orders (user & seller)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/track', [OrderController::class, 'track'])->name('orders.track');
+    Route::get('/orders/live-track', [OrderController::class, 'liveTrack'])->name('orders.liveTrack');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/seller/orders', [OrderController::class, 'sellerOrders'])->name('seller.orders');

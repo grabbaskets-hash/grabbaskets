@@ -391,4 +391,51 @@ Grabbasket Team
             'eta_minutes' => $order->fresh()->eta_minutes
         ]);
     }
+
+    /**
+     * Show live tracking page with Google Maps
+     */
+    public function liveTrack()
+    {
+        $orders = Order::with(['product', 'sellerUser', 'deliveryPartner'])
+            ->where('buyer_id', Auth::id())
+            ->whereIn('status', ['paid', 'confirmed', 'shipped'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('orders.live-track', compact('orders'));
+    }
+
+    /**
+     * Get real-time location data for order (API endpoint)
+     */
+    public function getLocation($id)
+    {
+        $order = Order::with('deliveryPartner')->findOrFail($id);
+
+        // Verify user owns this order
+        if ($order->buyer_id !== Auth::id()) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
+        $data = [
+            'success' => true,
+            'status' => $order->status,
+            'delivery_lat' => null,
+            'delivery_lng' => null,
+        ];
+
+        // If delivery partner is assigned, get their current location
+        if ($order->deliveryPartner) {
+            $data['delivery_lat'] = $order->deliveryPartner->latitude;
+            $data['delivery_lng'] = $order->deliveryPartner->longitude;
+            $data['delivery_partner'] = [
+                'name' => $order->deliveryPartner->name,
+                'phone' => $order->deliveryPartner->phone,
+            ];
+        }
+
+        return response()->json($data);
+    }
 }
+

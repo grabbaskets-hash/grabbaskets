@@ -108,6 +108,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::post('/', [\App\Http\Controllers\Api\OrderController::class, 'store']);
         Route::get('{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
         Route::get('{id}/track', [\App\Http\Controllers\Api\OrderController::class, 'track']);
+        Route::get('{id}/location', [\App\Http\Controllers\Api\OrderController::class, 'getLocation']);
         Route::post('{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
     });
 
