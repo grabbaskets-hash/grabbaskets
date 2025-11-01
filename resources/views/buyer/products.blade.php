@@ -383,6 +383,7 @@
       <div class="collapse navbar-collapse" id="navbarContent">
 
         <ul class="navbar-nav ms-auto align-items-lg-center">
+          @auth
           <li class="nav-item d-none d-lg-block me-2">
             <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
           </li>
@@ -404,6 +405,13 @@
               @csrf
             </form>
           </li>
+          @else
+          <li class="nav-item">
+            <a href="{{ route('login') }}" class="btn btn-outline-warning btn-sm">
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+          </li>
+          @endauth
         </ul>
       </div>
     </div>
