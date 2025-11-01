@@ -62,11 +62,7 @@ class HomeController extends Controller
                 'secondary_color' => '#FFD700',
             ];
 
-            // Temporarily use maintenance page while we fix the view syntax error
-            // TODO: Remove this after fixing index.blade.php
-            return view('index-maintenance');
-            
-            /* return view('index', [
+            return view('index', [
                 'categories' => $categories,
                 'products' => $products,
                 'trending' => $trending,
@@ -75,7 +71,7 @@ class HomeController extends Controller
                 'categoryProducts' => [],
                 'banners' => $banners,
                 'settings' => $settings
-            ]); */
+            ]);
             
         } catch (\PDOException $e) {
             // Database connection error
