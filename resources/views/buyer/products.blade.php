@@ -479,23 +479,24 @@
                 @endif
 
                 <!-- Gender-Based Product Suggestions -->
+                @auth
                 @php
                 $user = Auth::user();
                 $suggested = collect();
                 if ($user && isset($user->sex)) {
-                $sex = strtolower($user->sex);
-                $suggested = $products->filter(function($prod) use ($sex) {
-                $cat = strtolower(optional($prod->category)->name ?? '');
-                if ($sex === 'female') {
-                return str_contains($cat, 'women') || str_contains($cat, 'beauty') || str_contains($cat, 'fashion');
-                } elseif ($sex === 'male') {
-                return str_contains($cat, 'men') || str_contains($cat, 'electronics') || str_contains($cat, 'sports');
-                }
-                return true;
-                })->take(6);
+                    $sex = strtolower($user->sex);
+                    $suggested = $products->filter(function($prod) use ($sex) {
+                        $cat = strtolower(optional($prod->category)->name ?? '');
+                        if ($sex === 'female') {
+                            return str_contains($cat, 'women') || str_contains($cat, 'beauty') || str_contains($cat, 'fashion');
+                        } elseif ($sex === 'male') {
+                            return str_contains($cat, 'men') || str_contains($cat, 'electronics') || str_contains($cat, 'sports');
+                        }
+                        return true;
+                    })->take(6);
                 }
                 @endphp
-                @if($user && $suggested->count())
+                @if($suggested->count() > 0)
                 <div class="mb-4">
                     <h4 class="fw-bold mb-3 text-primary"><i class="bi bi-stars"></i> Recommended for You</h4>
                     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-3 g-3">
@@ -572,6 +573,7 @@
                     </div>
                 </div>
                 @endif
+                @endauth
 
                 <!-- Store Cards (if any stores match the search) -->
                 @if(isset($matchedStores) && $matchedStores->isNotEmpty())
@@ -746,6 +748,7 @@
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                         <div class="card h-100 position-relative" style="border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                             <!-- Wishlist Heart Button -->
+                            @auth
                             <form method="POST" action="{{ route('wishlist.toggle') }}" class="position-absolute top-0 end-0 m-2" style="z-index:10;">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -753,6 +756,7 @@
                                     <i class="bi bi-heart{{ $product->isWishlistedBy(auth()->user()) ? '-fill text-danger' : '' }} fs-5"></i>
                                 </button>
                             </form>
+                            @endauth
 
                             <!-- Product Image -->
                             <div style="position: relative; overflow: hidden; height: 250px;">
