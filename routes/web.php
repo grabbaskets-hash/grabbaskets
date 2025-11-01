@@ -17,6 +17,7 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
@@ -1685,3 +1686,6 @@ Route::get('/test-password-reset-simple', function () {
         return "Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
     }
 });
+
+// SEO Routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

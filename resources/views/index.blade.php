@@ -2,13 +2,101 @@
 <html lang="en">
 
 <head>
+  <!-- Primary Meta Tags -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>grabbaskets - Home</title>
+  
+  <!-- SEO Meta Tags -->
+  <title>GrabBaskets - Online Grocery Shopping & 10-Minute Express Delivery in India</title>
+  <meta name="description" content="Shop groceries, fresh fruits, vegetables & daily essentials online at GrabBaskets. Get express delivery in 10 minutes. Fresh products, best prices. Free delivery on orders above ₹199. Order now!">
+  <meta name="keywords" content="online grocery shopping, quick delivery, grocery delivery, fresh vegetables online, fruits delivery, daily essentials, 10 minute delivery, GrabBaskets, grocery shopping India, buy groceries online">
+  <meta name="author" content="GrabBaskets">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="{{ config('app.url') }}">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ config('app.url') }}">
+  <meta property="og:title" content="GrabBaskets - Online Grocery Shopping & 10-Minute Express Delivery">
+  <meta property="og:description" content="Shop groceries online with express delivery in 10 minutes. Fresh products, best prices, free delivery on orders above ₹199.">
+  <meta property="og:image" content="{{ asset('asset/images/logo-image.png') }}">
+  <meta property="og:site_name" content="GrabBaskets">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="{{ config('app.url') }}">
+  <meta name="twitter:title" content="GrabBaskets - Online Grocery Shopping & Express Delivery">
+  <meta name="twitter:description" content="Shop groceries online with 10-minute express delivery. Fresh products, best prices.">
+  <meta name="twitter:image" content="{{ asset('asset/images/logo-image.png') }}">
+  
+  <!-- Mobile App Meta -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GrabBaskets">
+  <meta name="theme-color" content="#0C831F">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- Geo Meta Tags -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  
+  <!-- Favicon & Icons -->
   <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  <link rel="apple-touch-icon" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  <link rel="shortcut icon" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://maps.googleapis.com">
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com">
+  
+  <!-- Stylesheets -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Structured Data - Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "GrabBaskets",
+    "url": "{{ config('app.url') }}",
+    "logo": "{{ asset('asset/images/logo-image.png') }}",
+    "description": "Online grocery shopping and quick delivery service in India offering fresh fruits, vegetables, and daily essentials with 10-minute express delivery",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IN"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Service",
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi"]
+    }
+  }
+  </script>
+  
+  <!-- Structured Data - WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "GrabBaskets",
+    "url": "{{ config('app.url') }}",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ config('app.url') }}/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 
   @if(isset($database_error))
   <script>
@@ -4009,7 +4097,8 @@ li a{
         <!-- Delivery Location (Desktop) -->
         <div class="desktop-only" 
              id="locationDisplay"
-             style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px; transition: all 0.2s; touch-action: manipulation;">
+             onclick="openLocationModal()"
+             style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; cursor: pointer; min-width: 150px; transition: all 0.2s;">
           <i class="bi bi-geo-alt-fill" style="color: var(--primary-color);"></i>
           <div style="line-height: 1.2;">
             <div style="font-size: 0.75rem; color: var(--text-light);" id="locationLabel">Delivery in 10 mins</div>
@@ -5049,7 +5138,7 @@ li a{
 
                 <!-- Add to Cart Button -->
                 @auth
-                  <button class="add-to-cart-modern flash-add-to-cart" data-product-id="{{ $product->id }}" style="touch-action: manipulation;">
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-{{ $product->id }}').submit();">
                     <i class="bi bi-cart-plus"></i>
                     Add to Cart
                   </button>
@@ -5059,7 +5148,7 @@ li a{
                     <input type="hidden" name="quantity" value="1">
                   </form>
                 @else
-                  <button class="add-to-cart-modern flash-login-redirect" style="touch-action: manipulation;">
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Login to Buy
                   </button>
@@ -5129,7 +5218,7 @@ li a{
 
                 <!-- Add to Cart Button -->
                 @auth
-                  <button class="add-to-cart-modern trend-add-to-cart" data-product-id="{{ $product->id }}" style="touch-action: manipulation;">
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); document.getElementById('quick-add-trend-{{ $product->id }}').submit();">
                     <i class="bi bi-cart-plus"></i>
                     Add to Cart
                   </button>
@@ -5139,7 +5228,7 @@ li a{
                     <input type="hidden" name="quantity" value="1">
                   </form>
                 @else
-                  <button class="add-to-cart-modern trend-login-redirect" style="touch-action: manipulation;">
+                  <button class="add-to-cart-modern" onclick="event.stopPropagation(); window.location.href='{{ route('login') }}';">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Login to Buy
                   </button>
@@ -8242,8 +8331,15 @@ li a{
 
     // Detect current location (manual)
     function detectCurrentLocation() {
+      // Check if browser supports geolocation
       if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser');
+        alert('❌ Geolocation is not supported by your browser. Please use a modern browser like Chrome, Firefox, or Safari.');
+        return;
+      }
+
+      // Check if site is running on HTTPS (required for geolocation)
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        alert('⚠️ Location services require a secure connection (HTTPS). Please use https://grabbaskets.com');
         return;
       }
 
@@ -8252,13 +8348,32 @@ li a{
       document.getElementById('locationLoading').style.display = 'block';
       document.getElementById('currentLocationDisplay').classList.remove('active');
 
+      // Check for permission state (if supported)
+      if (navigator.permissions) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+          console.log('📍 Geolocation permission:', result.state);
+          
+          if (result.state === 'denied') {
+            document.getElementById('locationLoading').style.display = 'none';
+            document.getElementById('detectButtonText').textContent = 'Detect My Location';
+            alert('❌ Location access is blocked. Please enable location access in your browser settings:\n\n' +
+                  '1. Click the lock icon 🔒 in the address bar\n' +
+                  '2. Find "Location" permission\n' +
+                  '3. Change it to "Allow"\n' +
+                  '4. Refresh the page');
+            return;
+          }
+        });
+      }
+
+      // Request geolocation with improved options
       navigator.geolocation.getCurrentPosition(
         function(position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const accuracy = position.coords.accuracy;
 
-          console.log('📍 Location detected:', lat, lng, 'Accuracy:', accuracy + 'm');
+          console.log('✅ Location detected:', lat, lng, 'Accuracy:', accuracy + 'm');
 
           // Reverse geocode to get address
           reverseGeocode(lat, lng, function(address) {
@@ -8293,22 +8408,42 @@ li a{
           document.getElementById('locationLoading').style.display = 'none';
           document.getElementById('detectButtonText').textContent = 'Detect My Location';
           
-          let errorMessage = 'Unable to detect location. ';
+          let errorMessage = '❌ Unable to detect location.\n\n';
+          let solution = '';
+          
           switch(error.code) {
             case error.PERMISSION_DENIED:
-              errorMessage += 'Please allow location access in your browser settings.';
+              errorMessage += '🚫 Location access was denied.';
+              solution = '\n\n✅ How to fix:\n' +
+                        '1. Click the location icon 📍 or lock icon 🔒 in your browser address bar\n' +
+                        '2. Allow location access for this website\n' +
+                        '3. Refresh the page and try again\n\n' +
+                        'Or enter your location manually using the search box below.';
               break;
             case error.POSITION_UNAVAILABLE:
-              errorMessage += 'Location information is unavailable.';
+              errorMessage += '📍 Location information is currently unavailable.';
+              solution = '\n\n✅ Please check:\n' +
+                        '• Your device location services are enabled\n' +
+                        '• You have a stable internet connection\n' +
+                        '• Try entering your location manually';
               break;
             case error.TIMEOUT:
-              errorMessage += 'Location request timed out.';
+              errorMessage += '⏱️ Location request timed out.';
+              solution = '\n\n✅ Please:\n' +
+                        '• Check your internet connection\n' +
+                        '• Try again in a moment\n' +
+                        '• Or enter your location manually';
               break;
             default:
-              errorMessage += 'An unknown error occurred.';
+              errorMessage += '⚠️ An unknown error occurred.';
+              solution = '\n\n✅ Please try:\n' +
+                        '• Refreshing the page\n' +
+                        '• Using a different browser\n' +
+                        '• Entering your location manually';
           }
-          alert(errorMessage);
-          console.error('Geolocation error:', error);
+          
+          alert(errorMessage + solution);
+          console.error('Geolocation error:', error.code, error.message);
         },
         { 
           enableHighAccuracy: true, 
@@ -9005,91 +9140,6 @@ li a{
       }
       
       console.log('📱 Mobile Button Event Listeners Activated');
-      
-      // Desktop location display
-      const locationDisplay = document.getElementById('locationDisplay');
-      if (locationDisplay) {
-        locationDisplay.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          openLocationModal();
-        });
-        locationDisplay.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          openLocationModal();
-        });
-      }
-      
-      // Flash sale add to cart buttons
-      const flashAddToCartBtns = document.querySelectorAll('.flash-add-to-cart');
-      flashAddToCartBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const productId = this.getAttribute('data-product-id');
-          const form = document.getElementById('quick-add-' + productId);
-          if (form) form.submit();
-        });
-        btn.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const productId = this.getAttribute('data-product-id');
-          const form = document.getElementById('quick-add-' + productId);
-          if (form) form.submit();
-        });
-      });
-      
-      // Flash sale login redirect buttons
-      const flashLoginRedirectBtns = document.querySelectorAll('.flash-login-redirect');
-      flashLoginRedirectBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          window.location.href = '/login';
-        });
-        btn.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          window.location.href = '/login';
-        });
-      });
-      
-      // Trending products add to cart buttons
-      const trendAddToCartBtns = document.querySelectorAll('.trend-add-to-cart');
-      trendAddToCartBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const productId = this.getAttribute('data-product-id');
-          const form = document.getElementById('quick-add-trend-' + productId);
-          if (form) form.submit();
-        });
-        btn.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const productId = this.getAttribute('data-product-id');
-          const form = document.getElementById('quick-add-trend-' + productId);
-          if (form) form.submit();
-        });
-      });
-      
-      // Trending products login redirect buttons
-      const trendLoginRedirectBtns = document.querySelectorAll('.trend-login-redirect');
-      trendLoginRedirectBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          window.location.href = '/login';
-        });
-        btn.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          window.location.href = '/login';
-        });
-      });
-      
-      console.log('🛒 Product Action Button Event Listeners Activated');
     });
   </script>
 
