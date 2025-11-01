@@ -9139,7 +9139,93 @@ li a{
         });
       }
       
-      console.log('📱 Mobile Button Event Listeners Activated');
+      // Mobile Bottom Navigation Handlers
+      const categoryNav = document.getElementById('categoryNav');
+      if (categoryNav) {
+        categoryNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+        categoryNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+      }
+      
+      const profileNav = document.getElementById('profileNav');
+      if (profileNav) {
+        profileNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '{{ route("buyer.dashboard") }}';
+        });
+        profileNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '{{ route("buyer.dashboard") }}';
+        });
+      }
+      
+      const authNav = document.getElementById('authNav');
+      if (authNav) {
+        authNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileLoginCard = document.getElementById('mobileLoginCard');
+          if (mobileLoginCard) {
+            mobileLoginCard.style.display = 'block';
+            setTimeout(() => {
+              mobileLoginCard.classList.add('show');
+            }, 10);
+          }
+        });
+        authNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileLoginCard = document.getElementById('mobileLoginCard');
+          if (mobileLoginCard) {
+            mobileLoginCard.style.display = 'block';
+            setTimeout(() => {
+              mobileLoginCard.classList.add('show');
+            }, 10);
+          }
+        });
+      }
+      
+      // Category close button
+      const categoryCloseBtn = document.getElementById('categoryCloseBtn');
+      if (categoryCloseBtn) {
+        categoryCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+        categoryCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+      
+      console.log('📱 Mobile Bottom Navigation & Button Event Listeners Activated');
     });
   </script>
 
