@@ -77,7 +77,17 @@ Route::post('/admin/products/{product}/update-seller', function (Request $reques
 |--------------------------------------------------------------------------
 */
 
-// DIAGNOSTIC ROUTE - Access /test-index-debug to check all components
+// DIAGNOSTIC ROUTES - For production troubleshooting
+Route::get('/health-check', function () {
+    return response()->json([
+        'status' => 'OK',
+        'timestamp' => now()->toDateTimeString(),
+        'app' => 'GrabBaskets',
+        'env' => config('app.env'),
+        'debug' => config('app.debug')
+    ], 200);
+});
+
 Route::get('/test-index-debug', function () {
     try {
         $diagnostics = [];
@@ -117,7 +127,12 @@ Route::get('/test-index-debug', function () {
             $diagnostics['database'] = 'ERROR: ' . $e->getMessage();
         }
         
-        // Test 6: Try to load the actual index route logic
+        // Test 6: Storage permissions
+        $diagnostics['storage_writable'] = is_writable(storage_path('logs')) ? 'YES' : 'NO';
+        $diagnostics['cache_writable'] = is_writable(storage_path('framework/cache')) ? 'YES' : 'NO';
+        $diagnostics['views_writable'] = is_writable(storage_path('framework/views')) ? 'YES' : 'NO';
+        
+        // Test 7: Try to load the actual index route logic
         try {
             $banners = \App\Models\Banner::active()->byPosition('hero')->get();
             $categories = \App\Models\Category::with('subcategories')->get();
@@ -126,12 +141,18 @@ Route::get('/test-index-debug', function () {
             $diagnostics['index_route_logic'] = 'ERROR: ' . $e->getMessage();
         }
         
+        // Test 8: Check config cache
+        $diagnostics['config_cached'] = file_exists(base_path('bootstrap/cache/config.php')) ? 'YES' : 'NO';
+        $diagnostics['routes_cached'] = file_exists(base_path('bootstrap/cache/routes-v7.php')) ? 'YES' : 'NO';
+        
         return response()->json([
             'status' => 'Index Page Diagnostics',
             'timestamp' => now()->toDateTimeString(),
             'tests' => $diagnostics,
+            'php_version' => phpversion(),
+            'laravel_version' => app()->version(),
             'message' => 'All tests completed. Check results above.',
-            'next_step' => 'If all tests pass, the issue might be in the view rendering. Try accessing /?simple for basic test.'
+            'next_step' => 'If all tests pass, the issue might be in the view rendering. Clear caches or check permissions.'
         ], 200);
         
     } catch (\Exception $e) {
@@ -139,7 +160,8 @@ Route::get('/test-index-debug', function () {
             'error' => 'Diagnostic failed',
             'message' => $e->getMessage(),
             'file' => $e->getFile(),
-            'line' => $e->getLine()
+            'line' => $e->getLine(),
+            'trace' => explode("\n", $e->getTraceAsString())
         ], 500);
     }
 });

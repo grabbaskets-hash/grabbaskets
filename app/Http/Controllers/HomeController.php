@@ -7,17 +7,49 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
     public function index()
     {
         try {
-            // Load basic data with error handling
-            $categories = Category::with('subcategories')->limit(20)->get();
-            $products = Product::with('category')->limit(12)->get();
-            $trending = Product::limit(8)->get();
-            $banners = Banner::active()->byPosition('hero')->get();
+            // Test database connection first
+            DB::connection()->getPdo();
+            
+            // Load basic data with error handling and fallbacks
+            $categories = collect([]);
+            $products = collect([]);
+            $trending = collect([]);
+            $banners = collect([]);
+            
+            try {
+                $categories = Category::with('subcategories')->limit(20)->get();
+            } catch (\Exception $e) {
+                Log::warning('Categories load failed: ' . $e->getMessage());
+            }
+            
+            try {
+                $products = Product::with('category')->limit(12)->get();
+            } catch (\Exception $e) {
+                Log::warning('Products load failed: ' . $e->getMessage());
+            }
+            
+            try {
+                $trending = Product::orderBy('created_at', 'desc')->limit(8)->get();
+            } catch (\Exception $e) {
+                Log::warning('Trending products load failed: ' . $e->getMessage());
+            }
+            
+            try {
+                $banners = Banner::where('is_active', true)
+                    ->where('position', 'hero')
+                    ->orderBy('display_order')
+                    ->get();
+            } catch (\Exception $e) {
+                Log::warning('Banners load failed: ' . $e->getMessage());
+            }
             
             // Default settings
             $settings = [
@@ -40,9 +72,28 @@ class HomeController extends Controller
                 'banners' => $banners,
                 'settings' => $settings
             ]);
-        } catch (\Exception $e) {
-            // Log the error
-            Log::error('Homepage error: ' . $e->getMessage());
+            
+        } catch (\PDOException $e) {
+            // Database connection error
+            Log::error('Database connection error on homepage: ' . $e->getMessage());
+            
+            if (config('app.debug')) {
+                return response()->json([
+                    'error' => 'Database connection failed',
+                    'message' => $e->getMessage(),
+                    'hint' => 'Check database credentials in .env file'
+                ], 500);
+            }
+            
+            return response()->view('errors.500', [], 500);
+            
+        } catch (\Throwable $e) {
+            // Any other error
+            Log::error('Homepage error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             // Return error response for debugging
             if (config('app.debug')) {
@@ -51,25 +102,31 @@ class HomeController extends Controller
                     'message' => $e->getMessage(),
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
+                    'trace' => explode("\n", $e->getTraceAsString())
                 ], 500);
             }
             
-            // Return minimal fallback page
-            return view('index', [
-                'categories' => collect([]),
-                'products' => collect([]),
-                'trending' => collect([]),
-                'lookbookProduct' => null,
-                'blogProducts' => collect([]),
-                'categoryProducts' => [],
-                'banners' => collect([]),
-                'settings' => [
-                    'hero_title' => 'Welcome to GrabBaskets',
-                    'hero_subtitle' => 'Temporarily unavailable',
-                    'theme_color' => '#FF6B00',
-                ],
-                'database_error' => 'Service temporarily unavailable'
-            ]);
+            // Try to return minimal fallback page
+            try {
+                return view('index', [
+                    'categories' => collect([]),
+                    'products' => collect([]),
+                    'trending' => collect([]),
+                    'lookbookProduct' => null,
+                    'blogProducts' => collect([]),
+                    'categoryProducts' => [],
+                    'banners' => collect([]),
+                    'settings' => [
+                        'hero_title' => 'Welcome to GrabBaskets',
+                        'hero_subtitle' => 'Temporarily unavailable',
+                        'theme_color' => '#FF6B00',
+                    ],
+                    'database_error' => 'Service temporarily unavailable'
+                ]);
+            } catch (\Exception $viewException) {
+                // If even the view fails, return a simple HTML response
+                return response('<html><body><h1>GrabBaskets</h1><p>We are experiencing technical difficulties. Please try again shortly.</p></body></html>', 500);
+            }
         }
     }
 }
