@@ -164,36 +164,64 @@ class PaymentController extends Controller
 
     public function verifyPayment(Request $request)
     {
-        // Stock validation before payment processing
-        $checkoutData = session('checkout_data');
-        if (!$checkoutData) {
-            return response()->json(['error' => 'Checkout session expired'], 400);
-        }
-        foreach ($checkoutData['items'] as $itemData) {
-            $item = (object) $itemData;
-            $product = Product::find($item->product_id);
-            $qty = $item->quantity ?? 1;
-            if (!$product || $product->stock < $qty) {
-                $productName = $product ? $product->name : 'Unknown';
-                return response()->json([
-                    'error' => "Product '{$productName}' is out of stock or does not have enough quantity. Please update your cart."
-                ], 400);
-            }
-        }
-        $request->validate([
-            'razorpay_payment_id' => 'required',
-            'razorpay_order_id' => 'required',
-            'razorpay_signature' => 'required',
-        ]);
-
-        $api = new Api($this->razorpayId, $this->razorpayKey);
-
         try {
+            // Check if user is authenticated
+            if (!Auth::check()) {
+                Log::warning('Unauthenticated payment verification attempt');
+                return response()->json(['error' => 'Please login to continue'], 401);
+            }
+
+            // Get checkout data from session
             $checkoutData = session('checkout_data');
             
             if (!$checkoutData) {
-                return response()->json(['error' => 'Checkout session expired'], 400);
+                Log::warning('Checkout session expired or missing', [
+                    'user_id' => Auth::id(),
+                    'session_id' => session()->getId(),
+                    'has_session' => session()->has('checkout_data')
+                ]);
+                return response()->json([
+                    'error' => 'Your checkout session has expired. Please go back to your cart and try again.',
+                    'redirect' => route('cart.index')
+                ], 400);
             }
+
+            // Validate required session data
+            if (!isset($checkoutData['items']) || empty($checkoutData['items'])) {
+                Log::error('Checkout data missing items', ['user_id' => Auth::id()]);
+                return response()->json([
+                    'error' => 'Cart items missing. Please try again.',
+                    'redirect' => route('cart.index')
+                ], 400);
+            }
+
+            // Validate payment input
+            $request->validate([
+                'razorpay_payment_id' => 'required',
+                'razorpay_order_id' => 'required',
+                'razorpay_signature' => 'required',
+            ]);
+
+            // Stock validation before payment processing
+            foreach ($checkoutData['items'] as $itemData) {
+                $item = (object) $itemData;
+                $product = Product::find($item->product_id);
+                $qty = $item->quantity ?? 1;
+                
+                if (!$product) {
+                    return response()->json([
+                        'error' => "Product no longer available. Please update your cart."
+                    ], 400);
+                }
+                
+                if ($product->stock < $qty) {
+                    return response()->json([
+                        'error' => "Product '{$product->name}' is out of stock. Please update your cart."
+                    ], 400);
+                }
+            }
+
+            $api = new Api($this->razorpayId, $this->razorpayKey);
 
             // Verify payment signature
             $attributes = [
@@ -202,7 +230,15 @@ class PaymentController extends Controller
                 'razorpay_signature' => $request->razorpay_signature
             ];
 
+            Log::info('Verifying payment signature', [
+                'user_id' => Auth::id(),
+                'order_id' => $request->razorpay_order_id,
+                'payment_id' => $request->razorpay_payment_id
+            ]);
+
             $api->utility->verifyPaymentSignature($attributes);
+
+            Log::info('Payment signature verified successfully', ['user_id' => Auth::id()]);
 
             // Payment verified, create orders
             $orders = [];
@@ -274,14 +310,37 @@ class PaymentController extends Controller
             CartItem::where('user_id', Auth::id())->delete();
             session()->forget('checkout_data');
 
+            Log::info('Orders created successfully', [
+                'user_id' => Auth::id(),
+                'order_count' => count($orders),
+                'payment_id' => $request->razorpay_payment_id
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Payment successful! Your orders have been placed.',
                 'redirect' => route('orders.track')
             ]);
 
+        } catch (\Razorpay\Api\Errors\SignatureVerificationError $e) {
+            Log::error('Payment signature verification failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'payment_id' => $request->razorpay_payment_id ?? 'N/A'
+            ]);
+            return response()->json([
+                'error' => 'Payment verification failed. Your payment may not have been processed correctly. Please contact support with your payment details.'
+            ], 400);
+            
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Payment verification failed: ' . $e->getMessage()], 400);
+            Log::error('Payment verification error', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'error' => 'An error occurred while processing your payment. Please contact support.'
+            ], 500);
         }
     }
 
