@@ -1097,16 +1097,43 @@
 <body>
   <x-back-button />
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-light bg-white shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-dark" href="/">
-        <span class="material-icons align-middle text-warning">storefront</span> GrabBaskets
+ 
+      <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+        <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
       </a>
-      <div class="d-flex gap-2">
-        <a href="/cart" class="btn btn-outline-dark d-flex align-items-center gap-1">
-          <span class="material-icons">shopping_cart</span> Cart
-        </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item d-none d-lg-block me-2">
+            <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="/cart"
+              aria-expanded="false">
+              <i class="bi bi-person-circle"></i> Cart
+            </a>
+
+          </li>
+
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
+              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
