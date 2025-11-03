@@ -359,6 +359,47 @@
             .step:not(:last-child)::after {
                 width: 25px;
             }
+            
+            /* Enhanced mobile touch styles */
+            .form-control {
+                min-height: 48px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                touch-action: manipulation;
+            }
+            
+            .btn {
+                min-height: 48px;
+                touch-action: manipulation;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+            
+            .form-check-input {
+                width: 1.5rem;
+                height: 1.5rem;
+                touch-action: manipulation;
+            }
+            
+            .form-check-label {
+                touch-action: manipulation;
+                padding-left: 0.5rem;
+            }
+            
+            .input-group-text, 
+            .input-group .btn {
+                min-height: 48px;
+                touch-action: manipulation;
+            }
+            
+            a, button {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
         }
 
         /* Loading spinner */

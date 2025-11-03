@@ -2,13 +2,101 @@
 <html lang="en">
 
 <head>
+  <!-- Primary Meta Tags -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>grabbaskets - Home</title>
+  
+  <!-- SEO Meta Tags -->
+  <title>GrabBaskets - Online Grocery Shopping & 10-Minute Express Delivery in India</title>
+  <meta name="description" content="Shop groceries, fresh fruits, vegetables & daily essentials online at GrabBaskets. Get express delivery in 10 minutes. Fresh products, best prices. Free delivery on orders above ₹199. Order now!">
+  <meta name="keywords" content="online grocery shopping, quick delivery, grocery delivery, fresh vegetables online, fruits delivery, daily essentials, 10 minute delivery, GrabBaskets, grocery shopping India, buy groceries online">
+  <meta name="author" content="GrabBaskets">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="{{ config('app.url') }}">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ config('app.url') }}">
+  <meta property="og:title" content="GrabBaskets - Online Grocery Shopping & 10-Minute Express Delivery">
+  <meta property="og:description" content="Shop groceries online with express delivery in 10 minutes. Fresh products, best prices, free delivery on orders above ₹199.">
+  <meta property="og:image" content="{{ asset('asset/images/logo-image.png') }}">
+  <meta property="og:site_name" content="GrabBaskets">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="{{ config('app.url') }}">
+  <meta name="twitter:title" content="GrabBaskets - Online Grocery Shopping & Express Delivery">
+  <meta name="twitter:description" content="Shop groceries online with 10-minute express delivery. Fresh products, best prices.">
+  <meta name="twitter:image" content="{{ asset('asset/images/logo-image.png') }}">
+  
+  <!-- Mobile App Meta -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GrabBaskets">
+  <meta name="theme-color" content="#0C831F">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- Geo Meta Tags -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  
+  <!-- Favicon & Icons -->
   <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  <link rel="apple-touch-icon" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  <link rel="shortcut icon" href="{{ asset('asset/images/grabbaskets.jpg') }}">
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://maps.googleapis.com">
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com">
+  
+  <!-- Stylesheets -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Structured Data - Organization -->
+  <script type="application/ld+json">
+  {
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "GrabBaskets",
+    "url": "{{ config('app.url') }}",
+    "logo": "{{ asset('asset/images/logo-image.png') }}",
+    "description": "Online grocery shopping and quick delivery service in India offering fresh fruits, vegetables, and daily essentials with 10-minute express delivery",
+    "address": {
+      "@@type": "PostalAddress",
+      "addressCountry": "IN"
+    },
+    "contactPoint": {
+      "@@type": "ContactPoint",
+      "contactType": "Customer Service",
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi"]
+    }
+  }
+  </script>
+  
+  <!-- Structured Data - WebSite -->
+  <script type="application/ld+json">
+  {
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "GrabBaskets",
+    "url": "{{ config('app.url') }}",
+    "potentialAction": {
+      "@@type": "SearchAction",
+      "target": "{{ config('app.url') }}/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 
   @if(isset($database_error))
   <script>
@@ -237,7 +325,67 @@
       border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 72px;
-      z-index: 999;
+      z-index: 100; /* Lower z-index to not interfere with modals */
+    }
+
+    /* ============================================
+       MOBILE CATEGORY ALIGNMENT IMPROVEMENTS
+       ============================================ */
+    @media (max-width: 768px) {
+      .category-card-emoji-design {
+        min-height: 280px !important;
+        margin: 0 auto;
+        max-width: 100%;
+      }
+      
+      .category-card-emoji-design .emoji-circle {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 2.8rem !important;
+      }
+      
+      .category-card-emoji-design h5 {
+        font-size: 1rem !important;
+        line-height: 1.3;
+        margin-bottom: 15px !important;
+      }
+      
+      .category-card-emoji-design .badge {
+        font-size: 0.75rem !important;
+        padding: 4px 12px !important;
+      }
+      
+      /* Food delivery special styling for mobile */
+      .food-delivery-special {
+        background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%) !important;
+        border: 2px solid rgba(255, 107, 0, 0.4) !important;
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4) !important;
+      }
+      
+      .food-delivery-special:hover {
+        transform: translateY(-5px) scale(1.01) !important;
+        box-shadow: 0 10px 30px rgba(255, 107, 0, 0.6) !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .category-card-emoji-design {
+        padding: 20px 15px !important;
+        min-height: 260px !important;
+        border-radius: 15px !important;
+      }
+      
+      .category-card-emoji-design .emoji-circle {
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 2.5rem !important;
+        margin-bottom: 10px !important;
+      }
+      
+      .category-card-emoji-design h5 {
+        font-size: 0.95rem !important;
+        margin-bottom: 12px !important;
+      }
     }
 
     .category-scroll {
@@ -463,7 +611,7 @@
     }
 
     /* ============================================
-       MOBILE BOTTOM NAV (Blinkit/Zepto Style)
+       MOBILE BOTTOM NAV (Improved Food Delivery Style)
        ============================================ */
     .mobile-bottom-nav {
       display: none;
@@ -472,9 +620,10 @@
       left: 0;
       right: 0;
       background: white;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
       z-index: 1000;
-      padding: 8px 0;
+      padding: 12px 8px 8px 8px;
+      border-top: 1px solid #E5E5E5;
     }
 
     @media (max-width: 768px) {
@@ -485,62 +634,86 @@
       }
 
       body {
-        padding-bottom: 80px; /* Increased from 70px for better spacing */
+        padding-bottom: 85px; /* Increased for better spacing */
       }
 
-      /* HIDE FLOATING ELEMENTS IN MOBILE VIEW - Keep category menu near login */
+      /* Clean mobile experience - hide conflicting elements */
       .floating-actions {
-        display: none !important; /* Hide the large floating category menu on mobile */
+        display: none !important;
       }
 
-      /* Hide the simple menu button floating element */
       .btn.position-fixed[data-bs-toggle="modal"] {
         display: none !important;
       }
 
-      /* Hide other fixed position elements that interfere with mobile UX */
       .position-fixed.btn:not(.mobile-category-toggle):not(.mobile-bottom-nav *) {
         display: none !important;
       }
 
-      /* Fix z-index issues for mobile modals and mini windows */
-      .modal,
-      .modal-backdrop,
-      .dropdown-menu,
-      .popover,
-      .tooltip {
-        z-index: 9999 !important;
+      /* Simplify mobile layout */
+      .delivery-banner-modern {
+        padding: 8px 0 !important;
+        font-size: 0.8rem !important;
       }
+      
+      .category-pills-modern {
+        padding: 8px 0 !important;
+      }
+    }
 
-      /* Ensure banners don't interfere with modals on mobile */
-      .delivery-banner-modern,
-      .promo-tiles,
-      section[style*="background"] {
-        z-index: 1 !important;
-      }
+    /* ============================================
+       Z-INDEX HIERARCHY (Global - Both Desktop & Mobile)
+       ============================================ */
+    /* Base content: 1-99 */
+    .promo-tiles,
+    section[style*="background"] {
+      z-index: 1;
+    }
 
-      /* Mobile search suggestions should be above banners */
-      .zepto-suggestions,
-      #search-suggestions,
-      .search-suggestions {
-        z-index: 8888 !important;
-      }
+    /* Sticky elements: 100-999 */
+    .navbar-modern {
+      z-index: 1000;
+    }
 
-      /* Mobile category popup above everything except modals */
-      .mobile-category-popup {
-        z-index: 8000 !important;
-      }
+    .category-pills-modern {
+      z-index: 100; /* Lower than navbar, won't interfere with modals */
+    }
 
-      /* Fix mobile location modal z-index */
-      .location-modal {
-        z-index: 9000 !important;
-      }
+    /* Popups and suggestions: 1000-8999 */
+    .zepto-suggestions,
+    #search-suggestions,
+    .search-suggestions {
+      z-index: 2000;
+    }
 
-      /* HIDE CATEGORIES BANNER ON MOBILE - Keep for desktop only */
-      .zepto-cat-section,
-      section:has(.zepto-cat-section) {
-        display: none !important;
-      }
+    .mobile-category-popup,
+    .modern-category-popup {
+      z-index: 3000;
+    }
+
+    .mobile-profile-popup {
+      z-index: 3500;
+    }
+
+    /* Important modals: 9000-9999 */
+    .location-modal,
+    .location-modal-overlay {
+      z-index: 9000;
+    }
+
+    /* System modals (highest priority): 10000+ */
+    .modal,
+    .modal-backdrop,
+    .dropdown-menu,
+    .popover,
+    .tooltip {
+      z-index: 10000 !important;
+    }
+
+    /* Mobile specific adjustments */
+    @media (max-width: 768px) {
+
+      /* Category banner completely removed from page */
 
       /* Keep mobile category menu popup visible and positioned correctly */
       .mobile-category-popup {
@@ -562,6 +735,14 @@
         margin-top: 60px; /* Space from top */
         box-shadow: 0 -2px 20px rgba(0,0,0,0.2);
       }
+
+      /* Category elements completely removed from page */
+
+      /* Ensure mobile layout is clean and unobstructed */
+      .hero-section {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
     }
 
     .mobile-nav-item {
@@ -569,34 +750,552 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 4px;
-      padding: 10px 8px; /* Increased padding */
+      padding: 14px 8px 10px 8px; /* Better touch target */
       color: var(--text-light);
       text-decoration: none;
-      font-size: 0.75rem;
-      transition: all 0.3s ease;
-      position: relative;
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: all 0.3s ease;
+      font-size: 0.7rem;
+      font-weight: 600;
+      position: relative;
+      border-radius: 12px;
+      min-height: 60px; /* Consistent height */
+      background: transparent;
+      -webkit-tap-highlight-color: rgba(12, 131, 31, 0.1);
     }
 
     .mobile-nav-item.active,
-    .mobile-nav-item:hover {
+    .mobile-nav-item:hover,
+    .mobile-nav-item:active {
       color: var(--primary-color);
+      background: rgba(12, 131, 31, 0.08);
+      transform: translateY(-1px);
     }
 
     .mobile-nav-item i {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
+      margin-bottom: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .mobile-nav-item:active i {
+      transform: scale(0.9);
+    }
+
+    .mobile-nav-item span {
+      line-height: 1.1;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .mobile-nav-item .badge {
       position: absolute;
-      top: 4px;
+      top: 10px;
       right: 20%;
       background: var(--danger-color);
       color: white;
-      border-radius: 10px;
-      padding: 2px 5px;
-      font-size: 0.65rem;
+      border-radius: 12px;
+      padding: 3px 6px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      min-width: 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
+    }
+
+    /* ============================================
+       MODERN MOBILE CATEGORY MENU (Meesho/Blinkit Style)
+       ============================================ */
+    .modern-category-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      z-index: 2000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modern-category-popup.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .category-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .category-header h4 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .category-close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .category-content {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 68px);
+    }
+
+    .category-sidebar {
+      width: 140px;
+      background: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      overflow-y: auto;
+    }
+
+    .category-item {
+      padding: 16px 12px;
+      border-bottom: 1px solid #e9ecef;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: white;
+      margin: 0;
+      min-height: 80px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .category-item:hover,
+    .category-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .category-item .category-emoji {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .category-item .category-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .subcategory-panel {
+      flex: 1;
+      background: white;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .subcategory-header {
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+
+    .subcategory-header h5 {
+      margin: 0;
+      color: #333;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .subcategory-list {
+      padding: 16px 20px;
+    }
+
+    .subcategory-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+      text-decoration: none;
+      color: #333;
+      transition: all 0.2s ease;
+    }
+
+    .subcategory-item:hover {
+      color: #667eea;
+      text-decoration: none;
+      background: #f8f9ff;
+      margin: 0 -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .subcategory-item:last-child {
+      border-bottom: none;
+    }
+
+    .subcategory-icon {
+      width: 36px;
+      height: 36px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 1.2rem;
+    }
+
+    .subcategory-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .all-products-item {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      margin: 16px 20px;
+      padding: 16px;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      font-weight: 600;
+    }
+
+    .all-products-item:hover {
+      color: white;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    /* ============================================
+       MOBILE PROFILE MENU STYLES
+       ============================================ */
+    .mobile-profile-popup {
+      position: fixed;
+      bottom: 80px; /* Above mobile nav */
+      right: 20px;
+      left: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.25);
+      padding: 0;
+      z-index: 1600;
+      max-height: 70vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mobile-profile-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ============================================
+       MOBILE AUTH POPUP STYLES  
+       ============================================ */
+    .mobile-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-popup {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 24px 24px 0 0;
+      z-index: 1600;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 70vh;
+      overflow: hidden;
+    }
+
+    .mobile-popup.show {
+      transform: translateY(0);
+    }
+
+    .mobile-popup-header {
+      background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-popup-header h5 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .mobile-popup-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .mobile-popup-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .mobile-popup-content {
+      padding: 0;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .mobile-popup-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      text-decoration: none;
+      color: var(--text-dark);
+      border-bottom: 1px solid #F0F0F0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .mobile-popup-item:hover {
+      background: #F8F9FA;
+      color: var(--text-dark);
+    }
+
+    .mobile-popup-item:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-popup-item.featured {
+      background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%);
+      color: white;
+      margin: 8px 12px;
+      border-radius: 12px;
+      border-bottom: none;
+    }
+
+    .mobile-popup-item.featured:hover {
+      background: linear-gradient(135deg, #0A6B19 0%, #0D8220 100%);
+      color: white;
+    }
+
+    .mobile-popup-item i:first-child {
+      font-size: 1.5rem;
+      margin-right: 16px;
+      width: 32px;
+      text-align: center;
+    }
+
+    .mobile-popup-item .item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .mobile-popup-item .item-subtitle {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .mobile-popup-item i:last-child {
+      margin-left: auto;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    .mobile-popup-divider {
+      height: 8px;
+      background: #F8F9FA;
+      margin: 8px 0;
+    }
+
+    /* ============================================
+       MOBILE FOOD DELIVERY FAB
+       ============================================ */
+    .mobile-food-delivery-fab {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      right: 16px;
+      z-index: 1400;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-food-delivery-fab {
+        display: block;
+      }
+    }
+
+    .food-delivery-btn {
+      background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: rgba(255, 107, 0, 0.2);
+      animation: pulse-delivery 3s infinite;
+    }
+
+    .food-delivery-btn:hover,
+    .food-delivery-btn:active {
+      background: linear-gradient(135deg, #E55A00 0%, #E68A00 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 0, 0.5);
+    }
+
+    .food-delivery-btn i {
+      font-size: 1.2rem;
+    }
+
+    @keyframes pulse-delivery {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+      }
+      50% {
+        box-shadow: 0 8px 30px rgba(255, 107, 0, 0.6);
+        transform: scale(1.05);
+      }
+    }
+
+    .mobile-profile-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 20px;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+    }
+
+    .mobile-profile-avatar {
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .mobile-profile-menu {
+      padding: 0;
+    }
+
+    .mobile-profile-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      text-decoration: none;
+      color: var(--text-dark);
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-profile-item:hover {
+      background: #f8f9fa;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .mobile-profile-item:last-child {
+      border-bottom: none;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .mobile-profile-item i {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 1.1rem;
+      color: var(--primary-color);
+    }
+
+    .mobile-profile-item.logout {
+      color: #dc3545;
+    }
+
+    .mobile-profile-item.logout i {
+      color: #dc3545;
+    }
+
+    .mobile-profile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-profile-overlay.show {
+      opacity: 1;
+      visibility: visible;
     }
 
     /* ============================================
@@ -634,11 +1333,7 @@
         display: none !important;
       }
 
-      /* SHOW CATEGORIES BANNER ON DESKTOP ONLY */
-      .zepto-cat-section,
-      section:has(.zepto-cat-section) {
-        display: block !important;
-      }
+      /* Category banner removed from all screen sizes */
     }
 
     /* ============================================
@@ -1119,6 +1814,41 @@
       box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
       color: white;
       text-decoration: none;
+    }
+
+    /* Enhanced Menu Styling */
+    .mega-menu-wrapper {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform: translateY(-15px);
+    }
+
+    .mega-menu-wrapper.show {
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    
+    /* Prevent Bootstrap dropdown conflicts */
+    .mega-menu-wrapper.dropdown-menu {
+      display: block !important;
+    }
+    
+    /* Enhanced nav link styling */
+    .nav-link {
+      transition: color 0.2s ease, background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    .nav-link:hover,
+    .nav-link:focus {
+      color: inherit !important;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
     }
 
     /* Mobile Responsiveness */
@@ -2774,127 +3504,13 @@ li a{
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* Zepto-like category strip below banner */
-    .zepto-cat-section {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(35, 47, 62, 0.08);
-      margin-top: -16px;
-      padding: 14px 8px 6px;
-      position: relative;
-      z-index: 2;
-    }
+    /* Category section CSS removed - no longer needed */
 
-    .zepto-cat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 8px 8px;
-    }
+    /* Category banner CSS removed */
 
-    .zepto-cat-header h2 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #232f3e;
-      margin: 0;
-    }
-
-    .zepto-cat-track {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: 86px;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 6px 36px 10px; /* leave room for nav buttons */
-      scroll-snap-type: x proximity;
-    }
-
-    .zepto-cat-track::-webkit-scrollbar { height: 8px; }
-    .zepto-cat-track::-webkit-scrollbar-thumb { background: rgba(35,47,62,0.18); border-radius: 8px; }
-
-    .zepto-cat-item { scroll-snap-align: start; text-align: center; }
-
-    .zepto-cat-link {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #232f3e;
-      gap: 6px;
-    }
-
-    .zepto-cat-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: linear-gradient(135deg,#fafafa,#fff);
-      border: 1px solid rgba(139,69,19,0.12);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 4px 14px rgba(35,47,62,0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      overflow: hidden;
-    }
-
-    .zepto-cat-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .zepto-cat-emoji { font-size: 1.4rem; }
-
-    .zepto-cat-link:hover .zepto-cat-icon { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(35,47,62,0.16); }
-
-    .zepto-cat-name {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #2c3e50;
-      line-height: 1.1;
-      max-width: 80px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .zepto-cat-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      display: grid;
-      place-items: center;
-      background: #232f3e;
+    /* More category banner CSS removed */
       color: #ff9900;
-      box-shadow: 0 4px 12px rgba(35,47,62,0.25);
-      z-index: 3;
-    }
-    .zepto-cat-prev { left: 8px; }
-    .zepto-cat-next { right: 8px; }
-
-    @media (min-width: 768px) {
-      .zepto-cat-section { margin-top: -24px; padding: 18px 10px 8px; }
-      .zepto-cat-track { grid-auto-columns: 96px; gap: 12px; }
-      .zepto-cat-icon { width: 72px; height: 72px; }
-      .zepto-cat-name { font-size: 0.82rem; max-width: 92px; }
-    }
-
-    /* ============ BLINKIT-STYLE MOBILE 3×3 GRID ============ */
-    @media (max-width: 767px) {
-      /* Hide desktop scrolling navigation */
-      .zepto-cat-nav {
-        display: none !important;
-      }
-
-      /* Convert horizontal scroll to 3×3 grid */
-      .zepto-cat-track {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-auto-flow: row;
-        grid-auto-columns: auto;
-        gap: 16px;
-        overflow-x: visible;
-        overflow-y: visible;
-        padding: 12px 16px 16px;
-        scroll-snap-type: none;
+    /* All category banner CSS removed */
       }
 
       /* Show only first 9 items in mobile grid */
@@ -3503,9 +4119,16 @@ li a{
 
         <!-- Nav Icons -->
         <div class="nav-icons desktop-only">
+          <!-- Hotel Owner Registration - Prominent -->
+          <a href="{{ route('hotel-owner.register') }}" class="nav-icon-btn" 
+             style="background: linear-gradient(135deg, #0C831F 0%, #0F9B23 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(12, 131, 31, 0.3); margin-right: 8px;">
+            <i class="bi bi-shop" style="font-size: 1.3rem;"></i>
+            <span>List Restaurant</span>
+          </a>
+          
           <!-- Delivery Partner Button - Prominent -->
           <a href="{{ route('delivery-partner.register') }}" class="nav-icon-btn" 
-             style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); animation: pulse 2s infinite;">
+             style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);">
             <i class="bi bi-scooter" style="font-size: 1.3rem;"></i>
             <span>Partner with us</span>
           </a>
@@ -3560,12 +4183,22 @@ li a{
   <!-- Delivery Banner -->
   <div class="delivery-banner-modern">
     <div class="container">
-      <h3>
-        <i class="bi bi-lightning-charge-fill"></i>
-        Get 10-Minute Delivery on Groceries & Essentials
-        <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.8rem; margin-left: 8px;">Within 5km</span>
-      </h3>
-      <p>Free delivery on orders above ₹499 • Same-day delivery available nationwide</p>
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h3>
+            <i class="bi bi-lightning-charge-fill"></i>
+            Get 10-Minute Delivery on Groceries & Essentials
+            <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.8rem; margin-left: 8px;">Within 5km</span>
+          </h3>
+          <p>Free delivery on orders above ₹499 • Same-day delivery available nationwide</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <a href="{{ route('food.index') }}" class="btn btn-light btn-sm" style="background: rgba(255,255,255,0.9); color: var(--primary-color); font-weight: 600; padding: 8px 16px; border-radius: 20px; text-decoration: none;">
+            <i class="bi bi-cup-hot-fill me-1"></i>
+            Order Food Now
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3576,8 +4209,11 @@ li a{
         <a href="{{ route('home') }}" class="category-pill active">
           <i class="bi bi-house-fill me-1"></i> All
         </a>
+        <a href="{{ route('food.index') }}" class="category-pill" style="background: #FF6B35; color: white; border-color: #FF6B35;">
+          <i class="bi bi-cup-hot-fill me-1"></i> Food Delivery
+        </a>
         @if(!empty($categories) && $categories->count())
-          @foreach($categories->take(15) as $category)
+          @foreach($categories->take(14) as $category)
             <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="category-pill">
               {{ $category->emoji }} {{ $category->name }}
             </a>
@@ -3605,7 +4241,7 @@ li a{
   </div>
 
   <!-- Mobile Location Bar -->
-  <div class="mobile-location-bar below-nav" onclick="openLocationModal()">
+  <div class="mobile-location-bar below-nav" id="mobileLocationBar">
     <div class="mobile-location-content">
       <i class="bi bi-geo-alt-fill mobile-location-icon"></i>
       <div class="mobile-location-text">
@@ -3620,7 +4256,7 @@ li a{
   @guest
   <div class="mobile-location-section">
     <div class="mobile-login-card show" id="mobileLoginCard">
-      <button class="mobile-login-close" onclick="closeMobileLoginCard()">
+      <button class="mobile-login-close" id="mobileLoginCloseBtn">
         <i class="bi bi-x"></i>
       </button>
       
@@ -3967,53 +4603,7 @@ li a{
     </div>
   </section>
 
-  <!-- Zepto-like Category Strip (below banner) -->
-  <section class="py-2" id="categoryBannerSection">
-    <div class="container">
-      <div class="zepto-cat-section" aria-label="Shop by category">
-        <div class="zepto-cat-header">
-          <h2>Shop by category</h2>
-          <a href="{{ route('buyer.dashboard') }}" class="text-decoration-none" style="font-weight:600;color:#8B4513;">View all</a>
-        </div>
-
-        <button class="zepto-cat-nav zepto-cat-prev d-none d-md-grid" type="button" onclick="scrollZeptoCats(-1)">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <div id="zeptoCatTrack" class="zepto-cat-track">
-          @if(!empty($categories) && $categories->count())
-            @foreach($categories->take(24) as $category)
-              <div class="zepto-cat-item">
-                <a class="zepto-cat-link" href="{{ route('buyer.productsByCategory', $category->id) }}" title="{{ $category->name }}">
-                  <span class="zepto-cat-icon position-relative" style="background: linear-gradient(135deg,#fffbe6,#ffe4b5); border: 2px solid #ff9900;">
-                    @php $cImg = $category->image_url ?? $category->image ?? null; $emoji = $category->emoji ?? '🛍️'; @endphp
-                    @if(!empty($cImg))
-                      <img src="{{ $cImg }}" alt="{{ $category->name }}" style="z-index:2;position:relative;" onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.classList.remove('d-none');">
-                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle d-none" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
-                    @else
-                      <span class="zepto-cat-emoji position-absolute top-50 start-50 translate-middle" style="font-size:2rem;z-index:1;">{!! $emoji !!}</span>
-                    @endif
-                  </span>
-                  <span class="zepto-cat-name">{{ Str::limit($category->name, 12) }}</span>
-                </a>
-              </div>
-            @endforeach
-          @else
-            <div class="text-center text-muted" style="grid-column:1/-1;padding:10px 0;">No categories available</div>
-          @endif
-        </div>
-        <button class="zepto-cat-nav zepto-cat-next d-none d-md-grid" type="button" onclick="scrollZeptoCats(1)">
-          <i class="bi bi-chevron-right"></i>
-        </button>
-      </div>
-
-      <!-- Mobile "View All Categories" Button -->
-      <div class="d-md-none text-center mt-3 px-3">
-        <a href="{{ route('buyer.dashboard') }}" class="btn btn-outline-primary w-100" style="border-radius: 12px; padding: 12px; font-weight: 600; border: 2px solid #667eea;">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>View All Categories
-        </a>
-      </div>
-    </div>
-  </section>
+  <!-- Category Banner Removed: Categories accessible via mobile menu and desktop navigation -->
 
   <!-- Delivery Partner Promotional Section -->
   <section class="py-4" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">
@@ -4203,20 +4793,20 @@ li a{
     <!-- Enhanced Floating Category Menu - Mobile & Desktop Responsive with Hide/Show -->
     <div id="floatingActionsContainer" class="floating-actions" style="position:fixed;bottom:20px;right:20px;z-index:1200;transition:transform 0.3s ease, opacity 0.3s ease;">
       <!-- Hide Button (small, always visible on mobile) -->
-      <button class="fab-hide-btn" id="fabHideBtn" onclick="hideFloatingButton()" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:6px;box-shadow:0 3px 10px rgba(220,53,69,0.3);font-size:0.9rem;position:absolute;top:-38px;right:8px;width:32px;height:32px;cursor:pointer;transition:all 0.3s;opacity:0.9;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.9';this.style.transform='scale(1)'">
+      <button class="fab-hide-btn" id="fabHideBtn" style="display:none;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:50%;padding:6px;box-shadow:0 3px 10px rgba(220,53,69,0.3);font-size:0.9rem;position:absolute;top:-38px;right:8px;width:32px;height:32px;cursor:pointer;transition:all 0.3s;opacity:0.9;touch-action:manipulation;"
         <span style="font-weight:bold;line-height:1;">✕</span>
       </button>
       
       <!-- Main FAB Button -->
-      <button class="fab-main" id="fabMainBtn" onclick="toggleFloatingMenu()" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      <button class="fab-main" id="fabMainBtn" type="button" style="background:linear-gradient(135deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:50%;padding:12px;box-shadow:0 6px 20px rgba(139,69,19,0.2);font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;width:56px;height:56px;cursor:pointer;" data-no-focus-trap="true">
         <span class="fab-icon" style="font-size:1.8rem;">🛍️</span>
       </button>
       
       <!-- Enhanced Mobile & Desktop Responsive Floating Menu Popup -->
-      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);">
+      <div id="floatingMenu" class="floating-menu-popup" style="display:none;position:absolute;bottom:70px;right:0;width:min(90vw,420px);max-width:420px;max-height:min(80vh,500px);background:#fff;border-radius:20px;box-shadow:0 15px 50px rgba(139,69,19,0.2);padding:24px;overflow-y:auto;border:1px solid rgba(139,69,19,0.1);" data-no-focus-trap="true">
         <div class="floating-menu-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h6 style="margin:0;font-weight:700;color:#232f3e;font-size:1.1rem;">😊 Browse by Categories 🛍️</h6>
-          <button onclick="toggleFloatingMenu()" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.2)'" onmouseout="this.style.background='rgba(139,69,19,0.1)'">✕</button>
+          <button id="floatingMenuCloseBtn" style="background:rgba(139,69,19,0.1);border:none;font-size:1.3rem;color:#8B4513;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" data-no-focus-trap="true">✕</button>
         </div>
         
         <!-- Enhanced Responsive Categories Grid -->
@@ -4248,7 +4838,7 @@ li a{
     </div>
 
     <!-- Show FAB Button (appears when FAB is hidden) -->
-    <button id="showFabBtn" onclick="showFloatingButton()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1199;background:linear-gradient(135deg,#28a745,#20c997);color:#fff;border:none;border-radius:50%;padding:10px;box-shadow:0 4px 15px rgba(40,167,69,0.3);font-size:1.3rem;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;animation:pulse 2s infinite;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <button id="showFabBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1199;background:linear-gradient(135deg,#28a745,#20c997);color:#fff;border:none;border-radius:50%;padding:10px;box-shadow:0 4px 15px rgba(40,167,69,0.3);font-size:1.3rem;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.3s;animation:pulse 2s infinite;touch-action:manipulation;">
       <span>👁️</span>
     </button>
   </section>
@@ -4331,12 +4921,7 @@ li a{
   </style>
   
   <script>
-    function scrollZeptoCats(dir) {
-      const track = document.getElementById('zeptoCatTrack');
-      if (!track) return;
-      const itemWidth = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width : 100;
-      track.scrollBy({ left: dir * (itemWidth * 3), behavior: 'smooth' });
-    }
+    // Category scrolling function removed
   </script>
 
   <!-- Hero Banners Section - Admin Managed -->
@@ -4431,7 +5016,7 @@ li a{
           <span class="ms-auto d-none d-md-inline-block text-white-50" style="font-size:1.1rem;">🔥 Ends Soon</span>
         </div>
         <div class="shelf" style="border:2px solid #ff0033;box-shadow:0 4px 24px rgba(255,0,51,0.08);background:linear-gradient(90deg,#fff6f6 60%,#fffbe6 100%);">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('flash',-1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-left"></i></button>
+          <button class="nav-btn nav-prev" id="flashPrevBtn" style="background:#ff0033;color:#fff;touch-action:manipulation;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-flash" class="shelf-track">
             @foreach($flashSale as $product)
             <div class="shelf-item">
@@ -4489,7 +5074,7 @@ li a{
             </div>
             @endforeach
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('flash',1)" style="background:#ff0033;color:#fff;"><i class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" id="flashNextBtn" style="background:#ff0033;color:#fff;touch-action:manipulation;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
       @endif
@@ -4657,7 +5242,7 @@ li a{
       <div class="mb-4">
         <h2 class="mb-3">Free Delivery Picks</h2>
         <div class="shelf">
-          <button class="nav-btn nav-prev" onclick="scrollShelf('free',-1)"><i class="bi bi-chevron-left"></i></button>
+          <button class="nav-btn nav-prev" id="freePrevBtn" style="touch-action:manipulation;"><i class="bi bi-chevron-left"></i></button>
           <div id="shelf-free" class="shelf-track">
             @forelse($freeDelivery as $product)
             <div class="shelf-item">
@@ -4716,7 +5301,7 @@ li a{
             <div class="text-muted">No free delivery picks right now.</div>
             @endforelse
           </div>
-          <button class="nav-btn nav-next" onclick="scrollShelf('free',1)"><i class="bi bi-chevron-right"></i></button>
+          <button class="nav-btn nav-next" id="freeNextBtn" style="touch-action:manipulation;"><i class="bi bi-chevron-right"></i></button>
         </div>
       </div>
     </div>
@@ -4737,11 +5322,78 @@ li a{
         <p class="text-muted">Special Offers on Every Category!</p>
       </div>
 
-      <!-- Category Grid with Emojis -->
-      <div class="row g-4 mb-5">
+      <!-- Category Grid with Emojis - Improved Mobile Alignment -->
+      <div class="row g-3 mb-5">
         @if(!empty($categories) && $categories->count())
+          <!-- Food Delivery Special Category -->
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-6">
+            <a href="{{ route('products.food-delivery') }}" class="text-decoration-none">
+              <div class="category-card-emoji-design food-delivery-special" style="
+                background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);
+                border-radius: 20px;
+                padding: 25px 20px;
+                border: 2px solid rgba(255, 107, 0, 0.3);
+                transition: all 0.3s ease;
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3), 0 0 20px rgba(255, 107, 0, 0.2);
+              " onmouseover="
+                this.style.transform='translateY(-10px) scale(1.02)';
+                this.style.boxShadow='0 15px 40px rgba(255, 107, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.3)';
+                this.style.borderColor='rgba(255, 107, 0, 0.6)';
+              " onmouseout="
+                this.style.transform='translateY(0) scale(1)';
+                this.style.boxShadow='0 4px 15px rgba(255, 107, 0, 0.3), 0 0 20px rgba(255, 107, 0, 0.2)';
+                this.style.borderColor='rgba(255, 107, 0, 0.3)';
+              ">
+                
+                <!-- Emoji Circle with Orange Glow -->
+                <div class="text-center mb-3">
+                  <div style="
+                    width: 100px;
+                    height: 100px;
+                    margin: 0 auto;
+                    background: rgba(255,255,255,0.2);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 3.5rem;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+                    border: 3px solid rgba(255, 255, 255, 0.4);
+                  " class="emoji-circle">
+                    🚴‍♂️
+                  </div>
+                </div>
+                
+                <!-- Category Name -->
+                <h5 class="text-center fw-bold mb-2" style="color: white; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">
+                  Food Delivery
+                </h5>
+                
+                <!-- Special Badge -->
+                <div class="text-center">
+                  <span class="badge" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    font-size: 0.85rem;
+                    padding: 6px 15px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                  ">
+                    🔥 Hot & Fast
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+          
           @foreach($categories as $category)
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-6">
               <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
                 <div class="category-card-emoji-design" style="
                   background: linear-gradient(135deg, #FFFFFF 0%, #FFF5E6 100%);
@@ -5221,7 +5873,7 @@ li a{
       <!-- Products Slider -->
       <div class="trending-slider-wrapper position-relative">
         <!-- Previous Button -->
-        <button class="slider-nav slider-prev" onclick="slideTrending(-1)" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+        <button class="slider-nav slider-prev" id="trendingPrevBtn" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; color: #00ffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); touch-action: manipulation;">
           <i class="bi bi-chevron-left" style="font-size: 1.5rem;"></i>
         </button>
 
@@ -5613,6 +6265,95 @@ li a{
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Fix focus lock issues with floating menu
+    document.addEventListener('DOMContentLoaded', function() {
+      // Global focus lock prevention
+      let isFloatingMenuOpen = false;
+      
+      // Prevent focus traps from interfering with custom menus
+      document.addEventListener('keydown', function(e) {
+        // If floating menu is open and Escape is pressed, close it
+        if (e.key === 'Escape') {
+          const floatingMenu = document.getElementById('floatingMenu');
+          if (floatingMenu && floatingMenu.style.display === 'block') {
+            floatingMenu.style.display = 'none';
+            document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+            isFloatingMenuOpen = false;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Force blur any active element
+            if (document.activeElement && document.activeElement !== document.body) {
+              document.activeElement.blur();
+            }
+          }
+        }
+      });
+
+      // Monitor floating menu state
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            const floatingMenu = document.getElementById('floatingMenu');
+            if (floatingMenu) {
+              isFloatingMenuOpen = floatingMenu.style.display === 'block';
+            }
+          }
+        });
+      });
+
+      // Start observing
+      const floatingMenu = document.getElementById('floatingMenu');
+      if (floatingMenu) {
+        observer.observe(floatingMenu, { attributes: true });
+      }
+
+      // Add click event listener to FAB button to avoid onclick conflicts
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+      }
+
+      // Prevent Bootstrap modal focus management conflicts
+      document.addEventListener('focusin', function(e) {
+        if (isFloatingMenuOpen) {
+          const floatingMenu = document.getElementById('floatingMenu');
+          const fabContainer = document.getElementById('floatingActionsContainer');
+          
+          // Allow focus within floating menu and FAB container
+          if (floatingMenu && (floatingMenu.contains(e.target) || 
+                              fabContainer.contains(e.target) ||
+                              e.target.hasAttribute('data-no-focus-trap'))) {
+            return;
+          }
+          
+          // Prevent focus trap by other libraries
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+
+      // Global emergency cleanup
+      window.addEventListener('beforeunload', function() {
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+      });
+
+      // Periodic cleanup for stuck focus states
+      setInterval(function() {
+        const floatingMenu = document.getElementById('floatingMenu');
+        if (!floatingMenu || floatingMenu.style.display !== 'block') {
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        }
+      }, 5000);
+    });
+
     // Trending Slider Navigation
     function slideTrending(direction) {
       const grid = document.getElementById('trendingGrid');
@@ -5729,37 +6470,75 @@ li a{
       const genderTabs = document.querySelectorAll('.gender-tab');
       const categoryCards = document.querySelectorAll('.mega-category-card');
 
+      // Ensure elements exist before adding event listeners
+      if (!navbar || !megaMenuToggle || !megaMenu) {
+        console.warn('Navigation elements not found');
+        return;
+      }
+
       // Navbar scroll effect
       window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-          navbar.classList.add('scrolled');
-        } else {
-          navbar.classList.remove('scrolled');
+        try {
+          if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+          } else {
+            navbar.classList.remove('scrolled');
+          }
+        } catch (error) {
+          console.error('Error in scroll handler:', error);
         }
       });
 
-      // Mega menu hover functionality
+      // Disable Bootstrap dropdown functionality for mega menu to prevent conflicts
+      megaMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+
+      // Enhanced mega menu hover functionality with better touch support
       let hoverTimeout;
+      let isMenuOpen = false;
       
-      megaMenuToggle.addEventListener('mouseenter', function() {
-        clearTimeout(hoverTimeout);
-        megaMenu.classList.add('show');
-      });
-
-      megaMenuToggle.parentElement.addEventListener('mouseleave', function() {
-        hoverTimeout = setTimeout(() => {
-          megaMenu.classList.remove('show');
-        }, 300);
-      });
-
+      function showMegaMenu() {
+        try {
+          clearTimeout(hoverTimeout);
+          megaMenu.classList.add('show');
+          isMenuOpen = true;
+          console.log('Mega menu opened'); // Debug log
+        } catch (error) {
+          console.error('Error showing mega menu:', error);
+        }
+      }
+      
+      function hideMegaMenu() {
+        try {
+          hoverTimeout = setTimeout(() => {
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+            console.log('Mega menu closed'); // Debug log
+          }, 300);
+        } catch (error) {
+          console.error('Error hiding mega menu:', error);
+        }
+      }
+      
+      // Mouse events for desktop
+      megaMenuToggle.addEventListener('mouseenter', showMegaMenu);
+      megaMenuToggle.parentElement.addEventListener('mouseleave', hideMegaMenu);
       megaMenu.addEventListener('mouseenter', function() {
         clearTimeout(hoverTimeout);
       });
-
-      megaMenu.addEventListener('mouseleave', function() {
-        hoverTimeout = setTimeout(() => {
-          megaMenu.classList.remove('show');
-        }, 300);
+      megaMenu.addEventListener('mouseleave', hideMegaMenu);
+      
+      // Touch events for mobile
+      megaMenuToggle.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        if (isMenuOpen) {
+          hideMegaMenu();
+        } else {
+          showMegaMenu();
+        }
       });
 
       // Gender filter functionality
@@ -5791,20 +6570,31 @@ li a{
         });
       });
 
-      // Close mega menu on outside click
+      // Enhanced outside click handling
       document.addEventListener('click', function(e) {
-        if (!megaMenuToggle.parentElement.contains(e.target)) {
-          megaMenu.classList.remove('show');
+        try {
+          if (!megaMenuToggle.parentElement.contains(e.target) && !megaMenu.contains(e.target)) {
+            clearTimeout(hoverTimeout);
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+          }
+        } catch (error) {
+          console.error('Error in outside click handler:', error);
         }
       });
-
-      // Mobile mega menu handling
-      if (window.innerWidth <= 768) {
-        megaMenuToggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          megaMenu.classList.toggle('show');
-        });
-      }
+      
+      // Touch-friendly outside touch handling
+      document.addEventListener('touchstart', function(e) {
+        try {
+          if (isMenuOpen && !megaMenuToggle.parentElement.contains(e.target) && !megaMenu.contains(e.target)) {
+            clearTimeout(hoverTimeout);
+            megaMenu.classList.remove('show');
+            isMenuOpen = false;
+          }
+        } catch (error) {
+          console.error('Error in outside touch handler:', error);
+        }
+      });
 
       // Animate category cards on load
       setTimeout(() => {
@@ -5900,37 +6690,212 @@ li a{
     });
 
     function toggleFloatingMenu() {
-      const menu = document.getElementById('floatingMenu');
-      const subcategoryArea = document.getElementById('subcategoryArea');
-      if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-        subcategoryArea.style.display = 'none';
-      } else {
-        menu.style.display = 'none';
+      try {
+        const menu = document.getElementById('floatingMenu');
+        const subcategoryArea = document.getElementById('subcategoryArea');
+        
+        if (!menu) {
+          console.error('Floating menu element not found');
+          return;
+        }
+        
+        // AGGRESSIVE focus lock prevention for desktop
+        function forceBlurEverything() {
+          try {
+            // Blur absolutely everything that could hold focus
+            document.querySelectorAll('*:focus, [tabindex], button, input, select, textarea, a').forEach(el => {
+              if (el.blur && typeof el.blur === 'function') {
+                el.blur();
+              }
+              el.removeAttribute('tabindex');
+              el.removeAttribute('data-bs-focus');
+              el.removeAttribute('aria-modal');
+            });
+            
+            // Force focus to window
+            window.focus();
+            setTimeout(() => {
+              if (document.activeElement && document.activeElement !== document.body) {
+                document.activeElement.blur();
+              }
+              document.body.focus();
+              setTimeout(() => document.body.blur(), 10);
+            }, 10);
+            
+            // Clear any Bootstrap modal states
+            document.body.classList.remove('modal-open');
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            
+          } catch (e) {
+            // Last resort: blur the window itself
+            window.blur();
+            setTimeout(() => window.focus(), 50);
+          }
+        }
+        
+        // Immediate aggressive blur
+        forceBlurEverything();
+        
+        // Clear any existing event listeners
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
+        const isMenuVisible = menu.style.display === 'block';
+        
+        if (!isMenuVisible) {
+          // Open menu
+          menu.style.display = 'block';
+          if (subcategoryArea) {
+            subcategoryArea.style.display = 'none';
+          }
+          
+          // Add click outside listener with aggressive focus prevention
+          setTimeout(() => {
+            function safeOutsideClickHandler(event) {
+              forceBlurEverything();
+              if (menu && !menu.contains(event.target) && 
+                  !event.target.closest('#fabMainBtn') && 
+                  !event.target.closest('#floatingActionsContainer')) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', safeOutsideClickHandler);
+                forceBlurEverything();
+              }
+            }
+            
+            document.addEventListener('click', safeOutsideClickHandler, { 
+              once: false,
+              passive: true,
+              capture: true 
+            });
+          }, 300);
+        } else {
+          // Close menu
+          menu.style.display = 'none';
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        }
+        
+        // Post-action cleanup
+        setTimeout(() => {
+          forceBlurEverything();
+        }, 100);
+        
+        // Emergency cleanup every 2 seconds when menu is open
+        if (!window.desktopFocusCleanup && isMenuVisible === false) {
+          window.desktopFocusCleanup = setInterval(() => {
+            if (document.getElementById('floatingMenu')?.style.display === 'block') {
+              forceBlurEverything();
+            } else {
+              clearInterval(window.desktopFocusCleanup);
+              window.desktopFocusCleanup = null;
+            }
+          }, 2000);
+        }
+        
+      } catch (error) {
+        console.error('Error toggling floating menu:', error);
+        emergencyFloatingMenuCleanup();
+      }
+    }
+
+    // Emergency cleanup for floating menu
+    function emergencyFloatingMenuCleanup() {
+      try {
+        const menu = document.getElementById('floatingMenu');
+        if (menu) {
+          menu.style.display = 'none';
+          menu.removeAttribute('tabindex');
+          menu.removeAttribute('aria-modal');
+          menu.removeAttribute('data-bs-focus');
+        }
+        
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
+        // Force blur all active elements
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
+        
+        // Clear Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+        
+        console.log('Emergency floating menu cleanup completed');
+      } catch (error) {
+        console.error('Emergency floating menu cleanup failed:', error);
+      }
+    }
+
+    // Function to close floating menu when clicking outside
+    function closeFloatingMenuOnOutsideClick(event) {
+      try {
+        const menu = document.getElementById('floatingMenu');
+        const fabButton = document.getElementById('fabMainBtn');
+        const fabContainer = document.getElementById('floatingActionsContainer');
+        
+        // Check if click is outside menu and FAB elements
+        if (menu && 
+            !menu.contains(event.target) && 
+            !fabButton.contains(event.target) && 
+            !fabContainer.contains(event.target)) {
+          
+          menu.style.display = 'none';
+          document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+          
+          // Clear any focus issues
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+        }
+      } catch (error) {
+        console.error('Error in closeFloatingMenuOnOutsideClick:', error);
+        // Emergency cleanup
+        const menu = document.getElementById('floatingMenu');
+        if (menu) {
+          menu.style.display = 'none';
+        }
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
       }
     }
 
     function hideFloatingButton(saveState = true) {
-      const fabContainer = document.getElementById('floatingActionsContainer');
-      const showBtn = document.getElementById('showFabBtn');
-      const floatingMenu = document.getElementById('floatingMenu');
-      
-      // Close popup if open
-      floatingMenu.style.display = 'none';
-      
-      // Hide FAB
-      fabContainer.style.transform = 'translateX(150px)';
-      fabContainer.style.opacity = '0';
-      
-      // Show the show button
-      setTimeout(() => {
-        fabContainer.style.display = 'none';
-        showBtn.style.display = 'flex';
-      }, 300);
-      
-      // Save state to localStorage (mobile only)
-      if (saveState && window.innerWidth <= 768) {
-        localStorage.setItem('fabHidden', 'true');
+      try {
+        const fabContainer = document.getElementById('floatingActionsContainer');
+        const showBtn = document.getElementById('showFabBtn');
+        const floatingMenu = document.getElementById('floatingMenu');
+        
+        // Clear any focus lock
+        document.activeElement.blur();
+        
+        // Close popup if open
+        if (floatingMenu) {
+          floatingMenu.style.display = 'none';
+        }
+        
+        // Remove any event listeners
+        document.removeEventListener('click', closeFloatingMenuOnOutsideClick);
+        
+        if (fabContainer) {
+          // Hide FAB
+          fabContainer.style.transform = 'translateX(150px)';
+          fabContainer.style.opacity = '0';
+          
+          // Show the show button
+          setTimeout(() => {
+            fabContainer.style.display = 'none';
+            if (showBtn) {
+              showBtn.style.display = 'flex';
+            }
+          }, 300);
+        }
+        
+        // Save state to localStorage (mobile only)
+        if (saveState && window.innerWidth <= 768) {
+          localStorage.setItem('fabHidden', 'true');
+        }
+      } catch (error) {
+        console.error('Error hiding floating button:', error);
+        // Ensure focus is released
+        document.activeElement.blur();
       }
     }
 
@@ -5995,18 +6960,184 @@ li a{
       }
     });
 
-    // Mobile Category Menu Function
+    // Modern Mobile Category Menu Functions - Enhanced with Focus Lock Prevention
     function toggleMobileCategoryMenu() {
-      const menu = document.getElementById('mobileCategoryMenu');
-      const isVisible = menu.style.display === 'block';
-      
-      if (isVisible) {
-        menu.style.display = 'none';
-        document.body.style.overflow = '';
-      } else {
-        menu.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+      try {
+        const menu = document.getElementById('mobileCategoryMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        
+        console.log('Toggle mobile category menu called'); // Debug log
+        
+        if (!menu) {
+          console.error('Mobile category menu not found');
+          return;
+        }
+
+        // Prevent any focus lock issues immediately
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+
+        // Clear any Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+
+        // Remove any existing focus event listeners
+        document.removeEventListener('focusin', preventFocusLock);
+        document.removeEventListener('keydown', handleEscapeKey);
+        
+        if (menu.classList.contains('show')) {
+          // Closing menu
+          menu.classList.remove('show');
+          if (overlay) overlay.style.display = 'none';
+          document.body.style.overflow = '';
+          
+          // Release focus locks
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+        } else {
+          // Opening menu
+          menu.classList.add('show');
+          if (overlay) overlay.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          
+          // Add focus management
+          setTimeout(() => {
+            document.addEventListener('focusin', preventFocusLock);
+            document.addEventListener('keydown', handleEscapeKey);
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error toggling mobile category menu:', error);
+        // Emergency cleanup
+        emergencyCleanupFocus();
       }
+    }
+
+    // Prevent focus lock function
+    function preventFocusLock(event) {
+      try {
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu && menu.classList.contains('show')) {
+          // Allow focus within the menu
+          if (menu.contains(event.target)) {
+            return;
+          }
+          // Redirect focus to menu if trying to focus outside
+          event.preventDefault();
+          const firstFocusable = menu.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (firstFocusable) {
+            firstFocusable.focus();
+          }
+        }
+      } catch (error) {
+        console.error('Focus prevention error:', error);
+        emergencyCleanupFocus();
+      }
+    }
+
+    // Handle escape key to close menu
+    function handleEscapeKey(event) {
+      if (event.key === 'Escape') {
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu && menu.classList.contains('show')) {
+          toggleMobileCategoryMenu();
+        }
+      }
+    }
+
+    // Emergency cleanup function
+    function emergencyCleanupFocus() {
+      try {
+        // Remove all focus-related event listeners
+        document.removeEventListener('focusin', preventFocusLock);
+        document.removeEventListener('keydown', handleEscapeKey);
+        
+        // Close any open menus
+        const menu = document.getElementById('mobileCategoryMenu');
+        if (menu) {
+          menu.classList.remove('show');
+        }
+        
+        const overlay = document.getElementById('mobileMenuOverlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
+        
+        // Restore body overflow
+        document.body.style.overflow = '';
+        
+        // Force blur all elements
+        if (document.activeElement && document.activeElement !== document.body) {
+          document.activeElement.blur();
+        }
+        
+        // Clear Bootstrap focus traps
+        document.querySelectorAll('[data-bs-focus]').forEach(el => {
+          el.removeAttribute('data-bs-focus');
+        });
+        
+        console.log('Emergency focus cleanup completed');
+      } catch (error) {
+        console.error('Emergency cleanup failed:', error);
+      }
+    }
+
+    function showSubcategories(categoryId, categoryName, element) {
+      // Update active state
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+      
+      // Update header
+      document.getElementById('selectedCategoryName').textContent = categoryName;
+      
+      // Update view all link
+      const viewAllLink = document.getElementById('viewAllLink');
+      viewAllLink.href = '/buyer/category/' + categoryId + '/products';
+      
+      // Show loading state
+      const subcategoryItems = document.getElementById('subcategoryItems');
+      subcategoryItems.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div><p class="mt-2 mb-0 text-muted">Loading...</p></div>';
+      
+      // Fetch subcategories via AJAX
+      fetch(`/api/categories/${categoryId}/subcategories`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.subcategories && data.subcategories.length > 0) {
+            let html = '';
+            data.subcategories.forEach(subcategory => {
+              html += `
+                <a href="/buyer/subcategory/${subcategory.id}/products" class="subcategory-item">
+                  <div class="subcategory-icon">
+                    ${subcategory.emoji || '📦'}
+                  </div>
+                  <span class="subcategory-name">${subcategory.name}</span>
+                </a>
+              `;
+            });
+            subcategoryItems.innerHTML = html;
+          } else {
+            subcategoryItems.innerHTML = `
+              <div class="text-center py-4 text-muted">
+                <i class="bi bi-box-seam" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                <p>No subcategories available</p>
+              </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching subcategories:', error);
+          subcategoryItems.innerHTML = `
+            <div class="text-center py-4 text-muted">
+              <i class="bi bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+              <p>Failed to load subcategories</p>
+            </div>
+          `;
+        });
     }
 
     // Mobile Chatbot Function
@@ -6044,13 +7175,513 @@ li a{
       }
     }
 
-    // Close mobile category menu when clicking outside
+    // Enhanced mobile menu click handling with touch support
     document.addEventListener('click', function(event) {
       const menu = document.getElementById('mobileCategoryMenu');
       const menuButton = event.target.closest('.mobile-nav-item');
       
-      if (menu && menu.style.display === 'block' && !menu.contains(event.target) && !menuButton) {
-        menu.style.display = 'none';
+      if (menu && menu.classList.contains('show') && !menu.contains(event.target) && !menuButton) {
+        toggleMobileCategoryMenu();
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Enhanced touch event handling for mobile devices
+    document.addEventListener('touchstart', function(event) {
+      const menu = document.getElementById('mobileCategoryMenu');
+      const floatingMenu = document.getElementById('floatingMenu');
+      
+      // Handle mobile category menu
+      if (menu && menu.classList.contains('show')) {
+        const menuButton = event.target.closest('.mobile-nav-item');
+        if (!menu.contains(event.target) && !menuButton) {
+          event.preventDefault();
+          toggleMobileCategoryMenu();
+        }
+      }
+      
+      // Handle floating menu
+      if (floatingMenu && floatingMenu.style.display === 'block') {
+        const fabButton = event.target.closest('.fab-main');
+        const fabContainer = event.target.closest('#floatingActionsContainer');
+        if (!floatingMenu.contains(event.target) && !fabButton && !fabContainer) {
+          event.preventDefault();
+          toggleFloatingMenu();
+        }
+      }
+    }, { passive: false });
+
+    // Add global focus management and mobile navigation event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Clean up any existing focus locks on page load
+      if (typeof emergencyCleanupFocus === 'function') {
+        emergencyCleanupFocus();
+      }
+      
+      // Add event listeners for mobile navigation without onclick attributes
+      const categoryNavBtn = document.getElementById('categoryNav');
+      if (categoryNavBtn) {
+        // Add touch-action CSS for better mobile performance
+        categoryNavBtn.style.touchAction = 'manipulation';
+        
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        categoryNavBtn.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        categoryNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          // Only trigger if it's a tap (not a scroll)
+          if (touchDuration < 500 && touchDistance < 10) {
+            toggleMobileCategoryMenu();
+          }
+        });
+        
+        categoryNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+      }
+      
+      // Profile menu button
+      const profileNavBtn = document.getElementById('profileNav');
+      if (profileNavBtn) {
+        profileNavBtn.style.touchAction = 'manipulation';
+        
+        let profileTouchStartTime = 0;
+        let profileTouchStartY = 0;
+        
+        profileNavBtn.addEventListener('touchstart', function(e) {
+          profileTouchStartTime = Date.now();
+          profileTouchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        profileNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - profileTouchStartTime;
+          const touchDistance = Math.abs(touchEndY - profileTouchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            toggleMobileProfileMenu();
+          }
+        });
+        
+        profileNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileProfileMenu();
+        });
+      }
+      
+      // Auth menu button
+      const authNavBtn = document.getElementById('authNav');
+      if (authNavBtn) {
+        authNavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+        
+        authNavBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+      }
+      
+      // Food delivery button
+      const foodDeliveryBtn = document.querySelector('.food-delivery-btn');
+      if (foodDeliveryBtn) {
+        foodDeliveryBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+        
+        foodDeliveryBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+      }
+      
+      // Floating action button
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+        
+        fabMainBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFloatingMenu();
+        });
+      }
+      
+      // Category close button
+      const categoryCloseBtn = document.getElementById('categoryCloseBtn');
+      if (categoryCloseBtn) {
+        categoryCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+        
+        categoryCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileCategoryMenu();
+        });
+      }
+      
+      // Periodic cleanup every 5 seconds
+      setInterval(() => {
+        const hasOpenMenus = document.querySelector('#mobileCategoryMenu.show') || 
+                           document.querySelector('#floatingMenu:not([style*="display: none"])');
+        
+        if (!hasOpenMenus && document.activeElement && 
+            document.activeElement !== document.body &&
+            !document.activeElement.closest('input, textarea, select')) {
+          document.activeElement.blur();
+        }
+      }, 5000);
+    });
+
+    // Mobile Profile Menu Functions
+    function toggleMobileProfileMenu() {
+      try {
+        const popup = document.getElementById('mobileProfilePopup');
+        const overlay = document.getElementById('mobileProfileOverlay');
+        
+        console.log('Toggle mobile profile menu called'); // Debug log
+        
+        if (!popup) {
+          console.error('Mobile profile popup not found');
+          return;
+        }
+        
+        if (!overlay) {
+          console.error('Mobile profile overlay not found');
+          return;
+        }
+        
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile profile menu:', error);
+      }
+    }
+
+    // Mobile Authentication Menu Function
+    function toggleMobileAuthMenu() {
+      try {
+        const popup = document.getElementById('mobileAuthPopup');
+        const overlay = document.getElementById('mobileAuthOverlay');
+        
+        if (!popup || !overlay) {
+          // Create mobile auth popup if it doesn't exist
+          createMobileAuthPopup();
+          return;
+        }
+        
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile auth menu:', error);
+      }
+    }
+
+    // Create Mobile Auth Popup
+    function createMobileAuthPopup() {
+      const overlay = document.createElement('div');
+      overlay.id = 'mobileAuthOverlay';
+      overlay.className = 'mobile-popup-overlay';
+      overlay.addEventListener('click', toggleMobileAuthMenu);
+      overlay.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        toggleMobileAuthMenu();
+      });
+      
+      const popup = document.createElement('div');
+      popup.id = 'mobileAuthPopup';
+      popup.className = 'mobile-popup';
+      popup.innerHTML = 
+        '<div class="mobile-popup-header">' +
+          '<h5><i class="bi bi-person-circle me-2"></i>Join GrabBaskets</h5>' +
+          '<button id="mobileAuthCloseBtn" class="mobile-popup-close" style="touch-action: manipulation;">' +
+            '<i class="bi bi-x"></i>' +
+          '</button>' +
+        '</div>' +
+        '<div class="mobile-popup-content">' +
+          '<a href="{{ route('login') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-box-arrow-in-right text-primary"></i>' +
+            '<div>' +
+              '<div class="item-title">Customer Login</div>' +
+              '<div class="item-subtitle">Access your account & orders</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-person-plus text-success"></i>' +
+            '<div>' +
+              '<div class="item-title">Customer Sign Up</div>' +
+              '<div class="item-subtitle">Create new account</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<div class="mobile-popup-divider"></div>' +
+          
+          '<a href="{{ route('hotel-owner.register') }}" class="mobile-popup-item featured">' +
+            '<i class="bi bi-shop text-white"></i>' +
+            '<div>' +
+              '<div class="item-title">List Your Restaurant</div>' +
+              '<div class="item-subtitle">Join our food delivery network</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right text-white"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('delivery-partner.register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-scooter text-warning"></i>' +
+            '<div>' +
+              '<div class="item-title">Become Delivery Partner</div>' +
+              '<div class="item-subtitle">Earn money delivering orders</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+        '</div>';
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(popup);
+      
+      // Add event listener to close button after DOM insertion
+      const authCloseBtn = document.getElementById('mobileAuthCloseBtn');
+      if (authCloseBtn) {
+        authCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+        authCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileAuthMenu();
+        });
+      }
+      
+      // Show the popup
+      setTimeout(() => {
+        popup.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }, 10);
+    }
+
+    // Mobile Food Delivery Menu Function
+    function toggleMobileFoodMenu() {
+      try {
+        const popup = document.getElementById('mobileFoodPopup');
+        const overlay = document.getElementById('mobileFoodOverlay');
+        
+        if (!popup || !overlay) {
+          // Create mobile food delivery popup if it doesn't exist
+          createMobileFoodPopup();
+          return;
+        }
+        
+        const isOpen = popup.classList.contains('show');
+        
+        if (isOpen) {
+          // Close menu
+          popup.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = '';
+        } else {
+          // Open menu
+          popup.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      } catch (error) {
+        console.error('Error toggling mobile food menu:', error);
+      }
+    }
+
+    // Create Mobile Food Delivery Popup
+    function createMobileFoodPopup() {
+      const overlay = document.createElement('div');
+      overlay.id = 'mobileFoodOverlay';
+      overlay.className = 'mobile-popup-overlay';
+      overlay.addEventListener('click', toggleMobileFoodMenu);
+      overlay.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        toggleMobileFoodMenu();
+      });
+      
+      const popup = document.createElement('div');
+      popup.id = 'mobileFoodPopup';
+      popup.className = 'mobile-popup';
+      popup.innerHTML = 
+        '<div class="mobile-popup-header" style="background: linear-gradient(135deg, #FF6B00 0%, #FF9900 100%);">' +
+          '<h5><i class="bi bi-bicycle me-2"></i>Food Delivery</h5>' +
+          '<button id="mobileFoodCloseBtn" class="mobile-popup-close" style="touch-action: manipulation;">' +
+            '<i class="bi bi-x"></i>' +
+          '</button>' +
+        '</div>' +
+        '<div class="mobile-popup-content">' +
+          '<a href="{{ route('products.index') }}?category=food" class="mobile-popup-item">' +
+            '<i class="bi bi-search text-primary"></i>' +
+            '<div>' +
+              '<div class="item-title">Browse Restaurants</div>' +
+              '<div class="item-subtitle">Find food from local restaurants</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('cart.index') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-cart3 text-success"></i>' +
+            '<div>' +
+              '<div class="item-title">Your Cart</div>' +
+              '<div class="item-subtitle">Review and checkout your order</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+          
+          '<div class="mobile-popup-divider"></div>' +
+          
+          '<a href="{{ route('hotel-owner.register') }}" class="mobile-popup-item featured">' +
+            '<i class="bi bi-shop text-white"></i>' +
+            '<div>' +
+              '<div class="item-title">List Your Restaurant</div>' +
+              '<div class="item-subtitle">Start selling food on GrabBaskets</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right text-white"></i>' +
+          '</a>' +
+          
+          '<a href="{{ route('delivery-partner.register') }}" class="mobile-popup-item">' +
+            '<i class="bi bi-scooter text-warning"></i>' +
+            '<div>' +
+              '<div class="item-title">Become Delivery Partner</div>' +
+              '<div class="item-subtitle">Deliver food and earn money</div>' +
+            '</div>' +
+            '<i class="bi bi-chevron-right"></i>' +
+          '</a>' +
+        '</div>';
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(popup);
+      
+      // Add event listener to close button after DOM insertion
+      const foodCloseBtn = document.getElementById('mobileFoodCloseBtn');
+      if (foodCloseBtn) {
+        foodCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+        foodCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMobileFoodMenu();
+        });
+      }
+      
+      // Show the popup
+      setTimeout(() => {
+        popup.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }, 10);
+    }
+
+    // Close mobile auth menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const authPopup = document.getElementById('mobileAuthPopup');
+      const authOverlay = document.getElementById('mobileAuthOverlay');
+      const authButton = event.target.closest('[onclick="toggleMobileAuthMenu()"]');
+      
+      if (authPopup && authOverlay && authPopup.classList.contains('show') && 
+          !authPopup.contains(event.target) && !authButton) {
+        authPopup.classList.remove('show');
+        authOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close mobile food menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const foodPopup = document.getElementById('mobileFoodPopup');
+      const foodOverlay = document.getElementById('mobileFoodOverlay');
+      const foodButton = event.target.closest('[onclick="toggleMobileFoodMenu()"]');
+      
+      if (foodPopup && foodOverlay && foodPopup.classList.contains('show') && 
+          !foodPopup.contains(event.target) && !foodButton) {
+        foodPopup.classList.remove('show');
+        foodOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close mobile profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const popup = document.getElementById('mobileProfilePopup');
+      const overlay = document.getElementById('mobileProfileOverlay');
+      const accountButton = event.target.closest('[onclick="toggleMobileProfileMenu()"]');
+      
+      if (popup && popup.classList.contains('show') && !popup.contains(event.target) && !accountButton) {
+        popup.classList.remove('show');
+        overlay.classList.remove('show');
         document.body.style.overflow = '';
       }
     });
@@ -6365,20 +7996,23 @@ li a{
 
   <!-- Mobile Bottom Navigation  -->
   <div class="mobile-bottom-nav">
-    <a href="{{ route('home') }}" class="mobile-nav-item active">
+    <a href="{{ route('home') }}" class="mobile-nav-item active" id="homeNav">
       <i class="bi bi-house-fill"></i>
       <span>Home</span>
     </a>
-    <a href="{{ route('products.index') }}" class="mobile-nav-item">
+    
+    <!-- Mobile Category Menu Button -->
+    <div class="mobile-nav-item" id="categoryNav">
       <i class="bi bi-grid-3x3-gap-fill"></i>
       <span>Categories</span>
-    </a>
-    <!-- Mobile Category Menu Button with Chatbot -->
-    <div class="mobile-nav-item" onclick="toggleMobileCategoryMenu()" style="cursor: pointer;">
-      <i class="bi bi-chat-dots-fill"></i>
-      <span>Help</span>
     </div>
-    <a href="{{ route('cart.index') }}" class="mobile-nav-item">
+    
+    <a href="{{ route('products.index') }}" class="mobile-nav-item" id="searchNav">
+      <i class="bi bi-search"></i>
+      <span>Search</span>
+    </a>
+    
+    <a href="{{ route('cart.index') }}" class="mobile-nav-item" id="cartNav">
       <i class="bi bi-cart3"></i>
       <span>Cart</span>
       @if(session('cart') && count(session('cart')) > 0)
@@ -6387,59 +8021,151 @@ li a{
     </a>
     
     @auth
-      <a href="{{ route('profile.show') }}" class="mobile-nav-item">
+      <div class="mobile-nav-item" id="profileNav">
         <i class="bi bi-person-circle"></i>
         <span>Account</span>
-      </a>
+      </div>
     @else
-      <a href="{{ route('login') }}" class="mobile-nav-item">
+      <div class="mobile-nav-item" id="authNav">
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Login</span>
-      </a>
+      </div>
     @endauth
   </div>
 
-  <!-- Mobile Category Menu Popup -->
-  <div id="mobileCategoryMenu" class="mobile-category-popup" style="display: none;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0"><i class="bi bi-chat-dots-fill me-2"></i>Help & Categories</h5>
-      <button onclick="toggleMobileCategoryMenu()" class="btn-close" aria-label="Close"></button>
+  <!-- Mobile Food Delivery Quick Action Button -->
+  <div class="mobile-food-delivery-fab" id="mobileFoodFab">
+    <button class="food-delivery-btn">
+      <i class="bi bi-bicycle"></i>
+      <span>Food Delivery</span>
+    </button>
+  </div>
+
+  <!-- Modern Mobile Category Menu (Meesho/Blinkit Style) -->
+  <div id="mobileCategoryMenu" class="modern-category-popup">
+    <!-- Header -->
+    <div class="category-header">
+      <h4><i class="bi bi-grid-3x3-gap me-2"></i>Categories</h4>
+      <button class="category-close-btn" id="categoryCloseBtn">
+        <i class="bi bi-x"></i>
+      </button>
     </div>
-    
-    <!-- Chatbot Section -->
-    <div class="mb-4">
-      <div class="card" style="border-radius: 12px; border: 2px solid #ff6b35; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
-        <div class="card-body text-center text-white p-3">
-          <i class="bi bi-chat-dots-fill fs-2 mb-2"></i>
-          <h6 class="mb-2">Need Help?</h6>
-          <button onclick="openMobileChatbot()" class="btn btn-light btn-sm fw-bold">
-            <i class="bi bi-chat-square-text me-1"></i>Start Chat
-          </button>
+
+    <!-- Main Content -->
+    <div class="category-content">
+      <!-- Left Sidebar - Categories -->
+      <div class="category-sidebar">
+        @if(!empty($categories) && $categories->count())
+          @foreach($categories as $index => $category)
+            <div class="category-item {{ $index === 0 ? 'active' : '' }}" 
+                 data-category-id="{{ $category->id }}" 
+                 onclick="showSubcategories({{ $category->id }}, '{{ $category->name }}', this)">
+              <span class="category-emoji">{!! $category->emoji ?? '🛍️' !!}</span>
+              <span class="category-name">{{ Str::limit($category->name, 10) }}</span>
+            </div>
+          @endforeach
+        @else
+          <div class="category-item">
+            <span class="category-emoji">🛍️</span>
+            <span class="category-name">No Categories</span>
+          </div>
+        @endif
+      </div>
+
+      <!-- Right Panel - Subcategories -->
+      <div class="subcategory-panel">
+        <div class="subcategory-header">
+          <h5 id="selectedCategoryName">
+            @if(!empty($categories) && $categories->count())
+              {{ $categories->first()->name }}
+            @else
+              Select Category
+            @endif
+          </h5>
+        </div>
+        
+        <div class="subcategory-list" id="subcategoryList">
+          <!-- View All Products for selected category -->
+          <a href="#" class="all-products-item" id="viewAllLink">
+            <i class="bi bi-eye me-2"></i>View All Products
+          </a>
+          
+          <!-- Subcategories will be loaded here -->
+          <div id="subcategoryItems">
+            @if(!empty($categories) && $categories->count())
+              @php $firstCategory = $categories->first(); @endphp
+              @if($firstCategory->subcategories && $firstCategory->subcategories->count())
+                @foreach($firstCategory->subcategories as $subcategory)
+                  <a href="{{ route('buyer.productsBySubcategory', $subcategory->id) }}" class="subcategory-item">
+                    <div class="subcategory-icon">
+                      {!! $subcategory->emoji ?? '📦' !!}
+                    </div>
+                    <span class="subcategory-name">{{ $subcategory->name }}</span>
+                  </a>
+                @endforeach
+              @else
+                <div class="text-center py-4 text-muted">
+                  <i class="bi bi-box-seam" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                  <p>No subcategories available</p>
+                </div>
+              @endif
+            @endif
+          </div>
         </div>
       </div>
     </div>
-    
-    <!-- Categories Section -->
-    <div class="mb-3">
-      <h6 class="text-muted mb-3"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Shop by Category</h6>
-      <div class="row g-2">
-        @foreach($categories as $category)
-          <div class="col-4">
-            <a href="{{ route('buyer.productsByCategory', $category->id) }}" class="text-decoration-none">
-              <div class="card h-100 text-center p-2 category-mobile-card" style="border-radius: 12px; transition: all 0.3s;">
-                <div class="card-body p-1">
-                  <div style="font-size: 1.5rem; margin-bottom: 8px;">{!! $category->emoji !!}</div>
-                  <div style="font-size: 0.8rem; font-weight: 600; color: #232f3e; line-height: 1.2;">
-                    {{ Str::limit($category->name, 12) }}
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        @endforeach
+  </div>
+
+  <!-- Mobile Profile Menu Popup -->
+  @auth
+  <div class="mobile-profile-overlay" id="mobileProfileOverlay" onclick="toggleMobileProfileMenu()"></div>
+  <div class="mobile-profile-popup" id="mobileProfilePopup">
+    <div class="mobile-profile-header">
+      <div class="mobile-profile-avatar">
+        <i class="bi bi-person-fill" style="font-size: 2rem; color: white;"></i>
       </div>
+      <h5 class="mb-1">{{ Auth::user()->name ?? 'User' }}</h5>
+      <p class="mb-0 opacity-75" style="font-size: 0.9rem;">{{ Auth::user()->email }}</p>
+    </div>
+    <div class="mobile-profile-menu">
+      <a href="{{ route('profile.show') }}" class="mobile-profile-item">
+        <i class="bi bi-person-circle"></i>
+        <span>My Profile</span>
+      </a>
+      <a href="{{ route('orders.index') }}" class="mobile-profile-item">
+        <i class="bi bi-box-seam"></i>
+        <span>My Orders</span>
+      </a>
+      <a href="{{ route('wishlist.index') }}" class="mobile-profile-item">
+        <i class="bi bi-heart"></i>
+        <span>My Wishlist</span>
+      </a>
+      <a href="{{ route('cart.index') }}" class="mobile-profile-item">
+        <i class="bi bi-cart3"></i>
+        <span>My Cart</span>
+      </a>
+      <a href="{{ route('notifications.index') }}" class="mobile-profile-item">
+        <i class="bi bi-bell"></i>
+        <span>Notifications</span>
+      </a>
+      <a href="#" class="mobile-profile-item">
+        <i class="bi bi-headset"></i>
+        <span>Help & Support</span>
+      </a>
+      <a href="#" class="mobile-profile-item">
+        <i class="bi bi-gear"></i>
+        <span>Settings</span>
+      </a>
+      <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+        @csrf
+        <button type="submit" class="mobile-profile-item logout" style="width: 100%; background: none; border: none; text-align: left;">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </button>
+      </form>
     </div>
   </div>
+  @endauth
 
   <!-- Location Detection Modal -->
   <div class="location-modal-overlay" id="locationModalOverlay" onclick="closeLocationModal()"></div>
@@ -6605,8 +8331,15 @@ li a{
 
     // Detect current location (manual)
     function detectCurrentLocation() {
+      // Check if browser supports geolocation
       if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser');
+        alert('❌ Geolocation is not supported by your browser. Please use a modern browser like Chrome, Firefox, or Safari.');
+        return;
+      }
+
+      // Check if site is running on HTTPS (required for geolocation)
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        alert('⚠️ Location services require a secure connection (HTTPS). Please use https://grabbaskets.com');
         return;
       }
 
@@ -6615,13 +8348,32 @@ li a{
       document.getElementById('locationLoading').style.display = 'block';
       document.getElementById('currentLocationDisplay').classList.remove('active');
 
+      // Check for permission state (if supported)
+      if (navigator.permissions) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+          console.log('📍 Geolocation permission:', result.state);
+          
+          if (result.state === 'denied') {
+            document.getElementById('locationLoading').style.display = 'none';
+            document.getElementById('detectButtonText').textContent = 'Detect My Location';
+            alert('❌ Location access is blocked. Please enable location access in your browser settings:\n\n' +
+                  '1. Click the lock icon 🔒 in the address bar\n' +
+                  '2. Find "Location" permission\n' +
+                  '3. Change it to "Allow"\n' +
+                  '4. Refresh the page');
+            return;
+          }
+        });
+      }
+
+      // Request geolocation with improved options
       navigator.geolocation.getCurrentPosition(
         function(position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const accuracy = position.coords.accuracy;
 
-          console.log('📍 Location detected:', lat, lng, 'Accuracy:', accuracy + 'm');
+          console.log('✅ Location detected:', lat, lng, 'Accuracy:', accuracy + 'm');
 
           // Reverse geocode to get address
           reverseGeocode(lat, lng, function(address) {
@@ -6656,22 +8408,42 @@ li a{
           document.getElementById('locationLoading').style.display = 'none';
           document.getElementById('detectButtonText').textContent = 'Detect My Location';
           
-          let errorMessage = 'Unable to detect location. ';
+          let errorMessage = '❌ Unable to detect location.\n\n';
+          let solution = '';
+          
           switch(error.code) {
             case error.PERMISSION_DENIED:
-              errorMessage += 'Please allow location access in your browser settings.';
+              errorMessage += '🚫 Location access was denied.';
+              solution = '\n\n✅ How to fix:\n' +
+                        '1. Click the location icon 📍 or lock icon 🔒 in your browser address bar\n' +
+                        '2. Allow location access for this website\n' +
+                        '3. Refresh the page and try again\n\n' +
+                        'Or enter your location manually using the search box below.';
               break;
             case error.POSITION_UNAVAILABLE:
-              errorMessage += 'Location information is unavailable.';
+              errorMessage += '📍 Location information is currently unavailable.';
+              solution = '\n\n✅ Please check:\n' +
+                        '• Your device location services are enabled\n' +
+                        '• You have a stable internet connection\n' +
+                        '• Try entering your location manually';
               break;
             case error.TIMEOUT:
-              errorMessage += 'Location request timed out.';
+              errorMessage += '⏱️ Location request timed out.';
+              solution = '\n\n✅ Please:\n' +
+                        '• Check your internet connection\n' +
+                        '• Try again in a moment\n' +
+                        '• Or enter your location manually';
               break;
             default:
-              errorMessage += 'An unknown error occurred.';
+              errorMessage += '⚠️ An unknown error occurred.';
+              solution = '\n\n✅ Please try:\n' +
+                        '• Refreshing the page\n' +
+                        '• Using a different browser\n' +
+                        '• Entering your location manually';
           }
-          alert(errorMessage);
-          console.error('Geolocation error:', error);
+          
+          alert(errorMessage + solution);
+          console.error('Geolocation error:', error.code, error.message);
         },
         { 
           enableHighAccuracy: true, 
@@ -6930,6 +8702,530 @@ li a{
           }
         });
       }
+    });
+
+    // COMPREHENSIVE FOCUS LOCK PREVENTION SYSTEM
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // Global focus lock prevention
+      let focusLockActive = false;
+      let lastActiveElement = null;
+      
+      // Function to safely blur all elements
+      function emergencyBlurAll() {
+        try {
+          // Blur document active element
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+          
+          // Force blur on all potentially problematic elements
+          document.querySelectorAll('button, input, select, a, [tabindex]').forEach(el => {
+            try {
+              if (el.blur && typeof el.blur === 'function') {
+                el.blur();
+              }
+            } catch (e) {
+              // Ignore individual element errors
+            }
+          });
+          
+          // Reset focus to body
+          document.body.focus();
+          setTimeout(() => {
+            if (document.activeElement !== document.body) {
+              document.body.blur();
+            }
+          }, 50);
+          
+        } catch (error) {
+          console.log('Emergency blur completed with some errors (safe to ignore)');
+        }
+      }
+      
+      // Prevent focus lock on any click
+      document.addEventListener('click', function(e) {
+        // Emergency blur on any click that might cause focus lock
+        setTimeout(() => {
+          if (focusLockActive) {
+            emergencyBlurAll();
+            focusLockActive = false;
+          }
+        }, 100);
+      }, true);
+      
+      // Monitor for focus lock situations
+      document.addEventListener('focusin', function(e) {
+        lastActiveElement = e.target;
+        
+        // Check for potential focus lock
+        setTimeout(() => {
+          if (document.activeElement && 
+              document.activeElement.tagName && 
+              (document.activeElement.tagName.toLowerCase() === 'button' || 
+               document.activeElement.hasAttribute('data-bs-toggle'))) {
+            focusLockActive = true;
+            
+            // Prevent focus lock after a short delay
+            setTimeout(() => {
+              if (focusLockActive && document.activeElement === lastActiveElement) {
+                emergencyBlurAll();
+                focusLockActive = false;
+              }
+            }, 200);
+          }
+        }, 50);
+      });
+      
+      // Enhanced floating menu button handler
+      const fabMainBtn = document.getElementById('fabMainBtn');
+      if (fabMainBtn) {
+        fabMainBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleFloatingMenu();
+          }, 50);
+        });
+        
+        // Add hover effects back
+        fabMainBtn.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.05)';
+        });
+        
+        fabMainBtn.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+      }
+      
+      // Enhanced floating menu close button handler
+      const floatingMenuCloseBtn = document.getElementById('floatingMenuCloseBtn');
+      if (floatingMenuCloseBtn) {
+        floatingMenuCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleFloatingMenu();
+          }, 50);
+        });
+        
+        // Add hover effects
+        floatingMenuCloseBtn.addEventListener('mouseenter', function() {
+          this.style.background = 'rgba(139,69,19,0.2)';
+        });
+        
+        floatingMenuCloseBtn.addEventListener('mouseleave', function() {
+          this.style.background = 'rgba(139,69,19,0.1)';
+        });
+      }
+      
+      // Enhanced mobile category navigation with better touch handling
+      const categoryNav = document.getElementById('categoryNav');
+      if (categoryNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        // Touch start handler
+        categoryNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        // Touch end handler
+        categoryNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          // Reset visual feedback
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          // Only trigger if it's a quick tap (not a scroll)
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileCategoryMenu();
+            }, 50);
+          }
+        });
+        
+        // Click handler for non-touch devices
+        categoryNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileCategoryMenu();
+          }, 50);
+        });
+      }
+      
+      // Enhanced mobile profile navigation with better touch handling
+      const profileNav = document.getElementById('profileNav');
+      if (profileNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        profileNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        profileNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileProfileMenu();
+            }, 50);
+          }
+        });
+        
+        profileNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileProfileMenu();
+          }, 50);
+        });
+      }
+      
+      // Enhanced auth navigation with better touch handling
+      const authNav = document.getElementById('authNav');
+      if (authNav) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        
+        authNav.addEventListener('touchstart', function(e) {
+          touchStartTime = Date.now();
+          touchStartY = e.touches[0].clientY;
+          this.style.transform = 'scale(0.95)';
+          this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        authNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const touchEndTime = Date.now();
+          const touchEndY = e.changedTouches[0].clientY;
+          const touchDuration = touchEndTime - touchStartTime;
+          const touchDistance = Math.abs(touchEndY - touchStartY);
+          
+          this.style.transform = 'scale(1)';
+          this.style.opacity = '1';
+          
+          if (touchDuration < 500 && touchDistance < 10) {
+            emergencyBlurAll();
+            setTimeout(() => {
+              toggleMobileAuthMenu();
+            }, 50);
+          }
+        });
+        
+        authNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          emergencyBlurAll();
+          
+          setTimeout(() => {
+            toggleMobileAuthMenu();
+          }, 50);
+        });
+      }
+      
+      // Periodic focus lock detection and cleanup
+      setInterval(() => {
+        if (document.activeElement && 
+            document.activeElement.tagName && 
+            document.activeElement.hasAttribute('data-bs-toggle') &&
+            !document.querySelector('.show')) {
+          // Potential focus lock detected
+          emergencyBlurAll();
+        }
+      }, 1000);
+      
+      // Global escape key handler
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          emergencyBlurAll();
+          
+          // Close all menus
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu && mobileCategoryMenu.classList.contains('show')) {
+            toggleMobileCategoryMenu();
+          }
+          
+          const floatingMenu = document.getElementById('floatingMenu');
+          if (floatingMenu && floatingMenu.style.display === 'block') {
+            toggleFloatingMenu();
+          }
+        }
+      });
+      
+      // Enhanced visibility change handler
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+          // Page became visible again, ensure no focus lock
+          setTimeout(emergencyBlurAll, 100);
+        }
+      });
+      
+      // Window focus handler
+      window.addEventListener('focus', function() {
+        setTimeout(emergencyBlurAll, 100);
+      });
+      
+      console.log('🛡️ Comprehensive Focus Lock Prevention System Activated');
+      
+      // Mobile button event listeners to replace onclick attributes
+      
+      // Mobile location bar
+      const mobileLocationBar = document.getElementById('mobileLocationBar');
+      if (mobileLocationBar) {
+        mobileLocationBar.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+        mobileLocationBar.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLocationModal();
+        });
+      }
+      
+      // Mobile login close button
+      const mobileLoginCloseBtn = document.getElementById('mobileLoginCloseBtn');
+      if (mobileLoginCloseBtn) {
+        mobileLoginCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobileLoginCard();
+        });
+        mobileLoginCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobileLoginCard();
+        });
+      }
+      
+      // FAB hide button
+      const fabHideBtn = document.getElementById('fabHideBtn');
+      if (fabHideBtn) {
+        fabHideBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          hideFloatingButton();
+        });
+        fabHideBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          hideFloatingButton();
+        });
+      }
+      
+      // Show FAB button
+      const showFabBtn = document.getElementById('showFabBtn');
+      if (showFabBtn) {
+        showFabBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showFloatingButton();
+        });
+        showFabBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showFloatingButton();
+        });
+      }
+      
+      // Flash sale navigation buttons
+      const flashPrevBtn = document.getElementById('flashPrevBtn');
+      if (flashPrevBtn) {
+        flashPrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', -1);
+        });
+        flashPrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', -1);
+        });
+      }
+      
+      const flashNextBtn = document.getElementById('flashNextBtn');
+      if (flashNextBtn) {
+        flashNextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', 1);
+        });
+        flashNextBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('flash', 1);
+        });
+      }
+      
+      // Free delivery navigation buttons
+      const freePrevBtn = document.getElementById('freePrevBtn');
+      if (freePrevBtn) {
+        freePrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', -1);
+        });
+        freePrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', -1);
+        });
+      }
+      
+      const freeNextBtn = document.getElementById('freeNextBtn');
+      if (freeNextBtn) {
+        freeNextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', 1);
+        });
+        freeNextBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          scrollShelf('free', 1);
+        });
+      }
+      
+      // Trending navigation buttons
+      const trendingPrevBtn = document.getElementById('trendingPrevBtn');
+      if (trendingPrevBtn) {
+        trendingPrevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          slideTrending(-1);
+        });
+        trendingPrevBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          slideTrending(-1);
+        });
+      }
+      
+      // Mobile Bottom Navigation Handlers
+      const categoryNav = document.getElementById('categoryNav');
+      if (categoryNav) {
+        categoryNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+        categoryNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+      }
+      
+      const profileNav = document.getElementById('profileNav');
+      if (profileNav) {
+        profileNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '{{ route("buyer.dashboard") }}';
+        });
+        profileNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.href = '{{ route("buyer.dashboard") }}';
+        });
+      }
+      
+      const authNav = document.getElementById('authNav');
+      if (authNav) {
+        authNav.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileLoginCard = document.getElementById('mobileLoginCard');
+          if (mobileLoginCard) {
+            mobileLoginCard.style.display = 'block';
+            setTimeout(() => {
+              mobileLoginCard.classList.add('show');
+            }, 10);
+          }
+        });
+        authNav.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileLoginCard = document.getElementById('mobileLoginCard');
+          if (mobileLoginCard) {
+            mobileLoginCard.style.display = 'block';
+            setTimeout(() => {
+              mobileLoginCard.classList.add('show');
+            }, 10);
+          }
+        });
+      }
+      
+      // Category close button
+      const categoryCloseBtn = document.getElementById('categoryCloseBtn');
+      if (categoryCloseBtn) {
+        categoryCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+        categoryCloseBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const mobileCategoryMenu = document.getElementById('mobileCategoryMenu');
+          if (mobileCategoryMenu) {
+            mobileCategoryMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+      
+      console.log('📱 Mobile Bottom Navigation & Button Event Listeners Activated');
     });
   </script>
 

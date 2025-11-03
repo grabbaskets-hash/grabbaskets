@@ -9,12 +9,15 @@ use App\Models\Blog;
 use App\Models\Seller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BuyerController extends Controller
 {
 public function index()
 {
-    $categories = Category::with('subcategories')->get();
+    $categories = Category::with(['subcategories' => function($query) {
+        $query->withCount('products');
+    }])->withCount('products')->get();
 
     // Carousel products with higher discounts for banner
     $carouselProducts = Product::with('category')
@@ -142,6 +145,39 @@ $blogProducts = Product::whereNotNull('image')
         ->get();
 
     return view('buyer.index', compact('categories', 'products', 'carouselProducts','trending','lookbookProduct','blogProducts','deals','flashSale','freeDelivery'));
+}
+
+public function dashboard()
+{
+    try {
+        // Simplified approach with fallbacks
+        Log::info('Buyer Dashboard: Starting dashboard load');
+        
+        // Try to load categories with minimal complexity first
+        $categories = collect();
+        
+        try {
+            $categories = Category::select('id', 'name', 'emoji')->limit(50)->get();
+            Log::info('Buyer Dashboard: Basic categories loaded', ['count' => $categories->count()]);
+        } catch (\Exception $categoryError) {
+            Log::warning('Buyer Dashboard: Category loading failed, using empty collection', [
+                'error' => $categoryError->getMessage()
+            ]);
+            $categories = collect();
+        }
+        
+        // Return view with minimal data
+        return view('buyer.dashboard', ['categories' => $categories]);
+        
+    } catch (\Exception $e) {
+        Log::error('Buyer Dashboard Critical Error: ' . $e->getMessage(), [
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+        
+        // Ultimate fallback - simple response
+        return response('<h1>Dashboard Loading...</h1><p>Please refresh the page. If the problem persists, contact support.</p><script>setTimeout(() => window.location.reload(), 3000);</script>', 500);
+    }
 }
 
 
@@ -347,124 +383,154 @@ public function search(Request $request)
 
     public function productsByCategory(Request $request, $category_id)
     {
-        $category = Category::findOrFail($category_id);
-        $query = Product::where('category_id', $category_id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%');
+        try {
+            $category = Category::findOrFail($category_id);
+            $query = Product::with(['category', 'subcategory'])->where('category_id', $category_id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%');
 
-        // Filters
-        if ($request->filled('price_min')) {
-            $query->where('price', '>=', (float)$request->input('price_min'));
-        }
-        if ($request->filled('price_max')) {
-            $query->where('price', '<=', (float)$request->input('price_max'));
-        }
-        if ($request->filled('discount_min')) {
-            $query->where('discount', '>=', (float)$request->input('discount_min'));
-        }
-        if ($request->boolean('free_delivery')) {
-            $query->where(function($q){ $q->whereNull('delivery_charge')->orWhere('delivery_charge', 0); });
-        }
+            // Filters
+            if ($request->filled('price_min')) {
+                $query->where('price', '>=', (float)$request->input('price_min'));
+            }
+            if ($request->filled('price_max')) {
+                $query->where('price', '<=', (float)$request->input('price_max'));
+            }
+            if ($request->filled('discount_min')) {
+                $query->where('discount', '>=', (float)$request->input('discount_min'));
+            }
+            if ($request->boolean('free_delivery')) {
+                $query->where(function($q){ $q->whereNull('delivery_charge')->orWhere('delivery_charge', 0); });
+            }
 
-        if ($request->filled('q')) {
-        $search = $request->q;
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
-        });
-    }
+            if ($request->filled('q')) {
+                $search = $request->q;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
 
-        // Sorting
-        $sort = $request->input('sort');
-        switch ($sort) {
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            default:
-                $query->latest();
+            // Sorting
+            $sort = $request->input('sort', 'latest');
+            switch ($sort) {
+                case 'price_asc':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $products = $query->paginate(12)->appends($request->query());
+            $allCategories = Category::orderBy('name')->get();
+            $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
+            
+            // Make sure all required variables are set for the view
+            return view('buyer.products', [
+                'category' => $category,
+                'products' => $products,
+                'categories' => $allCategories,
+                'subsByCategory' => $subsByCategory,
+                'activeCategoryId' => (int)$category_id,
+                'activeSubcategoryId' => null,
+                'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
+                'searchQuery' => $request->input('q', ''),
+                'totalResults' => $products->total(),
+                'matchedStores' => collect([]),
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Category products error: ' . $e->getMessage(), [
+                'category_id' => $category_id,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            // Return a fallback response
+            return response()->view('errors.500', [
+                'message' => 'Unable to load category products. Please try again later.'
+            ], 500);
         }
-
-        $products = $query->paginate(12)->appends($request->query());
-        $allCategories = Category::orderBy('name')->get();
-        $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
-        return view('buyer.products', [
-            'category' => $category,
-            'products' => $products,
-            'categories' => $allCategories,
-            'subsByCategory' => $subsByCategory,
-            'activeCategoryId' => (int)$category_id,
-            'activeSubcategoryId' => null,
-            'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
-        ]);
     }
 
     public function productsBySubcategory(Request $request, $subcategory_id)
     {
-         $subcategory = Subcategory::with('category')->findOrFail($subcategory_id);
-          $products = Product::where('subcategory_id', $subcategory_id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->paginate(10);
-        $query = Product::where('subcategory_id', $subcategory_id)
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%');
+        try {
+            $subcategory = Subcategory::with('category')->findOrFail($subcategory_id);
+            $query = Product::with(['category', 'subcategory'])->where('subcategory_id', $subcategory_id)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%');
 
-        // Filters
-        if ($request->filled('price_min')) {
-            $query->where('price', '>=', (float)$request->input('price_min'));
-        }
-        if ($request->filled('price_max')) {
-            $query->where('price', '<=', (float)$request->input('price_max'));
-        }
-        if ($request->filled('discount_min')) {
-            $query->where('discount', '>=', (float)$request->input('discount_min'));
-        }
-        if ($request->boolean('free_delivery')) {
-            $query->where(function($q){ $q->whereNull('delivery_charge')->orWhere('delivery_charge', 0); });
-        }
+            // Filters
+            if ($request->filled('price_min')) {
+                $query->where('price', '>=', (float)$request->input('price_min'));
+            }
+            if ($request->filled('price_max')) {
+                $query->where('price', '<=', (float)$request->input('price_max'));
+            }
+            if ($request->filled('discount_min')) {
+                $query->where('discount', '>=', (float)$request->input('discount_min'));
+            }
+            if ($request->boolean('free_delivery')) {
+                $query->where(function($q){ $q->whereNull('delivery_charge')->orWhere('delivery_charge', 0); });
+            }
 
-        // Sorting
-        $sort = $request->input('sort');
-        switch ($sort) {
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            default:
-                $query->latest();
-        }
+            // Sorting
+            $sort = $request->input('sort', 'latest');
+            switch ($sort) {
+                case 'price_asc':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                default:
+                    $query->latest();
+            }
 
-        $products = $query->paginate(12)->appends($request->query());
-        $allCategories = Category::orderBy('name')->get();
-        $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
-        return view('buyer.products', [
-            'subcategory' => $subcategory,
-            'products' => $products,
-            'categories' => $allCategories,
-            'subsByCategory' => $subsByCategory,
-            'activeCategoryId' => (int)$subcategory->category_id,
-            'activeSubcategoryId' => (int)$subcategory_id,
-            'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
-        ]);
+            $products = $query->paginate(12)->appends($request->query());
+            $allCategories = Category::orderBy('name')->get();
+            $subsByCategory = Subcategory::orderBy('name')->get()->groupBy('category_id');
+            
+            return view('buyer.products', [
+                'subcategory' => $subcategory,
+                'products' => $products,
+                'categories' => $allCategories,
+                'subsByCategory' => $subsByCategory,
+                'activeCategoryId' => (int)$subcategory->category_id,
+                'activeSubcategoryId' => (int)$subcategory_id,
+                'filters' => $request->only(['price_min','price_max','discount_min','free_delivery','sort']),
+                'searchQuery' => $request->input('q', ''),
+                'totalResults' => $products->total(),
+                'matchedStores' => collect([]),
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Subcategory products error: ' . $e->getMessage(), [
+                'subcategory_id' => $subcategory_id,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            // Return a fallback response
+            return response()->view('errors.500', [
+                'message' => 'Unable to load subcategory products. Please try again later.'
+            ], 500);
+        }
     }}
 

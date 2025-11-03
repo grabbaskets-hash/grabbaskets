@@ -17,7 +17,10 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
@@ -74,7 +77,17 @@ Route::post('/admin/products/{product}/update-seller', function (Request $reques
 |--------------------------------------------------------------------------
 */
 
-// DIAGNOSTIC ROUTE - Access /test-index-debug to check all components
+// DIAGNOSTIC ROUTES - For production troubleshooting
+Route::get('/health-check', function () {
+    return response()->json([
+        'status' => 'OK',
+        'timestamp' => now()->toDateTimeString(),
+        'app' => 'GrabBaskets',
+        'env' => config('app.env'),
+        'debug' => config('app.debug')
+    ], 200);
+});
+
 Route::get('/test-index-debug', function () {
     try {
         $diagnostics = [];
@@ -114,7 +127,12 @@ Route::get('/test-index-debug', function () {
             $diagnostics['database'] = 'ERROR: ' . $e->getMessage();
         }
         
-        // Test 6: Try to load the actual index route logic
+        // Test 6: Storage permissions
+        $diagnostics['storage_writable'] = is_writable(storage_path('logs')) ? 'YES' : 'NO';
+        $diagnostics['cache_writable'] = is_writable(storage_path('framework/cache')) ? 'YES' : 'NO';
+        $diagnostics['views_writable'] = is_writable(storage_path('framework/views')) ? 'YES' : 'NO';
+        
+        // Test 7: Try to load the actual index route logic
         try {
             $banners = \App\Models\Banner::active()->byPosition('hero')->get();
             $categories = \App\Models\Category::with('subcategories')->get();
@@ -123,12 +141,18 @@ Route::get('/test-index-debug', function () {
             $diagnostics['index_route_logic'] = 'ERROR: ' . $e->getMessage();
         }
         
+        // Test 8: Check config cache
+        $diagnostics['config_cached'] = file_exists(base_path('bootstrap/cache/config.php')) ? 'YES' : 'NO';
+        $diagnostics['routes_cached'] = file_exists(base_path('bootstrap/cache/routes-v7.php')) ? 'YES' : 'NO';
+        
         return response()->json([
             'status' => 'Index Page Diagnostics',
             'timestamp' => now()->toDateTimeString(),
             'tests' => $diagnostics,
+            'php_version' => phpversion(),
+            'laravel_version' => app()->version(),
             'message' => 'All tests completed. Check results above.',
-            'next_step' => 'If all tests pass, the issue might be in the view rendering. Try accessing /?simple for basic test.'
+            'next_step' => 'If all tests pass, the issue might be in the view rendering. Clear caches or check permissions.'
         ], 200);
         
     } catch (\Exception $e) {
@@ -136,304 +160,13 @@ Route::get('/test-index-debug', function () {
             'error' => 'Diagnostic failed',
             'message' => $e->getMessage(),
             'file' => $e->getFile(),
-            'line' => $e->getLine()
+            'line' => $e->getLine(),
+            'trace' => explode("\n", $e->getTraceAsString())
         ], 500);
     }
 });
 
-Route::get('/', function () {
-    // Simple test first - return basic HTML
-    if (request()->has('simple')) {
-        return '<h1>Simple Test Working</h1><p>Time: ' . now() . '</p>';
-    }
-    
-    // Test with minimal template
-    if (request()->has('minimal')) {
-        try {
-            $categories = \App\Models\Category::with('subcategories')->get();
-            
-        // Load active banners
-        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
-            
-        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
-        $categoryProducts = [];
-        foreach ($categories as $category) {
-            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6) // Increased to show more realistic products
-                ->get();
-        }
-        
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
-        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
-        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
-        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
-        
-        $mixedProducts = collect();
-        
-        // Get products from each category
-        if ($cookingCategory) {
-            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($cookingProducts);
-        }
-        
-        if ($beautyCategory) {
-            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($beautyProducts);
-        }
-        
-        if ($dentalCategory) {
-            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($dentalProducts);
-        }
-        
-        // Shuffle the mixed products and paginate
-        $shuffledProducts = $mixedProducts->shuffle();
-        $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $shuffledProducts->forPage(1, 12),
-            $shuffledProducts->count(),
-            12,
-            1,
-            ['path' => request()->url()]
-        );
-            $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(8)
-                ->get(); // Increased for better showcase
-            $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->first();
-            $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6)
-                ->get(); // Increased for variety
-
-            return view('index-simple', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts'));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Minimal template test failed',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ], 500);
-        }
-    }
-    
-    try {
-        // Load active banners
-        $banners = \App\Models\Banner::active()->byPosition('hero')->get();
-        
-        // Force fresh data by adding a timestamp parameter that changes the cache key
-        $categories = \App\Models\Category::with('subcategories')->get();
-        
-        // Get sample products from ALL categories for better showcase - ONLY LEGITIMATE SELLER PRODUCTS
-        $categoryProducts = [];
-        foreach ($categories as $category) {
-            $categoryProducts[$category->name] = \App\Models\Product::where('category_id', $category->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(6) // Increased to show more realistic products
-                ->get();
-        }
-        
-        // Get shuffled products from MASALA/COOKING, PERFUME/BEAUTY & DENTAL CARE - ONLY LEGITIMATE SELLER PRODUCTS
-        $cookingCategory = \App\Models\Category::where('name', 'COOKING')->first();
-        $beautyCategory = \App\Models\Category::where('name', 'BEAUTY & PERSONAL CARE')->first();
-        $dentalCategory = \App\Models\Category::where('name', 'DENTAL CARE')->first();
-        
-        $mixedProducts = collect();
-        
-        // Get products from each category
-        if ($cookingCategory) {
-            $cookingProducts = \App\Models\Product::where('category_id', $cookingCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(8)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($cookingProducts);
-        }
-        
-        if ($beautyCategory) {
-            $beautyProducts = \App\Models\Product::where('category_id', $beautyCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(4)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($beautyProducts);
-        }
-        
-        if ($dentalCategory) {
-            $dentalProducts = \App\Models\Product::where('category_id', $dentalCategory->id)
-                ->whereNotNull('seller_id') // Only legitimate seller/admin products
-                ->whereNotNull('image')
-                ->where('image', '!=', '')
-                ->where('image', 'NOT LIKE', '%unsplash%')
-                ->where('image', 'NOT LIKE', '%placeholder%')
-                ->where('image', 'NOT LIKE', '%via.placeholder%')
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-            $mixedProducts = $mixedProducts->merge($dentalProducts);
-        }
-        
-        // Shuffle the mixed products and paginate
-        $shuffledProducts = $mixedProducts->shuffle();
-        $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $shuffledProducts->forPage(1, 15),
-            $shuffledProducts->count(),
-            15,
-            1,
-            ['path' => request()->url()]
-        );
-        $trending = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->take(12)
-            ->get(); // Increased for better showcase
-        $lookbookProduct = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->first();
-        $blogProducts = \App\Models\Product::whereNotNull('seller_id') // Only legitimate seller/admin products
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%')
-            ->inRandomOrder()
-            ->take(8)
-            ->get(); // Increased for variety
-
-        // Load index page settings from config (set by admin in Index Page Editor)
-        $settings = config('index-page', [
-            'hero_title' => 'Welcome to GrabBaskets',
-            'hero_subtitle' => 'Your one-stop shop for all your needs',
-            'show_categories' => true,
-            'show_featured_products' => true,
-            'show_trending' => true,
-            'featured_section_title' => 'Featured Products',
-            'trending_section_title' => 'Trending Now',
-            'products_per_row' => 4,
-            'show_banners' => true,
-            'show_newsletter' => true,
-            'newsletter_title' => 'Subscribe to Our Newsletter',
-            'newsletter_subtitle' => 'Get updates on new products and special offers',
-            'theme_color' => '#FF6B00',
-            'secondary_color' => '#FFD700',
-        ]);
-
-        return view('index', compact('categories', 'products', 'trending', 'lookbookProduct', 'blogProducts', 'categoryProducts', 'banners', 'settings'));
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        Log::error('Database error on homepage: ' . $e->getMessage());
-        
-        // For debugging, show the actual error
-        if (config('app.debug')) {
-            return response()->json([
-                'error' => 'Index page error',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-        
-        // Return a graceful fallback with empty data
-        return view('index', [
-            'categories' => collect([]),
-            'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12),
-            'trending' => collect([]),
-            'lookbookProduct' => null,
-            'blogProducts' => collect([]),
-            'banners' => collect([]),
-            'categoryProducts' => [],
-            'settings' => config('index-page', [
-                'hero_title' => 'Welcome to GrabBaskets',
-                'hero_subtitle' => 'Your one-stop shop for all your needs',
-                'show_categories' => true,
-                'show_featured_products' => true,
-                'show_trending' => true,
-                'show_banners' => true,
-                'show_newsletter' => true,
-                'products_per_row' => 4,
-                'theme_color' => '#FF6B00',
-                'secondary_color' => '#FFD700',
-            ]),
-            'database_error' => 'Unable to load products at this time. Please try again later.'
-        ]);
-    }
-})->name('home_old');
+// Removed conflicting closure route - using HomeController instead
 
 // New simplified home route using controller
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -518,6 +251,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     // Orders (user & seller)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/track', [OrderController::class, 'track'])->name('orders.track');
+    Route::get('/orders/live-track', [OrderController::class, 'liveTrack'])->name('orders.liveTrack');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/seller/orders', [OrderController::class, 'sellerOrders'])->name('seller.orders');
@@ -574,7 +308,229 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 
 // ===== PUBLIC BUYER ROUTES (Guest + Authenticated users can access) =====
 // Buyer dashboard & browsing - Anyone can view products
-Route::get('/buyer/dashboard', [BuyerController::class, 'index'])->name('buyer.dashboard');
+Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
+
+// Test route to bypass controller and render view directly
+Route::get('/buyer/dashboard/test', function() {
+    try {
+        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->withCount('products')->get();
+        
+        return view('buyer.dashboard', compact('categories'));
+    } catch (\Exception $e) {
+        return response('DIRECT TEST ERROR: ' . $e->getMessage(), 500)->header('Content-Type', 'text/plain');
+    }
+})->name('buyer.dashboard.test');
+
+// Simple text debug route to test buyer dashboard functionality
+Route::get('/buyer/dashboard/debug', function() {
+    $output = "=== BUYER DASHBOARD DEBUG ===\n\n";
+    
+    try {
+        // Test 1: Database connection
+        $output .= "1. Database Connection: ";
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $output .= "SUCCESS\n";
+        
+        // Test 2: Category model basic query
+        $output .= "2. Category Model: ";
+        $categoryCount = \App\Models\Category::count();
+        $output .= "SUCCESS - {$categoryCount} categories found\n";
+        
+        // Test 3: Category with relationships
+        $output .= "3. Category Relationships: ";
+        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->withCount('products')->take(1)->get();
+        $output .= "SUCCESS - Relationships loaded\n";
+        
+        // Test 4: View existence
+        $output .= "4. Dashboard View: ";
+        $viewExists = view()->exists('buyer.dashboard');
+        $output .= $viewExists ? "EXISTS\n" : "NOT FOUND\n";
+        
+        // Test 5: Try to call dashboard method directly
+        $output .= "5. Dashboard Controller: ";
+        $controller = new \App\Http\Controllers\BuyerController();
+        $output .= "INSTANTIATED SUCCESSFULLY\n";
+        
+        $output .= "\n=== ALL TESTS PASSED ===\n";
+        $output .= "The buyer dashboard should be working. If still getting 500 error, check server logs for runtime issues.\n";
+        
+    } catch (\Exception $e) {
+        $output .= "FAILED\n";
+        $output .= "ERROR: " . $e->getMessage() . "\n";
+        $output .= "FILE: " . $e->getFile() . "\n";
+        $output .= "LINE: " . $e->getLine() . "\n";
+    }
+    
+    return response($output, 200)->header('Content-Type', 'text/plain');
+})->name('buyer.dashboard.debug');
+// Debug route for category testing
+Route::get('/debug-category/{id}', function($id) {
+    try {
+        $category = \App\Models\Category::find($id);
+        if (!$category) {
+            return "Category {$id} not found";
+        }
+        
+        $products = \App\Models\Product::where('category_id', $id)->count();
+        
+        return response()->json([
+            'category_id' => $id,
+            'category_name' => $category->name,
+            'products_count' => $products,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+
+// Debug route for controller testing
+Route::get('/debug-controller-category/{id}', function($id) {
+    try {
+        $request = new \Illuminate\Http\Request();
+        $controller = new \App\Http\Controllers\BuyerController();
+        
+        // Test data gathering first
+        $category = \App\Models\Category::findOrFail($id);
+        $products = \App\Models\Product::with(['category', 'subcategory'])
+            ->where('category_id', $id)->paginate(1);
+        
+        return response()->json([
+            'category_id' => $id,
+            'category_name' => $category->name,
+            'products_found' => $products->count(),
+            'controller_accessible' => true,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+
+// Debug route to force cache clearing (for deployment issues)
+Route::get('/debug-clear-cache', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        
+        return response()->json([
+            'message' => 'All caches cleared successfully',
+            'timestamp' => now(),
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
+// Debug route for delivery partner data
+Route::get('/debug-delivery-partners', function() {
+    try {
+        $partners = \App\Models\DeliveryPartner::select(['id', 'name', 'email', 'phone', 'status'])
+            ->limit(5)
+            ->get();
+            
+        $totalCount = \App\Models\DeliveryPartner::count();
+        
+        return response()->json([
+            'total_partners' => $totalCount,
+            'sample_partners' => $partners,
+            'status' => 'success'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
+// Debug route to create a test delivery partner
+Route::get('/debug-create-delivery-partner', function() {
+    try {
+        // Check if test partner already exists
+        $existing = \App\Models\DeliveryPartner::where('email', 'test@delivery.com')->first();
+        if ($existing) {
+            return response()->json([
+                'message' => 'Test delivery partner already exists',
+                'partner' => [
+                    'id' => $existing->id,
+                    'name' => $existing->name,
+                    'email' => $existing->email,
+                    'phone' => $existing->phone,
+                    'status' => $existing->status
+                ],
+                'login_credentials' => [
+                    'email' => 'test@delivery.com',
+                    'phone' => '9999999999',
+                    'password' => 'password123'
+                ],
+                'status' => 'exists'
+            ]);
+        }
+        
+        // Create test partner
+        $partner = \App\Models\DeliveryPartner::create([
+            'name' => 'Test Delivery Partner',
+            'email' => 'test@delivery.com',
+            'phone' => '9999999999',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'address' => 'Test Address',
+            'city' => 'Test City',
+            'state' => 'Test State',
+            'pincode' => '123456',
+            'vehicle_type' => 'bike',
+            'status' => 'active',
+            'is_verified' => true,
+            'is_online' => true,
+            'is_available' => true
+        ]);
+        
+        return response()->json([
+            'message' => 'Test delivery partner created successfully',
+            'partner' => [
+                'id' => $partner->id,
+                'name' => $partner->name,
+                'email' => $partner->email,
+                'phone' => $partner->phone,
+                'status' => $partner->status
+            ],
+            'login_credentials' => [
+                'email' => 'test@delivery.com',
+                'phone' => '9999999999', 
+                'password' => 'password123'
+            ],
+            'status' => 'created'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'status' => 'failed'
+        ], 500);
+    }
+});
+
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
@@ -587,11 +543,15 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
 // Public product search - Anyone can search (Zepto/Blinkit style)
 Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
 
-// Instant search API for real-time suggestions (Zepto/Blinkit style)
-Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
+// Food delivery products route
+Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');
 
-// Auto-complete suggestions API (Zepto/Blinkit style)
-Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');
+// Food delivery main page route (alias for convenience)
+Route::get('/food', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('food.index');
+
+// AJAX search routes disabled per user request
+// Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
+// Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');
 
 // Optimized search route (for testing)
 Route::get('/products/optimized', [App\Http\Controllers\OptimizedBuyerController::class, 'guestSearch'])->name('products.optimized');
@@ -615,6 +575,36 @@ Route::prefix('api/tracking')->group(function () {
     Route::post('/track', [CourierTrackingController::class, 'apiTrack'])->name('api.tracking.track');
     Route::get('/detect/{trackingNumber}', [CourierTrackingController::class, 'apiDetectCourier'])->name('api.tracking.detect');
 });
+
+// API route for mobile category menu subcategories
+Route::get('/api/categories/{category}/subcategories', function($categoryId) {
+    try {
+        $category = \App\Models\Category::with(['subcategories' => function($query) {
+            $query->withCount('products');
+        }])->findOrFail($categoryId);
+        
+        $subcategories = $category->subcategories->map(function($subcat) {
+            return [
+                'id' => $subcat->id,
+                'name' => $subcat->name,
+                'emoji' => $subcat->emoji ?? '📦',
+                'products_count' => $subcat->products_count,
+                'url' => route('buyer.productsBySubcategory', $subcat->id)
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'subcategories' => $subcategories,
+            'category_name' => $category->name
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Category not found'
+        ], 404);
+    }
+})->name('api.categories.subcategories');
 
 // API Health Check for diagnostics
 Route::get('/api/health-check', function () {
@@ -1488,47 +1478,256 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:d
             ->name('cancel');
     });
     
-    // Orders Management - TODO: Implement OrderController
-    // Route::prefix('orders')->name('orders.')->group(function () {
-    //     Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
-    //         ->name('index');
-    //     Route::get('/available', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'available'])
-    //         ->name('available');
-    //     Route::get('/{order}', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'show'])
-    //         ->name('show');
-    //     Route::post('/{order}/accept', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'accept'])
-    //         ->name('accept');
-    //     Route::post('/{order}/pickup', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'pickup'])
-    //         ->name('pickup');
-    //     Route::post('/{order}/deliver', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'deliver'])
-    //         ->name('deliver');
-    //     Route::post('/{order}/cancel', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'cancel'])
-    //         ->name('cancel');
-    //     Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
-    //         ->name('update-status');
-    // });
+    // Orders Management
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
+            ->name('index');
+        Route::get('/available', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'available'])
+            ->name('available');
+        Route::get('/{order}', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'show'])
+            ->name('show');
+        Route::post('/{order}/accept', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'accept'])
+            ->name('accept');
+        Route::post('/{order}/pickup', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'pickup'])
+            ->name('pickup');
+        Route::post('/{order}/deliver', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'deliver'])
+            ->name('deliver');
+        Route::post('/{order}/cancel', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'cancel'])
+            ->name('cancel');
+        Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
+            ->name('update-status');
+    });
     
-    // Earnings and Reports - TODO: Implement EarningsController
-    // Route::prefix('earnings')->name('earnings.')->group(function () {
-    //     Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
-    //         ->name('index');
-    //     Route::get('/weekly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'weekly'])
-    //         ->name('weekly');
-    //     Route::get('/monthly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'monthly'])
-    //         ->name('monthly');
-    //     Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
-    //         ->name('withdraw');
-    // });
+    // Earnings and Reports
+    Route::prefix('earnings')->name('earnings.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
+            ->name('index');
+        Route::get('/weekly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'weekly'])
+            ->name('weekly');
+        Route::get('/monthly', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'monthly'])
+            ->name('monthly');
+        Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
+            ->name('withdraw');
+    });
     
-    // Notifications - TODO: Implement NotificationController
-    // Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
-    //     ->name('notifications');
-    // Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
-    //     ->name('notifications.read');
+    // Notifications
+    Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
+        ->name('notifications');
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
     
-    // Support and Help - TODO: Implement SupportController
-    // Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
-    //     ->name('support');
-    // Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
-    //     ->name('support.submit');
+    // Support and Help
+    Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
+        ->name('support');
+    Route::post('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'submit'])
+        ->name('support.submit');
 });
+
+// ============================================
+// HOTEL OWNER ROUTES (Food Delivery System)
+// ============================================
+
+// Hotel Owner Authentication Routes
+Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
+    // Guest routes (not authenticated)
+    Route::middleware('guest:hotel_owner')->group(function () {
+        Route::get('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'showLoginForm'])
+            ->name('login');
+        Route::post('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'login']);
+        
+        Route::get('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'showRegistrationForm'])
+            ->name('register');
+        Route::post('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'register']);
+    });
+
+    // Authenticated routes
+    Route::middleware('auth:hotel_owner')->group(function () {
+        Route::post('/logout', [App\Http\Controllers\HotelOwner\AuthController::class, 'logout'])
+            ->name('logout');
+
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\HotelOwner\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Profile Management
+        Route::get('/profile', [App\Http\Controllers\HotelOwner\DashboardController::class, 'profile'])
+            ->name('profile');
+        Route::put('/profile', [App\Http\Controllers\HotelOwner\DashboardController::class, 'updateProfile'])
+            ->name('profile.update');
+
+        // Food Items Management
+        Route::resource('food-items', App\Http\Controllers\HotelOwner\FoodItemController::class);
+
+        // Earnings and Reports
+        Route::prefix('earnings')->name('earnings.')->group(function () {
+            Route::get('/', [App\Http\Controllers\HotelOwner\EarningsController::class, 'index'])
+                ->name('index');
+            Route::get('/weekly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'weekly'])
+                ->name('weekly');
+            Route::get('/monthly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'monthly'])
+                ->name('monthly');
+            Route::post('/withdraw', [App\Http\Controllers\HotelOwner\EarningsController::class, 'withdraw'])
+                ->name('withdraw');
+        });
+
+        // Wallet (withdrawals)
+        Route::prefix('wallet')->name('wallet.')->group(function () {
+            Route::get('/', [App\Http\Controllers\HotelOwner\WalletController::class, 'index'])
+                ->name('index');
+            Route::post('/withdraw', [App\Http\Controllers\HotelOwner\WalletController::class, 'withdraw'])
+                ->name('withdraw');
+        });
+
+        // Orders Management - Commented out until HotelOwner\OrderController is created
+        // Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
+        //     ->name('orders');
+        // Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
+        //     ->name('orders.show');
+        // Route::patch('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
+        //     ->name('orders.update-status');
+
+        // Analytics and Reports - Commented out until AnalyticsController is created  
+        // Route::get('/analytics', [App\Http\Controllers\HotelOwner\AnalyticsController::class, 'index'])
+        //     ->name('analytics');
+    });
+});
+
+// Food Delivery Routes (Customer-facing)
+Route::prefix('food')->name('food.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Food\FoodController::class, 'index'])->name('index');
+    Route::get('/restaurants', [App\Http\Controllers\Food\FoodController::class, 'restaurants'])->name('restaurants');
+    Route::get('/restaurant/{hotelOwner}', [App\Http\Controllers\Food\FoodController::class, 'restaurant'])->name('restaurant');
+    Route::get('/category/{category}', [App\Http\Controllers\Food\FoodController::class, 'category'])->name('category');
+    Route::post('/add-to-cart', [App\Http\Controllers\Food\FoodController::class, 'addToCart'])->name('add-to-cart');
+});
+
+// Debug password reset route
+Route::get('/debug-password-reset', function () {
+    try {
+        echo '<h2>Password Reset Debug</h2>';
+        
+        // Test 1: Get a user with email
+        $user = App\Models\User::whereNotNull('email')->first();
+        if (!$user) {
+            echo '<p>❌ No users with email found</p>';
+            return;
+        }
+        
+        echo "<p>✓ Testing with user: {$user->email} (ID: {$user->id})</p>";
+        
+        // Test 2: Check mail configuration
+        echo '<h3>Mail Configuration:</h3>';
+        echo '<ul>';
+        echo '<li>Driver: ' . config('mail.default') . '</li>';
+        echo '<li>Host: ' . config('mail.mailers.smtp.host') . '</li>';
+        echo '<li>Port: ' . config('mail.mailers.smtp.port') . '</li>';
+        echo '<li>Username: ' . config('mail.mailers.smtp.username') . '</li>';
+        echo '<li>From: ' . config('mail.from.address') . '</li>';
+        echo '<li>Queue: ' . config('queue.default') . '</li>';
+        echo '</ul>';
+        
+        // Test 3: Send password reset
+        echo '<h3>Password Reset Test:</h3>';
+        
+        $status = Password::sendResetLink(['email' => $user->email]);
+        
+        echo "<p>Reset status: <strong>{$status}</strong></p>";
+        
+        if ($status == Password::RESET_LINK_SENT) {
+            echo '<p style="color: green;">✓ Password reset link sent successfully!</p>';
+        } else {
+            echo '<p style="color: red;">❌ Password reset failed</p>';
+            echo "<p>Possible reasons:</p>";
+            echo "<ul>";
+            echo "<li>Email server configuration issue</li>";
+            echo "<li>User not found in password_resets table structure</li>";
+            echo "<li>Mail template missing</li>";
+            echo "<li>SMTP authentication failure</li>";
+            echo "</ul>";
+        }
+        
+        // Test 4: Try sending a basic test email
+        echo '<h3>Basic Email Test:</h3>';
+        try {
+            Mail::raw('Test email from ' . config('app.name'), function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject('Test Email - ' . date('Y-m-d H:i:s'))
+                        ->from(config('mail.from.address'), config('mail.from.name'));
+            });
+            echo '<p style="color: green;">✓ Test email sent successfully!</p>';
+        } catch (Exception $e) {
+            echo '<p style="color: red;">❌ Test email failed: ' . $e->getMessage() . '</p>';
+        }
+        
+        // Test 5: Check password_resets table
+        echo '<h3>Password Resets Table:</h3>';
+        try {
+            $resets = DB::table('password_resets')->where('email', $user->email)->latest()->first();
+            if ($resets) {
+                echo '<p>✓ Password reset entry created in database</p>';
+                echo '<p>Token created at: ' . $resets->created_at . '</p>';
+            } else {
+                echo '<p>❌ No password reset entry found in database</p>';
+            }
+        } catch (Exception $e) {
+            echo '<p style="color: red;">❌ Error checking password_resets table: ' . $e->getMessage() . '</p>';
+        }
+        
+    } catch (Exception $e) {
+        echo '<p style="color: red;">❌ Debug error: ' . $e->getMessage() . '</p>';
+        echo '<p>File: ' . $e->getFile() . ' Line: ' . $e->getLine() . '</p>';
+    }
+});
+
+// Simple password reset test route
+Route::get('/test-password-reset-simple', function () {
+    try {
+        echo "<h2>Password Reset Test</h2>";
+        
+        // Find a user
+        $user = App\Models\User::whereNotNull('email')->first();
+        if (!$user) {
+            return "No user with email found.";
+        }
+        
+        echo "<p>Testing with: {$user->email}</p>";
+        
+        // Test direct password reset
+        $status = Password::sendResetLink(['email' => $user->email]);
+        
+        echo "<p>Status: <strong>{$status}</strong></p>";
+        
+        if ($status === Password::RESET_LINK_SENT) {
+            echo '<p style="color: green;">✓ SUCCESS: Reset link sent!</p>';
+        } else {
+            echo '<p style="color: red;">✗ FAILED: ' . $status . '</p>';
+            
+            // Additional debugging
+            echo "<h3>Debugging Info:</h3>";
+            echo "<ul>";
+            echo "<li>Mail Driver: " . config('mail.default') . "</li>";
+            echo "<li>SMTP Host: " . config('mail.mailers.smtp.host') . "</li>";
+            echo "<li>From Address: " . config('mail.from.address') . "</li>";
+            echo "<li>Queue Driver: " . config('queue.default') . "</li>";
+            echo "</ul>";
+            
+            // Check if token was created in database
+            $token = DB::table('password_reset_tokens')
+                ->where('email', $user->email)
+                ->latest('created_at')
+                ->first();
+                
+            if ($token) {
+                echo "<p>✓ Token created in database at: {$token->created_at}</p>";
+            } else {
+                echo "<p>✗ No token found in database</p>";
+            }
+        }
+        
+    } catch (Exception $e) {
+        return "Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
+    }
+});
+
+// SEO Routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

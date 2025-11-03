@@ -13,9 +13,16 @@ class Category extends Model
         'gender',
         'emoji',
     ];
+    
     // Each category has many subcategories
     public function subcategories()
     {
         return $this->hasMany(Subcategory::class);
+    }
+    
+    // Each category has many products
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }
