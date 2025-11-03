@@ -76,6 +76,9 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
+            {{-- Include extracted styles --}}
+            @include('hotel-owner._dashboard-styles')
+
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">
                     <div class="card h-100 shadow-sm" style="border-left:4px solid #E23744;">
@@ -144,6 +147,16 @@
                                     <div>No recent orders</div>
                                 </div>
                             @endif
+                        </div>
+                    </div>
+
+                    {{-- Earnings chart (quick) --}}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Earnings (Last 7 days)</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="dashboardEarningsChart" height="120"></canvas>
                         </div>
                     </div>
 
@@ -257,3 +270,31 @@
 </style>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function(){
+        const ctx = document.getElementById('dashboardEarningsChart');
+        if (!ctx) return;
+        const labels = [
+            @php
+                for ($i=6;$i>=0;$i--) { echo "'".\Carbon\Carbon::now()->subDays($i)->format('D')."',"; }
+            @endphp
+        ];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Earnings',
+                data: {{ json_encode($earnings_last_7 ?? []) }},
+                borderColor: '#E23744',
+                backgroundColor: 'rgba(226,55,68,0.08)',
+                tension: 0.3,
+                fill: true
+            }]
+        };
+
+        new Chart(ctx.getContext('2d'), { type:'line', data: data, options:{responsive:true, plugins:{legend:{display:false}}} });
+    })();
+</script>
+@endpush

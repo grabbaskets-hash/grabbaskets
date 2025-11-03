@@ -37,7 +37,13 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
-            return view('hotel-owner.dashboard', compact('stats', 'recentOrders', 'popularItems', 'hotelOwner'));
+            // Earnings: placeholder last 7 days (for chart)
+            $earnings_last_7 = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $earnings_last_7[] = rand(0, 500); // TODO: replace with real data
+            }
+
+            return view('hotel-owner.dashboard', compact('stats', 'recentOrders', 'popularItems', 'hotelOwner', 'earnings_last_7'));
             
         } catch (\Exception $e) {
             Log::error('Hotel Owner Dashboard Error: ' . $e->getMessage());
@@ -57,7 +63,7 @@ class DashboardController extends Controller
             $recentOrders = collect([]);
             $popularItems = collect([]);
             
-            return view('hotel-owner.dashboard', compact('stats', 'recentOrders', 'popularItems', 'hotelOwner'))
+            return view('hotel-owner.dashboard', compact('stats', 'recentOrders', 'popularItems', 'hotelOwner', 'earnings_last_7'))
                 ->with('error', 'Dashboard data temporarily unavailable. Please try again later.');
         }
     }

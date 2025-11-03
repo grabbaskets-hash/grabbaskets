@@ -1558,6 +1558,18 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
         // Food Items Management
         Route::resource('food-items', App\Http\Controllers\HotelOwner\FoodItemController::class);
 
+        // Earnings and Reports
+        Route::prefix('earnings')->name('earnings.')->group(function () {
+            Route::get('/', [App\Http\Controllers\HotelOwner\EarningsController::class, 'index'])
+                ->name('index');
+            Route::get('/weekly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'weekly'])
+                ->name('weekly');
+            Route::get('/monthly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'monthly'])
+                ->name('monthly');
+            Route::post('/withdraw', [App\Http\Controllers\HotelOwner\EarningsController::class, 'withdraw'])
+                ->name('withdraw');
+        });
+
         // Orders Management - Commented out until HotelOwner\OrderController is created
         // Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
         //     ->name('orders');
