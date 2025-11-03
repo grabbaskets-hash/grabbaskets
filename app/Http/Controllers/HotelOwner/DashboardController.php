@@ -37,10 +37,23 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
-            // Earnings: placeholder last 7 days (for chart)
+            // Earnings: compute last 7 days sums from orders (if available)
             $earnings_last_7 = [];
-            for ($i = 6; $i >= 0; $i--) {
-                $earnings_last_7[] = rand(0, 500); // TODO: replace with real data
+            try {
+                $today = \Carbon\Carbon::today();
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = $today->copy()->subDays($i);
+                    $sum = \App\Models\Order::where('seller_id', $hotelOwner->id)
+                        ->where('status', 'completed')
+                        ->whereDate('paid_at', $date)
+                        ->sum('amount');
+                    $earnings_last_7[] = (float) $sum;
+                }
+            } catch (\Exception $e) {
+                // fallback to zeros
+                for ($i = 0; $i < 7; $i++) {
+                    $earnings_last_7[] = 0;
+                }
             }
 
             return view('hotel-owner.dashboard', compact('stats', 'recentOrders', 'popularItems', 'hotelOwner', 'earnings_last_7'));

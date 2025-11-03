@@ -5,6 +5,8 @@ namespace App\Http\Controllers\HotelOwner;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
+use Carbon\Carbon;
 
 class EarningsController extends Controller
 {
@@ -12,18 +14,46 @@ class EarningsController extends Controller
     {
         $hotelOwner = Auth::guard('hotel_owner')->user();
 
-        // Placeholder earnings summary
+        // Real earnings summary using orders table
+        $today = Carbon::today();
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $startOfMonth = Carbon::now()->startOfMonth();
+
+        $earningsToday = Order::where('seller_id', $hotelOwner->id)
+            ->where('status', 'completed')
+            ->whereDate('paid_at', $today)
+            ->sum('amount');
+
+        $earningsWeek = Order::where('seller_id', $hotelOwner->id)
+            ->where('status', 'completed')
+            ->whereBetween('paid_at', [$startOfWeek, Carbon::now()])
+            ->sum('amount');
+
+        $earningsMonth = Order::where('seller_id', $hotelOwner->id)
+            ->where('status', 'completed')
+            ->whereBetween('paid_at', [$startOfMonth, Carbon::now()])
+            ->sum('amount');
+
+        $earningsTotal = Order::where('seller_id', $hotelOwner->id)
+            ->where('status', 'completed')
+            ->sum('amount');
+
         $earnings = [
-            'today' => 0,
-            'week' => 0,
-            'month' => $hotelOwner->this_month_revenue ?? 0,
-            'total' => $hotelOwner->total_revenue ?? 0,
+            'today' => $earningsToday,
+            'week' => $earningsWeek,
+            'month' => $earningsMonth,
+            'total' => $earningsTotal,
         ];
 
-        // Simple last 7 days placeholder series
+        // Last 7 days: group sums per day
         $earnings_last_7 = [];
         for ($i = 6; $i >= 0; $i--) {
-            $earnings_last_7[] = rand(0, 500); // placeholder random values
+            $date = Carbon::today()->subDays($i);
+            $sum = Order::where('seller_id', $hotelOwner->id)
+                ->where('status', 'completed')
+                ->whereDate('paid_at', $date)
+                ->sum('amount');
+            $earnings_last_7[] = (float) $sum;
         }
 
         return view('hotel-owner.earnings.index', compact('earnings', 'earnings_last_7', 'hotelOwner'));
