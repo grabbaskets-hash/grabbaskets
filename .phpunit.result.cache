@@ -1,0 +1,1 @@
+{"version":2,"defects":{"Tests\\Feature\\HotelOwner\\WalletTest::hotel_owner_can_view_wallet":8,"Tests\\Feature\\HotelOwner\\WalletTest::hotel_owner_can_request_withdrawal":8,"Tests\\Feature\\HotelOwner\\WalletTest::withdrawal_request_fails_with_insufficient_balance":8},"times":[]}

@@ -19,7 +19,7 @@ echo "<!DOCTYPE html><html><head><title>Google Maps Config Check</title>
     .badge-success { background: #d4edda; color: #155724; }
     .badge-danger { background: #f8d7da; color: #721c24; }
 </style>
-<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFbU1UkuV2HVULSP2rnTwQWYM0xpFvG20&libraries=places,geometry'></script>
+<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFbU1UkuV2HVULSP2rnTwQWYM0xpFvG20yes&libraries=places,geometry'></script>
 </head><body>";
 
 echo "<h1>🗺️ Google Maps Configuration Checker</h1>";

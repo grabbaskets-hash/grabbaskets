@@ -28,6 +28,32 @@
                 </div>
             </div>
         </div>
+
+            <div class="col-12 mt-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Withdraw</h6>
+                        @php
+                            $wallet = \App\Models\HotelOwnerWallet::firstOrCreate(['hotel_owner_id' => ($hotelOwner->id ?? null)], ['balance' => 0, 'currency' => 'INR']);
+                        @endphp
+                        <p>Available balance: <strong>₹{{ number_format($wallet->balance, 2) }}</strong></p>
+                        <form method="POST" action="{{ route('hotel-owner.wallet.withdraw') }}">
+                            @csrf
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <input type="number" name="amount" step="0.01" min="1" class="form-control" placeholder="Amount">
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" name="notes" class="form-control" placeholder="Notes (optional)">
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-danger w-100">Request</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
     </div>
 
     @push('scripts')

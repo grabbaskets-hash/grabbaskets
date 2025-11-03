@@ -16,7 +16,7 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
-     * Show the delivery partner dashboard.
+     * Show the delivery partner dashboard with minimal initial data.
      */
     public function index()
     {
@@ -27,53 +27,17 @@ class DashboardController extends Controller
                 return redirect()->route('delivery-partner.login')
                     ->with('error', 'Please login to access the dashboard.');
             }
-            
-            // Simple dashboard data to avoid complex queries that might fail
-            $stats = [
-                'total_orders' => 0,
-                'completed_orders' => 0,
-                'completion_rate' => 0,
-                'rating' => $partner->rating ?? 4.5,
-                'total_earnings' => 0,
-                'this_month_earnings' => 0,
-                'today_earnings' => 0,
-                'pending_orders' => 0,
-                'pending_requests' => 0,
-                'today_deliveries' => 0,
-                'week_deliveries' => 0,
-                'month_deliveries' => 0,
-                'active_hours' => '0h 0m',
-                'wallet_balance' => 0,
-                'total_withdrawals' => 0,
-                'available_earnings' => 0,
-            ];
-            
-            // Try to get actual data, but fallback to defaults on error
-            try {
-                $stats = $this->getDashboardStats($partner);
-                $recentOrders = $this->getRecentOrders($partner);
-                $availableOrders = $this->getAvailableOrders($partner);
-                $todayEarnings = $this->getTodayEarnings($partner);
-                $notifications = $this->getNotifications($partner);
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('Dashboard data loading failed, using defaults', [
-                    'error' => $e->getMessage(),
-                    'partner_id' => $partner->id
-                ]);
-                $recentOrders = collect([]);
-                $availableOrders = collect([]);
-                $todayEarnings = 0;
-                $notifications = [];
-            }
 
-            return view('delivery-partner.dashboard.index', compact(
-                'partner',
-                'stats', 
-                'recentOrders',
-                'availableOrders',
-                'todayEarnings',
-                'notifications'
-            ));
+            // Quick load with minimal data
+            return view('delivery-partner.dashboard.index', [
+                'partner' => $partner,
+                'initial_stats' => [
+                    'name' => $partner->name,
+                    'status' => $partner->status,
+                    'is_online' => $partner->is_online,
+                    'rating' => $partner->rating ?? 4.5,
+                ],
+            ]);
             
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Dashboard loading failed completely', [

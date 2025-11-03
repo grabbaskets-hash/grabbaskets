@@ -48,6 +48,24 @@ return [
 
     'google' => [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+        'maps' => [
+            'allowed_domains' => [
+                'grabbaskets.com',
+                'www.grabbaskets.com',
+                '*.grabbaskets.com',
+                'localhost',
+                '127.0.0.1',
+            ],
+            'enabled_apis' => [
+                'maps_javascript',
+                'geocoding',
+                'places',
+                'distance_matrix',
+                'directions',
+            ],
+            'cache_enabled' => true,
+            'cache_duration' => 60 * 24, // 24 hours
+        ],
     ],
 
 ];
