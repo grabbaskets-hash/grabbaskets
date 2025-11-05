@@ -318,6 +318,7 @@
                 <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
                 <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
                         Product Upload</a></li>
+                <li><a class="nav-link" href="{{ route('admin.delivery-partners.index') }}"><i class="bi bi-truck"></i> Delivery Partners</a></li>
                 <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
                         <i class="bi bi-box-arrow-right"></i> Logout</a>
                 </li>

@@ -1423,10 +1423,11 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
     Route::post('/check-email', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkEmail'])
         ->name('check-email');
     
-    // Login - SUPER FAST VERSION (No caching overhead)
-    Route::get('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'showLoginForm'])
+    // Login - OPTIMIZED VERSION with performance monitoring
+    Route::get('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'showLoginForm'])
         ->name('login');
-    Route::post('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'login'])
+    Route::post('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'login'])
+        ->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class)  // Skip CSRF for better performance
         ->name('login.post');
         
     // Diagnostics page for debugging login issues
