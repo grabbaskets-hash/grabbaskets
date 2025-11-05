@@ -421,7 +421,7 @@
                                     {{ $order->product->name ?? '-' }}
                                 </td>
                                 <td><span class="badge bg-info">{{ $order->quantity }}</span></td>
-                                <td class="fw-semibold text-success">₹{{ number_format($order->amount, 2) }}</td>
+                                <td class="fw-semibold text-success">₹{{ sprintf('%.2f', $order->amount) }}</td>
                                 <td>
                                     @if($order->status === 'Delivered')
                                     <span class="badge bg-success">{{ $order->status }}</span>
