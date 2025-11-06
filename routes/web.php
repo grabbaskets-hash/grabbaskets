@@ -848,6 +848,38 @@ Route::prefix('admin/warehouse')->group(function () {
     Route::get('/export-inventory', [App\Http\Controllers\Admin\WarehouseController::class, 'exportInventory'])->name('admin.warehouse.export-inventory');
 });
 
+// Admin Delivery Partner Management Routes
+Route::prefix('admin/delivery-partners')->name('admin.delivery-partners.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'dashboard'])->name('dashboard');
+    
+    // List all partners
+    Route::get('/', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'index'])->name('index');
+    
+    // Show partner details
+    Route::get('/{deliveryPartner}', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'show'])->name('show');
+    
+    // Assign job to partner
+    Route::post('/{deliveryPartner}/assign-job', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'assignJob'])->name('assign-job');
+    
+    // Bulk assign jobs
+    Route::post('/bulk-assign', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'bulkAssignJobs'])->name('bulk-assign');
+    
+    // Update partner status
+    Route::post('/{deliveryPartner}/update-status', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'updateStatus'])->name('update-status');
+    
+    // Track partner location
+    Route::get('/{deliveryPartner}/track', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'track'])->name('track');
+    
+    // Send notification
+    Route::post('/{deliveryPartner}/send-notification', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'sendNotification'])->name('send-notification');
+    
+    // API routes
+    Route::get('/api/available-partners', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'getAvailablePartners'])->name('api.available');
+    Route::get('/api/statistics', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'getStatistics'])->name('api.statistics');
+});
+
+
 // Separate Warehouse Staff Authentication & Management Routes
 Route::prefix('warehouse')->group(function () {
     // Authentication routes
