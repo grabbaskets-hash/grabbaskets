@@ -434,27 +434,39 @@
     <!-- 🛒 Main Products Section -->
     <div class="container py-5">
         @if($products->count())
-        <div class="row g-3">
-            @foreach ($products as $p)
-            <div class="col-6 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
-                <div class="card product-card h-100">
-                    @if($p->image || $p->image_data)
-                    <img src="{{ $p->image_url }}" alt="{{ $p->name }}" class="product-img">
-                    @endif
+        
+        <!-- Display products grouped by category -->
+        @foreach($productsByCategory as $categoryId => $categoryProducts)
+            @php
+                $category = $categoryProducts->first()->category;
+            @endphp
+            <div class="mb-5">
+                <h3 class="fw-bold mb-4 text-dark" style="border-bottom: 3px solid #ff5722; padding-bottom: 10px; display: inline-block;">
+                    📦 {{ $category->name ?? 'Uncategorized' }}
+                </h3>
+                <div class="row g-3">
+                    @foreach($categoryProducts as $p)
+                    <div class="col-6 col-md-4 col-lg-3 product-card-wrapper" data-product-name="{{ strtolower($p->name) }}">
+                        <div class="card product-card h-100">
+                            @if($p->image || $p->image_data)
+                            <img src="{{ $p->image_url }}" alt="{{ $p->name }}" class="product-img">
+                            @endif
 
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="product-title">{{ $p->name }}</h5>
-                            <div class="product-price">₹{{ number_format($p->price, 2) }}</div>
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="product-title">{{ $p->name }}</h5>
+                                    <div class="product-price">₹{{ number_format($p->price, 2) }}</div>
+                                </div>
+                                <a href="{{ route('product.details', $p->id) }}" class="btn btn-view mt-auto">
+                                    <i class="bi bi-bag-heart-fill"></i> Buy Now
+                                </a>
+                            </div>
                         </div>
-                        <a href="{{ route('product.details', $p->id) }}" class="btn btn-view mt-auto">
-                            <i class="bi bi-bag-heart-fill"></i> Buy Now
-                        </a>
                     </div>
+                    @endforeach
                 </div>
             </div>
-            @endforeach
-        </div>
+        @endforeach
 
         @else
         <div class="text-center py-5">

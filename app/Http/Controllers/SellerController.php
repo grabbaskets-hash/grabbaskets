@@ -334,18 +334,27 @@ class SellerController extends Controller
             // If no matching user found, return empty products
             $products = Product::with(['category', 'subcategory'])
                 ->whereNull('id') // Force empty result
-                
-            return view('seller.store-products', compact('seller', 'products'));
+                ->paginate(12);
+            $productsByCategory = collect();
+            return view('seller.store-products', compact('seller', 'products', 'productsByCategory'));
         }
 
-        // Find products by the user ID
+        // Get all products by this seller grouped by category
+        $productsByCategory = Product::with(['category', 'subcategory'])
+            ->where('seller_id', $user->id)
+            ->whereNotNull('image') // Only show products with images
+            ->orderBy('category_id')
+            ->get()
+            ->groupBy('category_id');
+
+        // Also get paginated products for the main display
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', $user->id)
             ->whereNotNull('image') // Only show products with images
             ->latest()
             ->paginate(12);
 
-        return view('seller.store-products', compact('seller', 'products'));
+        return view('seller.store-products', compact('seller', 'products', 'productsByCategory'));
     }
 public function updateProfile(Request $request)
 {
