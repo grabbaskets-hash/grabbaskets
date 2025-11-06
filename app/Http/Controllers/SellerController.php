@@ -325,21 +325,23 @@ class SellerController extends Controller
         $images = $product->productImages()->ordered()->get();
         return view('seller.product-gallery', compact('product', 'images'));
     }
-    public function storeProducts($sellerId)
+    public function storeProducts(\App\Models\Seller $seller)
     {
-        // The $sellerId parameter is the user_id from products table
-        // First, try to find the user/seller by ID
-        $user = User::findOrFail($sellerId);
+        // Get the User ID from the seller's email (products.seller_id references users.id, not sellers.id)
+        $user = User::where('email', $seller->email)->first();
 
-        // Get seller details from the sellers table by email
-        $seller = Seller::where('email', $user->email)->first();
-        if (!$seller) {
-            $seller = (object)['name' => $user->name, 'store_name' => $user->name];
+        if (!$user) {
+            // If no matching user found, return empty products
+            $products = Product::with(['category', 'subcategory'])
+                ->whereNull('id') // Force empty result
+                ->paginate(12);
+            return view('seller.store-products', compact('seller', 'products'));
         }
 
-        // Find all products by this seller (no image filter - show all products)
+        // Find products by the user ID
         $products = Product::with(['category', 'subcategory'])
             ->where('seller_id', $user->id)
+            ->whereNotNull('image') // Only show products with images
             ->latest()
             ->paginate(12);
 
