@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\DeliveryPartnerController;
+// use App\Http\Controllers\Api\DeliveryPartnerController; // TODO: Create this controller
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaymentController;
 
@@ -54,13 +54,13 @@ Route::prefix('v1')->group(function () {
     Route::get('products/trending', [ProductController::class, 'trending']);
     Route::get('search', [ProductController::class, 'search']);
 
-    // Delivery partner public routes
-    Route::prefix('delivery-partner')->group(function () {
-        Route::post('register', [DeliveryPartnerController::class, 'register']);
-        Route::post('login', [DeliveryPartnerController::class, 'login']);
-        Route::post('send-otp', [DeliveryPartnerController::class, 'sendOTP']);
-        Route::post('verify-otp', [DeliveryPartnerController::class, 'verifyOTP']);
-    });
+    // Delivery partner public routes - TODO: Create Api\DeliveryPartnerController
+    // Route::prefix('delivery-partner')->group(function () {
+    //     Route::post('register', [DeliveryPartnerController::class, 'register']);
+    //     Route::post('login', [DeliveryPartnerController::class, 'login']);
+    //     Route::post('send-otp', [DeliveryPartnerController::class, 'sendOTP']);
+    //     Route::post('verify-otp', [DeliveryPartnerController::class, 'verifyOTP']);
+    // });
 });
 
 // Protected routes (authentication required)
@@ -128,47 +128,47 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Delivery Partner protected routes
-Route::prefix('v1/delivery')->middleware('auth:delivery_partner')->group(function () {
-    
-    // Authentication
-    Route::post('logout', [DeliveryPartnerController::class, 'logout']);
-    Route::get('me', [DeliveryPartnerController::class, 'me']);
-
-    // Profile management
-    Route::get('profile', [DeliveryPartnerController::class, 'profile']);
-    Route::put('profile', [DeliveryPartnerController::class, 'updateProfile']);
-    Route::post('documents', [DeliveryPartnerController::class, 'uploadDocuments']);
-
-    // Status management
-    Route::post('status/online', [DeliveryPartnerController::class, 'toggleOnlineStatus']);
-    Route::post('status/available', [DeliveryPartnerController::class, 'toggleAvailability']);
-    Route::post('location', [DeliveryPartnerController::class, 'updateLocation']);
-
-    // Order management
-    Route::prefix('orders')->group(function () {
-        Route::get('available', [DeliveryPartnerController::class, 'getAvailableOrders']);
-        Route::get('assigned', [DeliveryPartnerController::class, 'getAssignedOrders']);
-        Route::get('{id}', [DeliveryPartnerController::class, 'getOrderDetails']);
-        Route::post('{id}/accept', [DeliveryPartnerController::class, 'acceptOrder']);
-        Route::post('{id}/pickup', [DeliveryPartnerController::class, 'pickupOrder']);
-        Route::post('{id}/complete', [DeliveryPartnerController::class, 'completeDelivery']);
-        Route::post('{id}/cancel', [DeliveryPartnerController::class, 'cancelDelivery']);
-    });
-
-    // Earnings and wallet
-    Route::prefix('earnings')->group(function () {
-        Route::get('/', [DeliveryPartnerController::class, 'getEarnings']);
-        Route::get('daily', [DeliveryPartnerController::class, 'getDailyEarnings']);
-        Route::get('weekly', [DeliveryPartnerController::class, 'getWeeklyEarnings']);
-        Route::get('monthly', [DeliveryPartnerController::class, 'getMonthlyEarnings']);
-        Route::post('withdraw', [DeliveryPartnerController::class, 'requestWithdrawal']);
-    });
-
-    // Performance stats
-    Route::get('stats', [DeliveryPartnerController::class, 'getStats']);
-    Route::get('delivery-history', [DeliveryPartnerController::class, 'getDeliveryHistory']);
-});
+// Delivery Partner protected routes - TODO: Create Api\DeliveryPartnerController
+// Route::prefix('v1/delivery')->middleware('auth:delivery_partner')->group(function () {
+//     
+//     // Authentication
+//     Route::post('logout', [DeliveryPartnerController::class, 'logout']);
+//     Route::get('me', [DeliveryPartnerController::class, 'me']);
+//
+//     // Profile management
+//     Route::get('profile', [DeliveryPartnerController::class, 'profile']);
+//     Route::put('profile', [DeliveryPartnerController::class, 'updateProfile']);
+//     Route::post('documents', [DeliveryPartnerController::class, 'uploadDocuments']);
+//
+//     // Status management
+//     Route::post('status/online', [DeliveryPartnerController::class, 'toggleOnlineStatus']);
+//     Route::post('status/available', [DeliveryPartnerController::class, 'toggleAvailability']);
+//     Route::post('location', [DeliveryPartnerController::class, 'updateLocation']);
+//
+//     // Order management
+//     Route::prefix('orders')->group(function () {
+//         Route::get('available', [DeliveryPartnerController::class, 'getAvailableOrders']);
+//         Route::get('assigned', [DeliveryPartnerController::class, 'getAssignedOrders']);
+//         Route::get('{id}', [DeliveryPartnerController::class, 'getOrderDetails']);
+//         Route::post('{id}/accept', [DeliveryPartnerController::class, 'acceptOrder']);
+//         Route::post('{id}/pickup', [DeliveryPartnerController::class, 'pickupOrder']);
+//         Route::post('{id}/complete', [DeliveryPartnerController::class, 'completeDelivery']);
+//         Route::post('{id}/cancel', [DeliveryPartnerController::class, 'cancelDelivery']);
+//     });
+//
+//     // Earnings and wallet
+//     Route::prefix('earnings')->group(function () {
+//         Route::get('/', [DeliveryPartnerController::class, 'getEarnings']);
+//         Route::get('daily', [DeliveryPartnerController::class, 'getDailyEarnings']);
+//         Route::get('weekly', [DeliveryPartnerController::class, 'getWeeklyEarnings']);
+//         Route::get('monthly', [DeliveryPartnerController::class, 'getMonthlyEarnings']);
+//         Route::post('withdraw', [DeliveryPartnerController::class, 'requestWithdrawal']);
+//     });
+//
+//     // Performance stats
+//     Route::get('stats', [DeliveryPartnerController::class, 'getStats']);
+//     Route::get('delivery-history', [DeliveryPartnerController::class, 'getDeliveryHistory']);
+// });
 
 // Webhook routes (for payment gateways, etc.)
 Route::prefix('webhooks')->group(function () {
