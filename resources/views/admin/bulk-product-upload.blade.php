@@ -129,6 +129,18 @@
                 </a>
             </li>
             <li>
+                <a class="nav-link {{ request()->routeIs('admin.warehouse.dashboard') ? 'active' : '' }}" 
+                   href="{{ route('admin.warehouse.dashboard') }}">
+                    <i class="bi bi-shop"></i> Warehouse Management
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {{ request()->routeIs('admin.delivery-partners.dashboard') ? 'active' : '' }}" 
+                   href="{{ route('admin.delivery-partners.dashboard') }}">
+                    <i class="bi bi-bicycle"></i> Delivery Partners
+                </a>
+            </li>
+            <li>
                 <a class="nav-link text-danger" href="{{ route('admin.logout') }}">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
