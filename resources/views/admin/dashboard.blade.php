@@ -390,7 +390,12 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-cart-check"></i> Recent Orders</h5>
-                    <span class="badge bg-light text-dark">{{ $ordersCount->count() }} Orders</span>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-light text-dark">{{ $ordersCount->count() }} Orders</span>
+                        <button class="btn btn-sm btn-outline-light" id="refreshOrdersBtn" title="Refresh orders">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-hover table-bordered align-middle">
@@ -497,6 +502,21 @@
                     }
                 }
             });
+
+            // Auto-refresh orders every 30 seconds
+            setInterval(function() {
+                location.reload();
+            }, 30000); // 30 seconds
+
+            // Manual refresh button
+            const refreshBtn = document.getElementById('refreshOrdersBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    this.disabled = true;
+                    this.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+                    location.reload();
+                });
+            }
         });
     </script>
 </body>
