@@ -334,7 +334,7 @@ class SellerController extends Controller
             // If no matching user found, return empty products
             $products = Product::with(['category', 'subcategory'])
                 ->whereNull('id') // Force empty result
-                ->paginate(12);
+                
             return view('seller.store-products', compact('seller', 'products'));
         }
 
