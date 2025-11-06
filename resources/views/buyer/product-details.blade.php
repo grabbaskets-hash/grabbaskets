@@ -291,10 +291,17 @@
         <!-- Right Side -->
         <ul class="navbar-nav ms-auto align-items-lg-center">
           <li class="nav-item d-none d-lg-block me-2">
-            <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+            <span class="text-light small">
+              @auth
+                Hello, {{ Auth::user()->name }}
+              @else
+                <a href="{{ route('login') }}" class="text-warning text-decoration-none">Login</a>
+              @endauth
+            </span>
           </li>
 
           <!-- Account Dropdown -->
+          @auth
           <li class="nav-item dropdown">
             <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
               id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -309,7 +316,15 @@
               <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
             </ul>
           </li>
+          @else
+          <li class="nav-item ms-lg-2">
+            <a href="{{ route('login') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1">
+              <i class="bi bi-person-circle"></i> Login
+            </a>
+          </li>
+          @endauth
 
+          @auth
           <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
             <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -317,6 +332,9 @@
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
               @csrf
+            </form>
+          </li>
+          @endauth
             </form>
           </li>
         </ul>
