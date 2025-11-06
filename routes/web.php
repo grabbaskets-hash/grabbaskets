@@ -534,8 +534,10 @@ Route::get('/debug-create-delivery-partner', function() {
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
-// Product details & reviews - Anyone can view
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
+// Product details & reviews - Protected routes
+Route::get('/product/{id}', [ProductController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('product.details');
 Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
