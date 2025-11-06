@@ -12,11 +12,6 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            // Ensure user is authenticated (double-check even though middleware should handle this)
-            if (!Auth::check()) {
-                return redirect()->route('login')->with('error', 'Please login to view product details.');
-            }
-            
             // Load product with relationships including seller (User)
             $product = Product::with(['category', 'subcategory', 'seller'])->findOrFail($id);
             
