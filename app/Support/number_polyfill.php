@@ -1,14 +1,81 @@
 <?php
 
-namespace Illuminate\Support;
+// Place the polyfill in an explicit global namespace block so the
+// following "namespace Illuminate\Support;" declaration remains the
+// first non-declarative statement for that namespace (and to avoid
+// "namespace must be the first statement" PHP errors).
+namespace {
+    if (! class_exists('NumberFormatter')) {
+        class NumberFormatter
+        {
+            public const DECIMAL = 0;
+            public const SPELLOUT = 1;
+            public const ORDINAL = 2;
+            public const PERCENT = 3;
+            public const CURRENCY = 4;
+
+            public const MAX_FRACTION_DIGITS = 1001;
+            public const FRACTION_DIGITS = 1000;
+
+            public const DEFAULT_RULESET = 'default';
+
+            protected $locale;
+            protected $style;
+            protected $fractionDigits = 2;
+
+            public function __construct($locale = 'en', $style = self::DECIMAL)
+            {
+                $this->locale = $locale;
+                $this->style = $style;
+            }
+
+            public function setAttribute($attr, $value)
+            {
+                if ($attr === self::MAX_FRACTION_DIGITS || $attr === self::FRACTION_DIGITS) {
+                    $this->fractionDigits = (int) $value;
+                }
+                return true;
+            }
+
+            public function setTextAttribute($attr, $value)
+            {
+                return true;
+            }
+
+            public function format($number)
+            {
+                return number_format((float) $number, $this->fractionDigits, '.', ',');
+            }
+
+            public function parse($string, $type = null)
+            {
+                $normalized = str_replace([' ', ','], ['', ''], $string);
+                $normalized = str_replace(',', '.', $normalized);
+
+                if ($type === null) {
+                    return is_numeric($normalized) ? (float) $normalized : false;
+                }
+
+                return is_numeric($normalized) ? $normalized + 0 : false;
+            }
+
+            public function formatCurrency($number, $currency)
+            {
+                return $this->format($number) . ' ' . $currency;
+            }
+        }
+    }
+}
 
 // Provide a safe fallback for Illuminate\Support\Number when PHP's intl extension is not available.
 // This file is intentionally simple and provides basic, locale-agnostic behavior so the app
 // doesn't throw RuntimeExceptions. It is NOT a full replacement for the intl behavior.
 
-if (! class_exists(Number::class)) {
-    class Number
-    {
+namespace Illuminate\Support {
+
+    if (! class_exists(Number::class)) {
+        class Number
+        {
         protected static $locale = 'en';
         protected static $currency = 'USD';
 
@@ -190,4 +257,5 @@ if (! class_exists(Number::class)) {
             return;
         }
     }
+}
 }
