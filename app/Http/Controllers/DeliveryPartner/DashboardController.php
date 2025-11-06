@@ -24,9 +24,20 @@ class DashboardController extends Controller
             $partner = Auth::guard('delivery_partner')->user();
             
             if (!$partner) {
+                \Illuminate\Support\Facades\Log::warning('Dashboard accessed without authentication', [
+                    'session_id' => session()->getId(),
+                    'guard_check' => Auth::guard('delivery_partner')->check(),
+                    'user_agent' => request()->userAgent()
+                ]);
+                
                 return redirect()->route('delivery-partner.login')
                     ->with('error', 'Please login to access the dashboard.');
             }
+
+            \Illuminate\Support\Facades\Log::info('Dashboard loaded successfully', [
+                'partner_id' => $partner->id,
+                'partner_name' => $partner->name
+            ]);
 
             // Quick load with minimal data
             return view('delivery-partner.dashboard.index', [
@@ -43,7 +54,8 @@ class DashboardController extends Controller
             \Illuminate\Support\Facades\Log::error('Dashboard loading failed completely', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             return response()->view('errors.500', [

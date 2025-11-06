@@ -11,13 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use App\Models\DeliveryPartner;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
 
 class SuperFastAuthController extends Controller
 {
@@ -172,6 +165,16 @@ class SuperFastAuthController extends Controller
             'ip' => $request->ip()
         ]);
 
+        // VERIFY: Confirm session is actually persisted before redirect
+        if (!Auth::guard('delivery_partner')->check()) {
+            Log::error('CRITICAL: Session check failed after login', [
+                'partner_id' => $partner->id,
+                'session_id' => $request->session()->getId(),
+                'session_data' => $request->session()->all()
+            ]);
+            return back()->withErrors(['login' => 'Login failed - session not persisted. Please try again.']);
+        }
+
         // Handle status-specific redirects
         if ($partner->status === 'pending') {
             return redirect()
@@ -179,8 +182,9 @@ class SuperFastAuthController extends Controller
                 ->with('warning', 'Your account is under review. You will be notified once approved.');
         }
 
-        return redirect()
-            ->intended(route('delivery-partner.dashboard'))
+        // EXPLICIT REDIRECT - Do not use intended() for delivery partners
+        // This ensures we always redirect to the dashboard
+        return redirect('/delivery-partner/dashboard')
             ->with('success', 'Welcome back, ' . $partner->name . '!');
     }
 

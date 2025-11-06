@@ -169,8 +169,8 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', true), // Changed to true for HTTPS
-
+    'secure' => env('SESSION_SECURE_COOKIE', false), // Changed to false as default for HTTP dev, set true in production .env
+    
     /*
     |--------------------------------------------------------------------------
     | HTTP Access Only
