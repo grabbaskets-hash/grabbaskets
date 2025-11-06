@@ -33,13 +33,25 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->renderable(function (Throwable $e, $request) {
-            // For AJAX or JSON requests, return JSON error
+            // If the exception is the missing PHP intl extension runtime error,
+            // show a clear instructions page instead of a generic 500.
+            if ($e instanceof \RuntimeException && str_contains($e->getMessage(), 'intl')) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Server misconfiguration: PHP "intl" extension is missing. Please enable it on the server.'
+                    ], 500);
+                }
+
+                return response()->view('errors.missing_intl', [], 500);
+            }
+
+            // Fallback: existing generic behavior
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Oops! Something went wrong. Please try again later.'
                 ], 500);
             }
-            // For web requests, show a friendly error page
+
             return response()->view('errors.custom', [
                 'message' => 'Oops! Something went wrong. Please try again later.'
             ], 500);

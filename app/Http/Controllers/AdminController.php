@@ -121,17 +121,28 @@ class AdminController extends Controller
 
     public function transactions()
     {
-        $products = Product::all();
-        $ordersCount = Order::with('buyerUser')->get(); // Changed to buyerUser
-        $sellersCount = User::where('role', 'seller')->count();
-        $buyersCount = User::where('role', 'buyer')->count();
+        try {
+            $products = Product::all();
+            $ordersCount = Order::with(['buyerUser', 'product'])->latest()->take(10)->get(); // Get only latest 10 orders
+            $sellersCount = User::where('role', 'seller')->count();
+            $buyersCount = User::where('role', 'buyer')->count();
 
-        return view('admin.dashboard', compact(
-            'products',
-            'ordersCount',
-            'sellersCount',
-            'buyersCount'
-        ));
+            return view('admin.dashboard', compact(
+                'products',
+                'ordersCount',
+                'sellersCount',
+                'buyersCount'
+            ));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin dashboard error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->view('errors.custom', [
+                'message' => 'There was an error loading the dashboard. Please try again.'
+            ], 500);
+        }
     }
 
     public function orders(Request $request)

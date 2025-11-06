@@ -46,6 +46,7 @@ class ComposerStaticInit87e2b36dd3e511e0e6477900904781c9
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '13906c19e3d8fcd1341b24ed4d51cf72' => __DIR__ . '/..' . '/razorpay/razorpay/Deprecated.php',
+        '637f347ab3b13b2454496db46a0bd91f' => __DIR__ . '/../..' . '/app/Support/number_polyfill.php',
     );
 
     public static $prefixLengthsPsr4 = array (

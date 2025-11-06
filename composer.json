@@ -33,6 +33,10 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
+        ,
+        "files": [
+            "app/Support/number_polyfill.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
