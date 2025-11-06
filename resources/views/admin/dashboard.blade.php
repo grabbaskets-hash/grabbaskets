@@ -318,7 +318,6 @@
                 <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
                 <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
                         Product Upload</a></li>
-                <li><a class="nav-link" href="{{ route('admin.delivery-partners.index') }}"><i class="bi bi-truck"></i> Delivery Partners</a></li>
                 <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
                         <i class="bi bi-box-arrow-right"></i> Logout</a>
                 </li>
@@ -336,7 +335,7 @@
                     <div class="card stat-card text-center p-3 bg-light">
                         <div class="text-primary icon"><i class="bi bi-box-seam"></i></div>
                         <h6 class="mt-2">Products</h6>
-                        <p class="display-6 fw-bold">{{ $products->count() }}</p>
+                        <p class="display-6 fw-bold">{{ $products['count'] ?? 0 }}</p>
                     </div>
                 </div>
 

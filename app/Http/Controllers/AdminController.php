@@ -122,10 +122,24 @@ class AdminController extends Controller
     public function transactions()
     {
         try {
-            $products = Product::all();
-            $ordersCount = Order::with(['buyerUser', 'product'])->latest()->take(10)->get(); // Get only latest 10 orders
+            // Count of products safely
+            $productsCount = Product::count();
+            
+            // Get latest orders with eager loading - handle null relationships gracefully
+            $ordersCount = Order::with([
+                'buyerUser' => function ($query) {
+                    $query->select('id', 'name', 'email');
+                },
+                'product' => function ($query) {
+                    $query->select('id', 'name', 'price');
+                }
+            ])->latest()->take(10)->get();
+            
             $sellersCount = User::where('role', 'seller')->count();
             $buyersCount = User::where('role', 'buyer')->count();
+
+            // Create a collection with count method available
+            $products = collect(['count' => $productsCount]);
 
             return view('admin.dashboard', compact(
                 'products',
