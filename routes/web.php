@@ -534,10 +534,8 @@ Route::get('/debug-create-delivery-partner', function() {
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
-// Product details & reviews - Protected routes
-Route::get('/product/{id}', [ProductController::class, 'show'])
-    ->middleware(['auth', 'verified'])
-    ->name('product.details');
+// Product details & reviews - Anyone can view
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
 Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
@@ -1425,11 +1423,10 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
     Route::post('/check-email', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkEmail'])
         ->name('check-email');
     
-    // Login - OPTIMIZED VERSION with performance monitoring
-    Route::get('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'showLoginForm'])
+    // Login - SUPER FAST VERSION (No caching overhead)
+    Route::get('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'showLoginForm'])
         ->name('login');
-    Route::post('/login', [App\Http\Controllers\DeliveryPartner\OptimizedAuthController::class, 'login'])
-        ->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class)  // Skip CSRF for better performance
+    Route::post('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'login'])
         ->name('login.post');
         
     // Diagnostics page for debugging login issues
