@@ -240,7 +240,6 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::post('/seller/update-profile', [SellerController::class, 'updateProfile'])->name('seller.updateProfile');
     Route::get('/seller/profile/{seller}', [SellerController::class, 'publicProfileBySeller'])->name('seller.publicProfile');
     Route::get('/seller/transactions', [SellerController::class, 'transactions'])->name('seller.transactions');
-    Route::get('/store/{seller}', [SellerController::class, 'storeProducts'])->name('store.products');
 
     // Seller: Image Library
     Route::get('/seller/image-library', [SellerController::class, 'imageLibrary'])->name('seller.imageLibrary');
@@ -534,7 +533,10 @@ Route::get('/debug-create-delivery-partner', function() {
 Route::get('/buyer/category/{category_id}', [BuyerController::class, 'productsByCategory'])->name('buyer.productsByCategory');
 Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'productsBySubcategory'])->name('buyer.productsBySubcategory');
 
-// Product details & reviews - Anyone can view
+// Store/Seller catalog - View all products from a specific store (no auth required for guests)
+Route::get('/store/{seller}', [SellerController::class, 'storeProducts'])->name('store.products');
+
+// Product details & reviews - Anyone can view (no auth required)
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
 Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
