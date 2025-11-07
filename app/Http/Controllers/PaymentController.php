@@ -279,13 +279,13 @@ class PaymentController extends Controller
                     // Send email to seller
                     $this->sendOrderNotificationEmail($seller, $order, $product, 'seller');
                     
-                    // 📱 Send SMS notification to seller
-                    $smsService = new InfobipSmsService();
+                    // Send SMS notification to seller via Twilio
+                    $smsService = new \App\Services\SmsService();
                     $smsResult = $smsService->sendOrderConfirmationToSeller($seller, $order);
                     if ($smsResult['success']) {
-                        Log::info('SMS sent to seller', ['seller_id' => $seller->id, 'order_id' => $order->id]);
+                        Log::info('SMS sent to seller via Twilio', ['seller_id' => $seller->id, 'order_id' => $order->id]);
                     } else {
-                        Log::warning('Failed to send SMS to seller', ['seller_id' => $seller->id, 'error' => $smsResult['error']]);
+                        Log::warning('Failed to send SMS to seller', ['seller_id' => $seller->id, 'error' => $smsResult['error'] ?? 'Unknown error']);
                     }
                 }
 
@@ -297,13 +297,13 @@ class PaymentController extends Controller
             // Send email to buyer
             $this->sendOrderNotificationEmail(Auth::user(), $orders[0], null, 'buyer', $orders);
             
-            // 📱 Send SMS payment confirmation to buyer
-            $smsService = new InfobipSmsService();
+            // Send SMS payment confirmation to buyer via Twilio
+            $smsService = new \App\Services\SmsService();
             $buyerSmsResult = $smsService->sendPaymentConfirmationToBuyer(Auth::user(), $orders[0]);
             if ($buyerSmsResult['success']) {
-                Log::info('Payment confirmation SMS sent to buyer', ['buyer_id' => Auth::id(), 'order_count' => count($orders)]);
+                Log::info('Payment confirmation SMS sent to buyer via Twilio', ['buyer_id' => Auth::id(), 'order_count' => count($orders)]);
             } else {
-                Log::warning('Failed to send payment confirmation SMS to buyer', ['buyer_id' => Auth::id(), 'error' => $buyerSmsResult['error']]);
+                Log::warning('Failed to send payment confirmation SMS to buyer', ['buyer_id' => Auth::id(), 'error' => $buyerSmsResult['error'] ?? 'Unknown error']);
             }
 
             // Clear cart and session

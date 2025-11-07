@@ -76,8 +76,9 @@ class TwilioChannel
 
     /**
      * Send SMS via Twilio API.
+     * Returns array with success status and details.
      */
-    protected function sendSms(string $to, string $message): void
+    public function sendSms(string $to, string $message): array
     {
         try {
             $sid = config('services.twilio.sid');
@@ -87,7 +88,7 @@ class TwilioChannel
 
             if (!$sid || !$token || !$from) {
                 Log::error('Twilio credentials not configured');
-                return;
+                return ['success' => false, 'error' => 'Twilio credentials not configured'];
             }
 
             $payload = [
@@ -96,10 +97,9 @@ class TwilioChannel
                 'Body' => $message,
             ];
 
-            // Add sender name if configured
-            if ($senderName) {
-                $payload['MessagingServiceSid'] = $senderName;
-            }
+            // Note: Twilio sender name is configured at account level, not per-message
+            // The 'From' number will show as the sender
+            // For alphanumeric sender ID, you need to configure it in Twilio console
 
             $response = Http::withBasicAuth($sid, $token)
                 ->asForm()
@@ -111,12 +111,21 @@ class TwilioChannel
                     'sender' => $senderName,
                     'message_sid' => $response->json('sid')
                 ]);
+                return [
+                    'success' => true,
+                    'message_sid' => $response->json('sid'),
+                    'to' => $to
+                ];
             } else {
                 Log::error('Twilio SMS failed', [
                     'to' => $to,
                     'status' => $response->status(),
                     'error' => $response->json('message') ?? $response->body()
                 ]);
+                return [
+                    'success' => false,
+                    'error' => $response->json('message') ?? $response->body()
+                ];
             }
         } catch (\Exception $e) {
             Log::error('Twilio SMS exception', [
@@ -124,6 +133,10 @@ class TwilioChannel
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
 }

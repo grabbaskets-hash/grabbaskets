@@ -228,6 +228,17 @@ Grabbasket Team
         // Send notification to buyer
         NotificationService::sendOrderStatusUpdate($order->buyerUser, $order, $newStatus);
 
+        // Send SMS notification to buyer about status change
+        $smsService = new \App\Services\SmsService();
+        $smsResult = $smsService->sendOrderStatusUpdateToBuyer($order->buyerUser, $order, $newStatus);
+        if ($smsResult['success']) {
+            \Illuminate\Support\Facades\Log::info('Order status update SMS sent to buyer', [
+                'buyer_id' => $order->buyer_id,
+                'order_id' => $order->id,
+                'status' => $newStatus
+            ]);
+        }
+
         // Special handling for delivery completion
         if ($newStatus === 'delivered') {
             // Send review request after 24 hours (in real app, use a queue/job)
