@@ -306,6 +306,18 @@ class PaymentController extends Controller
                 Log::warning('Failed to send payment confirmation SMS to buyer', ['buyer_id' => Auth::id(), 'error' => $buyerSmsResult['error'] ?? 'Unknown error']);
             }
 
+            // Send SMS notification to admin numbers for each order
+            foreach ($orders as $order) {
+                $seller = User::find($order->seller_id);
+                $adminSmsResult = $smsService->sendNewOrderNotificationToAdmins($order, Auth::user(), $seller);
+                if ($adminSmsResult['success']) {
+                    Log::info('Order notification SMS sent to admins', [
+                        'order_id' => $order->id,
+                        'successful_sends' => count(array_filter($adminSmsResult['results'], fn($r) => $r['success']))
+                    ]);
+                }
+            }
+
             // Clear cart and session
             CartItem::where('user_id', Auth::id())->delete();
             session()->forget('checkout_data');

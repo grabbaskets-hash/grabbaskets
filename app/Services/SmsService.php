@@ -144,4 +144,68 @@ class SmsService
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+
+    /**
+     * Send new order notification SMS to admin numbers
+     */
+    public function sendNewOrderNotificationToAdmins($order, $buyer, $seller)
+    {
+        if (!$this->enabled) {
+            Log::info('SMS disabled, skipping admin order notification');
+            return ['success' => false, 'error' => 'SMS notifications disabled'];
+        }
+
+        // Admin phone numbers
+        $adminNumbers = [
+            '+918438074230',
+            '+919659993496'
+        ];
+
+        $productName = $order->product->name ?? 'Product';
+        $buyerName = $buyer->name ?? 'Customer';
+        $sellerName = $seller->name ?? 'Seller';
+        
+        $message = "New Order Alert! Order #{$order->id} | Product: {$productName} | Amount: ₹{$order->amount} | Buyer: {$buyerName} | Seller: {$sellerName} | Payment: {$order->payment_method} - grabbaskets-TN";
+
+        $results = [];
+        foreach ($adminNumbers as $adminPhone) {
+            try {
+                $result = $this->twilioChannel->sendSms($adminPhone, $message);
+                $results[] = [
+                    'phone' => $adminPhone,
+                    'success' => $result['success'],
+                    'error' => $result['error'] ?? null
+                ];
+                
+                if ($result['success']) {
+                    Log::info('Order notification SMS sent to admin', [
+                        'admin_phone' => $adminPhone,
+                        'order_id' => $order->id
+                    ]);
+                } else {
+                    Log::warning('Failed to send SMS to admin', [
+                        'admin_phone' => $adminPhone,
+                        'order_id' => $order->id,
+                        'error' => $result['error'] ?? 'Unknown'
+                    ]);
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to send SMS to admin', [
+                    'admin_phone' => $adminPhone,
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage()
+                ]);
+                $results[] = [
+                    'phone' => $adminPhone,
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        return [
+            'success' => count(array_filter($results, fn($r) => $r['success'])) > 0,
+            'results' => $results
+        ];
+    }
 }
