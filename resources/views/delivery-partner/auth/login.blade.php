@@ -158,67 +158,121 @@
         }
     }
 
-    // ULTRA-OPTIMIZED: Login form submission with immediate visual feedback and pre-processing
-    document.getElementById('login-btn').addEventListener('click', function(e) {
-        const form = e.target.closest('form');
-        if (form.checkValidity()) {
-            // Immediate visual feedback for better perceived performance
-            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing In...';
-            this.disabled = true;
-            this.className = 'btn btn-primary opacity-75';
-            
-            // Pre-process form data for faster backend processing
-            const loginField = document.getElementById('login');
-            const passwordField = document.getElementById('password');
-            
-            // Normalize input for faster database lookup
-            if (loginField.value.includes('@')) {
-                loginField.value = loginField.value.trim().toLowerCase();
-            } else {
-                // Remove all non-digits from phone
-                loginField.value = loginField.value.replace(/\D/g, '');
+    // ULTRA-OPTIMIZED: Pre-process and give immediate feedback on form submit (attach to form submit event)
+    (function() {
+        const form = document.querySelector('form.needs-validation');
+        const btn = document.getElementById('login-btn');
+        if (!form || !btn) return;
+
+        form.addEventListener('submit', async function(e) {
+            // Prevent default submission so we can handle redirect reliably
+            e.preventDefault();
+
+            // Allow browser validation to run first
+            if (!form.checkValidity()) {
+                // Let the layout validation handler show errors
+                return;
             }
-            
-            // Add performance hints to form
-            const optimizeField = document.createElement('input');
-            optimizeField.type = 'hidden';
-            optimizeField.name = '_optimize_auth';
-            optimizeField.value = '1';
-            form.appendChild(optimizeField);
-            
-            // Add login type hint for faster backend processing
-            const typeField = document.createElement('input'); 
-            typeField.type = 'hidden';
-            typeField.name = '_login_type';
-            typeField.value = loginField.value.includes('@') ? 'email' : 'phone';
-            form.appendChild(typeField);
-            
-            // Set a timeout to show "still loading" message if taking too long
-            const loadingTimeouts = [
-                setTimeout(() => {
-                    if (this.disabled) {
-                        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Connecting...';
+
+            // Provide immediate visual feedback
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing In...';
+            btn.disabled = true;
+            btn.className = 'btn btn-primary opacity-75';
+
+            // Pre-process form data
+            const loginField = document.getElementById('login');
+            if (loginField) {
+                if (loginField.value.includes('@')) {
+                    loginField.value = loginField.value.trim().toLowerCase();
+                } else {
+                    loginField.value = loginField.value.replace(/\D/g, '');
+                }
+            }
+
+            // Ensure performance hints are present
+            if (!form.querySelector('input[name="_optimize_auth"]')) {
+                const optimizeField = document.createElement('input');
+                optimizeField.type = 'hidden';
+                optimizeField.name = '_optimize_auth';
+                optimizeField.value = '1';
+                form.appendChild(optimizeField);
+            }
+            if (!form.querySelector('input[name="_login_type"]')) {
+                const typeField = document.createElement('input');
+                typeField.type = 'hidden';
+                typeField.name = '_login_type';
+                typeField.value = (loginField && loginField.value.includes('@')) ? 'email' : 'phone';
+                form.appendChild(typeField);
+            }
+
+            // Set progressive loading messages (will be cleared if we navigate)
+            const loadingTimeouts = [];
+            loadingTimeouts.push(setTimeout(() => {
+                if (btn.disabled) btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Connecting...';
+            }, 2000));
+            loadingTimeouts.push(setTimeout(() => {
+                if (btn.disabled) btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Almost there...';
+            }, 5000));
+            loadingTimeouts.push(setTimeout(() => {
+                if (btn.disabled) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Taking longer than expected...';
+                    btn.className = 'btn btn-warning opacity-75';
+                }
+            }, 10000));
+
+            // Prepare form data for fetch
+            const formData = new FormData(form);
+
+            // Include CSRF token header for safety
+            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const headers = {};
+            if (csrfTokenMeta) headers['X-CSRF-TOKEN'] = csrfTokenMeta.getAttribute('content');
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: headers,
+                    redirect: 'manual'
+                });
+
+                // If server sent a redirect (Location header) — follow it
+                if (response.status >= 300 && response.status < 400) {
+                    const location = response.headers.get('Location') || response.headers.get('location');
+                    if (location) {
+                        window.location.href = location;
+                        return;
                     }
-                }, 2000),
-                setTimeout(() => {
-                    if (this.disabled) {
-                        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Almost there...';
-                    }
-                }, 5000),
-                setTimeout(() => {
-                    if (this.disabled) {
-                        this.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Taking longer than expected...';
-                        this.className = 'btn btn-warning opacity-75';
-                    }
-                }, 10000)
-            ];
-            
-            // Clear timeouts when form submits successfully
-            form.addEventListener('submit', () => {
-                loadingTimeouts.forEach(timeout => clearTimeout(timeout));
-            });
-        }
-    });
+                }
+
+                // Some servers may respond with a 200 and meta refresh — check response text for a refresh
+                const text = await response.text();
+                const metaRefreshMatch = text.match(/<meta[^>]+http-equiv=["']refresh["'][^>]*content=["']\s*0;url=([^"']+)["']/i);
+                if (metaRefreshMatch && metaRefreshMatch[1]) {
+                    window.location.href = metaRefreshMatch[1];
+                    return;
+                }
+
+                // If response redirected by fetch API (response.redirected)
+                if (response.redirected && response.url) {
+                    window.location.href = response.url;
+                    return;
+                }
+
+                // As a last attempt, try loading dashboard directly (safe fallback)
+                window.location.href = '/delivery-partner/dashboard';
+            } catch (err) {
+                console.error('Login fetch failed', err);
+                // Re-enable button and show a friendly message
+                btn.disabled = false;
+                btn.className = 'btn btn-primary';
+                btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+                alert('Unable to complete login due to a network issue. Please try again.');
+                loadingTimeouts.forEach(t => clearTimeout(t));
+            }
+        }, false);
+    })();
 
     // Auto-detect input type (email or phone)
     document.getElementById('login').addEventListener('input', function(e) {

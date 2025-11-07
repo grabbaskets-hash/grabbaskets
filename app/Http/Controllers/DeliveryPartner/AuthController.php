@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Mail\DeliveryPartnerRegistered;
+use App\Mail\DeliveryPartnerWelcome;
 
 class AuthController extends Controller
 {
@@ -146,8 +149,28 @@ class AuthController extends Controller
             // Create delivery partner
             $deliveryPartner = DeliveryPartner::create($data);
 
-            // Send notification to admin about new registration
-            // $this->notifyAdminNewRegistration($deliveryPartner);
+            // Send email notification to admin about new registration
+            try {
+                $adminEmail = config('mail.support_email');
+                Mail::to($adminEmail)->send(new DeliveryPartnerRegistered($deliveryPartner));
+                Log::info('Admin notification email sent for new delivery partner', ['partner_id' => $deliveryPartner->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send admin notification email', [
+                    'partner_id' => $deliveryPartner->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // Send welcome email to the new delivery partner
+            try {
+                Mail::to($deliveryPartner->email)->send(new DeliveryPartnerWelcome($deliveryPartner));
+                Log::info('Welcome email sent to delivery partner', ['partner_id' => $deliveryPartner->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send welcome email to delivery partner', [
+                    'partner_id' => $deliveryPartner->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             // Create wallet for the new partner
             try {
@@ -246,6 +269,29 @@ class AuthController extends Controller
                 'average_rating' => 0.00,
                 'is_active' => true,
             ]);
+
+            // Send email notification to admin about new registration
+            try {
+                $adminEmail = config('mail.support_email');
+                Mail::to($adminEmail)->send(new DeliveryPartnerRegistered($deliveryPartner));
+                Log::info('Admin notification email sent for quick registered delivery partner', ['partner_id' => $deliveryPartner->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send admin notification email for quick registration', [
+                    'partner_id' => $deliveryPartner->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // Send welcome email to the new delivery partner
+            try {
+                Mail::to($deliveryPartner->email)->send(new DeliveryPartnerWelcome($deliveryPartner));
+                Log::info('Welcome email sent to quick registered delivery partner', ['partner_id' => $deliveryPartner->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send welcome email to quick registered delivery partner', [
+                    'partner_id' => $deliveryPartner->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             return redirect()
                 ->route('delivery-partner.login')

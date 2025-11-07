@@ -84,12 +84,20 @@ class SuperFastAuthController extends Controller
         // SUPER FAST: Status check - accept repository's canonical statuses
         // (migration uses 'approved' rather than 'active')
         if (!in_array($partner->status, ['approved', 'pending'])) {
+            $supportEmail = config('mail.support_email', 'support@grabbasket.com');
             $messages = [
-                'rejected' => 'Your account has been rejected. Please contact support.',
-                'suspended' => 'Your account has been suspended. Please contact support.',
-                'inactive' => 'Your account is inactive. Please contact support.',
+                'rejected' => "Your application has been rejected. Please contact support at {$supportEmail} for more information.",
+                'suspended' => "Your account has been suspended due to policy violations. Please contact support at {$supportEmail} to appeal this decision.",
+                'inactive' => "Your account is inactive. Please contact support at {$supportEmail} to reactivate your account.",
             ];
-            return back()->withErrors(['login' => $messages[$partner->status] ?? 'Account status issue.']);
+            
+            Log::warning("DeliveryPartner Login Blocked - Account Status Issue", [
+                'partner_id' => $partner->id,
+                'status' => $partner->status,
+                'ip' => $request->ip()
+            ]);
+            
+            return back()->withErrors(['login' => $messages[$partner->status] ?? 'Account status issue. Please contact support.']);
         }
 
         // SUPER FAST: Login using ID (fastest method)

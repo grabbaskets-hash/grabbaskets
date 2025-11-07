@@ -859,6 +859,12 @@ Route::prefix('admin/delivery-partners')->name('admin.delivery-partners.')->grou
     // Show partner details
     Route::get('/{deliveryPartner}', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'show'])->name('show');
     
+    // Approve/Block/Unblock partners
+    Route::post('/{id}/approve', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'approve'])->name('approve');
+    Route::post('/{id}/block', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'block'])->name('block');
+    Route::post('/{id}/unblock', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'unblock'])->name('unblock');
+    Route::post('/{id}/reject', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'reject'])->name('reject');
+    
     // Assign job to partner
     Route::post('/{deliveryPartner}/assign-job', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'assignJob'])->name('assign-job');
     
@@ -1470,7 +1476,7 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
 });
 
 // Delivery Partner Protected Routes
-Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('auth:delivery_partner')->group(function () {
+Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:delivery_partner', 'delivery.partner.status'])->group(function () {
     // Logout
     Route::post('/logout', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'logout'])
         ->name('logout');

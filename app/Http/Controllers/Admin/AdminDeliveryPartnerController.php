@@ -300,7 +300,7 @@ class AdminDeliveryPartnerController extends Controller
     {
         $partners = DeliveryPartner::where('is_online', true)
             ->where('is_available', true)
-            ->where('status', 'active')
+            ->where('status', 'approved')  // Only approved partners can receive orders
             ->with('wallet')
             ->get()
             ->map(function ($partner) {
@@ -412,7 +412,7 @@ class AdminDeliveryPartnerController extends Controller
     {
         return DeliveryPartner::where('is_online', true)
             ->where('is_available', true)
-            ->where('status', 'active')
+            ->where('status', 'approved')  // Only approved partners can receive orders
             ->withCount(['deliveryRequests' => function ($q) {
                 $q->whereIn('status', ['accepted', 'picked_up']);
             }])

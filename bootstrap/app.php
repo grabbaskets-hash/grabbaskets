@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'optimize.login' => \App\Http\Middleware\OptimizeLoginSession::class,
             'optimize.delivery.auth' => \App\Http\Middleware\OptimizeDeliveryPartnerAuth::class,
+            'delivery.partner.status' => \App\Http\Middleware\CheckDeliveryPartnerStatus::class,
         ]);
         
         // Add global middleware for login optimization
