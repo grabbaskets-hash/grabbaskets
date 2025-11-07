@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryPartner;
 use App\Mail\DeliveryPartnerApproved;
 use App\Mail\DeliveryPartnerBlocked;
+use App\Notifications\DeliveryPartnerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -111,6 +112,23 @@ class DeliveryPartnerController extends Controller
             ]);
         }
 
+        // Send in-app notification
+        try {
+            $partner->notify(new DeliveryPartnerNotification(
+                'Account Approved! 🎉',
+                'Congratulations! Your delivery partner account has been approved. You can now go online and start accepting delivery requests.',
+                'success',
+                route('delivery-partner.dashboard'),
+                'Go to Dashboard',
+                ['send_email' => false] // Already sent approval email above
+            ));
+        } catch (\Exception $e) {
+            Log::error('Failed to send approval notification', [
+                'partner_id' => $partner->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         return back()->with('success', "Delivery partner '{$partner->name}' has been approved and notified via email.");
     }
 
@@ -144,6 +162,23 @@ class DeliveryPartnerController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send suspension email', [
+                'partner_id' => $partner->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Send in-app notification
+        try {
+            $partner->notify(new DeliveryPartnerNotification(
+                'Account Suspended',
+                'Your account has been suspended. Reason: ' . $request->reason . '. Please contact support for assistance.',
+                'danger',
+                null,
+                null,
+                ['send_email' => false, 'reason' => $request->reason]
+            ));
+        } catch (\Exception $e) {
+            Log::error('Failed to send suspension notification', [
                 'partner_id' => $partner->id,
                 'error' => $e->getMessage()
             ]);

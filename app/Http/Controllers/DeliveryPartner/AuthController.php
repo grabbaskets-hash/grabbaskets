@@ -12,10 +12,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Mail\DeliveryPartnerRegistered;
 use App\Mail\DeliveryPartnerWelcome;
+use App\Notifications\DeliveryPartnerNotification;
 
 class AuthController extends Controller
 {
@@ -167,6 +169,23 @@ class AuthController extends Controller
                 Log::info('Welcome email sent to delivery partner', ['partner_id' => $deliveryPartner->id]);
             } catch (\Exception $e) {
                 Log::error('Failed to send welcome email to delivery partner', [
+                    'partner_id' => $deliveryPartner->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // Send in-app notification
+            try {
+                $deliveryPartner->notify(new DeliveryPartnerNotification(
+                    'Welcome to ' . config('app.name') . '!',
+                    'Your registration has been received and is pending admin approval. You will be notified once your account is approved.',
+                    'info',
+                    route('delivery-partner.dashboard'),
+                    'Go to Dashboard',
+                    ['send_email' => false] // Already sent welcome email above
+                ));
+            } catch (\Exception $e) {
+                Log::error('Failed to send in-app notification', [
                     'partner_id' => $deliveryPartner->id,
                     'error' => $e->getMessage()
                 ]);

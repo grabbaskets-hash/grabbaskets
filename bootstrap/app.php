@@ -18,10 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'delivery.partner.status' => \App\Http\Middleware\CheckDeliveryPartnerStatus::class,
         ]);
         
-        // Add global middleware for login optimization
-        $middleware->web(append: [
-            \App\Http\Middleware\OptimizeLoginSession::class,
-        ]);
+        // Removed global OptimizeLoginSession middleware - apply it only where needed
+        // $middleware->web(append: [
+        //     \App\Http\Middleware\OptimizeLoginSession::class,
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
