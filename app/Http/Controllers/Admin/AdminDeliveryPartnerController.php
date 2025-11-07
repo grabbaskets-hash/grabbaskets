@@ -107,7 +107,7 @@ class AdminDeliveryPartnerController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
-        $partners = $query->with('wallet')->paginate(15);
+        $partners = $query->paginate(15);
 
         return view('admin.delivery-partners.index', compact('partners'));
     }

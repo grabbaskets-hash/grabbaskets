@@ -1,15 +1,41 @@
-@extends('layouts.admin')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Partners Management - Admin</title>
+    <link rel="icon" type="image/png" href="{{ asset('asset/images/grabbasket.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .card { border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .table-responsive { border-radius: 10px; background: white; }
+        .badge { padding: 5px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
 
-@section('title', 'Delivery Partners List')
-
-@section('content')
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="h3">
-                <i class="fas fa-users text-primary me-2"></i>All Delivery Partners
-            </h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3">
+                        <i class="fas fa-users text-primary me-2"></i>All Delivery Partners
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
+                            <li class="breadcrumb-item active">Delivery Partners</li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{{ route('admin.delivery-partners.dashboard') }}" class="btn btn-info">
+                    <i class="fas fa-chart-line me-2"></i>Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
@@ -74,7 +100,6 @@
                                         <th>Online</th>
                                         <th>Available</th>
                                         <th>Rating</th>
-                                        <th>Wallet Balance</th>
                                         <th>Joined</th>
                                         <th>Actions</th>
                                     </tr>
@@ -86,30 +111,29 @@
                                             <td>{{ $partner->phone }}</td>
                                             <td>{{ $partner->email }}</td>
                                             <td>
-                                                <span class="badge badge-{{ $partner->status === 'active' ? 'success' : ($partner->status === 'pending' ? 'warning' : 'danger') }}">
+                                                <span class="badge bg-{{ $partner->status === 'active' ? 'success' : ($partner->status === 'pending' ? 'warning' : 'danger') }}">
                                                     {{ ucfirst($partner->status) }}
                                                 </span>
                                             </td>
                                             <td>
                                                 @if($partner->is_online)
-                                                    <span class="badge badge-success">
+                                                    <span class="badge bg-success">
                                                         <i class="fas fa-circle"></i> Online
                                                     </span>
                                                 @else
-                                                    <span class="badge badge-secondary">Offline</span>
+                                                    <span class="badge bg-secondary">Offline</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($partner->is_available)
-                                                    <span class="badge badge-info">Available</span>
+                                                    <span class="badge bg-info">Available</span>
                                                 @else
-                                                    <span class="badge badge-danger">Busy</span>
+                                                    <span class="badge bg-danger">Busy</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 <i class="fas fa-star text-warning"></i> {{ $partner->rating ?? 0 }}/5
                                             </td>
-                                            <td>₹{{ $partner->wallet?->balance ?? 0 }}</td>
                                             <td>{{ $partner->created_at->format('M d, Y') }}</td>
                                             <td>
                                                 <div class="btn-group" role="group">
@@ -178,4 +202,7 @@
         </div>
     </div>
 </div>
-@endsection
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
