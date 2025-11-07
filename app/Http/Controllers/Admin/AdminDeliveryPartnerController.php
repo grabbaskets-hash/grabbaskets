@@ -20,29 +20,54 @@ class AdminDeliveryPartnerController extends Controller
      */
     public function dashboard()
     {
-        $stats = [
-            'total_partners' => DeliveryPartner::count(),
-            'online_partners' => DeliveryPartner::where('is_online', true)->count(),
-            'available_partners' => DeliveryPartner::where('is_available', true)->count(),
-            'pending_partners' => DeliveryPartner::where('status', 'pending')->count(),
-            'active_deliveries' => DeliveryRequest::whereIn('status', ['accepted', 'picked_up'])->count(),
-            'completed_today' => DeliveryRequest::where('status', 'completed')
-                ->whereDate('completed_at', today())
-                ->count(),
-        ];
+        try {
+            $stats = [
+                'total_partners' => DeliveryPartner::count(),
+                'online_partners' => DeliveryPartner::where('is_online', true)->count(),
+                'available_partners' => DeliveryPartner::where('is_available', true)->count(),
+                'pending_partners' => DeliveryPartner::where('status', 'pending')->count(),
+                'active_deliveries' => 0,
+                'completed_today' => 0,
+            ];
 
-        $recentActivity = DeliveryRequest::with(['deliveryPartner', 'order'])
-            ->orderBy('updated_at', 'desc')
-            ->limit(10)
-            ->get();
+            // Try to get delivery request stats if model/table exists
+            try {
+                if (class_exists('\App\Models\DeliveryRequest')) {
+                    $stats['active_deliveries'] = DeliveryRequest::whereIn('status', ['accepted', 'picked_up'])->count();
+                    $stats['completed_today'] = DeliveryRequest::where('status', 'completed')
+                        ->whereDate('completed_at', today())
+                        ->count();
+                }
+            } catch (\Exception $e) {
+                Log::warning('Could not load delivery request stats: ' . $e->getMessage());
+            }
 
-        $onlinePartners = DeliveryPartner::where('is_online', true)
-            ->with('wallet')
-            ->orderBy('last_active_at', 'desc')
-            ->limit(15)
-            ->get();
+            // Try to get recent activity
+            $recentActivity = [];
+            try {
+                if (class_exists('\App\Models\DeliveryRequest')) {
+                    $recentActivity = DeliveryRequest::with(['deliveryPartner', 'order'])
+                        ->orderBy('updated_at', 'desc')
+                        ->limit(10)
+                        ->get();
+                }
+            } catch (\Exception $e) {
+                Log::warning('Could not load recent activity: ' . $e->getMessage());
+            }
 
-        return view('admin.delivery-partners.dashboard', compact('stats', 'recentActivity', 'onlinePartners'));
+            // Get online partners
+            $onlinePartners = DeliveryPartner::where('is_online', true)
+                ->orderBy('updated_at', 'desc')
+                ->limit(15)
+                ->get();
+
+            return view('admin.delivery-partners.dashboard', compact('stats', 'recentActivity', 'onlinePartners'));
+        } catch (\Exception $e) {
+            Log::error('Admin Delivery Partner Dashboard Error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return back()->with('error', 'Error loading dashboard: ' . $e->getMessage());
+        }
     }
 
     /**
