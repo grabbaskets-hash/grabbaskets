@@ -365,6 +365,31 @@
                 </div>
             </div>
 
+            {{-- Delivery Partners Row --}}
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card stat-card text-center p-3 bg-light">
+                        <div class="text-info icon"><i class="bi bi-truck"></i></div>
+                        <h6 class="mt-2">Total Delivery Partners</h6>
+                        <p class="display-6 fw-bold">{{ $deliveryPartnersCount ?? 0 }}</p>
+                        <a href="{{ route('admin.delivery-partners.index') }}" class="btn btn-sm btn-info mt-2">
+                            <i class="bi bi-eye"></i> View All
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card stat-card text-center p-3 bg-light">
+                        <div class="text-success icon"><i class="bi bi-check-circle"></i></div>
+                        <h6 class="mt-2">Active Delivery Partners</h6>
+                        <p class="display-6 fw-bold">{{ $activeDeliveryPartnersCount ?? 0 }}</p>
+                        <a href="{{ route('admin.delivery-partners.dashboard') }}" class="btn btn-sm btn-success mt-2">
+                            <i class="bi bi-graph-up"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             {{-- Quick Actions --}}
             <div class="row mb-4">
                 <div class="col-12">

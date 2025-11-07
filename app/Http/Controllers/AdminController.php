@@ -137,6 +137,10 @@ class AdminController extends Controller
             
             $sellersCount = User::where('role', 'seller')->count();
             $buyersCount = User::where('role', 'buyer')->count();
+            
+            // Add delivery partners count
+            $deliveryPartnersCount = \App\Models\DeliveryPartner::count();
+            $activeDeliveryPartnersCount = \App\Models\DeliveryPartner::where('status', 'approved')->count();
 
             // Create a collection with count method available
             $products = collect(['count' => $productsCount]);
@@ -145,7 +149,9 @@ class AdminController extends Controller
                 'products',
                 'ordersCount',
                 'sellersCount',
-                'buyersCount'
+                'buyersCount',
+                'deliveryPartnersCount',
+                'activeDeliveryPartnersCount'
             ));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Admin dashboard error', [

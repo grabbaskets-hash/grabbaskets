@@ -83,23 +83,32 @@ class TwilioChannel
             $sid = config('services.twilio.sid');
             $token = config('services.twilio.token');
             $from = config('services.twilio.from');
+            $senderName = config('services.twilio.sender_name', 'grabbaskets-TN');
 
             if (!$sid || !$token || !$from) {
                 Log::error('Twilio credentials not configured');
                 return;
             }
 
+            $payload = [
+                'To' => $to,
+                'From' => $from,
+                'Body' => $message,
+            ];
+
+            // Add sender name if configured
+            if ($senderName) {
+                $payload['MessagingServiceSid'] = $senderName;
+            }
+
             $response = Http::withBasicAuth($sid, $token)
                 ->asForm()
-                ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
-                    'To' => $to,
-                    'From' => $from,
-                    'Body' => $message,
-                ]);
+                ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", $payload);
 
             if ($response->successful()) {
                 Log::info('Twilio SMS sent successfully', [
                     'to' => $to,
+                    'sender' => $senderName,
                     'message_sid' => $response->json('sid')
                 ]);
             } else {

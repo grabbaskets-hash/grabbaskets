@@ -1,4 +1,4 @@
-@extends('layouts.delivery-partner')
+@extends('delivery-partner.layouts.dashboard')
 
 @section('title', 'My Orders')
 
