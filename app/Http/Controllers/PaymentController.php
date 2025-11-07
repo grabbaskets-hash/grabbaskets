@@ -9,6 +9,8 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
 use App\Services\InfobipSmsService;
+use App\Notifications\BuyerPurchaseConfirmation;
+use App\Notifications\SellerNewOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -394,27 +396,28 @@ class PaymentController extends Controller
     private function sendOrderNotificationEmail($user, $order, $product, $type, $allOrders = null)
     {
         try {
-            $data = [
-                'user' => $user,
-                'order' => $order,
-                'product' => $product,
-                'type' => $type,
-                'orders' => $allOrders
-            ];
-
             if ($type === 'seller') {
-                Mail::send('emails.seller-order-notification', $data, function ($message) use ($user, $product) {
-                    $message->to($user->email)
-                            ->subject('New Order Received - ' . $product->name);
-                });
+                // Send seller new order notification
+                $user->notify(new SellerNewOrder($order, $product));
+                Log::info('Seller new order notification sent', [
+                    'seller_id' => $user->id,
+                    'order_id' => $order->id
+                ]);
             } else {
-                Mail::send('emails.buyer-order-confirmation', $data, function ($message) use ($user) {
-                    $message->to($user->email)
-                            ->subject('Order Confirmation - ' . config('app.name'));
-                });
+                // Send buyer purchase confirmation
+                $user->notify(new BuyerPurchaseConfirmation($order, $product, $allOrders));
+                Log::info('Buyer purchase confirmation sent', [
+                    'buyer_id' => $user->id,
+                    'order_id' => $order->id
+                ]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to send order notification email: ' . $e->getMessage());
+            Log::error('Failed to send order notification: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'type' => $type,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }
