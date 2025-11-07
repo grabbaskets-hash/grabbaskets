@@ -81,8 +81,9 @@ class SuperFastAuthController extends Controller
         }
         $passwordTime = (microtime(true) - $passwordStartTime) * 1000;
 
-        // SUPER FAST: Status check
-        if (!in_array($partner->status, ['active', 'pending'])) {
+        // SUPER FAST: Status check - accept repository's canonical statuses
+        // (migration uses 'approved' rather than 'active')
+        if (!in_array($partner->status, ['approved', 'pending'])) {
             $messages = [
                 'rejected' => 'Your account has been rejected. Please contact support.',
                 'suspended' => 'Your account has been suspended. Please contact support.',

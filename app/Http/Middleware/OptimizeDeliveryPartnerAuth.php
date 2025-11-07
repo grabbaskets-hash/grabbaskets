@@ -77,12 +77,11 @@ class OptimizeDeliveryPartnerAuth
      */
     private function optimizeSessionForAuth(): void
     {
-        // Use array driver for auth sessions to avoid file I/O
-        if (request()->is('delivery-partner/login')) {
-            config(['session.driver' => 'array']);
-        }
-        
-        // Reduce session data size
+        // NOTE: Do NOT switch session driver to 'array' here. The 'array' driver
+        // stores session data only for the current request which prevents the
+        // authentication session from persisting across requests (breaking login).
+
+        // Reduce session data size while keeping the configured driver
         config(['session.encrypt' => false]); // Skip encryption for auth sessions
         config(['session.same_site' => 'lax']); // Optimize cookie handling
     }

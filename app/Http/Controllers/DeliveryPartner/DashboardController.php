@@ -39,7 +39,14 @@ class DashboardController extends Controller
                 'partner_name' => $partner->name
             ]);
 
-            // Quick load with minimal data
+            // Quick load with minimal data + ensure view variables expected by the blade are present
+            // Compute full stats and collections used by the dashboard view. This may be slightly
+            // heavier than the minimal load but avoids undefined variable errors during rendering.
+            $stats = $this->getDashboardStats($partner);
+            $notifications = $this->getNotifications($partner, 10);
+            $availableOrders = $this->getAvailableOrders($partner, 10);
+            $recentOrders = $this->getRecentOrders($partner, 5);
+
             return view('delivery-partner.dashboard.index', [
                 'partner' => $partner,
                 'initial_stats' => [
@@ -48,6 +55,11 @@ class DashboardController extends Controller
                     'is_online' => $partner->is_online,
                     'rating' => $partner->rating ?? 4.5,
                 ],
+                // Provide full stats array under the key expected by the view
+                'stats' => $stats,
+                'notifications' => $notifications,
+                'availableOrders' => $availableOrders,
+                'recentOrders' => $recentOrders,
             ]);
             
         } catch (\Exception $e) {

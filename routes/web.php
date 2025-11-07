@@ -498,7 +498,7 @@ Route::get('/debug-create-delivery-partner', function() {
             'state' => 'Test State',
             'pincode' => '123456',
             'vehicle_type' => 'bike',
-            'status' => 'active',
+            'status' => 'approved',
             'is_verified' => true,
             'is_online' => true,
             'is_available' => true
