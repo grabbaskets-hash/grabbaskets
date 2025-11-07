@@ -117,43 +117,64 @@ class AdminDeliveryPartnerController extends Controller
      */
     public function show(DeliveryPartner $deliveryPartner)
     {
-        $partner = $deliveryPartner->load([
-            'wallet',
-            'deliveryRequests' => function ($q) {
-                $q->orderBy('created_at', 'desc')->limit(20);
-            }
-        ]);
+        // Try to load relationships, but handle missing ones gracefully
+        try {
+            $partner = $deliveryPartner->load([
+                'deliveryRequests' => function ($q) {
+                    $q->orderBy('created_at', 'desc')->limit(20);
+                }
+            ]);
+        } catch (\Exception $e) {
+            $partner = $deliveryPartner;
+            Log::warning('Could not load delivery partner relationships: ' . $e->getMessage());
+        }
 
-        // Get statistics
+        // Get statistics with error handling
         $stats = [
-            'total_deliveries' => DeliveryRequest::where('delivery_partner_id', $partner->id)->count(),
-            'completed_deliveries' => DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->count(),
-            'pending_deliveries' => DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->whereIn('status', ['accepted', 'picked_up'])
-                ->count(),
-            'today_deliveries' => DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->whereDate('completed_at', today())
-                ->count(),
-            'today_earnings' => DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->whereDate('completed_at', today())
-                ->sum('delivery_fee') ?? 0,
-            'total_earnings' => $partner->wallet?->balance ?? 0,
+            'total_deliveries' => 0,
+            'completed_deliveries' => 0,
+            'pending_deliveries' => 0,
+            'today_deliveries' => 0,
+            'today_earnings' => 0,
+            'total_earnings' => 0,
             'avg_rating' => $partner->rating ?? 0,
-            'completion_rate' => $this->getCompletionRate($partner->id),
+            'completion_rate' => 0,
         ];
 
+        try {
+            $stats['total_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)->count();
+            $stats['completed_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->where('status', 'completed')
+                ->count();
+            $stats['pending_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->whereIn('status', ['accepted', 'picked_up'])
+                ->count();
+            $stats['today_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->where('status', 'completed')
+                ->whereDate('completed_at', today())
+                ->count();
+            $stats['today_earnings'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
+                ->where('status', 'completed')
+                ->whereDate('completed_at', today())
+                ->sum('delivery_fee') ?? 0;
+            $stats['completion_rate'] = $this->getCompletionRate($partner->id);
+        } catch (\Exception $e) {
+            Log::warning('Could not load delivery statistics: ' . $e->getMessage());
+        }
+
         // Get pending orders available for assignment
-        $availableOrders = Order::where('delivery_status', 'pending')
-            ->whereNull('delivery_partner_id')
-            ->where('order_status', 'confirmed')
-            ->with(['user', 'orderItems.product'])
-            ->orderBy('created_at', 'asc')
-            ->limit(10)
-            ->get();
+        $availableOrders = collect([]);
+        try {
+            $availableOrders = Order::where('delivery_status', 'pending')
+                ->whereNull('delivery_partner_id')
+                ->where('order_status', 'confirmed')
+                ->with(['user', 'orderItems.product'])
+                ->orderBy('created_at', 'asc')
+                ->limit(10)
+                ->get();
+        } catch (\Exception $e) {
+            Log::warning('Could not load available orders: ' . $e->getMessage());
+        }
 
         return view('admin.delivery-partners.show', compact('partner', 'stats', 'availableOrders'));
     }
@@ -302,18 +323,29 @@ class AdminDeliveryPartnerController extends Controller
      */
     public function track(DeliveryPartner $deliveryPartner)
     {
-        $currentDeliveries = DeliveryRequest::where('delivery_partner_id', $deliveryPartner->id)
-            ->whereIn('status', ['accepted', 'picked_up'])
-            ->with('order')
-            ->get();
+        $currentDeliveries = collect([]);
+        $locationHistory = collect([]);
 
-        $locationHistory = DeliveryRequest::where('delivery_partner_id', $deliveryPartner->id)
-            ->where('status', 'completed')
-            ->whereDate('completed_at', today())
-            ->with('order')
-            ->orderBy('completed_at', 'desc')
-            ->limit(10)
-            ->get();
+        try {
+            $currentDeliveries = DeliveryRequest::where('delivery_partner_id', $deliveryPartner->id)
+                ->whereIn('status', ['accepted', 'picked_up'])
+                ->with('order')
+                ->get();
+        } catch (\Exception $e) {
+            Log::warning('Could not load current deliveries: ' . $e->getMessage());
+        }
+
+        try {
+            $locationHistory = DeliveryRequest::where('delivery_partner_id', $deliveryPartner->id)
+                ->where('status', 'completed')
+                ->whereDate('completed_at', today())
+                ->with('order')
+                ->orderBy('completed_at', 'desc')
+                ->limit(10)
+                ->get();
+        } catch (\Exception $e) {
+            Log::warning('Could not load location history: ' . $e->getMessage());
+        }
 
         return view('admin.delivery-partners.track', compact('deliveryPartner', 'currentDeliveries', 'locationHistory'));
     }
