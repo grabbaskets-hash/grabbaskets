@@ -1,8 +1,20 @@
-@extends('layouts.admin')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track {{ $deliveryPartner->name }} - Admin</title>
+    <link rel="icon" type="image/png" href="{{ asset('asset/images/grabbasket.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .card { border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .badge { padding: 5px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
 
-@section('title', 'Track Delivery Partner')
-
-@section('content')
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
@@ -41,20 +53,20 @@
                         <dt class="col-sm-6">Online:</dt>
                         <dd class="col-sm-6">
                             @if($deliveryPartner->is_online)
-                                <span class="badge badge-success">
+                                <span class="badge bg-success">
                                     <i class="fas fa-circle"></i> Online
                                 </span>
                             @else
-                                <span class="badge badge-secondary">Offline</span>
+                                <span class="badge bg-secondary">Offline</span>
                             @endif
                         </dd>
 
                         <dt class="col-sm-6">Available:</dt>
                         <dd class="col-sm-6">
                             @if($deliveryPartner->is_available)
-                                <span class="badge badge-info">Available</span>
+                                <span class="badge bg-info">Available</span>
                             @else
-                                <span class="badge badge-danger">Busy</span>
+                                <span class="badge bg-danger">Busy</span>
                             @endif
                         </dd>
 
@@ -89,7 +101,7 @@
                                 </p>
                                 <p class="mb-1">
                                     <small class="text-muted">Status:</small><br>
-                                    <span class="badge badge-{{ $delivery->status === 'picked_up' ? 'primary' : 'info' }}">
+                                    <span class="badge bg-{{ $delivery->status === 'picked_up' ? 'primary' : 'info' }}">
                                         {{ ucfirst(str_replace('_', ' ', $delivery->status)) }}
                                     </span>
                                 </p>
@@ -131,7 +143,7 @@
                                             Delivered at {{ $entry->completed_at?->format('H:i A') ?? 'N/A' }}
                                         </small>
                                         <p class="mb-0 mt-2">
-                                            <span class="badge badge-success">₹{{ $entry->delivery_fee ?? 0 }}</span>
+                                            <span class="badge bg-success">₹{{ $entry->delivery_fee ?? 0 }}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -181,9 +193,7 @@
         border-radius: 5px;
     }
 </style>
-@endpush
 
-@push('scripts')
 <script>
     // Real-time tracking update every 10 seconds
     setInterval(function() {
@@ -192,5 +202,6 @@
         console.log('Checking for delivery partner location updates...');
     }, 10000);
 </script>
-@endpush
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
