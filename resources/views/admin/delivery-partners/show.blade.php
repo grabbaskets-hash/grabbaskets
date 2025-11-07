@@ -1,8 +1,24 @@
-@extends('layouts.admin')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Partner Details - {{ $partner->name }} - Admin</title>
+    <link rel="icon" type="image/png" href="{{ asset('asset/images/grabbasket.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .card { border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .border-left-primary { border-left: 4px solid #007bff; }
+        .border-left-success { border-left: 4px solid #28a745; }
+        .border-left-warning { border-left: 4px solid #ffc107; }
+        .border-left-info { border-left: 4px solid #17a2b8; }
+        .badge { padding: 5px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
 
-@section('title', 'Delivery Partner Details')
-
-@section('content')
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
@@ -65,7 +81,7 @@
                     <dl class="row">
                         <dt class="col-sm-6">Status:</dt>
                         <dd class="col-sm-6">
-                            <span class="badge badge-{{ $partner->status === 'active' ? 'success' : 'warning' }}">
+                            <span class="badge bg-{{ $partner->status === 'active' ? 'success' : 'warning' }}">
                                 {{ ucfirst($partner->status) }}
                             </span>
                         </dd>
@@ -79,18 +95,18 @@
                         <dt class="col-sm-6">Online:</dt>
                         <dd class="col-sm-6">
                             @if($partner->is_online)
-                                <span class="badge badge-success">Online</span>
+                                <span class="badge bg-success">Online</span>
                             @else
-                                <span class="badge badge-secondary">Offline</span>
+                                <span class="badge bg-secondary">Offline</span>
                             @endif
                         </dd>
 
                         <dt class="col-sm-6">Available:</dt>
                         <dd class="col-sm-6">
                             @if($partner->is_available)
-                                <span class="badge badge-info">Available</span>
+                                <span class="badge bg-info">Available</span>
                             @else
-                                <span class="badge badge-danger">Busy</span>
+                                <span class="badge bg-danger">Busy</span>
                             @endif
                         </dd>
 
@@ -193,7 +209,7 @@
                                         <tr>
                                             <td>#{{ $delivery->order->order_number ?? 'N/A' }}</td>
                                             <td>
-                                                <span class="badge badge-{{ $delivery->status === 'picked_up' ? 'primary' : 'info' }}">
+                                                <span class="badge bg-{{ $delivery->status === 'picked_up' ? 'primary' : 'info' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $delivery->status)) }}
                                                 </span>
                                             </td>
@@ -246,20 +262,6 @@
     </div>
 </div>
 
-@push('styles')
-<style>
-    .border-left-primary {
-        border-left: 4px solid #007bff;
-    }
-    .border-left-success {
-        border-left: 4px solid #28a745;
-    }
-    .border-left-warning {
-        border-left: 4px solid #ffc107;
-    }
-    .border-left-info {
-        border-left: 4px solid #17a2b8;
-    }
-</style>
-@endpush
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
