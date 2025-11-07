@@ -1,12 +1,61 @@
-﻿@extends('admin.layouts.main')
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Partners Dashboard - Admin</title>
+    <link rel="icon" type="image/png" href="{{ asset('asset/images/grabbasket.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .bg-primary { background-color: #0d6efd !important; }
+        .bg-success { background-color: #198754 !important; }
+        .bg-info { background-color: #0dcaf0 !important; }
+        .bg-warning { background-color: #ffc107 !important; }
+        .table-responsive {
+            border-radius: 10px;
+            background: white;
+            padding: 20px;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
 
-@section('title', 'Delivery Partners Dashboard')
-
-@section('content')
-<div class="container-fluid mt-4">
+<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Delivery Partners Dashboard</h2>
-        <a href="{{ route('admin.delivery-partners.index') }}" class="btn btn-primary">View All Partners</a>
+        <div>
+            <h2><i class="fas fa-motorcycle me-2"></i>Delivery Partners Dashboard</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
+                    <li class="breadcrumb-item active">Delivery Partners</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{{ route('admin.delivery-partners.index') }}" class="btn btn-primary">
+                <i class="fas fa-list me-2"></i>View All Partners
+            </a>
+        </div>
     </div>
 
     <!-- Statistics Cards -->
@@ -199,18 +248,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@push('styles')
-<style>
-    .card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        margin-bottom: 1.5rem;
-    }
-    .opacity-50 {
-        opacity: 0.5;
-    }
-</style>
-@endpush
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
