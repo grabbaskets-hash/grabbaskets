@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\DatabaseMessage;
+use App\Notifications\Channels\TwilioChannel;
 
 class DeliveryPartnerNotification extends Notification implements ShouldQueue
 {
@@ -46,9 +47,10 @@ class DeliveryPartnerNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
         
-        // Add SMS channel if phone number exists and SMS enabled
-        if ($notifiable->phone && config('services.sms.enabled', false)) {
-            // $channels[] = 'vonage'; // or 'twilio' depending on your SMS provider
+        // Add SMS channel if enabled and phone exists
+        if (config('services.sms.enabled', false) && $notifiable->phone) {
+            // Use custom Twilio channel
+            $channels[] = TwilioChannel::class;
         }
         
         return $channels;
@@ -93,5 +95,26 @@ class DeliveryPartnerNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return $this->toArray($notifiable);
+    }
+
+    /**
+     * Get the SMS representation of the notification.
+     */
+    public function toTwilio(object $notifiable): string
+    {
+        // Keep SMS messages short and concise
+        $smsMessage = "{$this->title}\n\n{$this->message}";
+        
+        // Add action URL if available (shortened for SMS)
+        if ($this->actionUrl) {
+            $smsMessage .= "\n\nView: {$this->actionUrl}";
+        }
+        
+        // Limit to 160 characters for standard SMS
+        if (strlen($smsMessage) > 160) {
+            $smsMessage = substr($smsMessage, 0, 157) . '...';
+        }
+        
+        return $smsMessage;
     }
 }

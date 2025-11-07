@@ -46,6 +46,17 @@ return [
         'sender' => env('INFOBIP_SENDER', 'GrabBasket'),
     ],
 
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+    'sms' => [
+        'enabled' => env('SMS_ENABLED', false),
+        'provider' => env('SMS_PROVIDER', 'twilio'), // 'twilio', 'infobip'
+    ],
+
     'google' => [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
         'maps' => [
