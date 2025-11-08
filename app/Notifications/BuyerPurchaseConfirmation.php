@@ -33,7 +33,7 @@ class BuyerPurchaseConfirmation extends Notification
      */
     public function via(object $notifiable): array
     {
-        $channels = ['mail'];
+        $channels = ['mail', \App\Notifications\Channels\DatabaseChannel::class];
         
         // Add SMS channel if phone number is available
         if ($notifiable->phone) {
@@ -80,17 +80,46 @@ class BuyerPurchaseConfirmation extends Notification
     }
 
     /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        $orderId = $this->order->id;
+        $amount = number_format($this->order->amount, 2);
+        $productName = $this->product->name;
+        
+        if ($this->allOrders && count($this->allOrders) > 1) {
+            $totalAmount = number_format(collect($this->allOrders)->sum('amount'), 2);
+            return [
+                'title' => '✅ Orders Confirmed!',
+                'message' => "Your " . count($this->allOrders) . " orders (Total: ₹{$totalAmount}) have been placed successfully.",
+                'type' => 'order_confirmation',
+                'order_ids' => collect($this->allOrders)->pluck('id')->toArray(),
+                'total_amount' => collect($this->allOrders)->sum('amount'),
+                'action_url' => route('orders.index'),
+                'action_text' => 'Track Orders'
+            ];
+        }
+        
+        return [
+            'title' => '✅ Order Confirmed!',
+            'message' => "Your order #{$orderId} for {$productName} (₹{$amount}) has been placed successfully.",
+            'type' => 'order_confirmation',
+            'order_id' => $orderId,
+            'product_name' => $productName,
+            'amount' => $this->order->amount,
+            'action_url' => route('orders.show', $orderId),
+            'action_text' => 'View Order'
+        ];
+    }
+
+    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'order_id' => $this->order->id,
-            'product_name' => $this->product->name,
-            'amount' => $this->order->amount,
-            'type' => 'order_confirmation',
-        ];
+        return $this->toDatabase($notifiable);
     }
 }

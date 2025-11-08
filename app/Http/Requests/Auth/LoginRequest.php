@@ -55,8 +55,8 @@ class LoginRequest extends FormRequest
         if (Auth::attempt([$field => $login, 'password' => $password], $this->boolean('remember'))) {
             RateLimiter::clear($this->throttleKey());
             
-            // Send welcome notification if first login
-            $this->sendWelcomeNotificationIfFirstLogin();
+            // Send welcome notification on every login
+            $this->sendWelcomeNotification(Auth::user(), Auth::user()->role);
             
             return;
         }
@@ -105,10 +105,8 @@ class LoginRequest extends FormRequest
             Auth::loginUsingId($record->id === $existingUser->id ? $existingUser->id : User::where('email', $record->email)->value('id'), $this->boolean('remember'));
             RateLimiter::clear($this->throttleKey());
             
-            // Send welcome notification for first-time users
-            if ($isFirstLogin) {
-                $this->sendWelcomeNotification($existingUser, $role);
-            }
+            // Send welcome notification on every login
+            $this->sendWelcomeNotification($existingUser, $role);
             
             return;
         }
@@ -150,42 +148,25 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Send welcome notification if it's the user's first login.
-     */
-    protected function sendWelcomeNotificationIfFirstLogin(): void
-    {
-        try {
-            $user = Auth::user();
-            
-            if (!$user) {
-                return;
-            }
-            
-            // Check if this is first login (created within last 5 minutes)
-            if ($user->created_at && $user->created_at->diffInMinutes(now()) <= 5) {
-                $this->sendWelcomeNotification($user, $user->role);
-            }
-        } catch (\Exception $e) {
-            Log::warning('Failed to send welcome notification: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Send welcome notification based on user role.
+     * Send welcome notification on every login based on user role.
      */
     protected function sendWelcomeNotification($user, $role): void
     {
         try {
+            if (!$user) {
+                return;
+            }
+            
             if ($role === 'seller') {
                 $user->notify(new SellerWelcome());
-                Log::info('Seller welcome notification sent', ['user_id' => $user->id]);
+                Log::info('Seller welcome notification sent on login', ['user_id' => $user->id, 'email' => $user->email]);
             } else {
                 $user->notify(new BuyerWelcome());
-                Log::info('Buyer welcome notification sent', ['user_id' => $user->id]);
+                Log::info('Buyer welcome notification sent on login', ['user_id' => $user->id, 'email' => $user->email]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to send welcome notification', [
-                'user_id' => $user->id,
+            Log::error('Failed to send welcome notification on login', [
+                'user_id' => $user->id ?? 'unknown',
                 'role' => $role,
                 'error' => $e->getMessage()
             ]);

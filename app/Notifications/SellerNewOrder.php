@@ -31,7 +31,7 @@ class SellerNewOrder extends Notification
      */
     public function via(object $notifiable): array
     {
-        $channels = ['mail'];
+        $channels = ['mail', \App\Notifications\Channels\DatabaseChannel::class];
         
         // Add SMS channel if phone number is available
         if ($notifiable->phone) {
@@ -71,18 +71,35 @@ class SellerNewOrder extends Notification
     }
 
     /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        $orderId = $this->order->id;
+        $amount = number_format($this->order->amount, 2);
+        $productName = $this->product->name;
+        $buyerName = $this->order->buyerUser->name ?? 'Customer';
+        
+        return [
+            'title' => '🎉 New Order Received!',
+            'message' => "You received order #{$orderId} for {$productName} (₹{$amount}) from {$buyerName}.",
+            'type' => 'new_order',
+            'order_id' => $orderId,
+            'product_name' => $productName,
+            'amount' => $this->order->amount,
+            'buyer_name' => $buyerName,
+            'action_url' => route('seller.orders.show', $orderId),
+            'action_text' => 'View Order'
+        ];
+    }
+
+    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'order_id' => $this->order->id,
-            'product_name' => $this->product->name,
-            'amount' => $this->order->amount,
-            'buyer_name' => $this->order->buyerUser->name ?? 'Customer',
-            'type' => 'new_order',
-        ];
+        return $this->toDatabase($notifiable);
     }
 }

@@ -27,7 +27,7 @@ class BuyerWelcome extends Notification
      */
     public function via(object $notifiable): array
     {
-        $channels = ['mail'];
+        $channels = ['mail', \App\Notifications\Channels\DatabaseChannel::class];
         
         // Add SMS channel if phone number is available
         if ($notifiable->phone) {
@@ -58,15 +58,26 @@ class BuyerWelcome extends Notification
     }
 
     /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'title' => '🎉 Welcome to ' . config('app.name') . '!',
+            'message' => "Hi {$notifiable->name}! Start shopping from local sellers across India. Track orders, secure payments & fast delivery.",
+            'type' => 'welcome',
+            'action_url' => route('home'),
+            'action_text' => 'Start Shopping'
+        ];
+    }
+
+    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'message' => 'Welcome to ' . config('app.name'),
-            'type' => 'welcome',
-        ];
+        return $this->toDatabase($notifiable);
     }
 }

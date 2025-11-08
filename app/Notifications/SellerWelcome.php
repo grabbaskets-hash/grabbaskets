@@ -27,7 +27,7 @@ class SellerWelcome extends Notification
      */
     public function via(object $notifiable): array
     {
-        $channels = ['mail'];
+        $channels = ['mail', \App\Notifications\Channels\DatabaseChannel::class];
         
         // Add SMS channel if phone number is available
         if ($notifiable->phone) {
@@ -58,15 +58,26 @@ class SellerWelcome extends Notification
     }
 
     /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'title' => '🏪 Welcome to ' . config('app.name') . ' Seller Hub!',
+            'message' => "Hi {$notifiable->name}! Start listing products & reach thousands of customers. Instant payments, analytics & order notifications.",
+            'type' => 'welcome',
+            'action_url' => route('seller.dashboard'),
+            'action_text' => 'Go to Dashboard'
+        ];
+    }
+
+    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'message' => 'Welcome to ' . config('app.name') . ' as a seller',
-            'type' => 'welcome',
-        ];
+        return $this->toDatabase($notifiable);
     }
 }

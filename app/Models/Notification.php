@@ -3,18 +3,56 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Database\Eloquent\Model;
 
-class Notification extends DatabaseNotification
+class Notification extends Model
 {
     use HasFactory;
 
     /**
-     * Get the notifiable entity (user)
+     * Indicates if the IDs are auto-incrementing.
+     */
+    public $incrementing = false;
+
+    /**
+     * The "type" of the auto-incrementing ID.
+     */
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id',
+        'user_id',
+        'notifiable_type',
+        'notifiable_id',
+        'type',
+        'title',
+        'message',
+        'data',
+        'read_at'
+    ];
+
+    protected $casts = [
+        'data' => 'array',
+        'read_at' => 'datetime',
+    ];
+
+    /**
+     * Get the user that owns the notification (backward compatibility)
      */
     public function user()
     {
-        return $this->morphTo('notifiable');
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the notifiable entity (for Laravel notification system)
+     */
+    public function notifiable()
+    {
+        if ($this->notifiable_type && $this->notifiable_id) {
+            return $this->morphTo();
+        }
+        return $this->user();
     }
 
     /**
@@ -34,18 +72,20 @@ class Notification extends DatabaseNotification
     }
 
     /**
-     * Accessor for title (from data)
+     * Accessor for title
      */
-    public function getTitleAttribute()
+    public function getTitleAttribute($value)
     {
-        return $this->data['title'] ?? $this->type;
+        // Return title column if exists, otherwise get from data
+        return $value ?? $this->data['title'] ?? $this->type;
     }
 
     /**
-     * Accessor for message (from data)
+     * Accessor for message
      */
-    public function getMessageAttribute()
+    public function getMessageAttribute($value)
     {
-        return $this->data['message'] ?? '';
+        // Return message column if exists, otherwise get from data
+        return $value ?? $this->data['message'] ?? '';
     }
 }
