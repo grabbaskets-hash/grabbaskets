@@ -297,12 +297,13 @@ class AdminDeliveryPartnerController extends Controller
     public function updateStatus(Request $request, DeliveryPartner $deliveryPartner)
     {
         $request->validate([
-            'status' => 'required|in:active,suspended,rejected,inactive,pending'
+            'status' => 'required|in:pending,approved,rejected,suspended,inactive'
         ]);
 
         try {
             $oldStatus = $deliveryPartner->status;
-            $deliveryPartner->update(['status' => $request->status]);
+            $deliveryPartner->status = $request->status;
+            $deliveryPartner->save();
 
             Log::info('Delivery partner status updated', [
                 'partner_id' => $deliveryPartner->id,
@@ -313,8 +314,11 @@ class AdminDeliveryPartnerController extends Controller
             return back()->with('success', 'Status updated successfully!');
 
         } catch (\Exception $e) {
-            Log::error('Failed to update partner status', ['error' => $e->getMessage()]);
-            return back()->with('error', 'Failed to update status.');
+            Log::error('Failed to update partner status', [
+                'error' => $e->getMessage(),
+                'partner_id' => $deliveryPartner->id
+            ]);
+            return back()->with('error', 'Failed to update status: ' . $e->getMessage());
         }
     }
 
