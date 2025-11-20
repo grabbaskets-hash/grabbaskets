@@ -338,9 +338,9 @@
       <h2>16. Contact Information</h2>
       <p>For privacy-related inquiries, questions, or requests:</p>
       <ul>
-        <li><strong>Email:</strong> privacy@grabbaskets.com</li>
-        <li><strong>Support:</strong> support@grabbaskets.com</li>
-        <li><strong>Phone:</strong> +91-XXXX-XXXX-XX</li>
+        <li><strong>Email:</strong>grabbaskets@gmail.com</li>
+        <li><strong>Support:</strong> grabbaskets@gmail.com</li>
+        <li><strong>Phone:</strong> +91-8438074230</li>
         <li><strong>Address:</strong> GrabBaskets, India</li>
       </ul>
     </div>
@@ -349,7 +349,7 @@
       <h2>17. GRIEVANCE REDRESSAL OFFICER</h2>
       <p>As per E-Commerce Rules, 2020, our Grievance Redressal Officer is available to address your concerns:</p>
       <ul>
-        <li><strong>Name:</strong> [Officer Name]</li>
+         
         <li><strong>Email:</strong> grievance@grabbaskets.com</li>
         <li><strong>Response Time:</strong> Within 48 hours</li>
       </ul>
