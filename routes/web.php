@@ -542,6 +542,12 @@ Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
+// Delivery Zone / District-wise filtering routes
+Route::get('/api/products/by-delivery-type', [ProductController::class, 'getByDeliveryType'])->name('api.products.byDeliveryType');
+Route::get('/api/nearby-stores', [ProductController::class, 'getNearbyStores'])->middleware('auth')->name('api.nearbyStores');
+Route::get('/api/product/{id}/check-10min', [ProductController::class, 'check10MinDelivery'])->middleware('auth')->name('api.product.check10min');
+
+
 // Public product search - Anyone can search (Zepto/Blinkit style)
 Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
 
