@@ -1769,5 +1769,18 @@ Route::get('/test-password-reset-simple', function () {
     }
 });
 
+// Legal and Information Pages
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('privacy');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

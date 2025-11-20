@@ -6191,8 +6191,9 @@ li a{
         </div>
         <div class="col-md-6 text-center text-md-end">
           <div class="d-flex gap-3 justify-content-center justify-content-md-end flex-wrap">
-            <a href="mailto:grabbaskets@gmail.com?subject=Privacy Policy Inquiry" class="footer-link-small">Privacy Policy</a>
-            <a href="mailto:grabbaskets@gmail.com?subject=Terms and Conditions Inquiry" class="footer-link-small">Terms & Conditions</a>
+            <a href="/privacy" class="footer-link-small">Privacy Policy</a>
+            <a href="/terms" class="footer-link-small">Terms & Conditions</a>
+            <a href="/about" class="footer-link-small">About Us</a>
             <a href="mailto:grabbaskets@gmail.com?subject=Support Request" class="footer-link-small">Support</a>
           </div>
         </div>
