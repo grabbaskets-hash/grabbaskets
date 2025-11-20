@@ -24,6 +24,9 @@ class Product extends Model
         'delivery_charge',
         'gift_option',
         'stock',
+        'delivery_district',
+        'available_for_10min',
+        'delivery_radius_km',
     ];
 
     // Seller relationship - references users table (seller_id references users.id)
