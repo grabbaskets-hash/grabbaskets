@@ -12,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Change id to UUID
-        DB::statement('ALTER TABLE notifications MODIFY id CHAR(36) NOT NULL');
+        // Change id to UUID - only for MySQL/MariaDB
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE notifications MODIFY id CHAR(36) NOT NULL');
+        }
+        // SQLite and other databases don't need this change as they handle it differently
     }
 
     /**
@@ -21,7 +24,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Change id back to bigint
-        DB::statement('ALTER TABLE notifications MODIFY id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT');
+        // Change id back to bigint - only for MySQL/MariaDB
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE notifications MODIFY id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT');
+        }
     }
 };

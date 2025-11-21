@@ -12,9 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Make title and message nullable
-        DB::statement('ALTER TABLE notifications MODIFY title VARCHAR(255) NULL');
-        DB::statement('ALTER TABLE notifications MODIFY message TEXT NULL');
+        // Make title and message nullable - only for MySQL/MariaDB
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE notifications MODIFY title VARCHAR(255) NULL');
+            DB::statement('ALTER TABLE notifications MODIFY message TEXT NULL');
+        }
     }
 
     /**
@@ -22,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Make title and message not null
-        DB::statement('ALTER TABLE notifications MODIFY title VARCHAR(255) NOT NULL');
-        DB::statement('ALTER TABLE notifications MODIFY message TEXT NOT NULL');
+        // Make title and message not null - only for MySQL/MariaDB
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE notifications MODIFY title VARCHAR(255) NOT NULL');
+            DB::statement('ALTER TABLE notifications MODIFY message TEXT NOT NULL');
+        }
     }
 };
