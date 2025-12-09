@@ -1,4 +1,4 @@
-@extends('layouts.minimal')
+@extends('layouts.app')
 
 @section('title', 'Restaurant Dashboard')
 
@@ -23,25 +23,16 @@
                 <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.food-items.index') }}">
                     <i class="fas fa-utensils me-2 text-secondary"></i> Menu
                 </a>
-              <a class="nav-link py-2 mb-1 rounded disabled-link" href="javascript:void(0)">
-    <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders (Coming Soon)
-    <span class="badge bg-warning text-dark ms-2">{{ $stats['pending_orders'] ?? 0 }}</span>
-</a>
-
+                <a class="nav-link py-2 mb-1 rounded" href="#">
+                    <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders
+                    <span class="badge bg-warning text-dark ms-2">{{ $stats['pending_orders'] ?? 0 }}</span>
+                </a>
                 <a class="nav-link py-2 mb-1 rounded" href="{{ \Illuminate\Support\Facades\Route::has('hotel-owner.earnings.index') ? route('hotel-owner.earnings.index') : '#' }}">
                     <i class="fas fa-wallet me-2 text-secondary"></i> Earnings
                 </a>
                 <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.profile') }}">
                     <i class="fas fa-user me-2 text-secondary"></i> Profile
                 </a>
-
-                <!-- Logout -->
-                <form action="{{ route('hotel-owner.logout') }}" method="POST" class="m-0 p-0">
-                    @csrf
-                    <button type="submit" class="nav-link py-2 mb-1 rounded border-0 bg-transparent w-100 text-start">
-                        <i class="fas fa-sign-out-alt me-2 text-secondary"></i> Logout
-                    </button>
-                </form>
             </nav>
         </aside>
 
@@ -85,6 +76,7 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
+            {{-- Include extracted styles --}}
             @include('hotel-owner._dashboard-styles')
 
             <div class="row g-3 mb-4">
@@ -128,7 +120,6 @@
 
             <div class="row g-3">
                 <div class="col-lg-7">
-                    <!-- Recent Orders -->
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Recent Orders</h5>
@@ -159,7 +150,7 @@
                         </div>
                     </div>
 
-                    <!-- Earnings chart -->
+                    {{-- Earnings chart (quick) --}}
                     <div class="card mb-3">
                         <div class="card-header">
                             <h5 class="mb-0">Earnings (Last 7 days)</h5>
@@ -169,7 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- Menu Highlights -->
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Menu Highlights</h5>
@@ -211,7 +201,6 @@
                     </div>
                 </div>
 
-                <!-- Right column -->
                 <div class="col-lg-5">
                     <div class="card mb-3">
                         <div class="card-header">
@@ -270,54 +259,42 @@
     </div>
 </div>
 
-<!-- Internal CSS -->
 <style>
-:root{ --z-red: #E23744; --z-green: #1BAD40; --z-orange:#FF8C00; --z-blue:#1E88E5; }
-.nav-link { color: #444; }
-.nav-link:hover { background: #f8f9fa; }
-.card { border-radius: 8px; }
-.vh-100 { height: 100vh; }
-@media (max-width: 767.98px){ main{padding:1rem;} }
-.disabled-link {
-    opacity: 0.6;
-    cursor: not-allowed;
-    pointer-events: none;
-}
+    /* Zomato-like palette accents */
+    :root{ --z-red: #E23744; --z-green: #1BAD40; --z-orange:#FF8C00; --z-blue:#1E88E5; }
+    .nav-link { color: #444; }
+    .nav-link:hover { background: #f8f9fa; }
+    .card { border-radius: 8px; }
+    .vh-100 { height: 100vh; }
+    @media (max-width: 767.98px){ main{padding:1rem;} }
 </style>
 
-<!-- Internal JS -->
+@endsection
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function(){
-    const ctx = document.getElementById('dashboardEarningsChart');
-    if (!ctx) return;
-    const labels = [
-        @php
-            for ($i=6;$i>=0;$i--) { echo "'".\Carbon\Carbon::now()->subDays($i)->format('D')."',"; }
-        @endphp
-    ];
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: 'Earnings',
-            data: {{ json_encode($earnings_last_7 ?? []) }},
-            borderColor: '#E23744',
-            backgroundColor: 'rgba(226,55,68,0.08)',
-            tension: 0.3,
-            fill: true
-        }]
-    };
-    new Chart(ctx.getContext('2d'), {
-        type:'line',
-        data: data,
-        options:{
-            responsive:true,
-            plugins:{legend:{display:false}}
-        }
-    });
-})();
+    (function(){
+        const ctx = document.getElementById('dashboardEarningsChart');
+        if (!ctx) return;
+        const labels = [
+            @php
+                for ($i=6;$i>=0;$i--) { echo "'".\Carbon\Carbon::now()->subDays($i)->format('D')."',"; }
+            @endphp
+        ];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Earnings',
+                data: {{ json_encode($earnings_last_7 ?? []) }},
+                borderColor: '#E23744',
+                backgroundColor: 'rgba(226,55,68,0.08)',
+                tension: 0.3,
+                fill: true
+            }]
+        };
+
+        new Chart(ctx.getContext('2d'), { type:'line', data: data, options:{responsive:true, plugins:{legend:{display:false}}} });
+    })();
 </script>
 @endpush
-
-@endsection
