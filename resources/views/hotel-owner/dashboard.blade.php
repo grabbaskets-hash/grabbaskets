@@ -296,5 +296,6 @@
 
         new Chart(ctx.getContext('2d'), { type:'line', data: data, options:{responsive:true, plugins:{legend:{display:false}}} });
     })();
+    
 </script>
 @endpush
