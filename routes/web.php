@@ -1,8 +1,5 @@
 <?php
 // Debug logging for edit product route
-
-
-
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ProfileController;
@@ -62,6 +59,10 @@ Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
     }
     return view('test-upload');
 });
+
+Route::get('/pay', [PaymentController::class, 'showButton']);
+Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
+Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 
 // Admin: Update product seller
 Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
