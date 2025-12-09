@@ -242,7 +242,7 @@
     <script>
         const internships = [{
                 name: "PYTHON BASICS",
-                fee: 1,
+                fee: 5000,
                 weeks: 1,
                 domain: "Python"
             },
