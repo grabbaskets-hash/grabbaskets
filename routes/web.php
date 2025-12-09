@@ -22,6 +22,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\InternshipController;
+
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
 // Test image upload route
@@ -60,6 +62,13 @@ Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
     return view('test-upload');
 });
 
+
+Route::post('/internship/payment', [InternshipController::class, 'payment']);
+Route::post('/internship/payment/success', [InternshipController::class, 'paymentSuccess']);
+
+Route::get('/internship', [InternshipController::class, 'index']);
+Route::get('/job/apply', [InternshipController::class, 'job']);
+Route::get('/internship/apply', [InternshipController::class, 'form']);
 Route::get('/pay', [PaymentController::class, 'showButton']);
 Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
 Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
