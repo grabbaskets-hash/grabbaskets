@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.minimal')
 
 @section('title', 'Restaurant Dashboard')
 
@@ -8,8 +8,8 @@
         <!-- Sidebar -->
         <aside class="col-12 col-md-3 col-lg-2 bg-white border-end vh-100 position-fixed d-none d-md-block" style="padding-top: 1.75rem;">
             <div class="text-center mb-4 px-3">
-                <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
-                     style="width:72px;height:72px;background:#E23744;color:#fff;font-size:28px;">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                    style="width:72px;height:72px;background:#E23744;color:#fff;font-size:28px;">
                     <i class="fas fa-utensils"></i>
                 </div>
                 <h5 class="mt-3 mb-0">{{ $hotelOwner->restaurant_name ?? 'My Restaurant' }}</h5>
@@ -23,16 +23,25 @@
                 <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.food-items.index') }}">
                     <i class="fas fa-utensils me-2 text-secondary"></i> Menu
                 </a>
-                <a class="nav-link py-2 mb-1 rounded" href="#">
-                    <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders
+                <a class="nav-link py-2 mb-1 rounded disabled-link" href="javascript:void(0)">
+                    <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders (Coming Soon)
                     <span class="badge bg-warning text-dark ms-2">{{ $stats['pending_orders'] ?? 0 }}</span>
                 </a>
+
                 <a class="nav-link py-2 mb-1 rounded" href="{{ \Illuminate\Support\Facades\Route::has('hotel-owner.earnings.index') ? route('hotel-owner.earnings.index') : '#' }}">
                     <i class="fas fa-wallet me-2 text-secondary"></i> Earnings
                 </a>
                 <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.profile') }}">
                     <i class="fas fa-user me-2 text-secondary"></i> Profile
                 </a>
+
+                <!-- Logout -->
+                <form action="{{ route('hotel-owner.logout') }}" method="POST" class="m-0 p-0">
+                    @csrf
+                    <button type="submit" class="nav-link py-2 mb-1 rounded border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt me-2 text-secondary"></i> Logout
+                    </button>
+                </form>
             </nav>
         </aside>
 
@@ -60,9 +69,9 @@
                         <small class="text-muted">Status</small>
                         <div>
                             @if($hotelOwner->is_active ?? false)
-                                <span class="badge" style="background:#1BAD40;color:#fff;">Active</span>
+                            <span class="badge" style="background:#1BAD40;color:#fff;">Active</span>
                             @else
-                                <span class="badge bg-secondary">Inactive</span>
+                            <span class="badge bg-secondary">Inactive</span>
                             @endif
                         </div>
                     </div>
@@ -73,10 +82,9 @@
             </div>
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            {{-- Include extracted styles --}}
             @include('hotel-owner._dashboard-styles')
 
             <div class="row g-3 mb-4">
@@ -120,6 +128,7 @@
 
             <div class="row g-3">
                 <div class="col-lg-7">
+                    <!-- Recent Orders -->
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Recent Orders</h5>
@@ -127,30 +136,30 @@
                         </div>
                         <div class="card-body p-0">
                             @if($recentOrders->count() > 0)
-                                <ul class="list-group list-group-flush">
-                                    @foreach($recentOrders as $order)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>#{{ $order->id }}</strong> — {{ $order->user->name ?? 'Guest' }}
-                                            <div><small class="text-muted">{{ $order->orderItems->count() ?? 0 }} items • ₹{{ number_format($order->total_amount,2) }}</small></div>
-                                        </div>
-                                        <div class="text-end">
-                                            <span class="badge rounded-pill {{ $order->status == 'completed' ? 'bg-success' : ($order->status == 'pending' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ ucfirst($order->status) }}</span>
-                                            <div class="mt-2"><a class="btn btn-sm btn-outline-primary">View</a></div>
-                                        </div>
-                                    </li>
-                                    @endforeach
-                                </ul>
+                            <ul class="list-group list-group-flush">
+                                @foreach($recentOrders as $order)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>#{{ $order->id }}</strong> — {{ $order->user->name ?? 'Guest' }}
+                                        <div><small class="text-muted">{{ $order->orderItems->count() ?? 0 }} items • ₹{{ number_format($order->total_amount,2) }}</small></div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge rounded-pill {{ $order->status == 'completed' ? 'bg-success' : ($order->status == 'pending' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ ucfirst($order->status) }}</span>
+                                        <div class="mt-2"><a class="btn btn-sm btn-outline-primary">View</a></div>
+                                    </div>
+                                </li>
+                                @endforeach
+                            </ul>
                             @else
-                                <div class="p-4 text-center text-muted">
-                                    <i class="fas fa-box-open fa-2x mb-2"></i>
-                                    <div>No recent orders</div>
-                                </div>
+                            <div class="p-4 text-center text-muted">
+                                <i class="fas fa-box-open fa-2x mb-2"></i>
+                                <div>No recent orders</div>
+                            </div>
                             @endif
                         </div>
                     </div>
 
-                    {{-- Earnings chart (quick) --}}
+                    <!-- Earnings chart -->
                     <div class="card mb-3">
                         <div class="card-header">
                             <h5 class="mb-0">Earnings (Last 7 days)</h5>
@@ -160,6 +169,7 @@
                         </div>
                     </div>
 
+                    <!-- Menu Highlights -->
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Menu Highlights</h5>
@@ -171,11 +181,11 @@
                                 <div class="col-6 col-md-4">
                                     <div class="card h-100">
                                         @if($item->image)
-                                            <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top" style="height:140px;object-fit:cover;" alt="{{ $item->name }}">
+                                        <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top" style="height:140px;object-fit:cover;" alt="{{ $item->name }}">
                                         @else
-                                            <div style="height:140px;background:#f7f7f7;display:flex;align-items:center;justify-content:center;">
-                                                <i class="fas fa-image text-muted fa-2x"></i>
-                                            </div>
+                                        <div style="height:140px;background:#f7f7f7;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-image text-muted fa-2x"></i>
+                                        </div>
                                         @endif
                                         <div class="card-body p-2">
                                             <div class="d-flex justify-content-between align-items-start">
@@ -201,6 +211,7 @@
                     </div>
                 </div>
 
+                <!-- Right column -->
                 <div class="col-lg-5">
                     <div class="card mb-3">
                         <div class="card-header">
@@ -234,9 +245,9 @@
                             <p><strong>Opening:</strong> {{ $hotelOwner->opening_time ?? 'Not set' }} &nbsp; <strong>Closing:</strong> {{ $hotelOwner->closing_time ?? 'Not set' }}</p>
                             <p>
                                 @if($hotelOwner->isOpen() ?? false)
-                                    <span class="badge" style="background:#1BAD40;color:#fff;">Open</span>
+                                <span class="badge" style="background:#1BAD40;color:#fff;">Open</span>
                                 @else
-                                    <span class="badge bg-secondary">Closed</span>
+                                <span class="badge bg-secondary">Closed</span>
                                 @endif
                             </p>
                         </div>
@@ -259,43 +270,88 @@
     </div>
 </div>
 
+<!-- Internal CSS -->
 <style>
-    /* Zomato-like palette accents */
-    :root{ --z-red: #E23744; --z-green: #1BAD40; --z-orange:#FF8C00; --z-blue:#1E88E5; }
-    .nav-link { color: #444; }
-    .nav-link:hover { background: #f8f9fa; }
-    .card { border-radius: 8px; }
-    .vh-100 { height: 100vh; }
-    @media (max-width: 767.98px){ main{padding:1rem;} }
+    :root {
+        --z-red: #E23744;
+        --z-green: #1BAD40;
+        --z-orange: #FF8C00;
+        --z-blue: #1E88E5;
+    }
+
+    .nav-link {
+        color: #444;
+    }
+
+    .nav-link:hover {
+        background: #f8f9fa;
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+
+    .vh-100 {
+        height: 100vh;
+    }
+
+    @media (max-width: 767.98px) {
+        main {
+            padding: 1rem;
+        }
+    }
+
+    .disabled-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 </style>
 
-@endsection
-
+<!-- Internal JS -->
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    (function(){
+    (function() {
         const ctx = document.getElementById('dashboardEarningsChart');
         if (!ctx) return;
         const labels = [
             @php
-                for ($i=6;$i>=0;$i--) { echo "'".\Carbon\Carbon::now()->subDays($i)->format('D')."',"; }
+            for ($i = 6; $i >= 0; $i--) {
+                echo "'".\Carbon\ Carbon::now() - > subDays($i) - > format('D').
+                "',";
+            }
             @endphp
         ];
         const data = {
             labels: labels,
             datasets: [{
                 label: 'Earnings',
-                data: {{ json_encode($earnings_last_7 ?? []) }},
+                data: {
+                    {
+                        json_encode($earnings_last_7 ?? [])
+                    }
+                },
                 borderColor: '#E23744',
                 backgroundColor: 'rgba(226,55,68,0.08)',
                 tension: 0.3,
                 fill: true
             }]
         };
-
-        new Chart(ctx.getContext('2d'), { type:'line', data: data, options:{responsive:true, plugins:{legend:{display:false}}} });
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
     })();
-    
 </script>
 @endpush
+
+@endsection
