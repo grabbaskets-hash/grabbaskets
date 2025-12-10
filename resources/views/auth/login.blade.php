@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* ==================== GLOBAL STYLES ==================== */
     * {
       margin: 0;
       padding: 0;
@@ -30,31 +29,17 @@
       animation: fadeIn 0.8s ease-in-out;
     }
 
-    /* LOGO */
     .logo {
       font-size: 36px;
-      /* Increased size */
       margin-bottom: 15px;
       font-weight: 800;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      align-items: center;
     }
 
-    .logo img {
-      width: 40px;
-      height: 40px;
-    }
-
-    /* ==================== LOGIN BOX ==================== */
     .login-box {
       background: #fff;
       padding: 50px 45px;
-      /* Larger box */
       border-radius: 22px;
       width: 420px;
-      /* Wider box */
       box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.15);
       animation: slideUp 0.9s ease-in-out;
     }
@@ -62,22 +47,18 @@
     h3 {
       margin-bottom: 20px;
       font-size: 26px;
-      /* Bigger heading */
       color: #2a2a2a;
       font-weight: 800;
     }
 
     .sub-note {
       font-size: 16px;
-      /* Larger note */
       color: #6b6b6b;
       margin-top: -5px;
       margin-bottom: 25px;
       font-style: italic;
-      letter-spacing: 0.4px;
     }
 
-    /* INPUT BOX */
     .input-group {
       position: relative;
       margin-bottom: 25px;
@@ -86,18 +67,14 @@
     .input-group input {
       width: 100%;
       padding: 16px 50px;
-      /* Bigger input */
       border-radius: 14px;
       border: 1.8px solid #c8c8c8;
       outline: none;
-      transition: 0.3s;
       font-size: 17px;
-      /* Larger input text */
     }
 
     .input-group input::placeholder {
       font-size: 16px;
-      /* Bigger placeholder */
     }
 
     .input-group input:focus {
@@ -105,14 +82,12 @@
       box-shadow: 0 0 12px rgba(0, 43, 122, 0.28);
     }
 
-    /* ICONS */
     .icon {
       position: absolute;
       top: 17px;
       left: 15px;
-      color: #666;
       font-size: 18px;
-      /* Bigger icon */
+      color: #666;
     }
 
     .eye {
@@ -120,14 +95,11 @@
       right: 15px;
       top: 17px;
       font-size: 18px;
-      /* Bigger eye icon */
       cursor: pointer;
     }
 
-    /* ERROR TEXT */
     .error-text {
       font-size: 14px;
-      /* Bigger error text */
       color: #d60000;
       text-align: left;
       margin-top: -12px;
@@ -135,21 +107,17 @@
       display: none;
     }
 
-    /* OPTIONS */
     .extra-options {
       display: flex;
       justify-content: space-between;
       margin-bottom: 25px;
       font-size: 16px;
-      /* Larger text */
     }
 
     .extra-options input {
       transform: scale(1.2);
-      /* Bigger checkbox */
     }
 
-    /* BUTTON */
     #loginBtn {
       width: 100%;
       padding: 16px;
@@ -158,7 +126,6 @@
       border-radius: 14px;
       color: white;
       font-size: 18px;
-      /* Bigger button text */
       cursor: pointer;
       font-weight: 700;
       transition: 0.3s ease-in-out;
@@ -169,7 +136,24 @@
       box-shadow: 0px 8px 20px rgba(0, 43, 122, 0.4);
     }
 
-    /* ANIMATIONS */
+    /* SIGN UP SECTION */
+    .signup-text {
+      margin-top: 25px;
+      font-size: 17px;
+      color: #333;
+    }
+
+    .signup-link {
+      color: #0056b3;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .signup-link:hover {
+      color: #003d80;
+      text-decoration: underline;
+    }
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -199,7 +183,7 @@
   <div class="container">
 
     <div class="logo">
-      <span>Grab<span style="color:#ff7b00;">Baskets</span></span>
+      Grab<span style="color:#ff7b00;">Basket</span>
     </div>
 
     <form method="POST" action="{{ route('login') }}" id="loginForm">
@@ -208,30 +192,28 @@
       <div class="login-box">
 
         <h3>Login to Your Account</h3>
-        <p class="sub-note">✨ Grow your business with GrabBaskets</p>
-        @error('login') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+        <p class="sub-note">✨ Grow your business with GrabBasket ✨</p>
 
+        @error('login')
+        <div class="text-danger small mt-1">{{ $message }}</div>
+        @enderror
 
-        <!-- SHOW CREDENTIAL ERROR -->
         @if(session('error'))
         <p class="error-text" style="display:block;">⚠ {{ session('error') }}</p>
         @endif
 
-        <!-- Email -->
         <div class="input-group">
           <i class="fa-solid fa-envelope icon"></i>
           <input type="text" id="email" name="login" placeholder="Email or Phone" />
-
         </div>
         <p id="emailError" class="error-text">⚠ Please enter a valid email or 10-digit phone.</p>
 
-        <!-- Password -->
         <div class="input-group">
           <i class="fa-solid fa-lock icon"></i>
           <input type="password" id="password" name="password" placeholder="Password" />
           <i class="fa-solid fa-eye-slash eye" id="togglePassword"></i>
         </div>
-        <p id="passError" class="error-text">⚠ Password must be 6+ characters, contain number & uppercase.</p>
+        <p id="passError" class="error-text">⚠ Password must be at least 6 characters.</p>
 
         <div class="extra-options">
           <label><input type="checkbox" name="remember" /> Remember me</label>
@@ -240,22 +222,29 @@
 
         <button id="loginBtn" type="submit">Log In</button>
 
+        <!-- SIGNUP LINK ADDED -->
+        <p class="signup-text">
+          Don’t have an account?
+          <a href="{{ route('register') }}" class="signup-link">Create one</a>
+        </p>
+
       </div>
     </form>
 
   </div>
 
   <script>
-    // Password toggle
+    // Toggle password
     document.getElementById("togglePassword").addEventListener("click", () => {
       const password = document.getElementById("password");
       const icon = document.getElementById("togglePassword");
+
       password.type = password.type === "password" ? "text" : "password";
       icon.classList.toggle("fa-eye");
       icon.classList.toggle("fa-eye-slash");
     });
 
-    // Frontend Validation
+    // Validation
     document.getElementById("loginForm").addEventListener("submit", function(e) {
       let valid = true;
 
@@ -272,7 +261,7 @@
         document.getElementById("emailError").style.display = "none";
       }
 
-      if (!(pass.length >= 6)) {
+      if (pass.length < 6) {
         valid = false;
         document.getElementById("passError").style.display = "block";
       } else {
