@@ -58,10 +58,10 @@
                                     <option value="soup" {{ old('category') == 'soup' ? 'selected' : '' }}>Soup</option>
                                     <option value="bread" {{ old('category') == 'Briyani' ? 'selected' : '' }}>Briyani</option>
                                     <option value="rice" {{ old('category') == 'rice' ? 'selected' : '' }}>Rice</option>
-                                    <option value="rice" {{ old('category') == 'burger' ? 'selected' : '' }}>Burger</option>
-                                    <option value="rice" {{ old('category') == 'Pizza' ? 'selected' : '' }}>Pizza</option>
-                                    <option value="rice" {{ old('category') == 'Seefood' ? 'selected' : '' }}>Seefood</option>
-                                    <option value="rice" {{ old('category') == 'chicken' ? 'selected' : '' }}>Chicken</option>
+                                    <option value="burger" {{ old('category') == 'burger' ? 'selected' : '' }}>Burger</option>
+                                    <option value="Pizza" {{ old('category') == 'Pizza' ? 'selected' : '' }}>Pizza</option>
+                                    <option value="Seefood" {{ old('category') == 'Seefood' ? 'selected' : '' }}>Seefood</option>
+                                    <option value="chicken" {{ old('category') == 'chicken' ? 'selected' : '' }}>Chicken</option>
 
                                 </select>
                                 @error('category')

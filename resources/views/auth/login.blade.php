@@ -183,7 +183,7 @@
   <div class="container">
 
     <div class="logo">
-      Grab<span style="color:#ff7b00;">Basket</span>
+      Grab<span style="color:#ff7b00;">Baskets</span>
     </div>
 
     <form method="POST" action="{{ route('login') }}" id="loginForm">
