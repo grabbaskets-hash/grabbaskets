@@ -27,11 +27,10 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('hotel-owner.food-items.update', $foodItem->id) }}"
+                    <form action="{{ route('hotel-owner.food-items.store') }}"
                         method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        @method('PUT')
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label required">Food Item Name</label>
@@ -154,15 +153,15 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label for="serves" class="form-label">Serves (people)</label>
+                                <label for="calories" class="form-label">Calories</label>
                                 <input type="number"
-                                    class="form-control @error('serves') is-invalid @enderror"
-                                    id="serves"
-                                    name="serves"
-                                    value="{{ old('serves') }}"
-                                    min="1"
-                                    placeholder="1">
-                                @error('serves')
+                                    class="form-control @error('calories') is-invalid @enderror"
+                                    id="calories"
+                                    name="calories"
+                                    value="{{ old('calories') }}"
+                                    min="0"
+                                    placeholder="250">
+                                @error('calories')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -225,12 +224,12 @@
                                 <div class="form-check">
                                     <input class="form-check-input"
                                         type="checkbox"
-                                        id="is_featured"
-                                        name="is_featured"
+                                        id="is_popular"
+                                        name="is_popular"
                                         value="1"
-                                        {{ old('is_featured') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_featured">
-                                        Featured item
+                                        {{ old('is_popular') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_popular">
+                                        Popular item
                                     </label>
                                 </div>
                             </div>

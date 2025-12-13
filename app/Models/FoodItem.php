@@ -17,7 +17,7 @@ class FoodItem extends Model
         'discounted_price',
         'category',
         'food_type',
-        'images',
+        'image',
         'is_available',
         'is_popular',
         'preparation_time',
@@ -31,7 +31,6 @@ class FoodItem extends Model
     ];
 
     protected $casts = [
-        'images' => 'array',
         'allergens' => 'array',
         'price' => 'decimal:2',
         'discounted_price' => 'decimal:2',
