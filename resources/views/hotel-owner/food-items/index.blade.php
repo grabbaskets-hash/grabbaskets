@@ -38,7 +38,7 @@
                         @if($item->image)
                             <img src="{{ Storage::url($item->image) }}"
                                  class="card-img-top"
-                                 style="height:200px; object-fit:cover;"
+                                 style="height:200px; object-fit:contain;"
                                  alt="{{ $item->name }}">
                         @else
                             <div class="card-img-top bg-light d-flex justify-content-center align-items-center"
