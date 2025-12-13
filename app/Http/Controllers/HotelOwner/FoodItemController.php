@@ -140,31 +140,62 @@ class FoodItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, FoodItem $foodItem)
-    {
-        $this->authorize('update', $foodItem);
+  public function update(Request $request, FoodItem $foodItem)
+{
+    $this->authorize('update', $foodItem);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'discounted_price' => 'nullable|numeric|min:0',
-            'category' => 'required|string|max:100',
-            'food_type' => 'required|in:veg,non_veg,vegan',
-            'preparation_time' => 'nullable|integer|min:1',
-            'ingredients' => 'nullable|string',
-            'spice_level' => 'nullable|in:mild,medium,hot,very_hot',
-            'allergens' => 'nullable|string',
-            'calories' => 'nullable|integer|min:0',
-            'is_available' => 'boolean',
-            'is_popular' => 'boolean',
-        ]);
+    // ---------------- VALIDATION ----------------
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'price' => 'required|numeric|min:0',
+        'discounted_price' => 'nullable|numeric|min:0',
+        'category' => 'required|string|max:100',
+        'food_type' => 'required|in:veg,non_veg,vegan',
+        'preparation_time' => 'nullable|integer|min:1',
+        'ingredients' => 'nullable|string',
+        'spice_level' => 'nullable|in:mild,medium,hot,very_hot',
+        'allergens' => 'nullable|string',
+        'calories' => 'nullable|integer|min:0',
+        'is_available' => 'boolean',
+        'is_popular' => 'boolean',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
 
-        $foodItem->update($validated);
-
-        return redirect()->route('hotel-owner.food-items.index')
-            ->with('success', 'Food item updated successfully!');
+    // ---------------- AUTH ----------------
+    $hotelOwner = Auth::guard('hotel_owner')->user();
+    if (!$hotelOwner) {
+        return back()->with('error', 'Authentication error');
     }
+
+    // ---------------- IMAGE UPDATE ----------------
+    if ($request->hasFile('image')) {
+
+        // Auto disk selection (local / cloud)
+        $disk = $this->isLaravelCloud() ? 'r2' : 'public';
+
+        // Delete old image if exists
+        if ($foodItem->image && \Storage::disk($disk)->exists($foodItem->image)) {
+            \Storage::disk($disk)->delete($foodItem->image);
+        }
+
+        $image = $request->file('image');
+        $folder = 'food-items/hotel-' . $hotelOwner->id;
+
+        $filename = Str::slug(
+            pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+        ) . '-' . time() . '.' . $image->getClientOriginalExtension();
+
+        $validated['image'] = $image->storeAs($folder, $filename, $disk);
+    }
+
+    // ---------------- UPDATE FOOD ITEM ----------------
+    $foodItem->update($validated);
+
+    return redirect()->route('hotel-owner.food-items.index')
+        ->with('success', 'Food item updated successfully!');
+}
+
 
     /**
      * Remove the specified resource from storage.
