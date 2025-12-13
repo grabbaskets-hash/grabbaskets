@@ -206,8 +206,21 @@
                             <label for="image" class="form-label">Food Image</label>
                             @if($foodItem->image)
                             <div class="mb-2">
-                                <img src="{{ asset('storage/' . $foodItem->image) }}" alt="{{ $foodItem->name }}"
-                                    class="img-thumbnail" style="max-height: 150px;">
+                                @php
+                                    $isLaravelCloud = (
+                                        env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
+                                        (app()->environment('production') &&
+                                         isset($_SERVER['SERVER_NAME']) &&
+                                         str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud'))
+                                    );
+                                    $disk = $isLaravelCloud ? 'r2' : 'public';
+                                    $imageUrl = $isLaravelCloud
+                                        ? route('serve-image', ['disk' => $disk, 'folder' => dirname($foodItem->image), 'filename' => basename($foodItem->image)])
+                                        : asset('storage/' . $foodItem->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="{{ $foodItem->name }}"
+                                    class="img-thumbnail" style="max-height: 150px;"
+                                    onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'">
                                 <p class="small text-muted mt-1">Current image</p>
                             </div>
                             @endif
@@ -241,12 +254,12 @@
                                 <div class="form-check">
                                     <input class="form-check-input"
                                         type="checkbox"
-                                        id="is_featured"
-                                        name="is_featured"
+                                        id="is_popular"
+                                        name="is_popular"
                                         value="1"
-                                        {{ old('is_featured', $foodItem->is_featured) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_featured">
-                                        Featured item
+                                        {{ old('is_popular', $foodItem->is_popular) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_popular">
+                                        Popular item
                                     </label>
                                 </div>
                             </div>
