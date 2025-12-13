@@ -40,15 +40,12 @@
                             env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
                             (app()->environment('production') &&
                              isset($_SERVER['SERVER_NAME']) &&
-                             str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud'))
+                             strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
                         );
-                        $disk = $isLaravelCloud ? 'r2' : 'public';
-                        $imageUrl = $isLaravelCloud
-                            ? route('serve-image', ['disk' => $disk, 'folder' => dirname($item->image), 'filename' => basename($item->image)])
-                            : asset('storage/' . $item->image);
+                        $type = $isLaravelCloud ? 'r2' : 'public';
                     @endphp
-                    <img src="{{ $imageUrl }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ $item->name }}"
-                         onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'">
+                    <img src="{{ url('/serve-image/' . $type . '/' . $item->image) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ $item->name }}"
+                         onerror="this.onerror=null; this.src='{{ asset('images/placeholder.png') }}'">
                     @else
                     <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                         <i class="fas fa-utensils fa-3x text-muted"></i>
