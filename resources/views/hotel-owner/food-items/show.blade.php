@@ -35,17 +35,14 @@
                                     env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
                                     (app()->environment('production') &&
                                      isset($_SERVER['SERVER_NAME']) &&
-                                     str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud'))
+                                     strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
                                 );
-                                $disk = $isLaravelCloud ? 'r2' : 'public';
-                                $imageUrl = $isLaravelCloud
-                                    ? route('serve-image', ['disk' => $disk, 'folder' => dirname($foodItem->image), 'filename' => basename($foodItem->image)])
-                                    : asset('storage/' . $foodItem->image);
+                                $type = $isLaravelCloud ? 'r2' : 'public';
                             @endphp
-                            <img src="{{ $imageUrl }}"
+                            <img src="{{ url('/serve-image/' . $type . '/' . $foodItem->image) }}"
                                  alt="{{ $foodItem->name }}"
                                  class="img-fluid rounded shadow"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'">
+                                 onerror="this.onerror=null; this.src='{{ asset('images/placeholder.png') }}'">
                         </div>
                         @endif
                         

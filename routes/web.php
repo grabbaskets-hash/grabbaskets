@@ -32,7 +32,10 @@ use Illuminate\Support\Facades\Log;
 // Universal image serving route for public and R2 disks
 use App\Http\Controllers\ImageServeController;
 
-
+// Image serving route using ImageServeController
+Route::get('/images/{disk}/{folder}/{filename}', [ImageServeController::class, 'serve'])
+    ->name('serve-image')
+    ->where(['disk' => 'public|r2', 'folder' => '.*', 'filename' => '.*']);
 
 
 // Removed temporary debug route for seller edit to avoid duplication/conflicts
@@ -1021,7 +1024,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     // Wrap the entire closure in try/catch for error logging
     try {
         // Validate allowed types
-        $allowedTypes = ['products', 'public', 'library'];
+        $allowedTypes = ['products', 'public', 'library', 'r2'];
         if (!in_array($type, $allowedTypes, true)) {
             Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
             return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
@@ -1033,6 +1036,8 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
             $storagePath = preg_replace('/^public\//', '', $leafPath);
         } elseif ($type === 'library') {
             $storagePath = 'library/' . $leafPath;
+        } elseif ($type === 'r2') {
+            $storagePath = $leafPath; // R2 paths are already relative to disk root
         } else {
             // products
             $storagePath = 'products/' . $leafPath;
@@ -1363,7 +1368,7 @@ Route::get('/test-simple-upload', function() {
         $routes = $router->getRoutes();
         
         foreach ($routes->getRoutes() as $route) {
-            if (str_contains($route->uri(), 'serve-image')) {
+            if (strpos($route->uri(), 'serve-image') !== false) {
                 $deploymentInfo['serve_route_exists'] = true;
                 $deploymentInfo['routes_found'][] = $route->uri();
             }
@@ -1418,7 +1423,7 @@ Route::get('/test-deployment', function () {
         $routes = $router->getRoutes();
         
         foreach ($routes->getRoutes() as $route) {
-            if (str_contains($route->uri(), 'serve-image')) {
+            if (strpos($route->uri(), 'serve-image') !== false) {
                 $response['serve_route_exists'] = true;
                 $response['routes'][] = $route->uri();
             }
