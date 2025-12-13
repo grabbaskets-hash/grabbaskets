@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers\HotelOwner;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\FoodItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-
 
 class FoodItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $hotelOwner = Auth::guard('hotel_owner')->user();
-        $foodItems = $hotelOwner->foodItems()->latest()->paginate(12);
+  public function index()
+{
+    $foodItems = FoodItem::where('hotel_owner_id', auth('hotel_owner')->id())
+        ->latest()
+        ->paginate(9);
 
-        return view('hotel-owner.food-items.index', compact('foodItems'));
-    }
+    return view('hotel-owner.food-items.index', compact('foodItems'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -34,6 +35,7 @@ class FoodItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     private function isLaravelCloud()
     {
         // Priority 1: Explicit Laravel Cloud deployment flag
@@ -60,6 +62,12 @@ class FoodItemController extends Controller
     }
     public function store(Request $request)
     {
+        Log::info('FoodItem store called', [
+            'has_image' => $request->hasFile('image'),
+            'inputs' => array_keys($request->all()),
+        ]);
+
+        // ---------------- VALIDATION ----------------
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -72,58 +80,44 @@ class FoodItemController extends Controller
             'spice_level' => 'nullable|in:mild,medium,hot,very_hot',
             'allergens' => 'nullable|string',
             'calories' => 'nullable|integer|min:0',
-            'is_available' => 'nullable|boolean',
-            'is_popular' => 'nullable|boolean',
+            'is_available' => 'boolean',
+            'is_popular' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
+        // ---------------- AUTH ----------------
         $hotelOwner = Auth::guard('hotel_owner')->user();
-
         if (!$hotelOwner) {
             return back()->with('error', 'Authentication error');
         }
 
-        // ---------------- IMAGE UPLOAD ----------------
+        $validated['hotel_owner_id'] = $hotelOwner->id;
+
+        // ---------------- IMAGE UPLOAD (CLOUD READY) ----------------
         $imagePath = null;
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
 
             $folder = 'food-items/hotel-' . $hotelOwner->id;
-
             $filename = Str::slug(
                 pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
             ) . '-' . time() . '.' . $image->getClientOriginalExtension();
 
+            // Auto switch between cloud & local
             $disk = $this->isLaravelCloud() ? 'r2' : 'public';
 
             $imagePath = $image->storeAs($folder, $filename, $disk);
         }
 
-        // ---------------- SAVE FOOD ITEM ----------------
-        FoodItem::create([
-            'hotel_owner_id' => $hotelOwner->id,
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'price' => $validated['price'],
-            'discounted_price' => $validated['discounted_price'] ?? null,
-            'category' => $validated['category'],
-            'food_type' => $validated['food_type'],
-            'preparation_time' => $validated['preparation_time'] ?? null,
-            'ingredients' => $validated['ingredients'] ?? null,
-            'spice_level' => $validated['spice_level'] ?? null,
-            'allergens' => $validated['allergens'] ?? null,
-            'calories' => $validated['calories'] ?? null,
-            'is_available' => $request->boolean('is_available'),
-            'is_popular' => $request->boolean('is_popular'),
-            'image' => $imagePath, // ✅ saved correctly
-        ]);
+        $validated['image'] = $imagePath;
 
-        return redirect()
-            ->route('hotel-owner.food-items.index')
+        // ---------------- CREATE FOOD ITEM ----------------
+        FoodItem::create($validated);
+
+        return redirect()->route('hotel-owner.food-items.index')
             ->with('success', 'Food item created successfully!');
     }
-
 
     /**
      * Display the specified resource.
@@ -175,7 +169,6 @@ class FoodItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-
     public function destroy(FoodItem $foodItem)
     {
         $this->authorize('delete', $foodItem);
