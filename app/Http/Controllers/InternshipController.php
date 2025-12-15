@@ -70,6 +70,6 @@ class InternshipController extends Controller
         $intern->status = 'paid';
         $intern->save();
 
-        return view('intern.internship');
+        return view('intern.success', ['intern' => $intern]);
     }
 }
