@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\InternshipController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
 
