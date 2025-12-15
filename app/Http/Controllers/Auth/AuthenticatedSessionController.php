@@ -15,6 +15,19 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected function authenticated(Request $request, $user)
+    {
+        // Get user role
+        $role = $user->role ?? 'buyer';
+
+        // Seller: always go to dashboard
+        if ($role === 'seller') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        // Buyer: respect intended URL (e.g. /food/cart), fallback to food index
+        return redirect()->intended(route('customer.food.index'));
+    }
     /**
      * Display the login view.
      */
@@ -44,6 +57,7 @@ class AuthenticatedSessionController extends Controller
             'success' => $greeting,
             'login_success' => true
         ]);
+        
     }
 
     /**

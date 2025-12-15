@@ -93,7 +93,7 @@ class PaymentController extends Controller
 
             // Create Razorpay order with error handling
             $api = new Api($this->razorpayId, $this->razorpayKey);
-
+            
             $orderData = [
                 'receipt'         => 'order_' . uniqid() . '_' . Auth::id(),
                 'amount'          => (int) ($totals['total'] * 100), // Convert to paise and ensure integer
@@ -147,12 +147,14 @@ class PaymentController extends Controller
                     'contact' => Auth::user()->phone ?? '',
                 ]
             ]);
+
         } catch (\Razorpay\Api\Errors\Error $e) {
             Log::error('Razorpay API Error: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'error_code' => $e->getCode()
             ]);
             return response()->json(['error' => 'Payment initialization failed. Please try again or contact support.'], 500);
+            
         } catch (\Exception $e) {
             Log::error('Payment creation error: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
@@ -173,7 +175,7 @@ class PaymentController extends Controller
 
             // Get checkout data from session
             $checkoutData = session('checkout_data');
-
+            
             if (!$checkoutData) {
                 Log::warning('Checkout session expired or missing', [
                     'user_id' => Auth::id(),
@@ -207,13 +209,13 @@ class PaymentController extends Controller
                 $item = (object) $itemData;
                 $product = Product::find($item->product_id);
                 $qty = $item->quantity ?? 1;
-
+                
                 if (!$product) {
                     return response()->json([
                         'error' => "Product no longer available. Please update your cart."
                     ], 400);
                 }
-
+                
                 if ($product->stock < $qty) {
                     return response()->json([
                         'error' => "Product '{$product->name}' is out of stock. Please update your cart."
@@ -245,7 +247,7 @@ class PaymentController extends Controller
             foreach ($checkoutData['items'] as $itemData) {
                 $item = (object) $itemData;
                 $amount = $this->lineAmountFromData($item);
-
+                
                 $order = Order::create([
                     'product_id' => $item->product_id,
                     'seller_id' => $item->seller_id,
@@ -271,14 +273,14 @@ class PaymentController extends Controller
                     $product->save();
                 }
                 $seller = User::find($item->seller_id);
-
+                
                 if ($seller) {
                     // Use NotificationService for Amazon-like notifications
                     NotificationService::sendNewOrderToSeller($seller, $order);
-
+                    
                     // Send email to seller
                     $this->sendOrderNotificationEmail($seller, $order, $product, 'seller');
-
+                    
                     // Send SMS notification to seller via Twilio
                     $smsService = new \App\Services\SmsService();
                     $smsResult = $smsService->sendOrderConfirmationToSeller($seller, $order);
@@ -296,7 +298,7 @@ class PaymentController extends Controller
 
             // Send email to buyer
             $this->sendOrderNotificationEmail(Auth::user(), $orders[0], null, 'buyer', $orders);
-
+            
             // Send SMS payment confirmation to buyer via Twilio
             $smsService = new \App\Services\SmsService();
             $buyerSmsResult = $smsService->sendPaymentConfirmationToBuyer(Auth::user(), $orders[0]);
@@ -333,6 +335,7 @@ class PaymentController extends Controller
                 'message' => 'Payment successful! Your orders have been placed.',
                 'redirect' => route('orders.track')
             ]);
+
         } catch (\Razorpay\Api\Errors\SignatureVerificationError $e) {
             Log::error('Payment signature verification failed', [
                 'user_id' => Auth::id(),
@@ -342,6 +345,7 @@ class PaymentController extends Controller
             return response()->json([
                 'error' => 'Payment verification failed. Your payment may not have been processed correctly. Please contact support with your payment details.'
             ], 400);
+            
         } catch (\Exception $e) {
             Log::error('Payment verification error', [
                 'user_id' => Auth::id(),
@@ -359,7 +363,7 @@ class PaymentController extends Controller
         $subtotal = 0;
         $discountTotal = 0;
         $deliveryTotal = 0;
-
+        
         foreach ($items as $item) {
             $price = (float) $item->price;
             $discPct = (float) $item->discount;
@@ -372,7 +376,7 @@ class PaymentController extends Controller
             $discountTotal += $lineDisc;
             $deliveryTotal += $delivery;
         }
-
+        
         $total = $subtotal - $discountTotal + $deliveryTotal;
         return compact('subtotal', 'discountTotal', 'deliveryTotal', 'total');
     }
@@ -383,7 +387,7 @@ class PaymentController extends Controller
         $discPct = (float) $item->discount;
         $qty = (int) $item->quantity;
         $delivery = (float) $item->delivery_charge;
-
+        
         $lineBase = $price * $qty;
         $lineDisc = $discPct > 0 ? ($lineBase * ($discPct / 100)) : 0;
         return $lineBase - $lineDisc + $delivery;
@@ -415,48 +419,5 @@ class PaymentController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
-    }
-
-    private $razorpayKeyId = 'rzp_live_RZLX30zmmnhHum';
-    private $razorpayKeySecret = 'XKmsdH5PbR49EiT74CgehYYi';
-
-    // Show payment button
-    public function showButton()
-    {
-        return view('razorpay-button');
-    }
-
-    // Create Razorpay order
-public function createOrder1(Request $request)
-{
-    $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
-
-    $amountInPaise = $request->amount * 100; // convert rupees to paise
-
-    $order = $api->order->create([
-        'receipt' => 'order_rcptid_' . rand(1000, 9999),
-        'amount'  => $amountInPaise,
-        'currency'=> 'INR',
-    ]);
-
-    return response()->json([
-        'order_id' => $order['id'],
-        'key'      => $this->razorpayKeyId,
-        'amount'   => $amountInPaise,
-
-        'customer' => [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ]
-    ]);
-}
-
-
-
-    // Payment success
-    public function paymentSuccess(Request $request)
-    {
-        return "Payment Success! Payment ID: " . $request->razorpay_payment_id;
     }
 }

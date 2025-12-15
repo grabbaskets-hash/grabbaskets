@@ -30,19 +30,9 @@
                     <div class="row">
                         @if($foodItem->image)
                         <div class="col-md-6 mb-4">
-                            @php
-                                $isLaravelCloud = (
-                                    env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
-                                    (app()->environment('production') &&
-                                     isset($_SERVER['SERVER_NAME']) &&
-                                     strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
-                                );
-                                $type = $isLaravelCloud ? 'r2' : 'public';
-                            @endphp
-                            <img src="{{ url('/serve-image/' . $type . '/' . $foodItem->image) }}"
-                                 alt="{{ $foodItem->name }}"
-                                 class="img-fluid rounded shadow"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/placeholder.png') }}'">
+                            <img src="{{ asset('storage/' . $foodItem->image) }}" 
+                                 alt="{{ $foodItem->name }}" 
+                                 class="img-fluid rounded shadow">
                         </div>
                         @endif
                         
@@ -56,8 +46,8 @@
                                     <span class="badge bg-{{ $foodItem->is_available ? 'success' : 'secondary' }}">
                                         {{ $foodItem->is_available ? 'Available' : 'Unavailable' }}
                                     </span>
-                                    @if($foodItem->is_popular)
-                                        <span class="badge bg-warning ms-2">Popular</span>
+                                    @if($foodItem->is_featured)
+                                        <span class="badge bg-warning ms-2">Featured</span>
                                     @endif
                                 </div>
                                 
@@ -81,7 +71,7 @@
                                 </div>
                             </div>
 
-                            @if($foodItem->spice_level || $foodItem->calories || $foodItem->preparation_time)
+                            @if($foodItem->spice_level || $foodItem->serves || $foodItem->preparation_time)
                             <div class="row mb-3">
                                 @if($foodItem->spice_level)
                                 <div class="col-4">
@@ -89,10 +79,10 @@
                                     <span class="badge bg-warning">{{ ucfirst($foodItem->spice_level) }}</span>
                                 </div>
                                 @endif
-                                @if($foodItem->calories)
+                                @if($foodItem->serves)
                                 <div class="col-4">
-                                    <strong>Calories:</strong><br>
-                                    {{ $foodItem->calories }} kcal
+                                    <strong>Serves:</strong><br>
+                                    {{ $foodItem->serves }} {{ Str::plural('person', $foodItem->serves) }}
                                 </div>
                                 @endif
                                 @if($foodItem->preparation_time)
@@ -170,9 +160,9 @@
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
-                            <span>Popular:</span>
-                            <span class="badge bg-{{ $foodItem->is_popular ? 'warning' : 'light text-dark' }}">
-                                {{ $foodItem->is_popular ? 'Yes' : 'No' }}
+                            <span>Featured:</span>
+                            <span class="badge bg-{{ $foodItem->is_featured ? 'warning' : 'light text-dark' }}">
+                                {{ $foodItem->is_featured ? 'Yes' : 'No' }}
                             </span>
                         </div>
                     </div>
@@ -221,14 +211,14 @@
                         <form action="{{ route('hotel-owner.food-items.update', $foodItem) }}" method="POST" class="d-inline">
                             @csrf
                             @method('PUT')
-                            <input type="hidden" name="is_popular" value="{{ $foodItem->is_popular ? '0' : '1' }}">
+                            <input type="hidden" name="is_featured" value="{{ $foodItem->is_featured ? '0' : '1' }}">
                             <input type="hidden" name="name" value="{{ $foodItem->name }}">
                             <input type="hidden" name="category" value="{{ $foodItem->category }}">
                             <input type="hidden" name="price" value="{{ $foodItem->price }}">
                             <input type="hidden" name="food_type" value="{{ $foodItem->food_type }}">
-                            <button type="submit" class="btn btn-{{ $foodItem->is_popular ? 'outline-warning' : 'warning' }} btn-sm w-100">
+                            <button type="submit" class="btn btn-{{ $foodItem->is_featured ? 'outline-warning' : 'warning' }} btn-sm w-100">
                                 <i class="fas fa-star me-1"></i>
-                                {{ $foodItem->is_popular ? 'Remove from Popular' : 'Make Popular' }}
+                                {{ $foodItem->is_featured ? 'Remove from Featured' : 'Make Featured' }}
                             </button>
                         </form>
                         

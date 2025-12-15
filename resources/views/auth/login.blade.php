@@ -1,277 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GrabBasket Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - grabbasket</title>
+  <link rel="icon" type="image/jpeg" href="{{ asset('asset/images/grabbasket.jpg') }}">
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      font-family: "Poppins", sans-serif;
-      box-sizing: border-box;
-    }
-
     body {
-      background: linear-gradient(140deg, #eaf1ff, #ffffff);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
-    .container {
-      text-align: center;
-      animation: fadeIn 0.8s ease-in-out;
-    }
-
-    .logo {
-      font-size: 36px;
-      margin-bottom: 15px;
-      font-weight: 800;
-    }
-
-    .login-box {
-      background: #fff;
-      padding: 50px 45px;
-      border-radius: 22px;
-      width: 420px;
-      box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.15);
-      animation: slideUp 0.9s ease-in-out;
-    }
-
-    h3 {
-      margin-bottom: 20px;
-      font-size: 26px;
-      color: #2a2a2a;
-      font-weight: 800;
-    }
-
-    .sub-note {
-      font-size: 16px;
-      color: #6b6b6b;
-      margin-top: -5px;
-      margin-bottom: 25px;
-      font-style: italic;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 25px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 16px 50px;
-      border-radius: 14px;
-      border: 1.8px solid #c8c8c8;
-      outline: none;
-      font-size: 17px;
-    }
-
-    .input-group input::placeholder {
-      font-size: 16px;
-    }
-
-    .input-group input:focus {
-      border-color: #002b7a;
-      box-shadow: 0 0 12px rgba(0, 43, 122, 0.28);
-    }
-
-    .icon {
-      position: absolute;
-      top: 17px;
-      left: 15px;
-      font-size: 18px;
-      color: #666;
-    }
-
-    .eye {
-      position: absolute;
-      right: 15px;
-      top: 17px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .error-text {
-      font-size: 14px;
-      color: #d60000;
-      text-align: left;
-      margin-top: -12px;
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    .extra-options {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 25px;
-      font-size: 16px;
-    }
-
-    .extra-options input {
-      transform: scale(1.2);
-    }
-
-    #loginBtn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(90deg, #003366, #0056b3);
+    .card {
       border: none;
-      border-radius: 14px;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 2.5rem;
+      background: #fff;
+    }
+    .brand {
+      font-size: 1.8rem;
       font-weight: 700;
-      transition: 0.3s ease-in-out;
+      color: darkorange;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    #loginBtn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0px 8px 20px rgba(0, 43, 122, 0.4);
+    .brand img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      object-fit: contain;
     }
-
-    /* SIGN UP SECTION */
-    .signup-text {
-      margin-top: 25px;
-      font-size: 17px;
+    .form-label {
+      font-weight: 600;
       color: #333;
     }
-
-    .signup-link {
-      color: #0056b3;
-      font-weight: 700;
-      text-decoration: none;
+    .input-group-text {
+      background: #f8f9fa;
+      border-right: 0;
+      border-radius: 12px 0 0 12px;
+      color: #888;
     }
-
-    .signup-link:hover {
-      color: #003d80;
+    .form-control {
+      border-radius: 0 12px 12px 0;
+      padding: 0.7rem 1rem;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus {
+      border-color: #ff6b00;
+      box-shadow: 0 0 0 0.2rem rgba(255,107,0,.2);
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #ff9900, #ff6b00);
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: #232f3e;
+      color: #fff;
+    }
+    .register-link {
+      color: #ff6b00;
+      font-weight: 600;
+    }
+    .register-link:hover {
+      color: #232f3e;
+      text-decoration: underline;
+    }
+    .forgot-link {
+      color: #555;
+      font-size: 0.9rem;
+    }
+    .forgot-link:hover {
+      color: #ff6b00;
       text-decoration: underline;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
       }
 
-      to {
-        opacity: 1;
+      .card {
+        padding: 1.5rem;
+        margin: 0.5rem;
+      }
+
+      .brand {
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .btn-primary {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.95rem;
+      }
+
+      .col-md-6 {
+        max-width: 100%;
       }
     }
 
-    @keyframes slideUp {
-      from {
-        transform: translateY(30px);
-        opacity: 0;
+    @media (max-width: 576px) {
+      .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
       }
 
-      to {
-        transform: translateY(0);
-        opacity: 1;
+      .card {
+        padding: 1.25rem;
+        border-radius: 15px;
+      }
+
+      .brand {
+        font-size: 1.2rem;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+      }
+
+      .form-control,
+      .input-group-text {
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        width: 100%;
       }
     }
   </style>
 </head>
-
 <body>
-
-  <div class="container">
-
-    <div class="logo">
-      Grab<span style="color:#ff7b00;">Baskets</span>
-    </div>
-
-    <form method="POST" action="{{ route('login') }}" id="loginForm">
-      @csrf
-
-      <div class="login-box">
-
-        <h3>Login to Your Account</h3>
-        <p class="sub-note">✨ Grow your business with GrabBasket ✨</p>
-
-        @error('login')
-        <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-
-        @if(session('error'))
-        <p class="error-text" style="display:block;">⚠ {{ session('error') }}</p>
-        @endif
-
-        <div class="input-group">
-          <i class="fa-solid fa-envelope icon"></i>
-          <input type="text" id="email" name="login" placeholder="Email or Phone" />
-        </div>
-        <p id="emailError" class="error-text">⚠ Please enter a valid email or 10-digit phone.</p>
-
-        <div class="input-group">
-          <i class="fa-solid fa-lock icon"></i>
-          <input type="password" id="password" name="password" placeholder="Password" />
-          <i class="fa-solid fa-eye-slash eye" id="togglePassword"></i>
-        </div>
-        <p id="passError" class="error-text">⚠ Password must be at least 6 characters.</p>
-
-        <div class="extra-options">
-          <label><input type="checkbox" name="remember" /> Remember me</label>
-          <a href="{{ route('password.request') }}">Forgot Password?</a>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        
+        <!-- Brand Logo -->
+        <div class="text-center mb-4">
+          <a href="/" class="brand text-decoration-none">
+            <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Grabbasket Logo">
+            grabbasket
+          </a>
         </div>
 
-        <button id="loginBtn" type="submit">Log In</button>
+        <!-- Card -->
+        <div class="card">
+          @if (session('status'))
+            <div class="alert alert-info">{{ session('status') }}</div>
+          @endif
+          <h4 class="mb-4 text-center">Login to Your Account</h4>
 
-        <!-- SIGNUP LINK ADDED -->
-        <p class="signup-text">
-          Don’t have an account?
-          <a href="{{ route('register') }}" class="signup-link">Create one</a>
-        </p>
+          <form method="POST" action="{{ route('login') }}" novalidate>
+            @csrf
 
+            <!-- Role Selection -->
+            <div class="mb-3">
+              <label class="form-label d-block">Login as</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="role" id="role_buyer" value="buyer" {{ old('role', 'buyer') == 'buyer' ? 'checked' : '' }}>
+                  <label class="form-check-label" for="role_buyer">Buyer</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="role" id="role_seller" value="seller" {{ old('role') == 'seller' ? 'checked' : '' }}>
+                  <label class="form-check-label" for="role_seller">Seller</label>
+                </div>
+              </div>
+              @error('role') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+            </div>
+
+            <!-- Email / Phone -->
+            <div class="mb-3">
+              <label for="login" class="form-label">Email or Phone</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                <input type="text" class="form-control" id="login" name="login" value="{{ old('login') }}" required autocomplete="username" autofocus>
+              </div>
+              @error('login') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
+              </div>
+              @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+            </div>
+
+            <!-- Remember me -->
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="remember_me" name="remember">
+              <label class="form-check-label" for="remember_me">Remember me</label>
+            </div>
+
+            <!-- Forgot password -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              @if (Route::has('password.request'))
+                <a class="forgot-link" href="{{ route('password.request') }}">Forgot your password?</a>
+              @endif
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary w-100">Log in</button>
+          </form>
+
+          <!-- Register -->
+          @if (Route::has('register'))
+          <div class="text-center mt-3">
+            <span class="text-muted small">New user?</span>
+            <a class="ms-1 register-link" href="{{ route('register') }}">Register here</a>
+          </div>
+          @endif
+        </div>
       </div>
-    </form>
-
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script>
-    // Toggle password
-    document.getElementById("togglePassword").addEventListener("click", () => {
-      const password = document.getElementById("password");
-      const icon = document.getElementById("togglePassword");
-
-      password.type = password.type === "password" ? "text" : "password";
-      icon.classList.toggle("fa-eye");
-      icon.classList.toggle("fa-eye-slash");
-    });
-
-    // Validation
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      let valid = true;
-
-      const email = document.getElementById("email").value.trim();
-      const pass = document.getElementById("password").value.trim();
-
-      const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,6}$/;
-      const phonePattern = /^[0-9]{10}$/;
-
-      if (!emailPattern.test(email) && !phonePattern.test(email)) {
-        valid = false;
-        document.getElementById("emailError").style.display = "block";
-      } else {
-        document.getElementById("emailError").style.display = "none";
-      }
-
-      if (pass.length < 6) {
-        valid = false;
-        document.getElementById("passError").style.display = "block";
-      } else {
-        document.getElementById("passError").style.display = "none";
-      }
-
-      if (!valid) e.preventDefault();
+    // Login form optimization for faster submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.querySelector('form');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        // Prevent multiple submissions and show loading state
+        loginForm.addEventListener('submit', function(e) {
+            // Disable button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Signing in...';
+            
+            // Re-enable after 5 seconds as fallback
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 5000);
+        });
+        
+        // Prefill form validation for faster processing
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        
+        [loginInput, passwordInput].forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const feedback = this.parentElement.nextElementSibling;
+                if (feedback && feedback.classList.contains('text-danger')) {
+                    feedback.style.display = 'none';
+                }
+            });
+        });
+        
+        // Auto-submit on Enter key for faster login
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && loginInput.value && passwordInput.value) {
+                e.preventDefault();
+                loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        });
     });
   </script>
-
 </body>
-
 </html>
