@@ -25,4 +25,9 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+   public function tenMinProducts()
+{
+    return $this->hasMany(\App\Models\TenMinDeliveryProduct::class, 'category_id');
+}
+
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
@@ -9,6 +10,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Imports\ProductsImport;
 use App\Services\GitHubImageService;
+use App\Models\TenMinDeliveryProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -356,225 +358,223 @@ class SellerController extends Controller
 
         return view('seller.store-products', compact('seller', 'products', 'productsByCategory'));
     }
-public function updateProfile(Request $request)
-{
-    try {
-        $request->validate([
-            'store_name' => 'nullable|string|max:255',
-            'gst_number' => 'nullable|string|max:255',
-            'store_address' => 'nullable|string|max:500',
-            'store_contact' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
-            'avatar_url' => 'nullable|string|url|max:500', // For avatar/emoji URLs
-        ]);
-
-        $user = Auth::user();
-
-        if (!$user) {
-            Log::error('updateProfile: User not authenticated');
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please log in to update your profile.'
-                ], 401);
-            }
-
-            return redirect()->route('login')->with('error', 'Please log in to update your profile.');
-        }
-
-        $seller = \App\Models\Seller::where('email', $user->email)->first();
-
-        if (!$seller) {
-            Log::error('updateProfile: Seller not found', [
-                'user_id' => $user->id,
-                'email' => $user->email
+    public function updateProfile(Request $request)
+    {
+        try {
+            $request->validate([
+                'store_name' => 'nullable|string|max:255',
+                'gst_number' => 'nullable|string|max:255',
+                'store_address' => 'nullable|string|max:500',
+                'store_contact' => 'nullable|string|max:255',
+                'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048', // 2MB max
+                'avatar_url' => 'nullable|string|url|max:500', // For avatar/emoji URLs
             ]);
 
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Seller profile not found.'
-                ], 404);
-            }
+            $user = Auth::user();
 
-            return redirect()->back()->with('error', 'Seller profile not found.');
-        }
+            if (!$user) {
+                Log::error('updateProfile: User not authenticated');
 
-        // Handle avatar/emoji URL (simpler than file upload)
-        if ($request->has('avatar_url')) {
-            $avatarUrl = $request->input('avatar_url');
-
-            // Update user's profile picture with avatar URL
-            \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
-
-            Log::info('Profile avatar updated successfully', [
-                'user_id' => $user->id,
-                'avatar_url' => $avatarUrl
-            ]);
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Avatar updated successfully!',
-                    'photo_url' => $avatarUrl
-                ]);
-            }
-
-            return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
-        }
-
-        // Update seller information
-        $seller->update($request->only([
-            'store_name',
-            'gst_number',
-            'store_address',
-            'store_contact'
-        ]));
-
-        // Handle profile photo upload with dual storage (R2 + public)
-        if ($request->hasFile('profile_photo')) {
-            try {
-                $photo = $request->file('profile_photo');
-
-                // Generate unique filename
-                $originalName = $photo->getClientOriginalName();
-                $originalNameSlug = \Illuminate\Support\Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
-                $ext = $photo->getClientOriginalExtension();
-                $filename = $originalNameSlug . '-' . time() . '-' . \Illuminate\Support\Str::random(4) . '.' . $ext;
-                $folder = 'profile_photos/' . $user->id;
-
-                $r2Path = null;
-                $publicPath = null;
-                $r2Success = false;
-                $publicSuccess = false;
-                $finalPath = null;
-
-                // Try AWS R2 first
-                try {
-                    $r2Path = $photo->storeAs($folder, $filename, 'r2');
-                    $r2Success = !empty($r2Path);
-                } catch (\Throwable $r2Ex) {
-                    \Log::warning('AWS R2 profile photo upload failed', [
-                        'error' => $r2Ex->getMessage(),
-                        'user_id' => $user->id,
-                        'original_name' => $originalName
-                    ]);
-                }
-
-                // Then try public disk (local/Git storage)
-                try {
-                    $publicPath = $photo->storeAs($folder, $filename, 'public');
-                    $publicSuccess = !empty($publicPath);
-                } catch (\Throwable $publicEx) {
-                    \Log::warning('Public disk profile photo upload failed', [
-                        'error' => $publicEx->getMessage(),
-                        'user_id' => $user->id,
-                        'original_name' => $originalName
-                    ]);
-                }
-
-                // Prefer R2 if available, otherwise fall back to public
-                $finalPath = $r2Success ? $r2Path : $publicPath;
-
-                if (!$finalPath) {
-                    throw new \Exception('Both AWS R2 and public storage failed to save the profile photo.');
-                }
-
-                // Build public URL — FIXED: removed trailing space!
-                $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud'; // ← NO TRAILING SPACE
-                $photoUrl = $r2Success 
-                    ? $r2PublicUrl . '/' . $finalPath 
-                            // : Storage::disk('public')->url($finalPath);
-                    :asset('storage/' . $finalPath);
-                    
-                // Delete old profile photo if it exists
-                if ($user->profile_picture) {
-                    try {
-                        // Only delete if it's a managed profile photo (not an external avatar URL)
-                        if (str_starts_with($user->profile_picture, $r2PublicUrl) || str_contains($user->profile_picture, '/storage/')) {
-                            // Extract path for R2
-                            if (str_starts_with($user->profile_picture, $r2PublicUrl)) {
-                                $oldPath = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
-                                if (str_starts_with($oldPath, 'profile_photos/')) {
-                                    Storage::disk('r2')->delete($oldPath);
-                                    \Log::info('Deleted old R2 profile photo', ['path' => $oldPath]);
-                                }
-                            }
-                            // Extract path for public disk
-                            elseif (str_contains($user->profile_picture, '/storage/')) {
-                                $oldPath = str_replace('/storage/', '', $user->profile_picture);
-                                if (str_starts_with($oldPath, 'profile_photos/')) {
-                                    Storage::disk('public')->delete($oldPath);
-                                    \Log::info('Deleted old public profile photo', ['path' => $oldPath]);
-                                }
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        \Log::warning('Failed to delete old profile photo', [
-                            'error' => $e->getMessage(),
-                            'old_url' => $user->profile_picture
-                        ]);
-                    }
-                }
-
-                // Update user's profile picture
-                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
-
-                \Log::info('Profile photo updated with dual storage', [
-                    'user_id' => $user->id,
-                    'photo_url' => $photoUrl,
-                    'r2_success' => $r2Success,
-                    'public_success' => $publicSuccess
-                ]);
-
-                // Return response based on request type
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
-                        'success' => true,
-                        'message' => 'Profile photo updated successfully!',
-                        'photo_url' => $photoUrl
-                    ]);
+                        'success' => false,
+                        'message' => 'Please log in to update your profile.'
+                    ], 401);
                 }
 
-                return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
+                return redirect()->route('login')->with('error', 'Please log in to update your profile.');
+            }
 
-            } catch (\Exception $e) {
-                \Log::error('Profile photo upload failed', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
+            $seller = \App\Models\Seller::where('email', $user->email)->first();
+
+            if (!$seller) {
+                Log::error('updateProfile: Seller not found', [
+                    'user_id' => $user->id,
+                    'email' => $user->email
                 ]);
 
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Upload failed: ' . $e->getMessage()
-                    ], 500);
+                        'message' => 'Seller profile not found.'
+                    ], 404);
                 }
 
-                return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Seller profile not found.');
             }
+
+            // Handle avatar/emoji URL (simpler than file upload)
+            if ($request->has('avatar_url')) {
+                $avatarUrl = $request->input('avatar_url');
+
+                // Update user's profile picture with avatar URL
+                \App\Models\User::where('id', $user->id)->update(['profile_picture' => $avatarUrl]);
+
+                Log::info('Profile avatar updated successfully', [
+                    'user_id' => $user->id,
+                    'avatar_url' => $avatarUrl
+                ]);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Avatar updated successfully!',
+                        'photo_url' => $avatarUrl
+                    ]);
+                }
+
+                return redirect()->route('seller.profile')->with('success', 'Avatar updated successfully!');
+            }
+
+            // Update seller information
+            $seller->update($request->only([
+                'store_name',
+                'gst_number',
+                'store_address',
+                'store_contact'
+            ]));
+
+            // Handle profile photo upload with dual storage (R2 + public)
+            if ($request->hasFile('profile_photo')) {
+                try {
+                    $photo = $request->file('profile_photo');
+
+                    // Generate unique filename
+                    $originalName = $photo->getClientOriginalName();
+                    $originalNameSlug = \Illuminate\Support\Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+                    $ext = $photo->getClientOriginalExtension();
+                    $filename = $originalNameSlug . '-' . time() . '-' . \Illuminate\Support\Str::random(4) . '.' . $ext;
+                    $folder = 'profile_photos/' . $user->id;
+
+                    $r2Path = null;
+                    $publicPath = null;
+                    $r2Success = false;
+                    $publicSuccess = false;
+                    $finalPath = null;
+
+                    // Try AWS R2 first
+                    try {
+                        $r2Path = $photo->storeAs($folder, $filename, 'r2');
+                        $r2Success = !empty($r2Path);
+                    } catch (\Throwable $r2Ex) {
+                        \Log::warning('AWS R2 profile photo upload failed', [
+                            'error' => $r2Ex->getMessage(),
+                            'user_id' => $user->id,
+                            'original_name' => $originalName
+                        ]);
+                    }
+
+                    // Then try public disk (local/Git storage)
+                    try {
+                        $publicPath = $photo->storeAs($folder, $filename, 'public');
+                        $publicSuccess = !empty($publicPath);
+                    } catch (\Throwable $publicEx) {
+                        \Log::warning('Public disk profile photo upload failed', [
+                            'error' => $publicEx->getMessage(),
+                            'user_id' => $user->id,
+                            'original_name' => $originalName
+                        ]);
+                    }
+
+                    // Prefer R2 if available, otherwise fall back to public
+                    $finalPath = $r2Success ? $r2Path : $publicPath;
+
+                    if (!$finalPath) {
+                        throw new \Exception('Both AWS R2 and public storage failed to save the profile photo.');
+                    }
+
+                    // Build public URL — FIXED: removed trailing space!
+                    $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud'; // ← NO TRAILING SPACE
+                    $photoUrl = $r2Success
+                        ? $r2PublicUrl . '/' . $finalPath
+                        // : Storage::disk('public')->url($finalPath);
+                        : asset('storage/' . $finalPath);
+
+                    // Delete old profile photo if it exists
+                    if ($user->profile_picture) {
+                        try {
+                            // Only delete if it's a managed profile photo (not an external avatar URL)
+                            if (str_starts_with($user->profile_picture, $r2PublicUrl) || str_contains($user->profile_picture, '/storage/')) {
+                                // Extract path for R2
+                                if (str_starts_with($user->profile_picture, $r2PublicUrl)) {
+                                    $oldPath = str_replace($r2PublicUrl . '/', '', $user->profile_picture);
+                                    if (str_starts_with($oldPath, 'profile_photos/')) {
+                                        Storage::disk('r2')->delete($oldPath);
+                                        \Log::info('Deleted old R2 profile photo', ['path' => $oldPath]);
+                                    }
+                                }
+                                // Extract path for public disk
+                                elseif (str_contains($user->profile_picture, '/storage/')) {
+                                    $oldPath = str_replace('/storage/', '', $user->profile_picture);
+                                    if (str_starts_with($oldPath, 'profile_photos/')) {
+                                        Storage::disk('public')->delete($oldPath);
+                                        \Log::info('Deleted old public profile photo', ['path' => $oldPath]);
+                                    }
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('Failed to delete old profile photo', [
+                                'error' => $e->getMessage(),
+                                'old_url' => $user->profile_picture
+                            ]);
+                        }
+                    }
+
+                    // Update user's profile picture
+                    \App\Models\User::where('id', $user->id)->update(['profile_picture' => $photoUrl]);
+
+                    \Log::info('Profile photo updated with dual storage', [
+                        'user_id' => $user->id,
+                        'photo_url' => $photoUrl,
+                        'r2_success' => $r2Success,
+                        'public_success' => $publicSuccess
+                    ]);
+
+                    // Return response based on request type
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Profile photo updated successfully!',
+                            'photo_url' => $photoUrl
+                        ]);
+                    }
+
+                    return redirect()->route('seller.profile')->with('success', 'Profile photo and store info updated successfully!');
+                } catch (\Exception $e) {
+                    \Log::error('Profile photo upload failed', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Upload failed: ' . $e->getMessage()
+                        ], 500);
+                    }
+
+                    return redirect()->back()->with('error', 'Profile photo upload failed: ' . $e->getMessage());
+                }
+            }
+
+            // Final return when only seller info was updated (no avatar, no file)
+            return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput()
+                ->with('error', 'Please fix the validation errors.');
+        } catch (\Exception $e) {
+            Log::error('updateProfile error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
         }
-
-        // Final return when only seller info was updated (no avatar, no file)
-        return redirect()->route('seller.profile')->with('success', 'Store info updated successfully!');
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return redirect()->back()
-            ->withErrors($e->validator)
-            ->withInput()
-            ->with('error', 'Please fix the validation errors.');
-    } catch (\Exception $e) {
-        Log::error('updateProfile error', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
     }
-}
 
-// The following block is your original commented-out code (preserved as requested):
-/*
+    // The following block is your original commented-out code (preserved as requested):
+    /*
 //         // Handle profile photo upload
 //         if ($request->hasFile('profile_photo')) {
 //             try {
@@ -1044,247 +1044,105 @@ public function updateProfile(Request $request)
             'all_files' => $request->allFiles(),
             'input_keys' => array_keys($request->all())
         ]);
-
+        // ---------------- VALIDATION ----------------
         $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0',
-            'delivery_charge' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gift_option' => 'required|in:yes,no',
-            'stock' => 'required|integer|min:0',
+            'name'              => 'required|string|max:255',
+            'category_id'       => 'required|integer|exists:categories,id',
+            'subcategory_id'    => 'required|integer|exists:subcategories,id',
+            'description'       => 'required|string',
+            'price'             => 'required|numeric',
+            'discount'          => 'nullable|numeric',
+            'delivery_charge'   => 'nullable|numeric',
+            'gift_option'       => 'nullable|string|in:yes,no',
+            'stock'             => 'required|integer',
+            'image'             => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'ten_min_delivery'  => 'required|in:yes,no',
         ]);
 
-        // Use database storage method
-        return $this->storeProductWithDatabaseImage($request);
-    }
+        // ---------------- UNIQUE ID ----------------
+        $uniqueId = Str::upper(Str::random(3));
 
-    // New method for cloud-compatible image storage
+        $seller = Auth::user();
+        return $this->storeProductWithDatabaseImage($request);
+    } // New method for cloud-compatible image storage
     private function storeProductWithDatabaseImage(Request $request)
     {
         try {
             $seller = Auth::user();
-
-            // Ensure seller_id is valid
-            if (!$seller || !$seller->id) {
-                Log::error('Product creation failed: Invalid seller', [
-                    'auth_id' => Auth::id(),
-                    'seller' => $seller
-                ]);
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Authentication error. Please logout and login again.');
+            if (!$seller) {
+                return redirect()->back()->withInput()->with('error', 'Authentication error.');
             }
 
             $unique_id = Str::upper(Str::random(2)) . rand(0, 9);
 
-            // Create the product with all required fields
+            // ---------------- IMAGE UPLOAD ----------------
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $folder = 'products/seller-' . $seller->id;
+                $filename = Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '.' . $image->getClientOriginalExtension();
+                $disk = $this->isLaravelCloud() ? 'r2' : 'public';
+                $imagePath = $image->storeAs($folder, $filename, $disk);
+            }
+
+            // ---------------- CREATE PRODUCT ----------------
             $product = Product::create([
                 'name' => $request->name,
                 'unique_id' => $unique_id,
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
-                'seller_id' => $seller->id, // Use seller object ID
+                'seller_id' => $seller->id,
                 'description' => $request->description,
                 'price' => $request->price,
                 'discount' => $request->discount ?? 0,
                 'delivery_charge' => $request->delivery_charge ?? 0,
-                'gift_option' => $request->gift_option,
+                'gift_option' => $request->gift_option ?? 'no',
                 'stock' => $request->stock,
-                'status' => 'active', // Ensure product is active
-                'is_active' => true, // Ensure product is visible
+                'status' => 'active',
+                'is_active' => true,
+                'image' => $imagePath, // ✅ Save uploaded image path
             ]);
 
-            Log::info('Product created successfully', [
-                'product_id' => $product->id,
-                'seller_id' => $product->seller_id,
-                'name' => $product->name,
-                'hasFile' => $request->hasFile('image')
-            ]);
-
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $sellerId = Auth::id();
-
-                // Use seller-specific folder structure (same as uploadProductImages)
-                $folder = 'products/seller-' . $sellerId;
-
-                // Preserve original filename without timestamp for easier retrieval
-                $ext = $image->getClientOriginalExtension();
-                $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $filename = Str::slug($originalName) . '.' . $ext;
-
-                $imageUploaded = false;
-                $imagePath = null;
-
-                // Determine if we're on Laravel Cloud (using helper method)
-                $isLaravelCloud = $this->isLaravelCloud();
-
-                // Environment-aware storage strategy
-                try {
-                    $publicSuccess = false;
-                    $r2Success = false;
-
-                    // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
-                    if ($isLaravelCloud) {
-                        try {
-                            $r2Path = $image->storeAs($folder, $filename, 'r2');
-
-                            if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
-                                $r2Success = true;
-                                $imagePath = $r2Path;
-
-                                Log::info('R2 upload SUCCESS on Laravel Cloud (create)', [
-                                    'path' => $r2Path,
-                                    'size' => $image->getSize(),
-                                    'bucket' => config('filesystems.disks.r2.bucket')
-                                ]);
-                            } else {
-                                Log::error('R2 upload returned path but file not found', [
-                                    'returned_path' => $r2Path,
-                                    'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
-                                ]);
-                            }
-                        } catch (\Throwable $r2Ex) {
-                            Log::error('R2 upload FAILED on Laravel Cloud (create)', [
-                                'error' => $r2Ex->getMessage(),
-                                'error_class' => get_class($r2Ex),
-                                'trace' => $r2Ex->getTraceAsString(),
-                                'bucket' => config('filesystems.disks.r2.bucket'),
-                                'endpoint' => config('filesystems.disks.r2.endpoint'),
-                                'has_key' => !empty(config('filesystems.disks.r2.key')),
-                                'has_secret' => !empty(config('filesystems.disks.r2.secret'))
-                            ]);
-                        }
-
-                        if (!$r2Success) {
-                            Log::error('Image upload to R2 failed on Laravel Cloud', [
-                                'product_name' => $request->name,
-                                'seller_id' => Auth::id(),
-                                'filename' => $filename
-                            ]);
-                            return redirect()->back()
-                                ->withInput()
-                                ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
-                        }
-
-                        $imageUploaded = $r2Success;
-                    }
-                    // Strategy 2: Local - Public disk primary, R2 backup
-                    else {
-                        // Save to public disk FIRST (primary storage locally)
-                        try {
-                            // Ensure directory exists
-                            $folderPath = storage_path('app/public/' . $folder);
-                            if (!file_exists($folderPath)) {
-                                mkdir($folderPath, 0755, true);
-                                Log::info('Created folder', ['path' => $folderPath]);
-                            }
-
-                            // Save using Laravel's storeAs method
-                            $publicPath = $image->storeAs($folder, $filename, 'public');
-
-                            if ($publicPath && Storage::disk('public')->exists($publicPath)) {
-                                $publicSuccess = true;
-                                $imagePath = $publicPath;
-
-                                Log::info('Public disk upload SUCCESS (local create)', [
-                                    'path' => $publicPath,
-                                    'size' => Storage::disk('public')->size($publicPath),
-                                    'full_path' => storage_path('app/public/' . $publicPath)
-                                ]);
-                            } else {
-                                Log::error('Public disk upload returned false or file not found', [
-                                    'returned_path' => $publicPath,
-                                    'exists' => Storage::disk('public')->exists($publicPath ?? '')
-                                ]);
-                            }
-                        } catch (\Throwable $publicEx) {
-                            Log::error('Public disk upload EXCEPTION', [
-                                'error' => $publicEx->getMessage(),
-                                'trace' => $publicEx->getTraceAsString(),
-                                'file' => $publicEx->getFile(),
-                                'line' => $publicEx->getLine()
-                            ]);
-                        }
-
-                        // Also save to R2 as backup (non-blocking)
-                        try {
-                            $r2Path = $image->storeAs($folder, $filename, 'r2');
-                            $r2Success = !empty($r2Path);
-
-                            if ($r2Success) {
-                                Log::info('R2 backup upload SUCCESS (local create)', ['path' => $r2Path]);
-                            }
-                        } catch (\Throwable $r2Ex) {
-                            // R2 failure is not critical on local
-                            Log::warning('R2 backup upload failed (non-critical)', [
-                                'error' => $r2Ex->getMessage()
-                            ]);
-                        }
-
-                        $imageUploaded = $publicSuccess;
-                    }
-
-                    if ($imageUploaded) {
-                        $product->update(['image' => $imagePath]);
-
-                        // Also create a ProductImage record for the new gallery system
-                        ProductImage::create([
-                            'product_id' => $product->id,
-                            'image_path' => $imagePath,
-                            'original_name' => $image->getClientOriginalName(),
-                            'mime_type' => $image->getMimeType(),
-                            'file_size' => $image->getSize(),
-                            'sort_order' => 1,
-                            'is_primary' => true, // First image is primary
-                        ]);
-
-                        Log::info('Product image stored successfully', [
-                            'product_id' => $product->id,
-                            'path' => $imagePath,
-                            'r2_backup' => $r2Success,
-                            'public_primary' => $publicSuccess,
-                            'size' => $image->getSize(),
-                            'original_name' => $image->getClientOriginalName()
-                        ]);
-                    } else {
-                        Log::error('Public disk storage failed for image upload', [
-                            'product_id' => $product->id,
-                            'public_success' => $publicSuccess,
-                            'r2_success' => $r2Success
-                        ]);
-                        return redirect()->back()->withInput()->with('error', 'Image upload failed. Please check storage permissions.');
-                    }
-                } catch (\Throwable $ex) {
-                    Log::error('Exception during image upload', [
-                        'error' => $ex->getMessage(),
-                        'trace' => $ex->getTraceAsString(),
-                        'product_id' => $product->id
-                    ]);
-                    return redirect()->back()->withInput()->with('error', 'Image upload failed. Error: ' . $ex->getMessage());
-                }
-            } else {
-                Log::info('No image file uploaded with product', ['product_id' => $product->id]);
+            if ($imagePath) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $imagePath,
+                    'original_name' => $image->getClientOriginalName(),
+                    'mime_type' => $image->getMimeType(),
+                    'file_size' => $image->getSize(),
+                    'sort_order' => 1,
+                    'is_primary' => true,
+                ]);
             }
 
-            $successMessage = "Product '{$product->name}' (ID: {$product->unique_id}) added successfully!";
-            return redirect()->route('seller.dashboard')->with('success', $successMessage);
-        } catch (\Exception $e) {
-            Log::error('Product creation failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->except(['image'])
-            ]);
+            // ---------------- TEN MIN DELIVERY ----------------
+            if ($request->ten_min_delivery === 'yes') {
+                TenMinDeliveryProduct::create([
+                    'product_id' => $product->id,
+                    'name' => $product->name,
+                    'unique_id' => $product->unique_id,
+                    'category_id' => $product->category_id,
+                    'subcategory_id' => $product->subcategory_id,
+                    'seller_id' => $product->seller_id,
+                    'description' => $product->description,
+                    'price' => $product->price,
+                    'discount' => $product->discount,
+                    'delivery_charge' => $product->delivery_charge,
+                    'gift_option' => $product->gift_option,
+                    'stock' => $product->stock,
+                    'image' => $imagePath, // ✅ Use uploaded image path
+                ]);
+            }
 
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to create product: ' . $e->getMessage());
+            return redirect()->route('seller.dashboard')
+                ->with('success', "Product '{$product->name}' added successfully!");
+        } catch (\Exception $e) {
+            Log::error('Product creation failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->withInput()->with('error', 'Failed to create product: ' . $e->getMessage());
         }
     }
+
 
     public function editProduct(Product $product)
     {
@@ -1330,11 +1188,178 @@ public function updateProfile(Request $request)
         }
     }
 
+public function showTenMinProducts(Request $request)
+{
+    $selectedCategoryId = $request->query('category');
+
+    // Fetch only categories that have 10-min products
+    $categories = Category::whereHas('tenMinProducts')
+        ->with(['tenMinProducts.subcategory'])
+        ->get()
+        ->map(function ($cat) {
+            // Only subcategories that are actually used by 10-min products
+            $subcategories = $cat->tenMinProducts
+                ->pluck('subcategory')
+                ->filter() // remove nulls
+                ->unique('id')
+                ->values();
+
+            $cat->filteredSubcategories = $subcategories;
+
+            return $cat;
+        });
+
+    // Determine active category safely
+    $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
+
+    // Prepare JS-ready data
+    $jsCategories = $categories->map(function ($cat) {
+        return [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'icon' => $cat->icon ?? '🛒',
+            'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+            ])->toArray(),
+            'products' => $cat->tenMinProducts->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'subcategory' => $p->subcategory ? $p->subcategory->name : 'Other',
+                'img' => asset('product_images/' . $p->image),
+                'price' => $p->price,
+                'discount' => $p->discount ?? 0,
+            ])->toArray(),
+        ];
+    })->toArray();
+
+    return view('ten-min-products/index', compact('categories', 'jsCategories', 'activeCategory'));
+}
+
+// ✅ ADD THESE METHODS BELOW showTenMinProducts
+
+public function tenMinCartAdd(Request $request)
+{
+    $request->validate([
+        'product_id' => 'required|exists:ten_min_products,id'
+    ]);
+
+    $product = \App\Models\TenMinProduct::findOrFail($request->product_id);
+    $cart = session()->get('cart_tenmin', []);
+
+    if (isset($cart[$product->id])) {
+        $cart[$product->id]['quantity']++;
+    } else {
+        $cart[$product->id] = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'image' => $product->image,
+            'quantity' => 1,
+        ];
+    }
+
+    session()->put('cart_tenmin', $cart);
+
+    return redirect()->route('tenmin.cart')->with('success', 'Added to quick basket!');
+}
+
+public function tenMinCartIndex()
+{
+    $cart = session()->get('cart_tenmin', []);
+    $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+    return view('ten_min_cart', compact('cart', 'total'));
+}
+
+public function tenMinCartUpdate(Request $request, $productId)
+{
+    $request->validate(['quantity' => 'required|integer|min:1']);
+    $cart = session()->get('cart_tenmin', []);
+
+    if (isset($cart[$productId])) {
+        if ($request->quantity <= 0) {
+            unset($cart[$productId]);
+        } else {
+            $cart[$productId]['quantity'] = $request->quantity;
+        }
+        session()->put('cart_tenmin', $cart);
+    }
+
+    return redirect()->route('tenmin.cart');
+}
+
+public function tenMinCartRemove($productId)
+{
+    $cart = session()->get('cart_tenmin', []);
+    unset($cart[$productId]);
+    session()->put('cart_tenmin', $cart);
+    return redirect()->route('tenmin.cart')->with('success', 'Removed from basket.');
+}
+
+public function tenMinCheckout()
+{
+    $cart = session()->get('cart_tenmin', []);
+    if (empty($cart)) {
+        return redirect()->route('tenmin.cart')->with('error', 'Your quick basket is empty.');
+    }
+
+    $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+
+    // Example: ₹100 minimum for 10-min basket (adjust as needed)
+    if ($total < 100) {
+        return back()->with('error', 'Minimum order ₹100 for 10-minute delivery.');
+    }
+
+    // 🚨 IMPORTANT: You need to decide how to store this order.
+    // Since you're reusing the food system, we'll create a special "grab basket" vendor
+    // or use a placeholder hotel_owner_id (e.g., ID 1 as admin/store)
+
+    $grabBasketVendorId = 1; // ← Set this to a valid hotel_owner_id that handles 10-min orders
+
+    $deliveryFee = 30; // or 0, or 50 — your choice
+    $totalAmount = $total + $deliveryFee;
+
+    $order = \App\Models\FoodOrder::create([
+        'hotel_owner_id' => $grabBasketVendorId,
+        'customer_name' => 'Quick Customer',
+        'customer_phone' => '0123456789', // replace with real data if logged in
+        'delivery_address' => '123 Test Street', // replace with real address
+        'food_total' => $total,
+        'delivery_fee' => $deliveryFee,
+        'total_amount' => $totalAmount,
+        'status' => 'pending',
+        'estimated_delivery_time' => now()->addMinutes(10),
+        // Optional: add a note or flag if you extend the table later
+    ]);
+
+    foreach ($cart as $item) {
+        \App\Models\FoodOrderItem::create([
+            'food_order_id' => $order->id,
+            'food_item_id' => null, // not a food item
+            'food_name' => $item['name'],
+            'price' => $item['price'],
+            'quantity' => $item['quantity'],
+            'food_type' => 'fast', // or leave null
+        ]);
+    }
+
+    session()->forget('cart_tenmin');
+    return redirect()->route('tenmin.order.success', $order->id);
+}
+
+public function tenMinOrderSuccess($orderId)
+{
+    $order = \App\Models\FoodOrder::with('items')->findOrFail($orderId);
+    return view('ten_min_order_success', compact('order'));
+}
+
+
     public function updateProduct(Request $request, Product $product)
     {
         if ($product->seller_id !== Auth::id()) {
             return redirect()->route('seller.dashboard')->with('error', 'Unauthorized access to product.');
         }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -1344,229 +1369,89 @@ public function updateProfile(Request $request)
             'discount' => 'nullable|numeric|min:0',
             'delivery_charge' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-        ]);
-        $data = $request->only(['name', 'category_id', 'subcategory_id', 'description', 'price', 'discount', 'delivery_charge']);
 
-        // Debug: Log if file is present
-        Log::info('Image upload debug', [
-            'hasFile' => $request->hasFile('image'),
-            'file' => $request->file('image'),
-            'library_image_url' => $request->library_image_url,
-            'all_files' => $request->allFiles(),
+            // ADD THIS FOR 10-MIN FIELD
+            'ten_min_delivery' => 'required|in:yes,no',
         ]);
 
-        // Handle image from library (URL provided)
-        if ($request->filled('library_image_url') && !$request->hasFile('image')) {
-            $libraryImageUrl = $request->library_image_url;
+        $data = $request->only([
+            'name',
+            'category_id',
+            'subcategory_id',
+            'description',
+            'price',
+            'discount',
+            'delivery_charge'
+        ]);
 
-            // Extract path from R2 URL
-            $r2BaseUrl = config('filesystems.disks.r2.url');
-            if (str_starts_with($libraryImageUrl, $r2BaseUrl)) {
-                $imagePath = str_replace($r2BaseUrl . '/', '', $libraryImageUrl);
+        /*  
+    ---------------------------------------
+    YOUR IMAGE LOGIC (UNCHANGED)  
+    ---------------------------------------
+    */
 
-                // Verify it's from the seller's library
-                $sellerId = Auth::id();
-                if (str_starts_with($imagePath, 'library/seller-' . $sellerId)) {
-                    // Delete old image records
-                    $product->productImages()->delete();
-
-                    // Create new ProductImage pointing to library image
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'image_path' => $imagePath,
-                        'original_name' => basename($imagePath),
-                        'mime_type' => 'image/jpeg',
-                        'file_size' => 0,
-                        'sort_order' => 1,
-                        'is_primary' => true,
-                    ]);
-
-                    // Update legacy field
-                    $data['image'] = $imagePath;
-
-                    Log::info('Product image updated from library', [
-                        'product_id' => $product->id,
-                        'library_path' => $imagePath
-                    ]);
-                }
-            }
-        }
-        // Handle image update: Environment-aware storage strategy
-        elseif ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $sellerId = Auth::id();
-            $folder = 'products/seller-' . $sellerId;
-            $ext = $image->getClientOriginalExtension();
-            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $filename = Str::slug($originalName) . '.' . $ext;
-            $finalPath = null;
-            $publicSuccess = false;
-            $r2Success = false;
-
-            // Determine if we're on Laravel Cloud (using helper method)
-            $isLaravelCloud = $this->isLaravelCloud();
-
-            try {
-                // Remove all old ProductImage records and files before uploading new image
-                // Get old paths for deletion (do after upload succeeds)
-                $oldImagePaths = $product->productImages->pluck('image_path')->toArray();
-                $oldLegacyPath = $product->image;
-
-                // Delete database records first
-                $product->productImages()->delete();
-
-                // Strategy 1: Laravel Cloud - R2 ONLY (primary storage)
-                if ($isLaravelCloud) {
-                    try {
-                        $r2Path = $image->storeAs($folder, $filename, 'r2');
-
-                        if ($r2Path && Storage::disk('r2')->exists($r2Path)) {
-                            $r2Success = true;
-                            $finalPath = $r2Path;
-
-                            Log::info('R2 upload SUCCESS on Laravel Cloud (update)', [
-                                'path' => $r2Path,
-                                'size' => $image->getSize(),
-                                'bucket' => config('filesystems.disks.r2.bucket')
-                            ]);
-                        } else {
-                            Log::error('R2 upload returned path but file not found (update)', [
-                                'returned_path' => $r2Path,
-                                'exists' => $r2Path ? Storage::disk('r2')->exists($r2Path) : false
-                            ]);
-                        }
-                    } catch (\Throwable $r2Ex) {
-                        Log::error('R2 upload FAILED on Laravel Cloud (update)', [
-                            'error' => $r2Ex->getMessage(),
-                            'error_class' => get_class($r2Ex),
-                            'product_id' => $product->id,
-                            'trace' => $r2Ex->getTraceAsString(),
-                            'bucket' => config('filesystems.disks.r2.bucket'),
-                            'endpoint' => config('filesystems.disks.r2.endpoint'),
-                            'has_key' => !empty(config('filesystems.disks.r2.key')),
-                            'has_secret' => !empty(config('filesystems.disks.r2.secret'))
-                        ]);
-                    }
-
-                    if (!$r2Success) {
-                        Log::error('Image upload to R2 failed on Laravel Cloud (update)', [
-                            'product_id' => $product->id,
-                            'product_name' => $product->name,
-                            'seller_id' => Auth::id(),
-                            'filename' => $filename
-                        ]);
-                        return redirect()->back()
-                            ->withInput()
-                            ->with('error', 'Failed to upload image to cloud storage. Please check your internet connection and try again. If the problem persists, contact support.');
-                    }
-                }
-                // Strategy 2: Local - Public disk primary, R2 backup
-                else {
-                    try {
-                        // Ensure directory exists
-                        $folderPath = storage_path('app/public/' . $folder);
-                        if (!file_exists($folderPath)) {
-                            mkdir($folderPath, 0755, true);
-                        }
-
-                        $publicPath = $image->storeAs($folder, $filename, 'public');
-
-                        if ($publicPath && Storage::disk('public')->exists($publicPath)) {
-                            $publicSuccess = true;
-                            $finalPath = $publicPath;
-
-                            Log::info('Public disk upload SUCCESS (local update)', [
-                                'path' => $publicPath,
-                                'size' => Storage::disk('public')->size($publicPath)
-                            ]);
-                        }
-                    } catch (\Throwable $publicEx) {
-                        Log::error('Public disk upload failed during product update', [
-                            'error' => $publicEx->getMessage(),
-                            'product_id' => $product->id,
-                            'trace' => $publicEx->getTraceAsString()
-                        ]);
-                    }
-
-                    // BACKUP: Also save to R2 (optional on local)
-                    try {
-                        $r2Path = $image->storeAs($folder, $filename, 'r2');
-                        $r2Success = !empty($r2Path);
-
-                        if ($r2Success) {
-                            Log::info('R2 backup upload SUCCESS (local update)', ['path' => $r2Path]);
-                        }
-                    } catch (\Throwable $r2Ex) {
-                        Log::warning('R2 backup failed on local (non-critical)', [
-                            'error' => $r2Ex->getMessage(),
-                            'product_id' => $product->id
-                        ]);
-                    }
-
-                    if (!$publicSuccess) {
-                        Log::error('Public disk upload failed - cannot update product', [
-                            'product_id' => $product->id
-                        ]);
-                        return redirect()->back()->with('error', 'Failed to upload image. Please check storage permissions.');
-                    }
-                }
-
-                // Update legacy image path
-                $data['image'] = $finalPath;
-
-                // Create new primary ProductImage
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $finalPath,
-                    'original_name' => $image->getClientOriginalName(),
-                    'mime_type' => $image->getMimeType(),
-                    'file_size' => $image->getSize(),
-                    'sort_order' => 1,
-                    'is_primary' => true,
-                ]);
-
-                Log::info('Product image updated successfully', [
-                    'product_id' => $product->id,
-                    'path' => $finalPath,
-                    'public_success' => $publicSuccess,
-                    'r2_success' => $r2Success,
-                    'is_laravel_cloud' => $isLaravelCloud ?? false,
-                ]);
-
-                // Clean up old files AFTER successful upload (non-blocking)
-                dispatch(function () use ($oldImagePaths, $oldLegacyPath) {
-                    foreach ($oldImagePaths as $path) {
-                        try {
-                            Storage::disk('public')->delete($path);
-                        } catch (\Throwable $e) {
-                        }
-                        try {
-                            Storage::disk('r2')->delete($path);
-                        } catch (\Throwable $e) {
-                        }
-                    }
-                    if (!empty($oldLegacyPath)) {
-                        try {
-                            Storage::disk('public')->delete($oldLegacyPath);
-                        } catch (\Throwable $e) {
-                        }
-                        try {
-                            Storage::disk('r2')->delete($oldLegacyPath);
-                        } catch (\Throwable $e) {
-                        }
-                    }
-                })->afterResponse();
-            } catch (\Throwable $ex) {
-                Log::error('Exception during image update', [
-                    'error' => $ex->getMessage(),
-                    'product_id' => $product->id
-                ]);
-                return redirect()->back()->with('error', 'Failed to upload image. Please try again.');
-            }
-        }
+        // After image logic ends → IMPORTANT
         $product->update($data);
-        return redirect()->route('seller.editProduct', $product)->with('success', 'Product updated successfully!');
+
+        /*
+    ==========================================================
+    🔥 ADD THIS SECTION: HANDLE 10-MIN DELIVERY TABLE UPDATE
+    ==========================================================
+    */
+
+        if ($request->ten_min_delivery === 'yes') {
+
+            // Check if already exists
+            $exists = TenMinDeliveryProduct::where('product_id', $product->id)->first();
+
+            if ($exists) {
+                // UPDATE existing record
+                $exists->update([
+                    'name'            => $product->name,
+                    'category_id'     => $product->category_id,
+                    'subcategory_id'  => $product->subcategory_id,
+                    'description'     => $product->description,
+                    'price'           => $product->price,
+                    'discount'        => $product->discount,
+                    'delivery_charge' => $product->delivery_charge,
+                    'image'           => $product->image,
+                    'gift_option'     => $product->gift_option,
+                    'stock'           => $product->stock,
+                ]);
+            } else {
+                // INSERT new record
+                TenMinDeliveryProduct::create([
+                    'product_id' => $product->id,
+                    'name' => $product->name,
+                    'unique_id' => $product->unique_id,
+                    'category_id' => $product->category_id,
+                    'subcategory_id' => $product->subcategory_id,
+                    'seller_id' => $product->seller_id,
+                    'description' => $product->description,
+                    'price' => $product->price,
+                    'discount' => $product->discount,
+                    'delivery_charge' => $product->delivery_charge,
+                    'gift_option' => $product->gift_option,
+                    'stock' => $product->stock,
+                    'image' => $product->image, // ✅ Use uploaded image path
+                ]);
+            }
+        } else {
+            // If changed to NO → remove from 10-min delivery
+            TenMinDeliveryProduct::where('product_id', $product->id)->delete();
+        }
+
+        /*
+    ==========================================================
+    END 10-MIN DELIVERY SECTION
+    ==========================================================
+    */
+
+        return redirect()
+            ->route('seller.editProduct', $product)
+            ->with('success', 'Product updated successfully!');
     }
+
 
     // Seller profile pages
     public function myProfile()

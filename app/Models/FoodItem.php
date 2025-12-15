@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class FoodItem extends Model
 {
@@ -17,7 +18,7 @@ class FoodItem extends Model
         'discounted_price',
         'category',
         'food_type',
-        'image',
+        'images',
         'is_available',
         'is_popular',
         'preparation_time',
@@ -31,6 +32,7 @@ class FoodItem extends Model
     ];
 
     protected $casts = [
+        'images' => 'array',
         'allergens' => 'array',
         'price' => 'decimal:2',
         'discounted_price' => 'decimal:2',
@@ -40,10 +42,11 @@ class FoodItem extends Model
     ];
 
     // Relationships
-    public function hotelOwner()
-    {
-        return $this->belongsTo(HotelOwner::class);
-    }
+ // In FoodItem.php
+public function hotelOwner()
+{
+    return $this->belongsTo(HotelOwner::class, 'hotel_owner_id');
+}
 
     public function orderItems()
     {
@@ -78,5 +81,17 @@ class FoodItem extends Model
     public function isNonVegetarian()
     {
         return $this->food_type === 'non-veg';
+    } 
+    // app/Models/FoodItem.php
+public function getFirstImageUrlAttribute()
+{
+    if (!empty($this->images) && is_array($this->images) && !empty($this->images[0])) {
+        // If it's a local path, convert to public URL
+        if (strpos($this->images[0], 'http') !== 0) {
+            return Storage::url($this->images[0]);
+        }
+        return $this->images[0]; // Already a URL
     }
+    return 'https://via.placeholder.com/480x300?text=No+Image';
+}
 }

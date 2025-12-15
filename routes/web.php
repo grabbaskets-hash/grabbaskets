@@ -1,5 +1,7 @@
 <?php
 // Debug logging for edit product route
+
+
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ProfileController;
@@ -22,20 +24,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\InternshipController;
-
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
+
 // Test image upload route
 #use Illuminate\Http\Request;
 #use Illuminate\Support\Facades\Storage;
 // Universal image serving route for public and R2 disks
 use App\Http\Controllers\ImageServeController;
 
-// Image serving route using ImageServeController
-Route::get('/images/{disk}/{folder}/{filename}', [ImageServeController::class, 'serve'])
-    ->name('serve-image')
-    ->where(['disk' => 'public|r2', 'folder' => '.*', 'filename' => '.*']);
+
 
 
 // Removed temporary debug route for seller edit to avoid duplication/conflicts
@@ -64,17 +62,6 @@ Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
     }
     return view('test-upload');
 });
-
-
-Route::post('/internship/payment', [InternshipController::class, 'payment']);
-Route::post('/internship/payment/success', [InternshipController::class, 'paymentSuccess']);
-
-Route::get('/internship', [InternshipController::class, 'index']);
-Route::get('/job/apply', [InternshipController::class, 'job']);
-Route::get('/internship/apply', [InternshipController::class, 'form']);
-Route::get('/pay', [PaymentController::class, 'showButton']);
-Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
-Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 
 // Admin: Update product seller
 Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
@@ -1024,7 +1011,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     // Wrap the entire closure in try/catch for error logging
     try {
         // Validate allowed types
-        $allowedTypes = ['products', 'public', 'library', 'r2'];
+        $allowedTypes = ['products', 'public', 'library'];
         if (!in_array($type, $allowedTypes, true)) {
             Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
             return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
@@ -1036,8 +1023,6 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
             $storagePath = preg_replace('/^public\//', '', $leafPath);
         } elseif ($type === 'library') {
             $storagePath = 'library/' . $leafPath;
-        } elseif ($type === 'r2') {
-            $storagePath = $leafPath; // R2 paths are already relative to disk root
         } else {
             // products
             $storagePath = 'products/' . $leafPath;
@@ -1368,7 +1353,7 @@ Route::get('/test-simple-upload', function() {
         $routes = $router->getRoutes();
         
         foreach ($routes->getRoutes() as $route) {
-            if (strpos($route->uri(), 'serve-image') !== false) {
+            if (str_contains($route->uri(), 'serve-image')) {
                 $deploymentInfo['serve_route_exists'] = true;
                 $deploymentInfo['routes_found'][] = $route->uri();
             }
@@ -1423,7 +1408,7 @@ Route::get('/test-deployment', function () {
         $routes = $router->getRoutes();
         
         foreach ($routes->getRoutes() as $route) {
-            if (strpos($route->uri(), 'serve-image') !== false) {
+            if (str_contains($route->uri(), 'serve-image')) {
                 $response['serve_route_exists'] = true;
                 $response['routes'][] = $route->uri();
             }
@@ -1627,6 +1612,9 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
                 ->name('weekly');
             Route::get('/monthly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'monthly'])
                 ->name('monthly');
+                   Route::get('/fetch', [App\Http\Controllers\HotelOwner\EarningsController::class, 'fetchEarnings'])
+                ->name('fetch');
+
             Route::post('/withdraw', [App\Http\Controllers\HotelOwner\EarningsController::class, 'withdraw'])
                 ->name('withdraw');
         });
@@ -1789,7 +1777,15 @@ Route::get('/test-password-reset-simple', function () {
         return "Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
     }
 });
+Route::post('/internship/payment', [InternshipController::class, 'payment']);
+Route::post('/internship/payment/success', [InternshipController::class, 'paymentSuccess']);
 
+Route::get('/internship', [InternshipController::class, 'index']);
+Route::get('/job/apply', [InternshipController::class, 'job']);
+Route::get('/internship/apply', [InternshipController::class, 'form']);
+Route::get('/pay', [PaymentController::class, 'showButton']);
+Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
+Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 // Legal and Information Pages
 Route::get('/terms', function () {
     return view('terms');
@@ -1805,3 +1801,27 @@ Route::get('/about', function () {
 
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+    Route::get('/ten-min-products', [SellerController::class, 'showTenMinProducts'])->name('ten.min.products');
+
+
+    use App\Http\Controllers\Customer\CustomerFoodController;
+Route::prefix('food')->group(function () {
+    // Public routes
+    Route::get('/customer', [CustomerFoodController::class, 'index'])->name('customer.food.index');
+
+
+Route::get('/customer/details/{id}', [CustomerFoodController::class, 'details'])
+    ->name('customer.food.details');
+    // Protected cart routes
+    Route::middleware('auth')->group(function () {
+        Route::get('/cart', [CustomerFoodController::class, 'cartIndex'])->name('customer.food.cart');
+        Route::post('/cart/add', [CustomerFoodController::class, 'cartAdd'])->name('customer.food.cart.add'); // <-- ADD THIS
+Route::post('/cart/update/{foodId}', [CustomerFoodController::class, 'cartUpdate'])
+    ->name('customer.food.cart.update');
+            Route::get('/cart/remove/{foodId}', [CustomerFoodController::class, 'cartRemove'])->name('customer.food.cart.remove');
+    Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
+    Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
+            Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
+    });
+});
