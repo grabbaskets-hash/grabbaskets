@@ -1188,53 +1188,53 @@ class SellerController extends Controller
         }
     }
 
-public function showTenMinProducts(Request $request)
-{
-    $selectedCategoryId = $request->query('category');
+    public function showTenMinProducts(Request $request)
+    {
+        $selectedCategoryId = $request->query('category');
 
-    // Fetch only categories that have 10-min products
-    $categories = Category::whereHas('tenMinProducts')
-        ->with(['tenMinProducts.subcategory'])
-        ->get()
-        ->map(function ($cat) {
-            // Only subcategories that are actually used by 10-min products
-            $subcategories = $cat->tenMinProducts
-                ->pluck('subcategory')
-                ->filter() // remove nulls
-                ->unique('id')
-                ->values();
+        // Fetch only categories that have 10-min products
+        $categories = Category::whereHas('tenMinProducts')
+            ->with(['tenMinProducts.subcategory'])
+            ->get()
+            ->map(function ($cat) {
+                // Only subcategories that are actually used by 10-min products
+                $subcategories = $cat->tenMinProducts
+                    ->pluck('subcategory')
+                    ->filter() // remove nulls
+                    ->unique('id')
+                    ->values();
 
-            $cat->filteredSubcategories = $subcategories;
+                $cat->filteredSubcategories = $subcategories;
 
-            return $cat;
-        });
+                return $cat;
+            });
 
-    // Determine active category safely
-    $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
+        // Determine active category safely
+        $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
 
-    // Prepare JS-ready data
-    $jsCategories = $categories->map(function ($cat) {
-        return [
-            'id' => $cat->id,
-            'name' => $cat->name,
-            'icon' => $cat->icon ?? '🛒',
-            'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
-                'id' => $s->id,
-                'name' => $s->name,
-            ])->toArray(),
-            'products' => $cat->tenMinProducts->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'subcategory' => $p->subcategory ? $p->subcategory->name : 'Other',
-                'img' => asset('product_images/' . $p->image),
-                'price' => $p->price,
-                'discount' => $p->discount ?? 0,
-            ])->toArray(),
-        ];
-    })->toArray();
+        // Prepare JS-ready data
+        $jsCategories = $categories->map(function ($cat) {
+            return [
+                'id' => $cat->id,
+                'name' => $cat->name,
+                'icon' => $cat->icon ?? '🛒',
+                'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                ])->toArray(),
+                'products' => $cat->tenMinProducts->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'subcategory' => $p->subcategory ? $p->subcategory->name : 'Other',
+                    'img' => ($p->image && !empty($p->image)) ? url('/serve-image/public/' . $p->image) : asset('images/placeholder.png'),
+                    'price' => $p->price,
+                    'discount' => $p->discount ?? 0,
+                ])->toArray(),
+            ];
+        })->toArray();
 
-    return view('ten-min-products/index', compact('categories', 'jsCategories', 'activeCategory'));
-}
+        return view('ten-min-products/index', compact('categories', 'jsCategories', 'activeCategory'));
+    }
 
 // ✅ ADD THESE METHODS BELOW showTenMinProducts
 
