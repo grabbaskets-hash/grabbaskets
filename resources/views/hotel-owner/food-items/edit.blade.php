@@ -56,20 +56,20 @@
                                 <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
                                     <option value="">Select Category</option>
                                     <option value="">Select Category</option>
-                                    <option value="appetizer" {{ old('category') == 'appetizer' ? 'selected' : '' }}>Appetizer</option>
-                                    <option value="main_course" {{ old('category') == 'main_course' ? 'selected' : '' }}>Main Course</option>
-                                    <option value="dessert" {{ old('category') == 'dessert' ? 'selected' : '' }}>Dessert</option>
-                                    <option value="beverage" {{ old('category') == 'beverage' ? 'selected' : '' }}>Beverage</option>
-                                    <option value="snack" {{ old('category') == 'snack' ? 'selected' : '' }}>Snack</option>
-                                    <option value="salad" {{ old('category') == 'salad' ? 'selected' : '' }}>Salad</option>
-                                    <option value="soup" {{ old('category') == 'soup' ? 'selected' : '' }}>Soup</option>
-                                    <option value="Staters" {{ old('category') == 'staters' ? 'selected' : '' }}>Staters</option>
-                                    <option value="rice" {{ old('category') == 'rice' ? 'selected' : '' }}>Rice</option>
-                                    <option value="Briyani" {{ old('category') == 'briyani' ? 'selected' : '' }}>Briyani</option>
-                                    <option value="Burger" {{ old('category') == 'burger' ? 'selected' : '' }}>Burger</option>
-                                    <option value="Pizza" {{ old('category') == 'pizza' ? 'selected' : '' }}>Pizza</option>
-                                    <option value="Seefood" {{ old('category') == 'Seefood' ? 'selected' : '' }}>See Food</option>
-                                    <option value="chicken" {{ old('category') == 'chicken' ? 'selected' : '' }}>Chicken</option>
+                                    <option value="appetizer" {{ old('category', $foodItem->category) == 'appetizer' ? 'selected' : '' }}>Appetizer</option>
+                                    <option value="main_course" {{ old('category', $foodItem->category) == 'main_course' ? 'selected' : '' }}>Main Course</option>
+                                    <option value="dessert" {{ old('category', $foodItem->category) == 'dessert' ? 'selected' : '' }}>Dessert</option>
+                                    <option value="beverage" {{ old('category', $foodItem->category) == 'beverage' ? 'selected' : '' }}>Beverage</option>
+                                    <option value="snack" {{ old('category', $foodItem->category) == 'snack' ? 'selected' : '' }}>Snack</option>
+                                    <option value="salad" {{ old('category', $foodItem->category) == 'salad' ? 'selected' : '' }}>Salad</option>
+                                    <option value="soup" {{ old('category', $foodItem->category) == 'soup' ? 'selected' : '' }}>Soup</option>
+                                    <option value="Staters" {{ old('category', $foodItem->category) == 'staters' ? 'selected' : '' }}>Staters</option>
+                                    <option value="rice" {{ old('category', $foodItem->category) == 'rice' ? 'selected' : '' }}>Rice</option>
+                                    <option value="Briyani" {{ old('category', $foodItem->category) == 'briyani' ? 'selected' : '' }}>Briyani</option>
+                                    <option value="Burger" {{ old('category', $foodItem->category) == 'burger' ? 'selected' : '' }}>Burger</option>
+                                    <option value="Pizza" {{ old('category', $foodItem->category) == 'pizza' ? 'selected' : '' }}>Pizza</option>
+                                    <option value="Seefood" {{ old('category', $foodItem->category) == 'Seefood' ? 'selected' : '' }}>See Food</option>
+                                    <option value="chicken" {{ old('category', $foodItem->category) == 'chicken' ? 'selected' : '' }}>Chicken</option>
                                 </select>
                                 @error('category')
                                 <div class="invalid-feedback">{{ $message }}</div>
