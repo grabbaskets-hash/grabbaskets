@@ -18,6 +18,8 @@ use App\Http\Controllers\CourierTrackingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
@@ -671,6 +673,58 @@ Route::get('/admin/logout', function () {
     session()->forget('is_admin');
     return redirect('/');
 })->name('admin.logout');
+
+// Seller Login Routes
+Route::get('/seller/login', function () {
+    return view('seller.login');
+})->name('seller.login');
+
+Route::post('/seller/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $seller = \App\Models\Seller::where('email', $request->email)->first();
+    
+    if ($seller && Hash::check($request->password, $seller->password)) {
+        session(['seller_id' => $seller->id, 'is_seller' => true]);
+        return redirect('/seller/dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Invalid seller credentials']);
+})->name('seller.login.submit');
+
+Route::get('/seller/logout', function () {
+    session()->forget(['seller_id', 'is_seller']);
+    return redirect('/');
+})->name('seller.logout');
+
+// Delivery Partner Login Routes
+Route::get('/partner/login', function () {
+    return view('partner.login');
+})->name('delivery-partner.login');
+
+Route::post('/partner/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $partner = \App\Models\DeliveryPartner::where('email', $request->email)->first();
+    
+    if ($partner && Hash::check($request->password, $partner->password)) {
+        session(['partner_id' => $partner->id, 'is_delivery_partner' => true]);
+        return redirect('/partner/dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Invalid partner credentials']);
+})->name('delivery-partner.login.submit');
+
+Route::get('/partner/logout', function () {
+    session()->forget(['partner_id', 'is_delivery_partner']);
+    return redirect('/');
+})->name('delivery-partner.logout');
 
 // Admin dashboard
 Route::get('/admin/dashboard', function () {

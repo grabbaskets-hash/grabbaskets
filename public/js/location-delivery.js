@@ -9,6 +9,8 @@ class LocationDelivery {
         this.userLng = null;
         this.radiusKm = 2;
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        this.autoRefreshInterval = null;
+        this.lastUpdateTime = null;
     }
 
     /**
@@ -200,22 +202,54 @@ class LocationDelivery {
     }
 
     /**
-     * Request location permission and set up auto-refresh
+     * Request location permission and set up auto-refresh (Zepto-like - every 30 seconds)
      */
-    async setupAutoRefresh(intervalMinutes = 5) {
-        setInterval(async () => {
-            try {
-                const location = await this.getUserLocation();
-                console.log('Auto-refreshing location:', location);
+    async setupAutoRefresh(intervalSeconds = 30) {
+        // Clear existing interval if any
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
 
-                const products = await this.getLocationBasedProducts();
-                if (products?.data) {
-                    this.displayProducts(products);
-                }
-            } catch (error) {
-                console.warn('Auto-refresh failed:', error);
+        // Initial update
+        await this.updateLocationAndProducts();
+
+        // Set up recurring auto-refresh (default 30 seconds like Zepto)
+        this.autoRefreshInterval = setInterval(async () => {
+            await this.updateLocationAndProducts();
+        }, intervalSeconds * 1000);
+
+        console.log(`Location auto-refresh enabled every ${intervalSeconds} seconds`);
+    }
+
+    /**
+     * Update location and refresh products
+     */
+    async updateLocationAndProducts() {
+        try {
+            const location = await this.getUserLocation();
+            this.lastUpdateTime = new Date();
+            
+            await this.storeLocationInSession();
+            
+            const products = await this.getLocationBasedProducts();
+            if (products?.data) {
+                this.displayProducts(products);
+                console.log(`✓ Location updated at ${this.lastUpdateTime.toLocaleTimeString()}`);
             }
-        }, intervalMinutes * 60 * 1000);
+        } catch (error) {
+            console.warn('Auto-refresh update failed:', error);
+        }
+    }
+
+    /**
+     * Stop auto-refresh
+     */
+    stopAutoRefresh() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+            console.log('Location auto-refresh stopped');
+        }
     }
 }
 
@@ -228,8 +262,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await locationDelivery.initialize();
             
-            // Set up auto-refresh every 5 minutes
-            locationDelivery.setupAutoRefresh(5);
+            // Set up auto-refresh every 30 seconds like Zepto (aggressive real-time updates)
+            locationDelivery.setupAutoRefresh(30);
         } catch (error) {
             console.log('Location-based delivery not available');
         }
