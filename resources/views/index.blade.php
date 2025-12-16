@@ -25,16 +25,57 @@
             --border-color: #E5E5E5;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ============================================
+           DELIVERY MODE TOGGLE/TABS
+           ============================================ */
+        .delivery-mode-toggle {
+            display: flex;
+            gap: 0;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 70px;
+            z-index: 999;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+        .delivery-mode-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .delivery-mode-btn.active {
+            color: white;
+        }
+
+        .delivery-mode-btn.ten-min.active {
+            background: linear-gradient(135deg, var(--primary-10min) 0%, #0A6B19 100%);
+        }
+
+        .delivery-mode-btn.normal.active {
+            background: linear-gradient(135deg, var(--primary-normal) 0%, #E55A00 100%);
+        }
+
+        .delivery-mode-btn:hover {
+            background: var(--bg-light);
+        }
+
+        .delivery-mode-btn.active:hover {
+            filter: brightness(1.1);
         }
 
         /* ============================================
@@ -42,51 +83,16 @@
            ============================================ */
         .mobile-view,
         .desktop-view {
+            display: block;
+        }
+
+        /* Hide/show based on delivery mode */
+        .delivery-content {
             display: none;
         }
 
-        /* Mobile: ≤768px */
-        @media (max-width: 768px) {
-            .mobile-view {
-                display: block;
-            }
-            .desktop-view {
-                display: none;
-            }
-            
-            /* Hide desktop elements */
-            .desktop-only {
-                display: none !important;
-            }
-            
-            /* Show mobile elements */
-            .mobile-only {
-                display: block !important;
-            }
-
-            body {
-                padding-bottom: 80px; /* Space for mobile bottom nav */
-            }
-        }
-
-        /* Desktop: >768px */
-        @media (min-width: 769px) {
-            .mobile-view {
-                display: none;
-            }
-            .desktop-view {
-                display: block;
-            }
-            
-            /* Hide mobile elements */
-            .mobile-only {
-                display: none !important;
-            }
-            
-            /* Show desktop elements */
-            .desktop-only {
-                display: block !important;
-            }
+        .delivery-content.active {
+            display: block;
         }
 
         /* ============================================
@@ -420,6 +426,33 @@
             font-size: 0.9rem;
         }
 
+        .view-all-link.normal {
+            color: var(--primary-normal);
+        }
+
+        .view-all-link.normal:hover {
+            color: #E55A00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 80px; /* Space for mobile bottom nav */
+        }
+
+        @media (min-width: 769px) {
+            body {
+                padding-bottom: 0;
+            }
+        }
+
         /* ============================================
            ANIMATIONS
            ============================================ */
@@ -464,24 +497,44 @@
 </head>
 
 <body>
-    <!-- Responsive Layout Based on Viewport -->
-    
-    <!-- MOBILE VIEW: 10-MINUTE DELIVERY (≤768px) -->
-    <div class="mobile-view">
-        <!-- Navigation -->
-        <nav class="navbar-modern">
-            <div class="container d-flex align-items-center justify-content-between">
-                <a href="{{ route('home') }}" class="navbar-brand-modern">
-                    <i class="bi bi-bag-check-fill"></i>
-                    GrabBaskets
+    <!-- Main Navigation -->
+    <nav class="navbar-modern">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a href="{{ route('home') }}" class="navbar-brand-modern">
+                <i class="bi bi-bag-check-fill"></i>
+                GrabBaskets
+            </a>
+            @auth
+                <a href="{{ route('cart.index') }}" class="ms-auto me-3" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                    <i class="bi bi-cart3"></i> Cart
                 </a>
-                <div class="delivery-mode-badge ten-min">
-                    <i class="bi bi-lightning-charge-fill"></i>
-                    10 mins
-                </div>
-            </div>
-        </nav>
+                <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                    <i class="bi bi-person-circle"></i> Account
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="ms-auto" style="text-decoration: none; color: white; background: var(--primary-normal); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
+                    Login
+                </a>
+            @endauth
+        </div>
+    </nav>
 
+    <!-- Delivery Mode Toggle -->
+    <div class="container mt-3">
+        <div class="delivery-mode-toggle">
+            <button class="delivery-mode-btn ten-min active" onclick="switchDeliveryMode('ten-min')">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>10 Mins</span>
+            </button>
+            <button class="delivery-mode-btn normal" onclick="switchDeliveryMode('normal')">
+                <i class="bi bi-truck"></i>
+                <span>2-5 Days</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 10-MINUTE DELIVERY VIEW -->
+    <div class="delivery-content active" id="ten-min-view">
         <!-- Header -->
         <div class="ten-min-header">
             <h1>Get Groceries in 10 Minutes!</h1>
@@ -572,34 +625,8 @@
         </div>
     </div>
 
-    <!-- DESKTOP VIEW: NORMAL DELIVERY (>768px) -->
-    <div class="desktop-view">
-        <!-- Navigation -->
-        <nav class="navbar-modern">
-            <div class="container d-flex align-items-center justify-content-between">
-                <a href="{{ route('home') }}" class="navbar-brand-modern">
-                    <i class="bi bi-bag-check-fill"></i>
-                    GrabBaskets
-                </a>
-                <div class="delivery-mode-badge normal">
-                    <i class="bi bi-truck"></i>
-                    2-5 Days
-                </div>
-                @auth
-                    <a href="{{ route('cart.index') }}" class="ms-auto me-3" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
-                        <i class="bi bi-cart3"></i> Cart
-                    </a>
-                    <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
-                        <i class="bi bi-person-circle"></i> Account
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="ms-auto" style="text-decoration: none; color: white; background: var(--primary-normal); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
-                        Login
-                    </a>
-                @endauth
-            </div>
-        </nav>
-
+    <!-- NORMAL DELIVERY VIEW -->
+    <div class="delivery-content" id="normal-view">
         <!-- Header -->
         <div class="normal-header">
             <h1>Shop Everything You Need</h1>
@@ -610,7 +637,7 @@
         <div class="container">
             <div class="section-header">
                 <h2>Shop by Category</h2>
-                <a href="{{ route('buyer.dashboard') }}" class="view-all-link">View All</a>
+                <a href="{{ route('buyer.dashboard') }}" class="view-all-link normal">View All</a>
             </div>
 
             <div class="normal-categories">
@@ -627,7 +654,7 @@
             <!-- Products Grid -->
             <div class="section-header">
                 <h2>Featured Products</h2>
-                <a href="{{ route('products.index') }}" class="view-all-link">View All</a>
+                <a href="{{ route('products.index') }}" class="view-all-link normal">View All</a>
             </div>
 
             <div class="products-grid">
@@ -666,11 +693,11 @@
                 @endforelse
             </div>
 
-            <!-- Food Section (Desktop Only) -->
+            <!-- Food Section -->
             <div class="mt-4">
                 <div class="section-header">
                     <h2 style="color: var(--primary-normal);">🍕 Order Food</h2>
-                    <a href="{{ route('food.index') }}" class="view-all-link" style="color: var(--primary-normal);">View All</a>
+                    <a href="{{ route('food.index') }}" class="view-all-link normal">View All</a>
                 </div>
                 
                 <div style="background: linear-gradient(135deg, var(--primary-normal) 0%, #E55A00 100%); color: white; padding: 40px; border-radius: 16px; text-align: center;">
@@ -688,6 +715,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        function switchDeliveryMode(mode) {
+            // Update active buttons
+            document.querySelectorAll('.delivery-mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.delivery-mode-btn.${mode}`).classList.add('active');
+
+            // Update active content
+            document.querySelectorAll('.delivery-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${mode}-view`).classList.add('active');
+
+            // Save user preference
+            localStorage.setItem('preferredDeliveryMode', mode);
+        }
+
         function addToCart(productId) {
             @auth
                 const form = document.createElement('form');
@@ -708,31 +752,10 @@
             @endauth
         }
 
-        // Detect if user is on mobile/desktop and load appropriate content
-        function initializeView() {
-            const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // Load 10-minute delivery data
-                fetch('{{ route('10-minute-delivery') }}')
-                    .then(r => r.text())
-                    .catch(e => console.log('10-min delivery not available'));
-            } else {
-                // Load normal delivery data
-                fetch('{{ route('normal-delivery') }}')
-                    .then(r => r.text())
-                    .catch(e => console.log('Normal delivery not available'));
-            }
-        }
-
-        // Initialize on load
-        window.addEventListener('load', initializeView);
-        
-        // Reinitialize on resize
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(initializeView, 250);
+        // Load saved delivery mode preference on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('preferredDeliveryMode') || 'ten-min';
+            switchDeliveryMode(savedMode);
         });
     </script>
 </body>
