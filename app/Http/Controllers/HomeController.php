@@ -62,6 +62,13 @@ class HomeController extends Controller
                 'secondary_color' => '#FFD700',
             ];
 
+            // Load 10-minute delivery products for mobile view
+            $ten_min_products = Product::limit(12)->get();
+            $ten_min_categories = Category::limit(8)->get();
+            
+            // Load all products for desktop normal delivery view
+            $all_products = Product::limit(24)->get();
+
             return view('index', [
                 'categories' => $categories,
                 'products' => $products,
@@ -70,7 +77,10 @@ class HomeController extends Controller
                 'blogProducts' => $products->take(6),
                 'categoryProducts' => [],
                 'banners' => $banners,
-                'settings' => $settings
+                'settings' => $settings,
+                'ten_min_products' => $ten_min_products,
+                'ten_min_categories' => $ten_min_categories,
+                'all_products' => $all_products
             ]);
             
         } catch (\PDOException $e) {

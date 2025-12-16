@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Log;
 #use Illuminate\Support\Facades\Storage;
 // Universal image serving route for public and R2 disks
 use App\Http\Controllers\ImageServeController;
+use App\Http\Controllers\DeliveryModeController;
 
 
 
@@ -180,6 +181,12 @@ Route::get('/test-index-debug', function () {
 
 // New simplified home route using controller
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Delivery Mode Routes (10-minute vs Normal)
+Route::get('/10-minute-delivery', [DeliveryModeController::class, 'tenMinuteDelivery'])->name('delivery.10-minute');
+Route::get('/normal-delivery', [DeliveryModeController::class, 'normalDelivery'])->name('delivery.normal');
+Route::post('/store-location', [DeliveryModeController::class, 'storeLocation'])->name('delivery.store-location');
+Route::get('/delivery/category/{categoryId}', [DeliveryModeController::class, 'getCategoryProducts'])->name('delivery.category-products');
 
 Route::get('/otp/verify-page', function (Request $request) {
     $user_id = $request->query('user_id');
