@@ -33,13 +33,21 @@ class DeliveryModeController extends Controller
             // Get categories available for 10-minute delivery (quick categories only)
             $categories = $this->getTenMinuteDeliveryCategories();
             
-            // Get featured products from nearby stores
+            // Get featured products from nearby stores within 2km range (priority products)
+            $nearbyProducts = $this->getProductsByLocationRange($userLat, $userLng, $storeIds, 2);
+            
+            // Get trending/featured products from all nearby stores (5km)
             $products = Product::whereIn('seller_id', $storeIds)
                 ->with(['category', 'seller'])
                 ->where('is_active', true)
                 ->orderBy('created_at', 'desc')
                 ->limit(12)
                 ->get();
+            
+            // Merge nearby products first for better relevance
+            if ($nearbyProducts->count() > 0) {
+                $products = $nearbyProducts->merge($products)->unique('id')->take(12);
+            }
             
             // Get trending/featured products
             $trending = Product::whereIn('seller_id', $storeIds)
@@ -58,6 +66,7 @@ class DeliveryModeController extends Controller
             $settings = [
                 'delivery_mode' => '10-minute',
                 'delivery_radius_km' => 5,
+                'priority_distance_km' => 2,
                 'nearby_stores_count' => count($storeIds),
                 'hero_title' => '10-Minute Express Delivery',
                 'hero_subtitle' => 'Get groceries in 10 minutes!',
@@ -71,6 +80,7 @@ class DeliveryModeController extends Controller
             return view('delivery.ten-minute-index', [
                 'categories' => $categories,
                 'products' => $products,
+                'nearbyProducts' => $nearbyProducts,
                 'trending' => $trending,
                 'stores' => $stores,
                 'banners' => $banners,
@@ -212,7 +222,54 @@ class DeliveryModeController extends Controller
     }
     
     /**
-     * Get categories available for 10-minute delivery
+     * Get products from sellers within specified range (in km)
+     * Fetches products from stores closest to user location
+     */
+    private function getProductsByLocationRange($userLat = null, $userLng = null, $storeIds = [], $radiusKm = 2)
+    {
+        if (!$userLat || !$userLng || empty($storeIds)) {
+            return collect([]);
+        }
+        
+        try {
+            // Get stores within specified radius using Haversine formula
+            $nearbyStores = Seller::selectRaw(
+                '*, 
+                ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * 
+                cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * 
+                sin( radians( latitude ) ) ) ) AS distance',
+                [$userLat, $userLng, $userLat]
+            )
+            ->whereIn('id', $storeIds)
+            ->where('available_for_10_min_delivery', true)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->havingRaw('distance < ?', [$radiusKm])
+            ->orderBy('distance')
+            ->get();
+            
+            $nearbyStoreIds = $nearbyStores->pluck('id')->toArray();
+            
+            if (empty($nearbyStoreIds)) {
+                return collect([]);
+            }
+            
+            // Get products from nearby stores with distance prioritization
+            $products = Product::whereIn('seller_id', $nearbyStoreIds)
+                ->with(['category', 'seller'])
+                ->where('is_active', true)
+                ->where('in_stock', true)
+                ->orderBy('created_at', 'desc')
+                ->limit(12)
+                ->get();
+            
+            return $products;
+            
+        } catch (\Exception $e) {
+            Log::warning('Get products by location range failed: ' . $e->getMessage());
+            return collect([]);
+        }
+    }
      * These are quick pickup categories (not food)
      */
     private function getTenMinuteDeliveryCategories()
@@ -237,9 +294,96 @@ class DeliveryModeController extends Controller
     }
     
     /**
-     * Store user location preference
+     * API: Get products within location range (AJAX endpoint)
      */
-    public function storeLocation(Request $request)
+    public function getLocationBasedProducts(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'radius_km' => 'nullable|numeric|min:1|max:10',
+                'category_id' => 'nullable|integer',
+                'limit' => 'nullable|integer|min:1|max:50',
+            ]);
+            
+            $userLat = $validated['latitude'];
+            $userLng = $validated['longitude'];
+            $radiusKm = $validated['radius_km'] ?? 2;
+            $categoryId = $validated['category_id'] ?? null;
+            $limit = $validated['limit'] ?? 12;
+            
+            // Get stores in radius
+            $stores = $this->getNearbyStores($userLat, $userLng, 5);
+            $storeIds = $stores->pluck('id')->toArray();
+            
+            // Get products by location range
+            $query = Seller::selectRaw(
+                'sellers.*, 
+                ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * 
+                cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * 
+                sin( radians( latitude ) ) ) ) AS distance',
+                [$userLat, $userLng, $userLat]
+            )
+            ->whereIn('sellers.id', $storeIds)
+            ->where('available_for_10_min_delivery', true)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->havingRaw('distance < ?', [$radiusKm])
+            ->orderBy('distance');
+            
+            $nearbyStores = $query->get();
+            $nearbyStoreIds = $nearbyStores->pluck('id')->toArray();
+            
+            if (empty($nearbyStoreIds)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'message' => 'No stores found within ' . $radiusKm . 'km radius',
+                ]);
+            }
+            
+            // Get products from nearby stores
+            $productsQuery = Product::whereIn('seller_id', $nearbyStoreIds)
+                ->with(['category', 'seller'])
+                ->where('is_active', true)
+                ->where('in_stock', true);
+            
+            if ($categoryId) {
+                $productsQuery->where('category_id', $categoryId);
+            }
+            
+            $products = $productsQuery
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'price' => $product->price,
+                        'image_url' => $product->image_url,
+                        'category' => $product->category->name ?? 'N/A',
+                        'seller' => $product->seller->shop_name ?? 'N/A',
+                        'in_stock' => $product->in_stock,
+                        'distance_km' => round($nearbyStores->firstWhere('id', $product->seller_id)?->distance ?? 0, 2),
+                    ];
+                }),
+                'nearby_stores_count' => count($nearbyStoreIds),
+                'radius_km' => $radiusKm,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Get location-based products error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
     {
         $validated = $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
@@ -268,14 +412,28 @@ class DeliveryModeController extends Controller
             $stores = $this->getNearbyStores($userLat, $userLng, 5);
             $storeIds = $stores->pluck('id')->toArray();
             
-            $products = Product::where('category_id', $categoryId)
+            // Get products from nearby stores, prioritizing 2km range
+            $nearbyProducts = $this->getProductsByLocationRange($userLat, $userLng, $storeIds, 2);
+            $nearbyProductIds = $nearbyProducts->pluck('id')->toArray();
+            
+            // Get remaining products from all nearby stores
+            $allProducts = Product::where('category_id', $categoryId)
                 ->whereIn('seller_id', $storeIds)
                 ->with(['category', 'seller'])
                 ->where('is_active', true)
                 ->paginate(12);
             
+            // Reorganize to put nearby products first
+            if (count($nearbyProductIds) > 0) {
+                $sorted = $allProducts->getCollection()->sortByDesc(function ($product) use ($nearbyProductIds) {
+                    return in_array($product->id, $nearbyProductIds) ? 1 : 0;
+                });
+                $allProducts->setCollection($sorted);
+            }
+            
             return view('delivery.category-products', [
-                'products' => $products,
+                'products' => $allProducts,
+                'nearbyProducts' => $nearbyProducts,
                 'categoryId' => $categoryId,
                 'delivery_mode' => '10-minute',
             ]);
