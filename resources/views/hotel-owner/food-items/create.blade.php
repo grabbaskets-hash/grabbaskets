@@ -28,9 +28,9 @@
                     @endif
 
                     <form action="{{ route('hotel-owner.food-items.store') }}"
-      method="POST"
-      enctype="multipart/form-data">
-    @csrf
+                        method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -58,8 +58,15 @@
                                     <option value="snack" {{ old('category') == 'snack' ? 'selected' : '' }}>Snack</option>
                                     <option value="salad" {{ old('category') == 'salad' ? 'selected' : '' }}>Salad</option>
                                     <option value="soup" {{ old('category') == 'soup' ? 'selected' : '' }}>Soup</option>
-                                    <option value="bread" {{ old('category') == 'bread' ? 'selected' : '' }}>Bread</option>
+                                    <option value="staters" {{ old('category') == 'staters' ? 'selected' : '' }}>Staters</option>
                                     <option value="rice" {{ old('category') == 'rice' ? 'selected' : '' }}>Rice</option>
+                                    <option value="chicken" {{ old('category') == 'chicken' ? 'selected' : '' }}>Chicken</option>
+                                    <option value="seefood" {{ old('category') == 'seefood' ? 'selected' : '' }}>Seefood</option>
+                                    <option value="burger" {{ old('category') == 'burger' ? 'selected' : '' }}>Burger</option>
+                                    <option value="pizza" {{ old('category') == 'pizza' ? 'selected' : '' }}>Pizza</option>
+                                    <option value="mutton" {{ old('category') == 'mutton' ? 'selected' : '' }}>Mutton</option>
+                                    <option value="briyani" {{ old('category') == 'briyani' ? 'selected' : '' }}>Briyani</option>
+
                                 </select>
                                 @error('category')
                                 <div class="invalid-feedback">{{ $message }}</div>
