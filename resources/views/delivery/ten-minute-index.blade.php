@@ -447,19 +447,39 @@
     <!-- Navbar -->
     <nav class="navbar-10min">
         <div class="navbar-content">
-            <div class="delivery-mode-badge">
+            <a href="{{ route('home') }}" class="delivery-mode-badge" style="text-decoration: none; color: var(--text-dark);">
                 <i class="bi bi-lightning-charge-fill"></i>
                 10 Min
-            </div>
+            </a>
             
             <div class="search-box">
                 <input type="text" placeholder="Search products..." class="search-input">
             </div>
             
-            <button class="cart-icon">
-                <i class="bi bi-bag"></i>
-                <span class="cart-badge" id="cart-count">0</span>
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                @auth
+                    <a href="{{ route('cart.index') }}" class="cart-icon" style="text-decoration: none; color: var(--text-dark);">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                    <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+                @else
+                    <button class="cart-icon">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </button>
+                    <a href="{{ route('login') }}" style="text-decoration: none; color: white; background: var(--primary-color); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                        Login
+                    </a>
+                @endauth
+                
+                <!-- Delivery Partner Login -->
+                <a href="{{ route('admin.login') }}" style="text-decoration: none; color: var(--primary-color); background: transparent; border: 2px solid var(--primary-color); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block;">
+                    Partner
+                </a>
+            </div>
         </div>
     </nav>
 
