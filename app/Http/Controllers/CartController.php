@@ -120,6 +120,13 @@ class CartController extends Controller
         return back()->with('success', 'Cart cleared');
     }
 
+    public function count()
+    {
+        $count = CartItem::where('user_id', Auth::id())->sum('quantity') ?? 0;
+        return response()->json(['count' => $count]);
+    }
+    }
+
     public function checkout(Request $request)
     {
         $request->validate([
