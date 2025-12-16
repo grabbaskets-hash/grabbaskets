@@ -504,20 +504,55 @@
                 <i class="bi bi-bag-check-fill"></i>
                 GrabBaskets
             </a>
-            @auth
-                <a href="{{ route('cart.index') }}" class="ms-auto me-3" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
-                    <i class="bi bi-cart3"></i> Cart
-                </a>
-                <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
-                    <i class="bi bi-person-circle"></i> Account
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="ms-auto" style="text-decoration: none; color: white; background: var(--primary-normal); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
-                    Login
-                </a>
-            @endauth
+            <div style="display: flex; gap: 15px; align-items: center; margin-left: auto;">
+                @auth
+                    <a href="{{ route('cart.index') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                        <i class="bi bi-cart3"></i> Cart
+                    </a>
+                    <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                        <i class="bi bi-person-circle"></i> Account
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" style="text-decoration: none; color: white; background: var(--primary-normal); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
+                        Buyer Login
+                    </a>
+                @endauth
+                
+                <!-- Delivery Partner Dropdown -->
+                <div style="position: relative; display: inline-block;">
+                    <button onclick="togglePartnerMenu()" style="background: transparent; border: 2px solid var(--primary-10min); color: var(--primary-10min); padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer;">
+                        <i class="bi bi-briefcase"></i> Partner
+                    </button>
+                    <div id="partnerMenu" style="position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 200px; display: none; z-index: 1000; margin-top: 8px;">
+                        <a href="{{ route('admin.login') }}" style="display: block; padding: 12px 16px; text-decoration: none; color: var(--text-dark); font-weight: 600; border-bottom: 1px solid #eee;">
+                            <i class="bi bi-shop"></i> Seller Login
+                        </a>
+                        <a href="{{ route('admin.login') }}" style="display: block; padding: 12px 16px; text-decoration: none; color: var(--text-dark); font-weight: 600; border-bottom: 1px solid #eee;">
+                            <i class="bi bi-bicycle"></i> Delivery Partner
+                        </a>
+                        <a href="{{ route('admin.login') }}" style="display: block; padding: 12px 16px; text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                            <i class="bi bi-shield-check"></i> Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
+
+    <script>
+        function togglePartnerMenu() {
+            const menu = document.getElementById('partnerMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('partnerMenu');
+            if (!event.target.closest('[onclick="togglePartnerMenu()"]') && !event.target.closest('#partnerMenu')) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
 
     <!-- Delivery Mode Toggle -->
     <div class="container mt-3">

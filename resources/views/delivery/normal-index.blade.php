@@ -460,7 +460,7 @@
     <!-- Navbar -->
     <nav class="navbar-normal">
         <div class="navbar-content">
-            <a href="/" class="navbar-brand">
+            <a href="{{ route('home') }}" class="navbar-brand" style="text-decoration: none; color: var(--text-dark);">
                 <i class="bi bi-bag-check"></i> GrabBaskets
             </a>
             
@@ -468,14 +468,35 @@
                 <input type="text" placeholder="Search products..." class="search-input">
             </div>
             
-            <div class="nav-actions">
-                <button class="nav-btn" onclick="window.location.href='/wishlist'">
-                    <i class="bi bi-heart"></i>
-                </button>
-                <button class="nav-btn cart-btn">
-                    <i class="bi bi-bag"></i>
-                    <span class="nav-badge" id="cart-count">0</span>
-                </button>
+            <div class="nav-actions" style="display: flex; gap: 10px; align-items: center;">
+                @auth
+                    <a href="{{ route('wishlist.index') }}" class="nav-btn" style="text-decoration: none; color: var(--text-dark);">
+                        <i class="bi bi-heart"></i>
+                    </a>
+                    <a href="{{ route('cart.index') }}" class="nav-btn cart-btn" style="text-decoration: none; color: var(--text-dark);">
+                        <i class="bi bi-bag"></i>
+                        <span class="nav-badge" id="cart-count">0</span>
+                    </a>
+                    <a href="{{ route('profile.show') }}" style="text-decoration: none; color: var(--text-dark); font-weight: 600;">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+                @else
+                    <button class="nav-btn" onclick="window.location.href='{{ route('wishlist.index') }}'">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                    <button class="nav-btn cart-btn">
+                        <i class="bi bi-bag"></i>
+                        <span class="nav-badge" id="cart-count">0</span>
+                    </button>
+                    <a href="{{ route('login') }}" style="text-decoration: none; color: white; background: var(--primary-color); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                        Login
+                    </a>
+                @endauth
+                
+                <!-- Delivery Partner Login -->
+                <a href="{{ route('admin.login') }}" style="text-decoration: none; color: var(--primary-color); background: transparent; border: 2px solid var(--primary-color); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block;">
+                    Partner
+                </a>
             </div>
         </div>
     </nav>
