@@ -558,7 +558,7 @@
             <!-- Products Grid -->
             <div class="section-header">
                 <h2>Featured Products</h2>
-                <a href="{{ route('10-minute-delivery') }}" class="view-all-link">View All</a>
+                <a href="{{ route('delivery.10-minute') }}" class="view-all-link">View All</a>
             </div>
 
             <div class="products-grid">
@@ -599,11 +599,11 @@
                 <i class="bi bi-house-fill"></i>
                 Home
             </a>
-            <a href="{{ route('10-minute-delivery') }}" class="nav-item">
+            <a href="{{ route('delivery.10-minute') }}" class="nav-item">
                 <i class="bi bi-lightning-charge"></i>
                 Express
             </a>
-            <a href="{{ route('normal-delivery') }}" class="nav-item">
+            <a href="{{ route('delivery.normal') }}" class="nav-item">
                 <i class="bi bi-bag-check"></i>
                 Shop
             </a>
