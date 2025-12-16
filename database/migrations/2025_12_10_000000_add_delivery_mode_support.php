@@ -16,23 +16,23 @@ return new class extends Migration
             Schema::table('sellers', function (Blueprint $table) {
                 // Add if columns don't exist
                 if (!Schema::hasColumn('sellers', 'available_for_10_min_delivery')) {
-                    $table->boolean('available_for_10_min_delivery')->default(false)->after('is_active');
+                    $table->boolean('available_for_10_min_delivery')->default(false);
                 }
                 
                 if (!Schema::hasColumn('sellers', 'latitude')) {
-                    $table->decimal('latitude', 10, 8)->nullable()->after('available_for_10_min_delivery');
+                    $table->decimal('latitude', 10, 8)->nullable();
                 }
                 
                 if (!Schema::hasColumn('sellers', 'longitude')) {
-                    $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
+                    $table->decimal('longitude', 11, 8)->nullable();
                 }
                 
                 if (!Schema::hasColumn('sellers', 'delivery_radius_km')) {
-                    $table->integer('delivery_radius_km')->default(5)->after('longitude');
+                    $table->integer('delivery_radius_km')->default(5);
                 }
                 
                 if (!Schema::hasColumn('sellers', 'delivery_mode')) {
-                    $table->enum('delivery_mode', ['normal', '10-minute', 'both'])->default('normal')->after('delivery_radius_km');
+                    $table->enum('delivery_mode', ['normal', '10-minute', 'both'])->default('normal');
                 }
             });
         }
