@@ -178,6 +178,7 @@ Route::get('/10-minute-delivery', [DeliveryModeController::class, 'tenMinuteDeli
 Route::get('/normal-delivery', [DeliveryModeController::class, 'normalDelivery'])->name('delivery.normal');
 Route::post('/store-location', [DeliveryModeController::class, 'storeLocation'])->name('delivery.store-location');
 Route::get('/delivery/category/{categoryId}', [DeliveryModeController::class, 'getCategoryProducts'])->name('delivery.category-products');
+Route::post('/api/location-based-products', [DeliveryModeController::class, 'getLocationBasedProducts'])->name('api.location-based-products');
 
 Route::get('/otp/verify-page', function (Request $request) {
     $user_id = $request->query('user_id');
