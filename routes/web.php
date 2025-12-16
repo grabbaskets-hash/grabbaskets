@@ -1,5 +1,7 @@
 <?php
 // Debug logging for edit product route
+
+
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ProfileController;
@@ -23,9 +25,9 @@ use Illuminate\Support\Facades\Storage;
 #use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\InternshipController;
-
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
+
 // Test image upload route
 #use Illuminate\Http\Request;
 #use Illuminate\Support\Facades\Storage;
@@ -62,17 +64,6 @@ Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
     }
     return view('test-upload');
 });
-
-
-Route::post('/internship/payment', [InternshipController::class, 'payment']);
-Route::post('/internship/payment/success', [InternshipController::class, 'paymentSuccess']);
-
-Route::get('/internship', [InternshipController::class, 'index']);
-Route::get('/job/apply', [InternshipController::class, 'job']);
-Route::get('/internship/apply', [InternshipController::class, 'form']);
-Route::get('/pay', [PaymentController::class, 'showButton']);
-Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
-Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 
 // Admin: Update product seller
 Route::post('/admin/products/{product}/update-seller', function (Request $request, $product) {
@@ -1629,6 +1620,9 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
                 ->name('weekly');
             Route::get('/monthly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'monthly'])
                 ->name('monthly');
+                   Route::get('/fetch', [App\Http\Controllers\HotelOwner\EarningsController::class, 'fetchEarnings'])
+                ->name('fetch');
+
             Route::post('/withdraw', [App\Http\Controllers\HotelOwner\EarningsController::class, 'withdraw'])
                 ->name('withdraw');
         });
@@ -1791,7 +1785,15 @@ Route::get('/test-password-reset-simple', function () {
         return "Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
     }
 });
+Route::post('/internship/payment', [InternshipController::class, 'payment']);
+Route::post('/internship/payment/success', [InternshipController::class, 'paymentSuccess']);
 
+Route::get('/internship', [InternshipController::class, 'index']);
+Route::get('/job/apply', [InternshipController::class, 'job']);
+Route::get('/internship/apply', [InternshipController::class, 'form']);
+Route::get('/pay', [PaymentController::class, 'showButton']);
+Route::post('/create-order', [PaymentController::class, 'createOrder1'])->name('create.order');
+Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 // Legal and Information Pages
 Route::get('/terms', function () {
     return view('terms');
@@ -1807,3 +1809,27 @@ Route::get('/about', function () {
 
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+    Route::get('/ten-min-products', [SellerController::class, 'showTenMinProducts'])->name('ten.min.products');
+
+
+    use App\Http\Controllers\Customer\CustomerFoodController;
+Route::prefix('food')->group(function () {
+    // Public routes
+    Route::get('/customer', [CustomerFoodController::class, 'index'])->name('customer.food.index');
+
+
+Route::get('/customer/details/{id}', [CustomerFoodController::class, 'details'])
+    ->name('customer.food.details');
+    // Protected cart routes
+    Route::middleware('auth')->group(function () {
+        Route::get('/cart', [CustomerFoodController::class, 'cartIndex'])->name('customer.food.cart');
+        Route::post('/cart/add', [CustomerFoodController::class, 'cartAdd'])->name('customer.food.cart.add'); // <-- ADD THIS
+Route::post('/cart/update/{foodId}', [CustomerFoodController::class, 'cartUpdate'])
+    ->name('customer.food.cart.update');
+            Route::get('/cart/remove/{foodId}', [CustomerFoodController::class, 'cartRemove'])->name('customer.food.cart.remove');
+    Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
+    Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
+            Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
+    });
+});

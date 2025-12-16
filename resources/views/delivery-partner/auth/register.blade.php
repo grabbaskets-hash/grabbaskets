@@ -743,13 +743,19 @@
     });
 
     // Form submission with loading state
-    document.getElementById('submit-btn').addEventListener('click', function(e) {
-        const form = e.target.closest('form');
-        if (validateStep(4) && form.checkValidity()) {
-            this.innerHTML = '<span class="spinner"></span> Submitting Application...';
-            this.disabled = true;
-        }
-    });
+document.getElementById('submit-btn').addEventListener('click', function(e) {
+    const form = document.getElementById('registration-form');
+
+    if (validateStep(4) && form.checkValidity()) {
+        this.innerHTML = '<span class="spinner"></span> Submitting Application...';
+        this.disabled = true;
+
+        form.submit();   // 🔥 REQUIRED
+    }
+});
+
+
+
 
     // Auto-uppercase for certain fields
     document.getElementById('vehicle_number').addEventListener('input', function(e) {
@@ -826,9 +832,9 @@
     });
 
     // Initialize form handler to prevent multiple submissions
-    document.addEventListener('DOMContentLoaded', function() {
-        new DeliveryPartnerFormHandler('registration-form', 'submit-btn');
-    });
+     document.addEventListener('DOMContentLoaded', function() {
+         new DeliveryPartnerFormHandler('registration-form', 'submit-btn');
+     });
 
     // Compress images to reduce upload time
     function compressFormImages() {

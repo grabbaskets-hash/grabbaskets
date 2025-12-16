@@ -75,4 +75,51 @@ class EarningsController extends Controller
         // TODO: Implement withdrawal logic
         return back()->with('success', 'Withdrawal request submitted.');
     }
+   public function fetchEarnings(Request $request)
+{
+    $hotelOwner = Auth::guard('hotel_owner')->user();
+    $range = $request->input('range', '7'); // default 7 days
+    $labels = [];
+    $data = [];
+
+    if($range == '7') {
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $sum = Order::where('seller_id', $hotelOwner->id)
+                        ->where('status', 'completed')
+                        ->whereDate('paid_at', $date)
+                        ->sum('amount');
+            $labels[] = $date->format('D'); // Mon, Tue, etc.
+            $data[] = (float) $sum;
+        }
+    } elseif($range == '30') {
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $sum = Order::where('seller_id', $hotelOwner->id)
+                        ->where('status', 'completed')
+                        ->whereDate('paid_at', $date)
+                        ->sum('amount');
+            $labels[] = $date->format('d M');
+            $data[] = (float) $sum;
+        }
+    } elseif($range == 'month') {
+        for ($i = 11; $i >= 0; $i--) {
+            $start = Carbon::now()->subMonths($i)->startOfMonth();
+            $end = Carbon::now()->subMonths($i)->endOfMonth();
+            $sum = Order::where('seller_id', $hotelOwner->id)
+                        ->where('status', 'completed')
+                        ->whereBetween('paid_at', [$start, $end])
+                        ->sum('amount');
+            $labels[] = $start->format('M Y');
+            $data[] = (float) $sum;
+        }
+    }
+
+    return response()->json([
+        'labels' => $labels,
+        'data' => $data
+    ]);
+}
+
+
 }
