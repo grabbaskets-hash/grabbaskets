@@ -16,6 +16,7 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CourierTrackingController;
 use App\Http\Controllers\HomeController;
+use \App\Models\DeliveryPartner;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
@@ -700,31 +701,18 @@ Route::get('/seller/logout', function () {
 })->name('seller.logout');
 
 // Delivery Partner Login Routes
-Route::get('/partner/login', function () {
-    return view('partner.login');
-})->name('delivery-partner.login');
+Route::prefix('partner')->name('delivery-partner.')->group(function () {
 
-Route::post('/partner/login', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
+    Route::get('/login', [DeliveryPartner::class, 'showLogin'])
+        ->name('login');
 
-    $partner = \App\Models\DeliveryPartner::where('email', $request->email)->first();
-    
-    if ($partner && Hash::check($request->password, $partner->password)) {
-        session(['partner_id' => $partner->id, 'is_delivery_partner' => true]);
-        return redirect('/partner/dashboard');
-    }
+    Route::post('/login', [DeliveryPartner::class, 'login'])
+        ->name('login.submit');
 
-    return back()->withErrors(['email' => 'Invalid partner credentials']);
-})->name('delivery-partner.login.submit');
+    Route::post('/logout', [DeliveryPartner::class, 'logout'])
+        ->name('logout');
 
-Route::get('/partner/logout', function () {
-    session()->forget(['partner_id', 'is_delivery_partner']);
-    return redirect('/');
-})->name('delivery-partner.logout');
-
+});
 // Admin dashboard
 Route::get('/admin/dashboard', function () {
     if (!session('is_admin')) {
