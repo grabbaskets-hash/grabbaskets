@@ -180,13 +180,18 @@
                                 @forelse($popularItems as $item)
                                 <div class="col-6 col-md-4">
                                     <div class="card h-100">
-                                        @if($item->image)
-                                            <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top" style="height:140px;object-fit:cover;" alt="{{ $item->name }}">
-                                        @else
-                                            <div style="height:140px;background:#f7f7f7;display:flex;align-items:center;justify-content:center;">
-                                                <i class="fas fa-image text-muted fa-2x"></i>
-                                            </div>
-                                        @endif
+                                      @if($item->image)
+    <img src="{{ asset('storage/' . $item->image) }}"
+         class="img-fluid rounded shadow"
+         style="height:140px; object-fit:cover;"
+         alt="{{ $item->name }}">
+@else
+    <div style="height:140px;background:#f7f7f7;display:flex;align-items:center;justify-content:center;"
+         class="rounded shadow">
+        <i class="fas fa-image text-muted fa-2x"></i>
+    </div>
+@endif
+
                                         <div class="card-body p-2">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
@@ -285,39 +290,46 @@
 }
 </style>
 
-<!-- Internal JS -->
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function(){
+(function () {
     const ctx = document.getElementById('dashboardEarningsChart');
     if (!ctx) return;
+
     const labels = [
         @php
-            for ($i=6;$i>=0;$i--) { echo "'".\Carbon\Carbon::now()->subDays($i)->format('D')."',"; }
+        for ($i = 6; $i >= 0; $i--) {
+            echo "'" . \Carbon\Carbon::now()->subDays($i)->format('D') . "',";
+        }
         @endphp
     ];
+
     const data = {
         labels: labels,
         datasets: [{
             label: 'Earnings',
-            data: {{ json_encode($earnings_last_7 ?? []) }},
+            data: {!! json_encode($earnings_last_7 ?? []) !!},
             borderColor: '#E23744',
             backgroundColor: 'rgba(226,55,68,0.08)',
             tension: 0.3,
             fill: true
         }]
     };
+
     new Chart(ctx.getContext('2d'), {
-        type:'line',
+        type: 'line',
         data: data,
-        options:{
-            responsive:true,
-            plugins:{legend:{display:false}}
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
         }
     });
 })();
 </script>
 @endpush
+
 
 @endsection
