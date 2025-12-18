@@ -243,31 +243,31 @@
         const internships = [{
                 name: "PYTHON BASICS",
                 fee: 5000,
-                weeks: 1,
+                weeks: 12,
                 domain: "Python"
             },
             {
                 name: "PYTHON (BASICS TO INTERMEDIATE)",
                 fee: 5000,
-                weeks: 2,
+                weeks: 12,
                 domain: "Python"
             },
             {
                 name: "PYTHON ADVANCED",
                 fee: 5000,
-                weeks: 4,
+                weeks: 12,
                 domain: "Python"
             },
             {
                 name: "PYTHON (BASICS TO ADVANCED)",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Python"
             },
             {
                 name: "PYTHON WITH AI",
                 fee: 5000,
-                weeks: 10,
+                weeks: 12,
                 domain: "Python + AI"
             },
             {
@@ -285,7 +285,7 @@
             {
                 name: "PYTHON FULLSTACK",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Fullstack"
             },
             {
@@ -297,19 +297,19 @@
             {
                 name: "PROMPT ENGINEERING FOUNDATION",
                 fee: 5000,
-                weeks: 2,
+                weeks: 12,
                 domain: "Prompt Engineering"
             },
             {
                 name: "PROMPT ENGINEERING ADVANCED",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Prompt Engineering"
             },
             {
                 name: "DATA ANALYTICS",
                 fee: 5000,
-                weeks: 10,
+                weeks: 12,
                 domain: "Data Analytics"
             },
             {
@@ -321,7 +321,7 @@
             {
                 name: "DATASCIENCE",
                 fee: 5000,
-                weeks: 10,
+                weeks: 12,
                 domain: "Data Science"
             },
             {
@@ -339,13 +339,13 @@
             {
                 name: "AGENTIC AI FOUNDATION",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Agentic AI"
             },
             {
                 name: "AGENTIC AI AUTOMATION (N8N)",
                 fee: 5000,
-                weeks: 4,
+                weeks: 12,
                 domain: "N8N Automation"
             },
             {
@@ -357,13 +357,13 @@
             {
                 name: "DIGITAL MARKETING FOUNDATION",
                 fee: 5000,
-                weeks: 4,
+                weeks: 12,
                 domain: "Digital Marketing"
             },
             {
                 name: "DIGITAL MARKETING",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Digital Marketing"
             },
             {
@@ -387,7 +387,7 @@
             {
                 name: "MERN STACK",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "MERN"
             },
             {
@@ -399,25 +399,25 @@
             {
                 name: "LARAVEL",
                 fee: 5000,
-                weeks: 4,
+                weeks: 12,
                 domain: "Laravel"
             },
             {
                 name: "LARAVEL WITH AI",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Laravel + AI"
             },
             {
                 name: "SNOWFLAKE",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Snowflake"
             },
             {
                 name: "CLOUD FULLSTACK FOUNDATION",
                 fee: 5000,
-                weeks: 8,
+                weeks: 12,
                 domain: "Cloud Fullstack"
             },
             {
