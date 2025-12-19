@@ -510,6 +510,21 @@
                 </div>
             </div>
 
+            <!-- Instant Munchies (Location Based) -->
+            <div class="product-rail">
+                <div class="rail-header">
+                    <h5 class="fw-bold mb-0">⚡ Instant Munchies (Nearby)</h5>
+                    <div class="fs-8 text-muted" id="user-location-label"><i class="bi bi-geo-alt"></i> Locating...</div>
+                </div>
+                <div id="instant-munchies-rail" class="rail-scroll">
+                    <!-- Loading State -->
+                    <div class="d-flex align-items-center justify-content-center w-100 py-3 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Finding stores near you...
+                    </div>
+                </div>
+            </div>
+
             <!-- Fresh Rail -->
             <div class="product-rail">
                 <div class="rail-header">
@@ -705,7 +720,47 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/location-delivery.js') }}"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.innerWidth < 992) { // Only on mobile/tablet for now or check layout
+                console.log('Initializing Location Delivery for Instant Munchies...');
+                const delivery = new LocationDelivery();
+                
+                try {
+                    // 1. Get Location
+                    await delivery.getUserLocation();
+                    
+                    // 2. Update status label
+                    const locLabel = document.getElementById('user-location-label');
+                    if (locLabel) {
+                        const address = await delivery.getAddressFromCoordinates(delivery.userLat, delivery.userLng);
+                        locLabel.innerHTML = `<i class="bi bi-geo-alt-fill text-success"></i> ${address || 'Nearby'}`;
+                    }
+
+                    // 3. Fetch Products (categoryId: null for all/mixed, or specify if known)
+                    // Passing null category to get broad "Instant" products
+                    const products = await delivery.getLocationBasedProducts(null, 5, 12); // 5km radius, 12 items
+                    
+                    // 4. Render
+                    if (products && products.success) {
+                        delivery.displayProducts(products, 'instant-munchies-rail');
+                    }
+                    
+                } catch (error) {
+                    console.error('Location error:', error);
+                    const container = document.getElementById('instant-munchies-rail');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="text-center w-100 py-3 px-3">
+                                <p class="mb-2 text-muted fs-8">Location access needed for Instant Munchies</p>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="window.location.reload()">Enable Location</button>
+                            </div>`;
+                    }
+                }
+            }
+        });
+
         function addToCart(productId) {
             @auth
                 fetch('{{ route('cart.add') }}', {

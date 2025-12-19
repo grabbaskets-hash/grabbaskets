@@ -101,7 +101,7 @@ class LocationDelivery {
     async initialize() {
         try {
             console.log('Initializing location-based delivery...');
-            
+
             // Try to get user's location
             const location = await this.getUserLocation();
             console.log('User location:', location);
@@ -156,34 +156,49 @@ class LocationDelivery {
             return;
         }
 
-        container.innerHTML = productsData.data.map(product => `
-            <div class="product-card animate-fade-in">
-                <img src="${product.image_url || '/images/no-image.png'}" 
-                     alt="${product.name}" 
-                     class="product-image"
-                     onerror="this.src='/images/no-image.png'">
-                
-                <div style="padding: 12px;">
-                    <div style="font-size: 0.85rem; font-weight: 500; color: #0C831F; margin-bottom: 4px;">
-                        <i class="bi bi-geo-alt-fill"></i> ${product.distance_km}km away
-                    </div>
-                    
-                    <div class="product-title">${product.name}</div>
-                    
-                    <div style="font-size: 0.75rem; color: #666; margin: 4px 0;">
-                        ${product.seller}
-                    </div>
-                    
-                    <div class="product-price">
-                        <span class="current-price">₹${parseFloat(product.price).toFixed(2)}</span>
-                    </div>
+        // Check if we are rendering for mobile rail (horizontal) or grid
+        const isRail = container.classList.contains('rail-scroll');
 
-                    <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
-                        <i class="bi bi-cart-plus"></i> Add
-                    </button>
-                </div>
-            </div>
-        `).join('');
+        container.innerHTML = productsData.data.map(product => {
+            if (isRail) {
+                // Mobile Rail Card
+                return `
+                <div class="product-card-mobile" onclick="window.location.href='/product/${product.id}'">
+                    <div class="pm-image-box">
+                        <img src="${product.image_url || '/images/no-image.png'}" alt="${product.name}" class="pm-image" onerror="this.src='/images/no-image.png'">
+                    </div>
+                    <div class="fs-8 text-muted truncate-1">${product.distance_km}km • ${product.seller}</div>
+                    <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">${product.name}</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="fs-7 fw-bold">₹${parseFloat(product.price).toFixed(0)}</span>
+                    </div>
+                    <button class="add-btn" onclick="event.stopPropagation(); addToCart(${product.id})">ADD</button>
+                </div>`;
+            } else {
+                // Standard Grid Card (existing logic)
+                return `
+                <div class="product-card animate-fade-in" onclick="window.location.href='/product/${product.id}'">
+                    <img src="${product.image_url || '/images/no-image.png'}" 
+                         alt="${product.name}" 
+                         class="product-image"
+                         onerror="this.src='/images/no-image.png'">
+                    
+                    <div style="padding: 12px;">
+                        <div style="font-size: 0.85rem; font-weight: 500; color: #0C831F; margin-bottom: 4px;">
+                            <i class="bi bi-geo-alt-fill"></i> ${product.distance_km}km away
+                        </div>
+                        <div class="product-title">${product.name}</div>
+                        <div style="font-size: 0.75rem; color: #666; margin: 4px 0;">${product.seller}</div>
+                        <div class="product-price">
+                            <span class="current-price">₹${parseFloat(product.price).toFixed(2)}</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(${product.id})">
+                            <i class="bi bi-cart-plus"></i> Add
+                        </button>
+                    </div>
+                </div>`;
+            }
+        }).join('');
     }
 
     /**
@@ -193,7 +208,7 @@ class LocationDelivery {
         const R = 6371; // Earth's radius in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLng = (lng2 - lng1) * Math.PI / 180;
-        const a = 
+        const a =
             Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLng / 2) * Math.sin(dLng / 2);
@@ -228,9 +243,9 @@ class LocationDelivery {
         try {
             const location = await this.getUserLocation();
             this.lastUpdateTime = new Date();
-            
+
             await this.storeLocationInSession();
-            
+
             const products = await this.getLocationBasedProducts();
             if (products?.data) {
                 this.displayProducts(products);
@@ -257,11 +272,11 @@ class LocationDelivery {
 document.addEventListener('DOMContentLoaded', async () => {
     if (document.body.dataset.deliveryMode === '10-minute' || window.location.pathname.includes('10-minute-delivery')) {
         const locationDelivery = new LocationDelivery();
-        
+
         // Try to initialize location-based delivery
         try {
             await locationDelivery.initialize();
-            
+
             // Set up auto-refresh every 30 seconds like Zepto (aggressive real-time updates)
             locationDelivery.setupAutoRefresh(30);
         } catch (error) {
