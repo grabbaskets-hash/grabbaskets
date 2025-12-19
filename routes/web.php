@@ -700,7 +700,8 @@ Route::get('/seller/logout', function () {
     return redirect('/');
 })->name('seller.logout');
 
-// Delivery Partner Login Routes
+// Delivery Partner Login Routes - DEPRECATED (See line 1504)
+/*
 Route::prefix('partner')->name('delivery-partner.')->group(function () {
 
     Route::get('/login', [DeliveryPartner::class, 'showLogin'])
@@ -713,6 +714,7 @@ Route::prefix('partner')->name('delivery-partner.')->group(function () {
         ->name('logout');
 
 });
+*/
 // Admin dashboard
 Route::get('/admin/dashboard', function () {
     if (!session('is_admin')) {
