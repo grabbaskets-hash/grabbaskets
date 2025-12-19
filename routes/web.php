@@ -715,6 +715,9 @@ Route::prefix('partner')->name('delivery-partner.')->group(function () {
 
 });
 */
+// Categories Alias
+Route::get('/all-categories', [App\Http\Controllers\HomeController::class, 'index'])->name('categories.index');
+
 // Admin dashboard
 Route::get('/admin/dashboard', function () {
     if (!session('is_admin')) {
