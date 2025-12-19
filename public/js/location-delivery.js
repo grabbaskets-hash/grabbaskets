@@ -268,22 +268,6 @@ class LocationDelivery {
     }
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', async () => {
-    if (document.body.dataset.deliveryMode === '10-minute' || window.location.pathname.includes('10-minute-delivery')) {
-        const locationDelivery = new LocationDelivery();
-
-        // Try to initialize location-based delivery
-        try {
-            await locationDelivery.initialize();
-
-            // Set up auto-refresh every 30 seconds like Zepto (aggressive real-time updates)
-            locationDelivery.setupAutoRefresh(30);
-        } catch (error) {
-            console.log('Location-based delivery not available');
-        }
-    }
-});
-
 // Expose to global scope for manual triggering
 window.LocationDelivery = LocationDelivery;
+
