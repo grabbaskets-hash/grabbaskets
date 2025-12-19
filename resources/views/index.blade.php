@@ -5,8 +5,8 @@
     /* Global Zepto Theme */
     :root {
         --primary-zepto: #3C096C; /* Deep Purple */
-        --accent-zepto: #FF3269; /* Pink/Red for calls to action */
-        --bg-gray: #f5f7fd;
+        --accent-zepto: #FF3269; /* Pink/Red */
+        --bg-gray: #f5f5f5;
         --border-radius-card: 16px;
         --nav-height-mobile: 60px;
     }
@@ -14,6 +14,17 @@
     body {
         background-color: var(--bg-gray);
         font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-y: none; /* Prevent rubber-banding on pull */
+    }
+
+    /* Hide Scrollbars Global but allow scroll functionality */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    * {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 
     /* === MOBILE STYLES (< 992px) === */
@@ -21,14 +32,16 @@
         .desktop-only { display: none !important; }
         .mobile-only { display: block !important; }
 
-        /* Sticky Header */
+        /* Sticky Header - Zepto Purple */
         .mobile-header-sticky {
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: #fff;
-            padding: 12px 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: var(--primary-zepto);
+            padding: 12px 16px 20px 16px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 12px rgba(60, 9, 108, 0.15);
         }
 
         .location-header {
@@ -43,16 +56,16 @@
         }
 
         .location-title {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 800;
-            color: #2e2e2e;
+            color: #fff;
             display: flex;
             align-items: center;
         }
 
         .location-subtitle {
             font-size: 0.75rem;
-            color: #666;
+            color: rgba(255, 255, 255, 0.85);
             margin-top: -2px;
             white-space: nowrap;
             overflow: hidden;
@@ -60,18 +73,26 @@
             max-width: 250px;
         }
 
+        /* Search Bar inside Purple Header */
         .search-container {
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            background: #f0f5ff;
-            border: 1px solid #e0e7ff;
+            background: #fff;
+            border: none;
             border-radius: 12px;
-            padding: 10px 12px 10px 42px;
+            padding: 12px 12px 12px 42px;
             font-size: 0.9rem;
             color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .search-input:focus {
+            transform: scale(1.01);
+            outline: none;
         }
 
         .search-icon {
@@ -83,12 +104,12 @@
             font-size: 1.1rem;
         }
 
-        /* Hero Banner */
+        /* Hero Banner - Overlapping header slightly? No, margin top. */
         .hero-banner-mobile {
             margin: 16px;
             border-radius: var(--border-radius-card);
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         /* Categories Zoom Grid */
@@ -110,13 +131,14 @@
         .cat-img-box {
             width: 100%;
             aspect-ratio: 1;
-            background: #eef2ff;
+            background: #fff;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 6px;
             overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         }
 
         .cat-img-box img {
@@ -136,6 +158,9 @@
         .rail-section {
             margin-bottom: 24px;
             padding-left: 16px;
+            background: #fff;
+            padding-top: 16px;
+            padding-bottom: 6px;
         }
 
         .rail-title {
@@ -161,7 +186,7 @@
             overflow-x: auto;
             gap: 12px;
             padding-right: 16px;
-            padding-bottom: 8px; /* Hide scrollbar visual impact */
+            padding-bottom: 12px; /* Hide scrollbar visual impact */
             -ms-overflow-style: none; /* IE/Edge */
             scrollbar-width: none; /* Firefox */
         }
@@ -173,8 +198,9 @@
             background: #fff;
             border-radius: 12px;
             padding: 8px;
-            border: 1px solid #eee;
+            border: 1px solid #f0f0f0;
             position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .pm-img-box {
@@ -192,15 +218,17 @@
         }
 
         .pm-time {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             background: #f0fdf4;
             color: #15803d;
             padding: 2px 6px;
             border-radius: 4px;
             position: absolute;
-            top: 8px;
-            left: 8px;
-            font-weight: 700;
+            top: 6px;
+            left: 6px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .pm-title {
@@ -240,21 +268,21 @@
             background: #fff;
             padding: 4px 16px;
             border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
+            font-size: 0.75rem;
+            font-weight: 800;
             text-transform: uppercase;
         }
 
-        /* Bottom Nav */
+        /* Bottom Nav - Native Feel */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
             background: #fff;
-            border-top: 1px solid #eee;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
+            padding: 8px 0 12px 0; /* Extra padding for iOS home bar */
             z-index: 1001;
         }
 
@@ -262,19 +290,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #999;
+            color: #a0a0a0;
             text-decoration: none;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 600;
         }
 
         .nav-item-m.active {
             color: var(--primary-zepto);
-            font-weight: 600;
         }
 
         .nav-icon {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
+            font-size: 1.3rem;
+            margin-bottom: 3px;
         }
     }
 
