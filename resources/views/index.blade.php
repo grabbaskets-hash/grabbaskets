@@ -550,7 +550,7 @@
             <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
                 <i class="bi bi-cart3"></i>
                 <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="top: 5px; right: 15px; font-size: 0.6rem;">
-                    {{ \App\Models\Cart::where('user_id', auth()->id())->count() ?? 0 }}
+                    {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
                 </span>
                 <span>Cart</span>
             </a>
