@@ -439,6 +439,59 @@
     </div>
     @endif
 
+    <!-- Service Options Grid (Mobile) -->
+    <div class="px-3 mb-4 mt-3">
+        <div class="row g-2">
+            <!-- 10 Min Delivery -->
+            <div class="col-3">
+                <a href="#instant-munchies-rail" class="text-decoration-none text-dark">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 50px; height: 50px; background: #ecfccb;">
+                            <i class="bi bi-stopwatch-fill fs-4 text-success"></i>
+                        </div>
+                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.2;">10 Mins<br>Delivery</span>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Normal Delivery -->
+            <div class="col-3">
+                <a href="{{ route('categories.index') }}" class="text-decoration-none text-dark">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 50px; height: 50px; background: #dbeafe;">
+                            <i class="bi bi-box-seam-fill fs-4 text-primary"></i>
+                        </div>
+                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.2;">Normal<br>Delivery</span>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Food Order -->
+            <div class="col-3">
+                <a href="{{ route('food.index') }}" class="text-decoration-none text-dark">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 50px; height: 50px; background: #ffedd5;">
+                            <i class="bi bi-cup-hot-fill fs-4 text-warning"></i>
+                        </div>
+                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.2;">Food<br>Order</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Delivery Partner -->
+            <div class="col-3">
+                <a href="{{ route('delivery-partner.login') }}" class="text-decoration-none text-dark">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 50px; height: 50px; background: #f3f4f6;">
+                            <i class="bi bi-bicycle fs-4 text-secondary"></i>
+                        </div>
+                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.2;">Partner<br>Join</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Categories Grid -->
     <div class="d-flex justify-content-between px-3 mb-2 align-items-center">
         <h5 class="fw-bold mb-0 text-dark">Explore By Category</h5>
