@@ -410,6 +410,16 @@
         'appetizer' => asset('images/categories/appetizer.jpeg'),
         'main_course' => asset('images/categories/main_course.jpeg'),
         'snack' => asset('images/categories/snack.jpeg'),
+        'salad' => asset('images/categories/salad.jpeg'),
+        'soup' => asset('images/categories/soup.jpeg'),
+        'staters'=>asset('images/categories/staters.jpeg'),
+        'rice'=>asset('images/categories/rice.jpeg'),
+        'seafood'=>asset('images/categories/seafood.jpeg'),
+        'chicken'=>asset('images/categories/chicken.jpeg'),
+        'mutton'=>asset('images/categories/mutton.jpeg'),
+        'burger'=>asset('images/categories/burger.jpeg'),
+        'pizza'=>asset('images/categories/pizza.jpeg'),
+
     ];
 
     $image = $categoryImages[$categoryName] 
