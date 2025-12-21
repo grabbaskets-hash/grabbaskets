@@ -1,780 +1,805 @@
-@extends('layouts.app')
-
-@section('content')
-<style>
-    /* Global Zepto Theme */
-    :root {
-        --primary-zepto: #3C096C; /* Deep Purple */
-        --accent-zepto: #FF3269; /* Pink/Red */
-        --bg-gray: #f5f5f5;
-        --border-radius-card: 16px;
-        --nav-height-mobile: 60px;
-    }
-
-    body {
-        background-color: var(--bg-gray);
-        font-family: 'Inter', sans-serif;
-        -webkit-tap-highlight-color: transparent;
-        overscroll-behavior-y: none; /* Prevent rubber-banding on pull */
-    }
-
-    /* Hide Scrollbars Global but allow scroll functionality */
-    ::-webkit-scrollbar {
-        display: none;
-    }
-    * {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-
-    /* === MOBILE STYLES (< 992px) === */
-    @media (max-width: 991.98px) {
-        .desktop-only { display: none !important; }
-        .mobile-only { display: block !important; }
-
-        /* Sticky Header - Zepto Purple */
-        .mobile-header-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: var(--primary-zepto);
-            padding: 12px 16px 20px 16px;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 12px rgba(60, 9, 108, 0.15);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <title>{{ config('app.name', 'GrabBaskets') }} - 10 Minute Grocery Delivery</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Brand Colors */
+            --primary: #3C096C; /* Deep Purple (Zepto-ish) */
+            --primary-light: #5A189A;
+            --secondary: #FF6B00; /* Orange Accent */
+            --accent: #FFD700; /* Gold */
+            
+            /* UI Colors */
+            --bg-body: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --border-light: #e9ecef;
+            
+            /* Spacing */
+            --header-height-mobile: 110px;
+            --bottom-nav-height: 70px;
         }
 
-        .location-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .location-text {
-            flex-grow: 1;
-            margin-left: 10px;
-        }
+        /* =========================================
+           UTILITIES
+           ========================================= */
+        .text-primary { color: var(--primary) !important; }
+        .bg-primary { background-color: var(--primary) !important; }
+        .text-secondary { color: var(--secondary) !important; }
+        .fw-bold { font-weight: 700 !important; }
+        .fw-semibold { font-weight: 600 !important; }
+        .fs-7 { font-size: 0.85rem; }
+        .fs-8 { font-size: 0.75rem; }
+        
+        .shadow-sm-custom { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .rounded-3 { border-radius: 12px !important; }
+        .rounded-4 { border-radius: 16px !important; }
 
-        .location-title {
-            font-size: 1rem;
-            font-weight: 800;
-            color: #fff;
-            display: flex;
-            align-items: center;
-        }
-
-        .location-subtitle {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.85);
-            margin-top: -2px;
+        .truncate-1 {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 250px;
         }
-
-        /* Search Bar inside Purple Header */
-        .search-container {
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            background: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 12px 12px 42px;
-            font-size: 0.9rem;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        
-        .search-input:focus {
-            transform: scale(1.01);
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-zepto);
-            font-size: 1.1rem;
-        }
-
-        /* Hero Banner - Overlapping header slightly? No, margin top. */
-        .hero-banner-mobile {
-            margin: 16px;
-            border-radius: var(--border-radius-card);
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        /* Categories Zoom Grid */
-        .category-grid-mobile {
-            padding: 0 16px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .cat-item-mobile {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .cat-img-box {
-            width: 100%;
-            aspect-ratio: 1;
-            background: #fff;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        }
-
-        .cat-img-box img {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-
-        .cat-name {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #444;
-            line-height: 1.2;
-        }
-
-        /* Rails */
-        .rail-section {
-            margin-bottom: 24px;
-            padding-left: 16px;
-            background: #fff;
-            padding-top: 16px;
-            padding-bottom: 6px;
-        }
-
-        .rail-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-right: 16px;
-        }
-
-        .view-all {
-            font-size: 0.8rem;
-            color: var(--primary-zepto);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .scroll-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding-right: 16px;
-            padding-bottom: 12px; /* Hide scrollbar visual impact */
-            -ms-overflow-style: none; /* IE/Edge */
-            scrollbar-width: none; /* Firefox */
-        }
-        .scroll-container::-webkit-scrollbar { display: none; }
-
-        .product-card-mobile {
-            min-width: 140px;
-            width: 140px;
-            background: #fff;
-            border-radius: 12px;
-            padding: 8px;
-            border: 1px solid #f0f0f0;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        .pm-img-box {
-            width: 100%;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .pm-img-box img {
-            max-height: 100%;
-            max-width: 100%;
-        }
-
-        .pm-time {
-            font-size: 0.55rem;
-            background: #f0fdf4;
-            color: #15803d;
-            padding: 2px 6px;
-            border-radius: 4px;
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .pm-title {
-            font-size: 0.8rem;
-            color: #333;
-            font-weight: 600;
-            height: 32px;
-            overflow: hidden;
+        .truncate-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            line-height: 1.2;
-            margin-bottom: 4px;
+            overflow: hidden;
         }
 
-        .pm-weight {
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 8px;
+        /* =========================================
+           MOBILE VIEW
+           ========================================= */
+        @media (max-width: 991px) {
+            .desktop-only { display: none !important; }
+            
+            body { padding-bottom: calc(var(--bottom-nav-height) + 20px); }
+
+            /* Mobile Header */
+            .mobile-header {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: var(--bg-white);
+                padding: 10px 15px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }
+
+            .location-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+            .location-info h6 {
+                margin: 0;
+                font-size: 1.1rem;
+                color: var(--text-main);
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .location-info p {
+                margin: 0;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+            }
+
+            .search-bar-container {
+                position: relative;
+            }
+
+            .search-input {
+                width: 100%;
+                background: #f3f4f6;
+                border: none;
+                padding: 12px 15px 12px 45px;
+                border-radius: 12px;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+            }
+            
+            .search-input:focus {
+                background: #fff;
+                box-shadow: 0 0 0 2px var(--primary-light);
+                outline: none;
+            }
+
+            .search-icon {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 1.1rem;
+            }
+
+            /* Categories Grid */
+            .category-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px 10px;
+                padding: 20px 15px;
+                background: #fff;
+                border-radius: 0 0 20px 20px;
+                margin-bottom: 10px;
+            }
+
+            .category-item {
+                text-align: center;
+                text-decoration: none;
+                color: var(--text-main);
+            }
+
+            .cat-icon-box {
+                width: 60px;
+                height: 60px;
+                background: #f0fdf4; /* Light green tint */
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+                margin: 0 auto 8px;
+                transition: transform 0.2s;
+            }
+            .category-item:nth-child(2n) .cat-icon-box { background: #fff7ed; } /* Orange tint */
+            .category-item:nth-child(3n) .cat-icon-box { background: #eff6ff; } /* Blue tint */
+            .category-item:nth-child(4n) .cat-icon-box { background: #fef2f2; } /* Red tint */
+
+            .category-item:active .cat-icon-box { transform: scale(0.95); }
+
+            /* Horizontal Product Rail */
+            .product-rail {
+                background: #fff;
+                padding: 20px 0;
+                margin-bottom: 10px;
+            }
+
+            .rail-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 15px 15px;
+            }
+
+            .rail-scroll {
+                display: flex;
+                overflow-x: auto;
+                gap: 15px;
+                padding: 0 15px;
+                scrollbar-width: none; /* Hide scrollbar Firefox */
+            }
+            .rail-scroll::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+
+            .product-card-mobile {
+                min-width: 140px;
+                width: 140px;
+                flex-shrink: 0;
+                position: relative;
+            }
+
+            .pm-image-box {
+                width: 100%;
+                height: 140px;
+                background: #f8f9fa;
+                border-radius: 14px;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-light);
+            }
+
+            .pm-image {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                mix-blend-mode: multiply;
+            }
+
+            .add-btn {
+                background: #fff;
+                border: 1px solid var(--primary);
+                color: var(--primary);
+                padding: 5px 0;
+                border-radius: 6px;
+                width: 100%;
+                font-weight: 600;
+                font-size: 0.9rem;
+                margin-top: 5px;
+            }
+            .add-btn:active {
+                background: var(--primary);
+                color: #fff;
+            }
+
+            /* Bottom Nav */
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: var(--bottom-nav-height);
+                background: #fff;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+                z-index: 1000;
+                padding-bottom: 5px; /* iOS safe area adjustment */
+            }
+
+            .nav-link-mobile {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                font-weight: 500;
+                gap: 4px;
+            }
+
+            .nav-link-mobile i {
+                font-size: 1.4rem;
+                margin-bottom: -2px;
+            }
+
+            .nav-link-mobile.active {
+                color: var(--primary);
+            }
+            
+            .banner-carousel {
+                padding: 0 15px;
+                margin-bottom: 15px;
+            }
+            .banner-img {
+                width: 100%;
+                border-radius: 16px;
+                aspect-ratio: 16/7;
+                object-fit: cover;
+            }
         }
 
-        .pm-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* =========================================
+           DESKTOP VIEW
+           ========================================= */
+        @media (min-width: 992px) {
+            .mobile-only { display: none !important; }
+
+            /* Desktop Navbar */
+            .desktop-navbar {
+                background: var(--bg-white);
+                padding: 15px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            }
+
+            .brand-logo {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: var(--primary);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .delivery-info {
+                max-width: 200px;
+                line-height: 1.2;
+                border-left: 1px solid var(--border-light);
+                padding-left: 15px;
+                margin-left: 15px;
+            }
+
+            .desktop-search {
+                width: 500px;
+                margin: 0 40px;
+            }
+
+            /* Layout */
+            .main-layout {
+                padding-top: 30px;
+                display: grid;
+                grid-template-columns: 240px 1fr;
+                gap: 30px;
+            }
+
+            /* Sidebar */
+            .sidebar-menu {
+                background: #fff;
+                border-radius: 16px;
+                padding: 15px;
+                position: sticky;
+                top: 100px;
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
+            }
+
+            .side-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 15px;
+                color: var(--text-main);
+                text-decoration: none;
+                border-radius: 10px;
+                transition: all 0.2s;
+                font-weight: 500;
+            }
+
+            .side-link:hover {
+                background: #f8f9fa;
+                color: var(--primary);
+                transform: translateX(5px);
+            }
+
+            /* Product Grids */
+            .desktop-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+
+            .product-card-desktop {
+                background: #fff;
+                border: 1px solid var(--border-light);
+                border-radius: 16px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                transition: all 0.3s ease;
+                height: 100%;
+            }
+
+            .product-card-desktop:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+                border-color: transparent;
+            }
+
+            .pd-image-box {
+                height: 180px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+
+            .pd-image {
+                max-height: 100%;
+                max-width: 100%;
+                object-fit: contain;
+            }
+
+            .add-to-cart-btn-desktop {
+                margin-top: auto;
+                background: #fff;
+                border: 1px solid var(--primary);
+                color: var(--primary);
+                padding: 8px;
+                border-radius: 8px;
+                font-weight: 600;
+                width: 100%;
+                transition: all 0.2s;
+            }
+
+            .add-to-cart-btn-desktop:hover {
+                background: var(--primary);
+                color: #fff;
+            }
         }
+    </style>
+</head>
+<body>
 
-        .pm-price {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .add-btn {
-            border: 1px solid var(--accent-zepto);
-            color: var(--accent-zepto);
-            background: #fff;
-            padding: 4px 16px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        /* Bottom Nav - Native Feel */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #fff;
-            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 12px 0; /* Extra padding for iOS home bar */
-            z-index: 1001;
-        }
-
-        .nav-item-m {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #a0a0a0;
-            text-decoration: none;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .nav-item-m.active {
-            color: var(--primary-zepto);
-        }
-
-        .nav-icon {
-            font-size: 1.3rem;
-            margin-bottom: 3px;
-        }
-    }
-
-    /* === DESKTOP STYLES (>= 992px) === */
-    @media (min-width: 992px) {
-        .mobile-only { display: none !important; }
-        .desktop-only { display: flex !important; }
-
-        .layout-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            display: flex;
-            gap: 24px;
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            flex-shrink: 0;
-            background: #fff;
-            border-radius: 16px;
-            height: calc(100vh - 40px);
-            position: sticky;
-            top: 20px;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            padding: 20px 0;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 24px;
-            color: #444;
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar-item:hover, .sidebar-item.active {
-            background: #f8f6fc;
-            color: var(--primary-zepto);
-            border-left-color: var(--primary-zepto);
-        }
-
-        .sidebar-icon img {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            margin-right: 12px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex-grow: 1;
-            width: 0; /* Flex fix */
-        }
-
-        /* Desktop Header */
-        .desktop-header {
-            background: #fff;
-            padding: 16px 24px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-
-        .d-location {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .d-search {
-            flex-grow: 1;
-            margin: 0 40px;
-            position: relative;
-        }
-
-        .d-actions {
-            display: flex;
-            gap: 16px;
-        }
-
-        .products-grid-d {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .product-card-d {
-            background: #fff;
-            border: 1px solid #f0f0f0;
-            border-radius: 12px;
-            padding: 12px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .product-card-d:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-            border-color: var(--primary-zepto);
-        }
-    }
-</style>
-
-<!-- === MOBILE VIEW === -->
-<div class="mobile-only" style="padding-bottom: 80px;">
-    <!-- Sticky Header -->
-    <div class="mobile-header-sticky">
-        <div class="location-header" onclick="window.location.reload()"> <!-- Quick reload hack -->
-            <div class="bg-light rounded-circle p-2 d-flex">
-                <i class="bi bi-geo-alt-fill text-danger fs-5"></i>
-            </div>
-            <div class="location-text">
-                <div class="location-title">
-                    Delivery to Home <i class="bi bi-chevron-down ms-1 fs-6"></i>
+    <!-- =========================
+         MOBILE VIEW CONTENT
+         ========================= -->
+    <div class="mobile-only">
+        
+        <!-- Sticky Header -->
+        <div class="mobile-header">
+            <!-- Location & Avatar -->
+            <div class="location-bar">
+                <div class="location-info">
+                    <h6 class="fw-bold"><i class="bi bi-geo-alt-fill text-secondary"></i> Home <i class="bi bi-chevron-down fs-8 ms-1"></i></h6>
+                    <p class="truncate-1">123, Green Park, Civil Lines, Nagpur</p>
                 </div>
-                <div class="location-subtitle" id="mobile-location-text">
-                    @if($settings['location_detected'])
-                        Detected Location (Within 2km)
-                    @else
-                        Select Location to View Products...
-                    @endif
+                <a href="{{ route('profile.show') }}" class="text-decoration-none">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-person-fill fs-5"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar-container" onclick="document.querySelector('.search-input').focus()">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search for 'milk'">
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <main style="padding-bottom: 20px;">
+            
+            <!-- Hero Banner -->
+            <div class="banner-carousel mt-3">
+                <div style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); border-radius: 16px; padding: 20px; color: white;">
+                    <span class="badge bg-warning text-dark mb-2">⚡ Superfast Delivery</span>
+                    <h2>Groceries in<br><strong>10 Minutes</strong></h2>
+                    <p class="mb-0 opacity-75">Everything you need, lickety-split!</p>
                 </div>
             </div>
-            <a href="{{ route('profile.show') }}" class="text-dark">
-                <i class="bi bi-person-circle fs-2" style="color: var(--primary-zepto);"></i>
+
+            <!-- Categories Grid -->
+            <div class="category-grid">
+                @foreach(($categories ?? [])->take(8) as $cat)
+                <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="category-item">
+                    <div class="cat-icon-box shadow-sm-custom">
+                        {{ $cat->emoji ?? '🥬' }}
+                    </div>
+                    <span class="fs-8 fw-semibold truncate-1">{{ $cat->name ?? 'Category' }}</span>
+                </a>
+                @endforeach
+                <!-- Fallback if empty -->
+                @if(count($categories ?? []) == 0)
+                    @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning'] as $dummy)
+                    <a href="#" class="category-item">
+                        <div class="cat-icon-box shadow-sm-custom">📦</div>
+                        <span class="fs-8 fw-semibold truncate-1">{{ $dummy }}</span>
+                    </a>
+                    @endforeach
+                @endif
+            </div>
+
+            <!-- Trending Rail -->
+            <div class="product-rail">
+                <div class="rail-header">
+                    <h5 class="fw-bold mb-0">🔥 Trending Now</h5>
+                    <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
+                </div>
+                <div class="rail-scroll">
+                    @foreach(($ten_min_products ?? [])->take(6) as $prod)
+                    <div class="product-card-mobile" onclick="window.location.href='{{ route('product.details', $prod->id) }}'">
+                        <div class="pm-image-box">
+                            <img src="{{ $prod->image_url ?? asset('images/no-image.png') }}" alt="{{ $prod->name }}" class="pm-image" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                        </div>
+                        <div class="fs-8 text-muted truncate-1">1 unit</div>
+                        <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
+                            <s class="fs-8 text-muted">₹{{ number_format($prod->price * 1.2, 0) }}</s>
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Instant Munchies (Location Based) -->
+            <div class="product-rail">
+                <div class="rail-header">
+                    <h5 class="fw-bold mb-0">⚡ Instant Munchies (Nearby)</h5>
+                    <div class="fs-8 text-muted" id="user-location-label"><i class="bi bi-geo-alt"></i> Locating...</div>
+                </div>
+                <div id="instant-munchies-rail" class="rail-scroll">
+                    <!-- Loading State -->
+                    <div class="d-flex align-items-center justify-content-center w-100 py-3 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Finding stores near you...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fresh Rail -->
+            <div class="product-rail">
+                <div class="rail-header">
+                    <h5 class="fw-bold mb-0">🥬 Fresh Vegetables</h5>
+                    <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
+                </div>
+                <div class="rail-scroll">
+                    @forelse(($products ?? [])->take(6) as $prod)
+                    <div class="product-card-mobile" onclick="window.location.href='{{ route('product.details', $prod->id) }}'">
+                        <div class="pm-image-box">
+                           <img src="{{ $prod->image_url ?? asset('images/no-image.png') }}" alt="{{ $prod->name }}" class="pm-image" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                        </div>
+                        <div class="fs-8 text-muted truncate-1">500g</div>
+                        <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+                    </div>
+                    @empty
+                    <div class="p-3 text-center w-100 text-muted">No items available</div>
+                    @endforelse
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="{{ route('home') }}" class="nav-link-mobile active">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Home</span>
             </a>
-        </div>
-        
-        <div class="search-container">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search for 'chips'">
-        </div>
-    </div>
-
-    <!-- Location Warning Banner -->
-    @if(!$settings['location_detected'])
-    <div class="bg-warning p-3 mx-3 mt-3 rounded-3 d-flex align-items-center justify-content-between" id="location-warning-m">
-        <div class="text-dark fw-bold fs-7">📍 Enable location to see nearby stores!</div>
-        <button class="btn btn-sm btn-dark rounded-pill px-3" onclick="requestLocation()">Enable</button>
-    </div>
-    @endif
-
-    <!-- Hero Banner -->
-    @if($banners->count() > 0)
-    <div class="hero-banner-mobile bg-white">
-        <div id="heroCarouselM" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-                @foreach($banners as $index => $banner)
-                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                    <img src="{{ asset('storage/' . $banner->image_path) }}" class="d-block w-100" style="aspect-ratio: 2/1; object-fit: cover;" alt="{{ $banner->title }}">
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- Service Options Grid (Mobile) -->
-    <!-- Service Options Grid (Mobile) -->
-    <div class="mx-3 mb-4 mt-3">
-        <div class="row g-2">
-            <!-- 10 Min Delivery -->
-            <div class="col-3 px-1">
-                <a href="#instant-munchies-rail" class="text-decoration-none text-dark">
-                    <div class="d-flex flex-column align-items-center text-center">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 100%; aspect-ratio: 1; max-width: 60px; background: #ecfccb;">
-                            <i class="bi bi-stopwatch-fill fs-3 text-success"></i>
-                        </div>
-                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.1; display: block; width: 100%;">10 Mins<br>Delivery</span>
-                    </div>
-                </a>
-            </div>
-            
-            <!-- Normal Delivery -->
-            <div class="col-3 px-1">
-                <a href="{{ route('categories.index') }}" class="text-decoration-none text-dark">
-                    <div class="d-flex flex-column align-items-center text-center">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 100%; aspect-ratio: 1; max-width: 60px; background: #dbeafe;">
-                            <i class="bi bi-box-seam-fill fs-3 text-primary"></i>
-                        </div>
-                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.1; display: block; width: 100%;">Normal<br>Delivery</span>
-                    </div>
-                </a>
-            </div>
-            
-            <!-- Food Order -->
-            <div class="col-3 px-1">
-                <a href="{{ route('food.index') }}" class="text-decoration-none text-dark">
-                    <div class="d-flex flex-column align-items-center text-center">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 100%; aspect-ratio: 1; max-width: 60px; background: #ffedd5;">
-                            <i class="bi bi-cup-hot-fill fs-3 text-warning"></i>
-                        </div>
-                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.1; display: block; width: 100%;">Food<br>Order</span>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Delivery Partner -->
-            <div class="col-3 px-1">
-                <a href="{{ route('delivery-partner.login') }}" class="text-decoration-none text-dark">
-                    <div class="d-flex flex-column align-items-center text-center">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 100%; aspect-ratio: 1; max-width: 60px; background: #f3f4f6;">
-                            <i class="bi bi-bicycle fs-3 text-secondary"></i>
-                        </div>
-                        <span style="font-size: 0.65rem; font-weight: 700; line-height: 1.1; display: block; width: 100%;">Partner<br>Join</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Categories Grid -->
-    <div class="d-flex justify-content-between px-3 mb-2 align-items-center">
-        <h5 class="fw-bold mb-0 text-dark">Explore By Category</h5>
-    </div>
-    <div class="category-grid-mobile">
-        @foreach($categories->take(8) as $cat)
-        <a href="{{ route('categories.index') }}" class="text-decoration-none">
-            <div class="cat-item-mobile">
-                <div class="cat-img-box">
-                    <img src="{{ asset('storage/' . $cat->image_path) }}" onerror="this.src='/images/no-image.png'" alt="{{ $cat->name }}">
-                </div>
-                <div class="cat-name">{{ Str::limit($cat->name, 10) }}</div>
-            </div>
-        </a>
-        @endforeach
-    </div>
-
-    <!-- 1. Instant Munchies Rail (Always Location Based) -->
-    <div class="rail-section">
-        <div class="rail-title">
-            <span>⚡ Instant Munchies</span>
-            <a href="#" class="view-all">See All</a>
-        </div>
-        <div class="scroll-container" id="instant-munchies-rail">
-            @if($settings['location_detected'] && $ten_min_products->count() > 0)
-                @foreach($ten_min_products as $product)
-                <div class="product-card-mobile" onclick="window.location.href='/product/{{ $product->id }}'">
-                    <span class="pm-time">10 MINS</span>
-                    <div class="pm-img-box">
-                        <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : '/images/no-image.png' }}" onerror="this.src='/images/no-image.png'">
-                    </div>
-                    <div class="pm-title">{{ $product->name }}</div>
-                    <div class="pm-weight text-muted"></div>
-                    <div class="pm-footer">
-                        <div class="pm-price">₹{{ number_format($product->price, 0) }}</div>
-                        <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $product->id }})">ADD</button>
-                    </div>
-                    <div class="fs-8 text-secondary mt-1 truncate-1"><i class="bi bi-shop"></i> {{ $product->seller->shop_name ?? 'Nearby Store' }}</div>
-                </div>
-                @endforeach
-            @else
-                <div class="text-center w-100 py-4 text-muted fs-7">
-                    @if(!$settings['location_detected'])
-                        Getting your location to show instant products...
+            <a href="{{ route('categories.index') }}" class="nav-link-mobile">
+                <i class="bi bi-grid"></i>
+                <span>Categories</span>
+            </a>
+            <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
+                <i class="bi bi-cart3"></i>
+                <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="top: 5px; right: 15px; font-size: 0.6rem;">
+                    @auth
+                        {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
                     @else
-                        No instant stores nearby :(
-                    @endif
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- 2. Trending Rail -->
-    <div class="rail-section">
-        <div class="rail-title">
-            <span>🔥 Trending Near You</span>
-            <a href="#" class="view-all">See All</a>
-        </div>
-        <div class="scroll-container">
-            @foreach($trending as $product)
-            <div class="product-card-mobile" onclick="window.location.href='/product/{{ $product->id }}'">
-                <div class="pm-img-box">
-                    <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : '/images/no-image.png' }}" onerror="this.src='/images/no-image.png'">
-                </div>
-                <div class="pm-title">{{ $product->name }}</div>
-                <div class="pm-footer">
-                    <div class="pm-price">₹{{ number_format($product->price, 0) }}</div>
-                    <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $product->id }})">ADD</button>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-
-    <!-- Bottom Nav -->
-    <div class="bottom-nav">
-        <a href="/" class="nav-item-m active">
-            <i class="bi bi-house-door-fill nav-icon"></i>
-            <span>Home</span>
-        </a>
-        <a href="{{ route('categories.index') }}" class="nav-item-m">
-            <i class="bi bi-grid-fill nav-icon"></i>
-            <span>Categories</span>
-        </a>
-        <a href="{{ route('cart.index') }}" class="nav-item-m position-relative">
-            <i class="bi bi-cart3 nav-icon"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="margin-left: -20px; margin-top: 5px;">
-                 @auth
-                    {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
-                @else
-                    0
-                @endauth
-            </span>
-            <span>Cart</span>
-        </a>
-    </div>
-</div>
-
-<!-- === DESKTOP VIEW === -->
-<div class="desktop-only layout-container">
-    
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <div class="px-4 mb-4">
-            <h4 class="fw-bold" style="color: var(--primary-zepto);">GrabBaskets</h4>
-        </div>
-        @foreach($categories as $cat)
-        <a href="#" class="sidebar-item">
-            <div class="sidebar-icon">
-                <img src="{{ asset('storage/' . $cat->image_path) }}" onerror="this.src='/images/no-image.png'">
-            </div>
-            <span class="fw-medium">{{ $cat->name }}</span>
-        </a>
-        @endforeach
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <!-- Desktop Header -->
-        <header class="desktop-header">
-            <div class="d-location">
-                <span class="text-secondary fs-7 fw-bold">DELIVERY IN 10 MINS</span>
-                <span class="fw-bold fs-6" id="d-location-text">
-                    @if($settings['location_detected'])
-                        Location Detected
-                    @else
-                        Select Location
-                    @endif
-                    <i class="bi bi-chevron-down ms-1"></i>
+                        0
+                    @endauth
                 </span>
-            </div>
+                <span>Cart</span>
+            </a>
+            <a href="{{ route('profile.show') }}" class="nav-link-mobile">
+                <i class="bi bi-person"></i>
+                <span>Account</span>
+            </a>
+        </nav>
+    </div>
 
-            <div class="d-search">
-                <i class="bi bi-search search-icon" style="left: 14px;"></i>
-                <input type="text" class="search-input" placeholder="Search for 'paneer, chips, milk'" style="background: #f8f8f8;">
-            </div>
 
-            <div class="d-actions">
-                @guest
-                    <a href="{{ route('login') }}" class="fw-bold text-dark text-decoration-none">Login</a>
-                @else
-                    <a href="{{ route('profile.show') }}" class="fw-bold text-dark text-decoration-none">Profile</a>
-                @endguest
-                <a href="{{ route('cart.index') }}" class="btn btn-success fw-bold d-flex align-items-center gap-2" style="background: #0c831f; border: none;">
-                    <i class="bi bi-cart3"></i>
-                    <span>My Cart</span>
-                </a>
-            </div>
-        </header>
-
-        <!-- Location Alert Desktop -->
-        @if(!$settings['location_detected'])
-        <div class="alert alert-warning d-flex justify-content-between align-items-center shadow-sm border-0 rounded-3 mb-4">
-            <div><i class="bi bi-geo-alt-fill me-2"></i> Please enable location to see products available in your area.</div>
-            <button class="btn btn-dark fw-bold" onclick="requestLocation()">Identify Location</button>
-        </div>
-        @endif
-
-        <!-- Banners -->
-        @if($banners->count() > 0)
-        <div class="row mb-5">
-            @foreach($banners->take(2) as $banner)
-            <div class="col-md-6 mb-3">
-                <img src="{{ asset('storage/' . $banner->image_path) }}" class="w-100 rounded-4 shadow-sm" style="height: 220px; object-fit: cover;">
-            </div>
-            @endforeach
-        </div>
-        @endif
-
-        <!-- Main Product Grid -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-dark">Bestsellers Near You</h3>
-            <a href="#" class="text-success fw-bold text-decoration-none">see all</a>
-        </div>
-
-        <div class="products-grid-d">
-            @foreach($products as $product)
-            <div class="product-card-d">
-                <div class="position-relative mb-3">
-                    <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : '/images/no-image.png' }}" class="w-100 rounded-3" style="aspect-ratio: 1; object-fit: contain; background: #f9f9f9;" onerror="this.src='/images/no-image.png'">
-                    <span class="position-absolute top-0 start-0 badge bg-white text-success shadow-sm mt-2 ms-2 border">10 MINS</span>
-                </div>
-                <h6 class="fw-bold mb-1 truncate-2" style="height: 40px;">{{ $product->name }}</h6>
-                <div class="text-secondary fs-7 mb-3">{{ $product->quantity ?? '1 unit' }}</div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">₹{{ number_format($product->price, 0) }}</span>
-                    <button class="btn btn-outline-danger btn-sm fw-bold rounded-3 px-3" onclick="addToCart({{ $product->id }})">ADD</button>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </main>
-</div>
-
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('js/location-delivery.js') }}"></script>
-<script>
-    const delivery = new LocationDelivery();
-
-    // 1. Force Location if not detected
-    async function requestLocation() {
-        try {
-            await delivery.enforceGlobalLocation();
-        } catch (e) {
-            alert('Location access is required to show nearby stores.');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Auto-request if not set? Maybe too aggressive.
-        // Let's check status and update UI text at least.
+    <!-- =========================
+         DESKTOP VIEW CONTENT
+         ========================= -->
+    <div class="desktop-only">
         
-        // Populate address in header if available via JS (cookies/localstorage fallback)
-        // or re-fetch from lat/lng in session if we passed it to view?
-        // We have {{ $user_lat }}, let's reverse geocode valid lat
-        @if($settings['location_detected'])
-            const address = await delivery.getAddressFromCoordinates({{ $user_lat }}, {{ $user_lng }});
-            
-            const mobText = document.getElementById('mobile-location-text');
-            if(mobText) mobText.innerText = address;
-            
-            const deskText = document.getElementById('d-location-text');
-            if(deskText) deskText.innerHTML = address + '<i class="bi bi-chevron-down ms-1"></i>';
-            
-        @else
-            // If strictly enforcing, uncomment below:
-            // requestLocation(); 
-            // For now, we show the "Enable" banners.
-        @endif
-    });
+        <!-- Navbar -->
+        <nav class="desktop-navbar">
+            <div class="container d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <a href="{{ route('home') }}" class="brand-logo">
+                        <i class="bi bi-bag-check-fill text-secondary"></i> GrabBaskets
+                    </a>
+                    <div class="delivery-info">
+                        <div class="fw-bold fs-7">Delivery in 10 mins</div>
+                        <div class="text-muted fs-8 truncate-1">Nagpur, Maharashtra, India</div>
+                    </div>
+                </div>
 
-    function addToCart(productId) {
-        @auth
-            fetch('{{ route('cart.add') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ product_id: productId, quantity: 1 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    // Update badge (simple reload for now or dom update)
-                    window.location.reload(); 
-                } else {
-                    alert('Failed to add');
+                <div class="search-bar-container desktop-search">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search for products, brands and more">
+                </div>
+
+                <div class="d-flex align-items-center gap-4">
+                    @guest
+                    <a href="{{ route('login') }}" class="fw-semibold text-decoration-none text-main">Login</a>
+                    @else
+                    <a href="{{ route('profile.show') }}" class="fw-semibold text-decoration-none text-main">Account</a>
+                    @endguest
+                    
+                    <a href="{{ route('cart.index') }}" class="btn btn-primary rounded-4 px-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-cart3"></i> 
+                        <span class="fw-bold">My Cart</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container main-layout">
+            
+            <!-- Sidebar -->
+            <aside>
+                <div class="sidebar-menu shadow-sm-custom">
+                    <div class="text-muted fs-8 fw-bold mb-3 px-3 text-uppercase tracking-wider">Categories</div>
+                    @foreach(($categories ?? [])->take(10) as $cat)
+                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="side-link">
+                        <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span> {{ $cat->name ?? 'Category' }}
+                    </a>
+                    @endforeach
+                    <a href="{{ route('categories.index') }}" class="side-link text-primary mt-2">
+                        <i class="bi bi-grid fs-5"></i> View All
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Right Content -->
+            <main>
+                
+                <!-- Hero Banners -->
+                <div class="row mb-5">
+                    <div class="col-8">
+                        <div style="background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); height: 250px; border-radius: 20px; display: flex; align-items: center; padding: 40px; color: white;">
+                            <div>
+                                <h1 class="fw-bold display-5 mb-2">Fresh Vegetables</h1>
+                                <p class="fs-5 mb-4 opacity-90">Farm fresh at your doorstep</p>
+                                <button class="btn btn-light rounded-pill px-4 fw-bold text-primary">Shop Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="background: #fff0c2; height: 250px; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; justify-content: center;">
+                            <h3 class="fw-bold mb-2">Instant<br>Munchies</h3>
+                            <p class="text-muted">Desires delivered in minutes</p>
+                            <a href="#" class="text-decoration-none fw-bold text-dark mt-auto">Browse <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Best Sellers -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold m-0">Daily Staples</h3>
+                    <a href="#" class="text-primary text-decoration-none fw-bold">see all</a>
+                </div>
+
+                <div class="desktop-grid">
+                    @forelse(($all_products ?? [])->take(8) as $prod)
+                    <div class="product-card-desktop">
+                        <div class="pd-image-box">
+                             <img src="{{ $prod->image_url ?? asset('images/no-image.png') }}" class="pd-image" alt="{{ $prod->name }}" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                        </div>
+                        <div class="text-muted fs-8 mb-1">1 unit</div>
+                        <h6 class="fw-bold truncate-2 mb-3" style="min-height: 40px;">{{ $prod->name }}</h6>
+                        
+                        <div class="d-flex justify-content-between align-items-end mt-auto">
+                            <div>
+                                <div class="text-decoration-line-through text-muted fs-8">₹{{ number_format($prod->price * 1.1, 0) }}</div>
+                                <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
+                            </div>
+                            <button class="btn btn-outline-primary rounded-3 px-3 fw-bold" onclick="addToCart({{ $prod->id }})">ADD</button>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-12 text-center py-5 text-muted bg-white rounded-4">
+                        <i class="bi bi-basket display-4 mb-3 d-block"></i>
+                        No products found
+                    </div>
+                    @endforelse
+                </div>
+
+                <!-- Section: Snacks -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold m-0">Snacks & Drinks</h3>
+                    <a href="#" class="text-primary text-decoration-none fw-bold">see all</a>
+                </div>
+                
+                <div class="desktop-grid">
+                    @foreach(($ten_min_products ?? [])->skip(6)->take(4) as $prod)
+                     <div class="product-card-desktop">
+                        <div class="pd-image-box">
+                             <img src="{{ $prod->image_url ?? asset('images/no-image.png') }}" class="pd-image" alt="{{ $prod->name }}" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                        </div>
+                        <div class="text-muted fs-8 mb-1">Pack</div>
+                        <h6 class="fw-bold truncate-2 mb-3" style="min-height: 40px;">{{ $prod->name }}</h6>
+                        
+                        <div class="d-flex justify-content-between align-items-end mt-auto">
+                            <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
+                            <button class="btn btn-outline-primary rounded-3 px-3 fw-bold" onclick="addToCart({{ $prod->id }})">ADD</button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/location-delivery.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.innerWidth < 992) { // Only on mobile/tablet for now or check layout
+                console.log('Initializing Location Delivery for Instant Munchies...');
+                const delivery = new LocationDelivery();
+                
+                try {
+                    // 1. Get Location
+                    await delivery.getUserLocation();
+                    
+                    // 2. Update status label
+                    const locLabel = document.getElementById('user-location-label');
+                    if (locLabel) {
+                        const address = await delivery.getAddressFromCoordinates(delivery.userLat, delivery.userLng);
+                        locLabel.innerHTML = `<i class="bi bi-geo-alt-fill text-success"></i> ${address || 'Nearby'}`;
+                    }
+
+                    // 3. Fetch Products (categoryId: null for all/mixed, or specify if known)
+                    // Passing null category to get broad "Instant" products
+                    const products = await delivery.getLocationBasedProducts(null, 5, 12); // 5km radius, 12 items
+                    
+                    // 4. Render
+                    if (products && products.success) {
+                        delivery.displayProducts(products, 'instant-munchies-rail');
+                    }
+                    
+                } catch (error) {
+                    console.error('Location error:', error);
+                    const container = document.getElementById('instant-munchies-rail');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="text-center w-100 py-3 px-3">
+                                <p class="mb-2 text-muted fs-8">Location access needed for Instant Munchies</p>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="window.location.reload()">Enable Location</button>
+                            </div>`;
+                    }
                 }
-            });
-        @else
-            window.location.href = "{{ route('login') }}";
-        @endauth
-    }
-</script>
-@endsection
+            }
+        });
+
+        function addToCart(productId) {
+            @auth
+                fetch('{{ route('cart.add') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Show visible feedback (simple toast for now)
+                        const btn = event.target;
+                        const originalText = btn.innerText;
+                        btn.innerText = '✔ Added';
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-success', 'text-white');
+                        
+                        setTimeout(() => {
+                            btn.innerText = originalText;
+                            btn.classList.add('btn-outline-primary');
+                            btn.classList.remove('btn-success', 'text-white');
+                        }, 1000);
+                        
+                        // Reload to update cart count (or implement dynamic update)
+                        // window.location.reload(); 
+                    } else {
+                        window.location.href = '{{ route('login') }}';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            @else
+                window.location.href = '{{ route('login') }}';
+            @endauth
+        }
+    </script>
+</body>
+</html>
