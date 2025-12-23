@@ -20,7 +20,7 @@ class FoodOrder extends Model
         'food_total',
         'delivery_fee',
         'total_amount',
-         'payment_method', 
+        'payment_method', 
         'status',
         'estimated_delivery_time',
         'delivery_partner_id'   // 👈 Optional: assign delivery person
