@@ -41,7 +41,7 @@ use App\Http\Controllers\DeliveryModeController;
 
 
 // Removed temporary debug route for seller edit to avoid duplication/conflicts
-Route::match(['get', 'post'], '/test-upload', function(Request $request) {
+Route::match(['get', 'post'], '/test-upload', function (Request $request) {
     if ($request->isMethod('post')) {
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -54,7 +54,7 @@ Route::match(['get', 'post'], '/test-upload', function(Request $request) {
     return view('test-upload');
 });
 // Test direct upload to R2
-Route::match(['get', 'post'], '/test-upload-r2', function(Request $request) {
+Route::match(['get', 'post'], '/test-upload-r2', function (Request $request) {
     if ($request->isMethod('post')) {
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -95,7 +95,7 @@ Route::get('/health-check', function () {
 Route::get('/test-index-debug', function () {
     try {
         $diagnostics = [];
-        
+
         // Test 1: Banner model
         try {
             $banners = \App\Models\Banner::active()->byPosition('hero')->get();
@@ -103,7 +103,7 @@ Route::get('/test-index-debug', function () {
         } catch (\Exception $e) {
             $diagnostics['banners'] = 'ERROR: ' . $e->getMessage();
         }
-        
+
         // Test 2: Categories
         try {
             $categories = \App\Models\Category::with('subcategories')->get();
@@ -111,7 +111,7 @@ Route::get('/test-index-debug', function () {
         } catch (\Exception $e) {
             $diagnostics['categories'] = 'ERROR: ' . $e->getMessage();
         }
-        
+
         // Test 3: Products
         try {
             $products = \App\Models\Product::whereNotNull('seller_id')->take(5)->get();
@@ -119,10 +119,10 @@ Route::get('/test-index-debug', function () {
         } catch (\Exception $e) {
             $diagnostics['products'] = 'ERROR: ' . $e->getMessage();
         }
-        
+
         // Test 4: View exists
         $diagnostics['view_exists'] = view()->exists('index') ? 'YES' : 'NO';
-        
+
         // Test 5: Database connection
         try {
             DB::connection()->getPdo();
@@ -130,12 +130,12 @@ Route::get('/test-index-debug', function () {
         } catch (\Exception $e) {
             $diagnostics['database'] = 'ERROR: ' . $e->getMessage();
         }
-        
+
         // Test 6: Storage permissions
         $diagnostics['storage_writable'] = is_writable(storage_path('logs')) ? 'YES' : 'NO';
         $diagnostics['cache_writable'] = is_writable(storage_path('framework/cache')) ? 'YES' : 'NO';
         $diagnostics['views_writable'] = is_writable(storage_path('framework/views')) ? 'YES' : 'NO';
-        
+
         // Test 7: Try to load the actual index route logic
         try {
             $banners = \App\Models\Banner::active()->byPosition('hero')->get();
@@ -144,11 +144,11 @@ Route::get('/test-index-debug', function () {
         } catch (\Exception $e) {
             $diagnostics['index_route_logic'] = 'ERROR: ' . $e->getMessage();
         }
-        
+
         // Test 8: Check config cache
         $diagnostics['config_cached'] = file_exists(base_path('bootstrap/cache/config.php')) ? 'YES' : 'NO';
         $diagnostics['routes_cached'] = file_exists(base_path('bootstrap/cache/routes-v7.php')) ? 'YES' : 'NO';
-        
+
         return response()->json([
             'status' => 'Index Page Diagnostics',
             'timestamp' => now()->toDateTimeString(),
@@ -158,7 +158,6 @@ Route::get('/test-index-debug', function () {
             'message' => 'All tests completed. Check results above.',
             'next_step' => 'If all tests pass, the issue might be in the view rendering. Clear caches or check permissions.'
         ], 200);
-        
     } catch (\Exception $e) {
         return response()->json([
             'error' => 'Diagnostic failed',
@@ -216,7 +215,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/product/{product}/edit', [SellerController::class, 'editProduct'])->name('seller.editProduct');
     Route::put('/seller/product/{product}', [SellerController::class, 'updateProduct'])->name('seller.updateProduct');
     Route::delete('/seller/product/{product}', [SellerController::class, 'destroyProduct'])->name('seller.destroyProduct');
-    
+
     // Product Gallery Management
     Route::get('/seller/product/{product}/gallery', [SellerController::class, 'productGallery'])->name('seller.productGallery');
     Route::post('/seller/product/{product}/images', [SellerController::class, 'uploadProductImages'])->name('seller.uploadProductImages');
@@ -230,7 +229,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     // Legacy bulk uploads (keep for compatibility)
     Route::post('/seller/bulk-image-upload-legacy', [SellerController::class, 'bulkImageUpload'])->name('seller.bulkImageUpload');
     Route::post('/seller/bulk-product-upload', [SellerController::class, 'bulkProductUpload'])->name('seller.bulkProductUpload');
-    
+
     // Excel Bulk Upload Routes
     Route::get('/seller/bulk-upload-excel', [SellerController::class, 'showBulkUploadForm'])->name('seller.bulkUploadForm');
     Route::post('/seller/bulk-upload-excel', [SellerController::class, 'processBulkUpload'])->name('seller.processBulkUpload');
@@ -267,7 +266,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/orders', [OrderController::class, 'sellerOrders'])->name('seller.orders');
     Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders/{order}/update-tracking', [OrderController::class, 'updateTracking'])->name('orders.updateTracking');
-    
+
     // Quick Delivery & Live Tracking (Blinkit/Zepto Style)
     Route::get('/orders/{order}/live-tracking', [OrderController::class, 'liveTracking'])->name('orders.liveTracking');
     Route::post('/orders/check-quick-delivery', [OrderController::class, 'checkQuickDelivery'])->name('orders.checkQuickDelivery');
@@ -307,7 +306,7 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
 
     // Chatbot
     Route::post('/chatbot/support', [SupportController::class, 'chatbotSupport'])->name('chatbot.support');
-    
+
     // Courier Tracking (Authenticated users)
     Route::get('/tracking/order/{order}', [CourierTrackingController::class, 'trackOrder'])->name('tracking.order');
     Route::post('/tracking/track-multiple', [CourierTrackingController::class, 'trackMultiple'])->name('tracking.multiple');
@@ -322,12 +321,12 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
 
 // Test route to bypass controller and render view directly
-Route::get('/buyer/dashboard/test', function() {
+Route::get('/buyer/dashboard/test', function () {
     try {
-        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+        $categories = \App\Models\Category::with(['subcategories' => function ($query) {
             $query->withCount('products');
         }])->withCount('products')->get();
-        
+
         return view('buyer.dashboard', compact('categories'));
     } catch (\Exception $e) {
         return response('DIRECT TEST ERROR: ' . $e->getMessage(), 500)->header('Content-Type', 'text/plain');
@@ -335,59 +334,58 @@ Route::get('/buyer/dashboard/test', function() {
 })->name('buyer.dashboard.test');
 
 // Simple text debug route to test buyer dashboard functionality
-Route::get('/buyer/dashboard/debug', function() {
+Route::get('/buyer/dashboard/debug', function () {
     $output = "=== BUYER DASHBOARD DEBUG ===\n\n";
-    
+
     try {
         // Test 1: Database connection
         $output .= "1. Database Connection: ";
         \Illuminate\Support\Facades\DB::connection()->getPdo();
         $output .= "SUCCESS\n";
-        
+
         // Test 2: Category model basic query
         $output .= "2. Category Model: ";
         $categoryCount = \App\Models\Category::count();
         $output .= "SUCCESS - {$categoryCount} categories found\n";
-        
+
         // Test 3: Category with relationships
         $output .= "3. Category Relationships: ";
-        $categories = \App\Models\Category::with(['subcategories' => function($query) {
+        $categories = \App\Models\Category::with(['subcategories' => function ($query) {
             $query->withCount('products');
         }])->withCount('products')->take(1)->get();
         $output .= "SUCCESS - Relationships loaded\n";
-        
+
         // Test 4: View existence
         $output .= "4. Dashboard View: ";
         $viewExists = view()->exists('buyer.dashboard');
         $output .= $viewExists ? "EXISTS\n" : "NOT FOUND\n";
-        
+
         // Test 5: Try to call dashboard method directly
         $output .= "5. Dashboard Controller: ";
         $controller = new \App\Http\Controllers\BuyerController();
         $output .= "INSTANTIATED SUCCESSFULLY\n";
-        
+
         $output .= "\n=== ALL TESTS PASSED ===\n";
         $output .= "The buyer dashboard should be working. If still getting 500 error, check server logs for runtime issues.\n";
-        
     } catch (\Exception $e) {
         $output .= "FAILED\n";
         $output .= "ERROR: " . $e->getMessage() . "\n";
         $output .= "FILE: " . $e->getFile() . "\n";
         $output .= "LINE: " . $e->getLine() . "\n";
     }
-    
+
     return response($output, 200)->header('Content-Type', 'text/plain');
 })->name('buyer.dashboard.debug');
 // Debug route for category testing
-Route::get('/debug-category/{id}', function($id) {
+Route::get('/debug-category/{id}', function ($id) {
     try {
         $category = \App\Models\Category::find($id);
         if (!$category) {
             return "Category {$id} not found";
         }
-        
+
         $products = \App\Models\Product::where('category_id', $id)->count();
-        
+
         return response()->json([
             'category_id' => $id,
             'category_name' => $category->name,
@@ -404,16 +402,16 @@ Route::get('/debug-category/{id}', function($id) {
 });
 
 // Debug route for controller testing
-Route::get('/debug-controller-category/{id}', function($id) {
+Route::get('/debug-controller-category/{id}', function ($id) {
     try {
         $request = new \Illuminate\Http\Request();
         $controller = new \App\Http\Controllers\BuyerController();
-        
+
         // Test data gathering first
         $category = \App\Models\Category::findOrFail($id);
         $products = \App\Models\Product::with(['category', 'subcategory'])
             ->where('category_id', $id)->paginate(1);
-        
+
         return response()->json([
             'category_id' => $id,
             'category_name' => $category->name,
@@ -431,13 +429,13 @@ Route::get('/debug-controller-category/{id}', function($id) {
 });
 
 // Debug route to force cache clearing (for deployment issues)
-Route::get('/debug-clear-cache', function() {
+Route::get('/debug-clear-cache', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('cache:clear');
         \Illuminate\Support\Facades\Artisan::call('view:clear');
         \Illuminate\Support\Facades\Artisan::call('config:clear');
         \Illuminate\Support\Facades\Artisan::call('route:clear');
-        
+
         return response()->json([
             'message' => 'All caches cleared successfully',
             'timestamp' => now(),
@@ -452,14 +450,14 @@ Route::get('/debug-clear-cache', function() {
 });
 
 // Debug route for delivery partner data
-Route::get('/debug-delivery-partners', function() {
+Route::get('/debug-delivery-partners', function () {
     try {
         $partners = \App\Models\DeliveryPartner::select(['id', 'name', 'email', 'phone', 'status'])
             ->limit(5)
             ->get();
-            
+
         $totalCount = \App\Models\DeliveryPartner::count();
-        
+
         return response()->json([
             'total_partners' => $totalCount,
             'sample_partners' => $partners,
@@ -476,7 +474,7 @@ Route::get('/debug-delivery-partners', function() {
 });
 
 // Debug route to create a test delivery partner
-Route::get('/debug-create-delivery-partner', function() {
+Route::get('/debug-create-delivery-partner', function () {
     try {
         // Check if test partner already exists
         $existing = \App\Models\DeliveryPartner::where('email', 'test@delivery.com')->first();
@@ -498,7 +496,7 @@ Route::get('/debug-create-delivery-partner', function() {
                 'status' => 'exists'
             ]);
         }
-        
+
         // Create test partner
         $partner = \App\Models\DeliveryPartner::create([
             'name' => 'Test Delivery Partner',
@@ -515,7 +513,7 @@ Route::get('/debug-create-delivery-partner', function() {
             'is_online' => true,
             'is_available' => true
         ]);
-        
+
         return response()->json([
             'message' => 'Test delivery partner created successfully',
             'partner' => [
@@ -527,7 +525,7 @@ Route::get('/debug-create-delivery-partner', function() {
             ],
             'login_credentials' => [
                 'email' => 'test@delivery.com',
-                'phone' => '9999999999', 
+                'phone' => '9999999999',
                 'password' => 'password123'
             ],
             'status' => 'created'
@@ -597,13 +595,13 @@ Route::prefix('api/tracking')->group(function () {
 });
 
 // API route for mobile category menu subcategories
-Route::get('/api/categories/{category}/subcategories', function($categoryId) {
+Route::get('/api/categories/{category}/subcategories', function ($categoryId) {
     try {
-        $category = \App\Models\Category::with(['subcategories' => function($query) {
+        $category = \App\Models\Category::with(['subcategories' => function ($query) {
             $query->withCount('products');
         }])->findOrFail($categoryId);
-        
-        $subcategories = $category->subcategories->map(function($subcat) {
+
+        $subcategories = $category->subcategories->map(function ($subcat) {
             return [
                 'id' => $subcat->id,
                 'name' => $subcat->name,
@@ -612,7 +610,7 @@ Route::get('/api/categories/{category}/subcategories', function($categoryId) {
                 'url' => route('buyer.productsBySubcategory', $subcat->id)
             ];
         });
-        
+
         return response()->json([
             'success' => true,
             'subcategories' => $subcategories,
@@ -620,7 +618,7 @@ Route::get('/api/categories/{category}/subcategories', function($categoryId) {
         ]);
     } catch (\Exception $e) {
         return response()->json([
-            'success' => false, 
+            'success' => false,
             'message' => 'Category not found'
         ], 404);
     }
@@ -629,7 +627,7 @@ Route::get('/api/categories/{category}/subcategories', function($categoryId) {
 // API Health Check for diagnostics
 Route::get('/api/health-check', function () {
     return response()->json([
-        'status' => 'ok', 
+        'status' => 'ok',
         'timestamp' => now(),
         'server_time' => microtime(true)
     ]);
@@ -686,7 +684,7 @@ Route::post('/seller/login', function (Request $request) {
     ]);
 
     $seller = \App\Models\Seller::where('email', $request->email)->first();
-    
+
     if ($seller && Hash::check($request->password, $seller->password)) {
         session(['seller_id' => $seller->id, 'is_seller' => true]);
         return redirect('/seller/dashboard');
@@ -914,34 +912,34 @@ Route::prefix('admin/warehouse')->group(function () {
 Route::prefix('admin/delivery-partners')->name('admin.delivery-partners.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'dashboard'])->name('dashboard');
-    
+
     // List all partners
     Route::get('/', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'index'])->name('index');
-    
+
     // Show partner details
     Route::get('/{deliveryPartner}', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'show'])->name('show');
-    
+
     // Approve/Block/Unblock partners
     Route::post('/{id}/approve', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'approve'])->name('approve');
     Route::post('/{id}/block', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'block'])->name('block');
     Route::post('/{id}/unblock', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'unblock'])->name('unblock');
     Route::post('/{id}/reject', [App\Http\Controllers\Admin\DeliveryPartnerController::class, 'reject'])->name('reject');
-    
+
     // Assign job to partner
     Route::post('/{deliveryPartner}/assign-job', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'assignJob'])->name('assign-job');
-    
+
     // Bulk assign jobs
     Route::post('/bulk-assign', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'bulkAssignJobs'])->name('bulk-assign');
-    
+
     // Update partner status
     Route::post('/{deliveryPartner}/update-status', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'updateStatus'])->name('update-status');
-    
+
     // Track partner location
     Route::get('/{deliveryPartner}/track', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'track'])->name('track');
-    
+
     // Send notification
     Route::post('/{deliveryPartner}/send-notification', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'sendNotification'])->name('send-notification');
-    
+
     // API routes
     Route::get('/api/available-partners', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'getAvailablePartners'])->name('api.available');
     Route::get('/api/statistics', [App\Http\Controllers\Admin\AdminDeliveryPartnerController::class, 'getStatistics'])->name('api.statistics');
@@ -954,7 +952,7 @@ Route::prefix('warehouse')->group(function () {
     Route::get('/login', [App\Http\Controllers\Warehouse\AuthController::class, 'showLoginForm'])->name('warehouse.login');
     Route::post('/login', [App\Http\Controllers\Warehouse\AuthController::class, 'login']);
     Route::post('/logout', [App\Http\Controllers\Warehouse\AuthController::class, 'logout'])->name('warehouse.logout');
-    
+
     // Protected warehouse routes
     Route::middleware('auth:warehouse')->group(function () {
         // Dashboard
@@ -962,17 +960,17 @@ Route::prefix('warehouse')->group(function () {
         Route::get('/stats', [App\Http\Controllers\Warehouse\DashboardController::class, 'quickStats'])->name('warehouse.stats');
         Route::get('/notifications', [App\Http\Controllers\Warehouse\DashboardController::class, 'notifications'])->name('warehouse.notifications');
         Route::get('/search', [App\Http\Controllers\Warehouse\DashboardController::class, 'search'])->name('warehouse.search');
-        
+
         // User Profile Management
         Route::get('/profile', [App\Http\Controllers\Warehouse\AuthController::class, 'profile'])->name('warehouse.profile');
         Route::put('/profile', [App\Http\Controllers\Warehouse\AuthController::class, 'updateProfile'])->name('warehouse.profile.update');
-        
+
         // User Management (Managers only)
         Route::get('/users', [App\Http\Controllers\Warehouse\AuthController::class, 'userManagement'])->name('warehouse.users');
         Route::post('/users', [App\Http\Controllers\Warehouse\AuthController::class, 'createUser'])->name('warehouse.users.create');
         Route::put('/users/{id}', [App\Http\Controllers\Warehouse\AuthController::class, 'updateUser'])->name('warehouse.users.update');
         Route::post('/users/{id}/toggle-status', [App\Http\Controllers\Warehouse\AuthController::class, 'toggleUserStatus'])->name('warehouse.users.toggle-status');
-        
+
         // Inventory Management
         Route::get('/inventory', [App\Http\Controllers\Warehouse\InventoryController::class, 'index'])->name('warehouse.inventory');
         Route::get('/inventory/add', [App\Http\Controllers\Warehouse\InventoryController::class, 'showAddStock'])->name('warehouse.inventory.add');
@@ -981,22 +979,22 @@ Route::prefix('warehouse')->group(function () {
         Route::post('/inventory/adjust', [App\Http\Controllers\Warehouse\InventoryController::class, 'adjustStock'])->name('warehouse.inventory.adjust.store');
         Route::get('/inventory/{id}', [App\Http\Controllers\Warehouse\InventoryController::class, 'show'])->name('warehouse.inventory.show');
         Route::put('/inventory/{id}', [App\Http\Controllers\Warehouse\InventoryController::class, 'update'])->name('warehouse.inventory.update');
-        
+
         // Stock Movements
         Route::get('/stock-movements', [App\Http\Controllers\Warehouse\StockMovementController::class, 'index'])->name('warehouse.stock-movements');
         Route::get('/stock-movements/{id}', [App\Http\Controllers\Warehouse\StockMovementController::class, 'show'])->name('warehouse.stock-movements.show');
-        
+
         // Quick Delivery Management
         Route::get('/quick-delivery', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'index'])->name('warehouse.quick-delivery');
         Route::post('/quick-delivery/{id}/toggle', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'toggle'])->name('warehouse.quick-delivery.toggle');
         Route::get('/quick-delivery/optimize', [App\Http\Controllers\Warehouse\QuickDeliveryController::class, 'optimize'])->name('warehouse.quick-delivery.optimize');
-        
+
         // Reports & Analytics
         Route::get('/reports', [App\Http\Controllers\Warehouse\ReportController::class, 'index'])->name('warehouse.reports');
         Route::get('/reports/stock-summary', [App\Http\Controllers\Warehouse\ReportController::class, 'stockSummary'])->name('warehouse.reports.stock-summary');
         Route::get('/reports/movements', [App\Http\Controllers\Warehouse\ReportController::class, 'movements'])->name('warehouse.reports.movements');
         Route::get('/reports/export', [App\Http\Controllers\Warehouse\ReportController::class, 'export'])->name('warehouse.reports.export');
-        
+
         // Location Management
         Route::get('/locations', [App\Http\Controllers\Warehouse\LocationController::class, 'index'])->name('warehouse.locations');
         Route::post('/locations', [App\Http\Controllers\Warehouse\LocationController::class, 'store'])->name('warehouse.locations.store');
@@ -1038,7 +1036,7 @@ require __DIR__ . '/debug.php';
 require __DIR__ . '/auth.php';
 
 // Public debug routes (no authentication required)
-Route::get('/debug-bulk-system', function() {
+Route::get('/debug-bulk-system', function () {
     try {
         return response()->json([
             'status' => 'OK',
@@ -1088,12 +1086,12 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
         try {
             $publicExists = Storage::disk('public')->exists($storagePath);
             Log::info("/serve-image: Public disk check", [
-                'path' => $storagePath, 
+                'path' => $storagePath,
                 'exists' => $publicExists,
                 'disk_root' => Storage::disk('public')->path(''),
                 'full_path' => Storage::disk('public')->path($storagePath)
             ]);
-            
+
             if ($publicExists) {
                 Log::info("/serve-image: Found in public disk", ['path' => $storagePath]);
                 $file = Storage::disk('public')->get($storagePath);
@@ -1141,7 +1139,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 'message' => $sdkEx->getMessage(),
             ]);
         }
-        
+
         // For legacy paths, try multiple fallback paths
         if ($type === 'products') {
             $legacyPaths = [
@@ -1150,7 +1148,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                 'storage/' . $leafPath, // Old storage/ prefix
                 'uploads/' . $leafPath, // Old uploads/ prefix
             ];
-            
+
             foreach ($legacyPaths as $legacyPath) {
                 try {
                     if (Storage::disk('public')->exists($legacyPath)) {
@@ -1169,7 +1167,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                             'Cache-Control' => 'public, max-age=86400',
                         ]);
                     }
-                    
+
                     if (Storage::disk('r2')->exists($legacyPath)) {
                         Log::info("/serve-image: Found legacy path in r2 disk", ['path' => $legacyPath]);
                         $file = Storage::disk('r2')->get($legacyPath);
@@ -1188,13 +1186,13 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
                     Log::debug('Legacy path not found', ['path' => $legacyPath]);
                 }
             }
-            
+
             Log::warning('All legacy paths failed for /serve-image', [
                 'tested_paths' => $legacyPaths,
                 'original_path' => $storagePath
             ]);
         }
-        
+
         // If R2 public URL is configured, try redirect as fallback
         $r2Base = config('filesystems.disks.r2.url');
         if (!empty($r2Base)) {
@@ -1206,8 +1204,8 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
         }
 
 
-    Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
-        
+        Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
+
         // Return 404 - no placeholder
         return response()->json(['error' => 'Image not found', 'path' => $storagePath], 404);
     } catch (\Throwable $e) {
@@ -1236,14 +1234,14 @@ Route::get('/debug/image-display-test', function () {
 // DEBUG: Test specific image path
 Route::get('/debug/test-image-path', function () {
     $testPath = 'products/seller-2/srm340-1760342455.jpg';
-    
+
     $result = [
         'test_path' => $testPath,
         'r2_configured' => config('filesystems.disks.r2') !== null,
         'r2_bucket' => config('filesystems.disks.r2.bucket', 'NOT SET'),
         'checks' => []
     ];
-    
+
     // Check public disk
     try {
         $publicExists = Storage::disk('public')->exists($testPath);
@@ -1254,14 +1252,14 @@ Route::get('/debug/test-image-path', function () {
     } catch (\Exception $e) {
         $result['checks']['public'] = ['error' => $e->getMessage()];
     }
-    
+
     // Check R2 disk
     try {
         $r2Exists = Storage::disk('r2')->exists($testPath);
         $result['checks']['r2'] = [
             'exists' => $r2Exists,
         ];
-        
+
         if ($r2Exists) {
             $result['checks']['r2']['size'] = Storage::disk('r2')->size($testPath);
             $result['checks']['r2']['last_modified'] = Storage::disk('r2')->lastModified($testPath);
@@ -1269,7 +1267,7 @@ Route::get('/debug/test-image-path', function () {
     } catch (\Exception $e) {
         $result['checks']['r2'] = ['error' => $e->getMessage()];
     }
-    
+
     return response()->json($result);
 });
 
@@ -1282,28 +1280,28 @@ Route::get('/debug/storage-files', function (Request $request) {
         'r2_files' => [],
         'errors' => []
     ];
-    
+
     try {
         $publicFiles = Storage::disk('public')->allFiles($directory);
         $result['public_files'] = array_slice($publicFiles, 0, 20); // Limit to first 20
     } catch (\Throwable $e) {
         $result['errors']['public'] = $e->getMessage();
     }
-    
+
     try {
         $r2Files = Storage::disk('r2')->allFiles($directory);
         $result['r2_files'] = array_slice($r2Files, 0, 20); // Limit to first 20
     } catch (\Throwable $e) {
         $result['errors']['r2'] = $e->getMessage();
     }
-    
+
     return response()->json($result);
 });
 
 // Debug: Check file system and storage configuration
 Route::get('/debug/file-system', function (Request $request) {
     $path = $request->get('path', 'products/1551/teat-1760330018-OtAw4b.jpg');
-    
+
     $result = [
         'path_tested' => $path,
         'public_disk' => [
@@ -1320,7 +1318,7 @@ Route::get('/debug/file-system', function (Request $request) {
         'app_env' => app()->environment(),
         'storage_link_exists' => is_link(public_path('storage')),
     ];
-    
+
     // Test public disk
     try {
         $result['public_disk']['root_path'] = Storage::disk('public')->path('');
@@ -1329,7 +1327,7 @@ Route::get('/debug/file-system', function (Request $request) {
     } catch (\Throwable $e) {
         $result['public_disk']['error'] = $e->getMessage();
     }
-    
+
     // Test R2 disk
     try {
         $result['r2_disk']['config'] = config('filesystems.disks.r2');
@@ -1337,13 +1335,15 @@ Route::get('/debug/file-system', function (Request $request) {
     } catch (\Throwable $e) {
         $result['r2_disk']['error'] = $e->getMessage();
     }
-    
+
     return response()->json($result);
 });
 
 // Debug: Inspect a product's image resolution details by id or name
 Route::get('/debug/product-image', function (Request $request) {
-    $query = \App\Models\Product::with(['productImages' => function($q){ $q->orderByDesc('is_primary')->orderBy('id'); }]);
+    $query = \App\Models\Product::with(['productImages' => function ($q) {
+        $q->orderByDesc('is_primary')->orderBy('id');
+    }]);
     if ($request->filled('id')) {
         $query->where('id', $request->id);
     } elseif ($request->filled('name')) {
@@ -1363,7 +1363,7 @@ Route::get('/debug/product-image', function (Request $request) {
         'legacy_image_field' => $product->image,
         'computed_image_url' => $product->image_url,
         'has_image_data' => (bool) ($product->image_data && $product->image_mime_type),
-        'product_images' => $product->productImages->map(function($img){
+        'product_images' => $product->productImages->map(function ($img) {
             return [
                 'path' => $img->image_path,
                 'is_primary' => (bool) $img->is_primary,
@@ -1394,7 +1394,7 @@ Route::get('/debug/product-image', function (Request $request) {
 });
 
 // Public test route for simple upload (no auth required)
-Route::get('/test-simple-upload', function() {
+Route::get('/test-simple-upload', function () {
     try {
         // Add deployment verification to existing route
         $deploymentInfo = [
@@ -1403,31 +1403,31 @@ Route::get('/test-simple-upload', function() {
             'sample_image_url' => '',
             'routes_found' => []
         ];
-        
+
         // Check for serve-image route
         $router = app('router');
         $routes = $router->getRoutes();
-        
+
         foreach ($routes->getRoutes() as $route) {
             if (str_contains($route->uri(), 'serve-image')) {
                 $deploymentInfo['serve_route_exists'] = true;
                 $deploymentInfo['routes_found'][] = $route->uri();
             }
         }
-        
+
         // Check product filtering
         $deploymentInfo['product_count_with_seller'] = \App\Models\Product::whereNotNull('seller_id')->count();
-        
+
         // Get sample image URL
         $sampleProduct = \App\Models\Product::whereNotNull('seller_id')
             ->whereNotNull('image')
             ->where('image', '!=', '')
             ->first();
-            
+
         if ($sampleProduct) {
             $deploymentInfo['sample_image_url'] = $sampleProduct->image_url;
         }
-        
+
         return response()->json([
             'status' => 'Simple upload system working',
             'routes_available' => [
@@ -1457,40 +1457,39 @@ Route::get('/test-deployment', function () {
         'product_count' => 0,
         'git_commit' => '02681ff' // Latest commit
     ];
-    
+
     try {
         // Check if routes are loaded
         $router = app('router');
         $routes = $router->getRoutes();
-        
+
         foreach ($routes->getRoutes() as $route) {
             if (str_contains($route->uri(), 'serve-image')) {
                 $response['serve_route_exists'] = true;
                 $response['routes'][] = $route->uri();
             }
         }
-        
+
         // Get product count with seller filter
         $response['product_count'] = \App\Models\Product::whereNotNull('seller_id')->count();
-        
+
         // Get sample image URL
         $sampleProduct = \App\Models\Product::whereNotNull('seller_id')
             ->whereNotNull('image')
             ->where('image', '!=', '')
             ->first();
-            
+
         if ($sampleProduct) {
             $response['sample_image_url'] = $sampleProduct->image_url;
             $response['sample_product_name'] = $sampleProduct->name;
         }
-        
+
         $response['status'] = 'success';
-        
     } catch (\Exception $e) {
         $response['status'] = 'error';
         $response['error'] = $e->getMessage();
     }
-    
+
     return response()->json($response, 200, [], JSON_PRETTY_PRINT);
 });
 
@@ -1512,27 +1511,27 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware('guest:
         ->name('register');
     Route::post('/register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'register'])
         ->name('register.post');
-    
+
     // Quick Registration - OPTIMIZED FOR SPEED
     Route::get('/quick-register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'showQuickRegisterForm'])
         ->name('quick-register');
     Route::post('/quick-register', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'quickRegister'])
         ->name('quick-register.post');
-    
+
     // AJAX validation routes
     Route::post('/check-phone', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkPhone'])
         ->name('check-phone');
     Route::post('/check-email', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'checkEmail'])
         ->name('check-email');
-    
+
     // Login - SUPER FAST VERSION (No caching overhead)
     Route::get('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'showLoginForm'])
         ->name('login');
     Route::post('/login', [App\Http\Controllers\DeliveryPartner\SuperFastAuthController::class, 'login'])
         ->name('login.post');
-        
+
     // Diagnostics page for debugging login issues
-    Route::get('/login-diagnostics', function() {
+    Route::get('/login-diagnostics', function () {
         return view('delivery-partner.auth.diagnostics');
     })->name('login.diagnostics');
 });
@@ -1542,11 +1541,11 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
     // Logout
     Route::post('/logout', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'logout'])
         ->name('logout');
-    
+
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\DeliveryPartner\DashboardController::class, 'index'])
         ->name('dashboard');
-    
+
     // Profile Management
     Route::get('/profile', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'profile'])
         ->name('profile');
@@ -1554,7 +1553,7 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
         ->name('profile.update');
     Route::post('/change-password', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'changePassword'])
         ->name('change-password');
-    
+
     // Status Management
     Route::post('/toggle-online', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'toggleOnlineStatus'])
         ->name('toggle-online');
@@ -1563,7 +1562,7 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
     // Location update route (moved to DeliveryRequestController for better organization)
     Route::post('/update-location', [App\Http\Controllers\DeliveryRequestController::class, 'updateLocation'])
         ->name('update-location');
-    
+
     // Delivery Requests Management - NEW WALLET SYSTEM WITH ₹25 REWARDS
     Route::prefix('requests')->name('requests.')->group(function () {
         Route::get('/', [App\Http\Controllers\DeliveryRequestController::class, 'index'])
@@ -1579,7 +1578,7 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
         Route::post('/{deliveryRequest}/cancel', [App\Http\Controllers\DeliveryRequestController::class, 'cancel'])
             ->name('cancel');
     });
-    
+
     // Orders Management
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'index'])
@@ -1599,7 +1598,7 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
         Route::post('/{order}/update-status', [App\Http\Controllers\DeliveryPartner\OrderController::class, 'updateStatus'])
             ->name('update-status');
     });
-    
+
     // Earnings and Reports
     Route::prefix('earnings')->name('earnings.')->group(function () {
         Route::get('/', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'index'])
@@ -1611,13 +1610,13 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
         Route::post('/withdraw', [App\Http\Controllers\DeliveryPartner\EarningsController::class, 'withdraw'])
             ->name('withdraw');
     });
-    
+
     // Notifications
     Route::get('/notifications', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'index'])
         ->name('notifications');
     Route::post('/notifications/{id}/read', [App\Http\Controllers\DeliveryPartner\NotificationController::class, 'markAsRead'])
         ->name('notifications.read');
-    
+
     // Support and Help
     Route::get('/support', [App\Http\Controllers\DeliveryPartner\SupportController::class, 'index'])
         ->name('support');
@@ -1636,7 +1635,7 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
         Route::get('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'showLoginForm'])
             ->name('login');
         Route::post('/login', [App\Http\Controllers\HotelOwner\AuthController::class, 'login']);
-        
+
         Route::get('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'showRegistrationForm'])
             ->name('register');
         Route::post('/register', [App\Http\Controllers\HotelOwner\AuthController::class, 'register']);
@@ -1668,7 +1667,7 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
                 ->name('weekly');
             Route::get('/monthly', [App\Http\Controllers\HotelOwner\EarningsController::class, 'monthly'])
                 ->name('monthly');
-                   Route::get('/fetch', [App\Http\Controllers\HotelOwner\EarningsController::class, 'fetchEarnings'])
+            Route::get('/fetch', [App\Http\Controllers\HotelOwner\EarningsController::class, 'fetchEarnings'])
                 ->name('fetch');
 
             Route::post('/withdraw', [App\Http\Controllers\HotelOwner\EarningsController::class, 'withdraw'])
@@ -1710,16 +1709,16 @@ Route::prefix('food')->name('food.')->group(function () {
 Route::get('/debug-password-reset', function () {
     try {
         echo '<h2>Password Reset Debug</h2>';
-        
+
         // Test 1: Get a user with email
         $user = App\Models\User::whereNotNull('email')->first();
         if (!$user) {
             echo '<p>❌ No users with email found</p>';
             return;
         }
-        
+
         echo "<p>✓ Testing with user: {$user->email} (ID: {$user->id})</p>";
-        
+
         // Test 2: Check mail configuration
         echo '<h3>Mail Configuration:</h3>';
         echo '<ul>';
@@ -1730,14 +1729,14 @@ Route::get('/debug-password-reset', function () {
         echo '<li>From: ' . config('mail.from.address') . '</li>';
         echo '<li>Queue: ' . config('queue.default') . '</li>';
         echo '</ul>';
-        
+
         // Test 3: Send password reset
         echo '<h3>Password Reset Test:</h3>';
-        
+
         $status = Password::sendResetLink(['email' => $user->email]);
-        
+
         echo "<p>Reset status: <strong>{$status}</strong></p>";
-        
+
         if ($status == Password::RESET_LINK_SENT) {
             echo '<p style="color: green;">✓ Password reset link sent successfully!</p>';
         } else {
@@ -1750,20 +1749,20 @@ Route::get('/debug-password-reset', function () {
             echo "<li>SMTP authentication failure</li>";
             echo "</ul>";
         }
-        
+
         // Test 4: Try sending a basic test email
         echo '<h3>Basic Email Test:</h3>';
         try {
             Mail::raw('Test email from ' . config('app.name'), function ($message) use ($user) {
                 $message->to($user->email)
-                        ->subject('Test Email - ' . date('Y-m-d H:i:s'))
-                        ->from(config('mail.from.address'), config('mail.from.name'));
+                    ->subject('Test Email - ' . date('Y-m-d H:i:s'))
+                    ->from(config('mail.from.address'), config('mail.from.name'));
             });
             echo '<p style="color: green;">✓ Test email sent successfully!</p>';
         } catch (Exception $e) {
             echo '<p style="color: red;">❌ Test email failed: ' . $e->getMessage() . '</p>';
         }
-        
+
         // Test 5: Check password_resets table
         echo '<h3>Password Resets Table:</h3>';
         try {
@@ -1777,7 +1776,6 @@ Route::get('/debug-password-reset', function () {
         } catch (Exception $e) {
             echo '<p style="color: red;">❌ Error checking password_resets table: ' . $e->getMessage() . '</p>';
         }
-        
     } catch (Exception $e) {
         echo '<p style="color: red;">❌ Debug error: ' . $e->getMessage() . '</p>';
         echo '<p>File: ' . $e->getFile() . ' Line: ' . $e->getLine() . '</p>';
@@ -1788,25 +1786,25 @@ Route::get('/debug-password-reset', function () {
 Route::get('/test-password-reset-simple', function () {
     try {
         echo "<h2>Password Reset Test</h2>";
-        
+
         // Find a user
         $user = App\Models\User::whereNotNull('email')->first();
         if (!$user) {
             return "No user with email found.";
         }
-        
+
         echo "<p>Testing with: {$user->email}</p>";
-        
+
         // Test direct password reset
         $status = Password::sendResetLink(['email' => $user->email]);
-        
+
         echo "<p>Status: <strong>{$status}</strong></p>";
-        
+
         if ($status === Password::RESET_LINK_SENT) {
             echo '<p style="color: green;">✓ SUCCESS: Reset link sent!</p>';
         } else {
             echo '<p style="color: red;">✗ FAILED: ' . $status . '</p>';
-            
+
             // Additional debugging
             echo "<h3>Debugging Info:</h3>";
             echo "<ul>";
@@ -1815,20 +1813,19 @@ Route::get('/test-password-reset-simple', function () {
             echo "<li>From Address: " . config('mail.from.address') . "</li>";
             echo "<li>Queue Driver: " . config('queue.default') . "</li>";
             echo "</ul>";
-            
+
             // Check if token was created in database
             $token = DB::table('password_reset_tokens')
                 ->where('email', $user->email)
                 ->latest('created_at')
                 ->first();
-                
+
             if ($token) {
                 echo "<p>✓ Token created in database at: {$token->created_at}</p>";
             } else {
                 echo "<p>✗ No token found in database</p>";
             }
         }
-        
     } catch (Exception $e) {
         return "Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
     }
@@ -1858,26 +1855,30 @@ Route::get('/about', function () {
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-    Route::get('/ten-min-products', [SellerController::class, 'showTenMinProducts'])->name('ten.min.products');
+Route::get('/ten-min-products', [SellerController::class, 'showTenMinProducts'])->name('ten.min.products');
 
 
-    use App\Http\Controllers\Customer\CustomerFoodController;
+use App\Http\Controllers\Customer\CustomerFoodController;
+
 Route::prefix('food')->group(function () {
     // Public routes
     Route::get('/customer', [CustomerFoodController::class, 'index'])->name('customer.food.index');
 
 
-Route::get('/customer/details/{id}', [CustomerFoodController::class, 'details'])
-    ->name('customer.food.details');
+    Route::get('/customer/details/{id}', [CustomerFoodController::class, 'details'])
+        ->name('customer.food.details');
     // Protected cart routes
     Route::middleware('auth')->group(function () {
         Route::get('/cart', [CustomerFoodController::class, 'cartIndex'])->name('customer.food.cart');
         Route::post('/cart/add', [CustomerFoodController::class, 'cartAdd'])->name('customer.food.cart.add'); // <-- ADD THIS
-Route::post('/cart/update/{foodId}', [CustomerFoodController::class, 'cartUpdate'])
-    ->name('customer.food.cart.update');
-            Route::get('/cart/remove/{foodId}', [CustomerFoodController::class, 'cartRemove'])->name('customer.food.cart.remove');
-    Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
-    Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
-            Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
+        Route::post('/cart/update/{foodId}', [CustomerFoodController::class, 'cartUpdate'])
+            ->name('customer.food.cart.update');
+        Route::get('/cart/remove/{foodId}', [CustomerFoodController::class, 'cartRemove'])->name('customer.food.cart.remove');
+        Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
+        Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
+        Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
     });
 });
+
+Route::get('/tenmins', [SellerController::class, 'tenmins']);
+Route::get('/joinus', [SellerController::class, 'joinus']);

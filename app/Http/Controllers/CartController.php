@@ -125,7 +125,7 @@ class CartController extends Controller
         $count = CartItem::where('user_id', Auth::id())->sum('quantity') ?? 0;
         return response()->json(['count' => $count]);
     }
-    }
+    
 
     public function checkout(Request $request)
     {

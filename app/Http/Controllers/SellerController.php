@@ -2115,4 +2115,12 @@ public function tenMinOrderSuccess($orderId)
 
         return false;
     }
+
+    public function tenmins(){
+        return view('tenmins');
+    }
+
+    public function joinus(){
+        return view('joinus');
+    }
 }
