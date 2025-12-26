@@ -112,13 +112,13 @@
 
     <!-- HEADER SECTION -->
     <div class="header-section">
-        <h1>Welcome to Our Internship Program</h1>
+        <h1>Welcome to Our NQT Program</h1>
         <p class="lead">Learn, Build & Grow with Real-World Skills</p>
     </div>
 
     <!-- ABOUT SECTION -->
     <div class="container mt-5">
-        <div class="section-title">About Our Internship</div>
+        <div class="section-title">About Our NQT</div>
 
         <div class="row">
             <div class="col-md-10 mx-auto">
@@ -134,8 +134,8 @@
     </div>
 
     <!-- PROCESS SECTION -->
-    <div class="container mt-5">
-        <div class="section-title">Internship Process</div>
+    <!-- <div class="container mt-5">
+        <div class="section-title">NQT Process</div>
 
         <div class="row text-center">
             <div class="col-md-3 process-step">
@@ -162,11 +162,11 @@
                 <p>Receive an internship completion certificate.</p>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- REQUIREMENTS SECTION -->
     <div class="container mt-5">
-        <div class="section-title">Internship Requirements</div>
+        <div class="section-title">NQT Requirements</div>
 
         <div class="row">
             <div class="col-md-8 mx-auto">
@@ -190,7 +190,8 @@
         let totalOpenings = 20000;
         document.getElementById("totalOpenings").innerHTML = `
         <div class="openings-box">
-            <span>Total Internship Openings Left</span>
+            <span>Total NQT Openings Left</span>
+            
             <strong>${totalOpenings}</strong>
         </div>
     `;
@@ -234,203 +235,210 @@
 
     <!-- INTERNSHIP OPENINGS -->
     <div class="container mt-5 mb-5">
-        <div class="section-title">Internship Programs</div>
+        <div class="section-title">NQT Programs</div>
         <div class="cards-container" id="internshipContainer"></div>
     </div>
 
     <!-- JS SECTION -->
     <script>
-        const internships = [{
-                name: "PYTHON BASICS",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python"
-            },
+        const internships = [
+            // {
+            //     name: "PYTHON BASICS",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python"
+            // },
+            // {
+            //     name: "PYTHON (BASICS TO INTERMEDIATE)",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python"
+            // },
+            // {
+            //     name: "PYTHON ADVANCED",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python"
+            // },
+            // {
+            //     name: "PYTHON (BASICS TO ADVANCED)",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python"
+            // },
+            // {
+            //     name: "PYTHON WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python + AI"
+            // },
+            // {
+            //     name: "PYTHON WITH GEN AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Python + Gen AI"
+            // },
+            // {
+            //     name: "PYTHON WITH AGENTIC AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Agentic AI"
+            // },
+            // {
+            //     name: "PYTHON FULLSTACK",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Fullstack"
+            // },
+            // {
+            //     name: "PYTHON FULLSTACK WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Fullstack + AI"
+            // },
+            // {
+            //     name: "PROMPT ENGINEERING FOUNDATION",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Prompt Engineering"
+            // },
+            // {
+            //     name: "PROMPT ENGINEERING ADVANCED",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Prompt Engineering"
+            // },
+            // {
+            //     name: "DATA ANALYTICS",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Data Analytics"
+            // },
+            // {
+            //     name: "DATA ANALYTICS WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Data Analytics + AI"
+            // },
+            // {
+            //     name: "DATASCIENCE",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Data Science"
+            // },
+            // {
+            //     name: "DATASCIENCE WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Data Science + AI"
+            // },
+            // {
+            //     name: "AI ENGINEER",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "AI Engineering"
+            // },
+            // {
+            //     name: "AGENTIC AI FOUNDATION",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Agentic AI"
+            // },
+            // {
+            //     name: "AGENTIC AI AUTOMATION (N8N)",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "N8N Automation"
+            // },
+            // {
+            //     name: "AGENTIC AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Agentic AI"
+            // },
+            // {
+            //     name: "DIGITAL MARKETING FOUNDATION",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Digital Marketing"
+            // },
+            // {
+            //     name: "DIGITAL MARKETING",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Digital Marketing"
+            // },
+            // {
+            //     name: "DIGITAL MARKETING WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "DM + AI"
+            // },
+            // {
+            //     name: "DIGITAL MARKETING WITH GEN AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "DM + Gen AI"
+            // },
+            // {
+            //     name: "DIGITAL MARKETING WITH AGENTIC AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "DM + Agentic AI"
+            // },
+            // {
+            //     name: "MERN STACK",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "MERN"
+            // },
+            // {
+            //     name: "MERN STACK WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "MERN + AI"
+            // },
+            // {
+            //     name: "LARAVEL",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Laravel"
+            // },
+            // {
+            //     name: "LARAVEL WITH AI",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Laravel + AI"
+            // },
+            // {
+            //     name: "SNOWFLAKE",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Snowflake"
+            // },
+            // {
+            //     name: "CLOUD FULLSTACK FOUNDATION",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Cloud Fullstack"
+            // },
+            // {
+            //     name: "CLOUD FULLSTACK INTERMEDIATE",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Cloud Fullstack"
+            // },
+            // {
+            //     name: "CLOUD FULLSTACK ADVANCED",
+            //     fee: 5000,
+            //     weeks: 12,
+            //     domain: "Cloud Advanced"
+            // },
             {
-                name: "PYTHON (BASICS TO INTERMEDIATE)",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python"
-            },
-            {
-                name: "PYTHON ADVANCED",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python"
-            },
-            {
-                name: "PYTHON (BASICS TO ADVANCED)",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python"
-            },
-            {
-                name: "PYTHON WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python + AI"
-            },
-            {
-                name: "PYTHON WITH GEN AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Python + Gen AI"
-            },
-            {
-                name: "PYTHON WITH AGENTIC AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Agentic AI"
-            },
-            {
-                name: "PYTHON FULLSTACK",
-                fee: 5000,
-                weeks: 12,
-                domain: "Fullstack"
-            },
-            {
-                name: "PYTHON FULLSTACK WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Fullstack + AI"
-            },
-            {
-                name: "PROMPT ENGINEERING FOUNDATION",
-                fee: 5000,
-                weeks: 12,
-                domain: "Prompt Engineering"
-            },
-            {
-                name: "PROMPT ENGINEERING ADVANCED",
-                fee: 5000,
-                weeks: 12,
-                domain: "Prompt Engineering"
-            },
-            {
-                name: "DATA ANALYTICS",
-                fee: 5000,
-                weeks: 12,
-                domain: "Data Analytics"
-            },
-            {
-                name: "DATA ANALYTICS WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Data Analytics + AI"
-            },
-            {
-                name: "DATASCIENCE",
-                fee: 5000,
-                weeks: 12,
-                domain: "Data Science"
-            },
-            {
-                name: "DATASCIENCE WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Data Science + AI"
-            },
-            {
-                name: "AI ENGINEER",
-                fee: 5000,
-                weeks: 12,
-                domain: "AI Engineering"
-            },
-            {
-                name: "AGENTIC AI FOUNDATION",
-                fee: 5000,
-                weeks: 12,
-                domain: "Agentic AI"
-            },
-            {
-                name: "AGENTIC AI AUTOMATION (N8N)",
-                fee: 5000,
-                weeks: 12,
-                domain: "N8N Automation"
-            },
-            {
-                name: "AGENTIC AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Agentic AI"
-            },
-            {
-                name: "DIGITAL MARKETING FOUNDATION",
-                fee: 5000,
-                weeks: 12,
-                domain: "Digital Marketing"
-            },
-            {
-                name: "DIGITAL MARKETING",
-                fee: 5000,
-                weeks: 12,
-                domain: "Digital Marketing"
-            },
-            {
-                name: "DIGITAL MARKETING WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "DM + AI"
-            },
-            {
-                name: "DIGITAL MARKETING WITH GEN AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "DM + Gen AI"
-            },
-            {
-                name: "DIGITAL MARKETING WITH AGENTIC AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "DM + Agentic AI"
-            },
-            {
-                name: "MERN STACK",
-                fee: 5000,
-                weeks: 12,
-                domain: "MERN"
-            },
-            {
-                name: "MERN STACK WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "MERN + AI"
-            },
-            {
-                name: "LARAVEL",
-                fee: 5000,
-                weeks: 12,
-                domain: "Laravel"
-            },
-            {
-                name: "LARAVEL WITH AI",
-                fee: 5000,
-                weeks: 12,
-                domain: "Laravel + AI"
-            },
-            {
-                name: "SNOWFLAKE",
-                fee: 5000,
-                weeks: 12,
-                domain: "Snowflake"
-            },
-            {
-                name: "CLOUD FULLSTACK FOUNDATION",
-                fee: 5000,
-                weeks: 12,
-                domain: "Cloud Fullstack"
-            },
-            {
-                name: "CLOUD FULLSTACK INTERMEDIATE",
-                fee: 5000,
-                weeks: 12,
-                domain: "Cloud Fullstack"
-            },
-            {
-                name: "CLOUD FULLSTACK ADVANCED",
-                fee: 5000,
-                weeks: 12,
-                domain: "Cloud Advanced"
+                name: "National Qualifier Test",
+                fee: 1000,
+                weeks: 0,
+                domain: "NQT"
             }
         ];
 
@@ -452,10 +460,9 @@
         });
 
         function applyNow(name, fee, weeks, domain) {
-    const url = `/internship/apply?name=${encodeURIComponent(name)}&fee=${fee}&weeks=${weeks}&domain=${encodeURIComponent(domain)}`;
-    window.location.href = url;
-}
-
+            const url = `/internship/apply?name=${encodeURIComponent(name)}&fee=${fee}&weeks=${weeks}&domain=${encodeURIComponent(domain)}`;
+            window.location.href = url;
+        }
     </script>
 
 </body>
