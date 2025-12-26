@@ -742,7 +742,20 @@
                             <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
                             <s class="fs-8 text-muted">₹{{ number_format($prod->price * 1.2, 0) }}</s>
                         </div>
-                        <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+@auth
+    <button 
+        class="add-btn"
+        onclick="event.stopPropagation(); addToCart({{ $prod->id }})">
+        ADD
+    </button>
+@else
+    <a 
+        href="{{ route('login') }}"
+        class="add-btn"
+        style="text-align:center; text-decoration:none;">
+        Login
+    </a>
+@endauth
                     </div>
                     @endforeach
                 </div>
