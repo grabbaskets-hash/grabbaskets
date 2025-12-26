@@ -1631,9 +1631,30 @@
               </strong>
             </div>
 
+            @if($totals['total'] > 2000)
+            <!-- Wallet Option -->
+            <div class="summary-row" style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 12px;">
+              <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                <input type="checkbox" id="use_wallet" name="use_wallet" value="1" style="width: 20px; height: 20px; cursor: pointer;" onchange="updateWalletDiscount()">
+                <label for="use_wallet" style="flex: 1; cursor: pointer; margin: 0;">
+                  <strong style="color: #856404;">
+                    <i class="bi bi-wallet2"></i> Use Wallet Points
+                  </strong>
+                  <small class="d-block text-muted" style="font-size: 0.85rem;">
+                    Available: ₹{{ number_format(Auth::user()->wallet_point ?? 0, 2) }} | Save ₹150
+                  </small>
+                </label>
+              </div>
+            </div>
+            <div class="summary-row" id="wallet-discount-row" style="display: none;">
+              <span><i class="bi bi-wallet2 text-warning"></i> Wallet Discount</span>
+              <strong class="text-warning">-₹150.00</strong>
+            </div>
+            @endif
+
             <div class="summary-total">
               <span>Total Amount</span>
-              <strong style="color: #667eea;">₹{{ number_format($totals['total'], 2) }}</strong>
+              <strong style="color: #667eea;" id="final-total">₹{{ number_format($totals['total'], 2) }}</strong>
             </div>
 
             <div class="text-center mt-3 p-3" style="background: #f0f7ff; border-radius: 8px;">
@@ -2351,6 +2372,12 @@
       btnText.textContent = 'Processing...';
 
       const formData = new FormData(document.getElementById('checkout-form'));
+      
+      // Include wallet checkbox value
+      const useWalletCheckbox = document.getElementById('use_wallet');
+      if (useWalletCheckbox) {
+        formData.append('use_wallet', useWalletCheckbox.checked ? '1' : '0');
+      }
 
       fetch('{{ route("payment.createOrder") }}', {
         method: 'POST',
@@ -2497,6 +2524,29 @@
         placeOrderBtn.disabled = false;
         btnText.textContent = 'Pay with Razorpay';
       });
+    }
+
+    // Wallet discount function
+    function updateWalletDiscount() {
+      const useWallet = document.getElementById('use_wallet');
+      const walletDiscountRow = document.getElementById('wallet-discount-row');
+      const finalTotalElement = document.getElementById('final-total');
+      
+      if (!useWallet || !walletDiscountRow || !finalTotalElement) {
+        return;
+      }
+
+      const originalTotal = {{ $totals['total'] }};
+      const walletDiscount = 150;
+
+      if (useWallet.checked) {
+        walletDiscountRow.style.display = 'flex';
+        const newTotal = originalTotal - walletDiscount;
+        finalTotalElement.textContent = '₹' + newTotal.toFixed(2);
+      } else {
+        walletDiscountRow.style.display = 'none';
+        finalTotalElement.textContent = '₹' + originalTotal.toFixed(2);
+      }
     }
   </script>
 

@@ -492,11 +492,7 @@
             <div class="col-sm-responsive p-2">
                 <a href="{{ route('customer.food.details', $food->id) }}" class="text-decoration-none">
                     <div class="food-card">
-                        @if(!empty($food->images) && is_array($food->images))
-                        <img src="{{ $food->images[0] }}" onerror="this.src='https://via.placeholder.com/480x300?text=No+Image'">
-                        @else
-                        <img src="https://via.placeholder.com/480x300?text=No+Image" />
-                        @endif
+                        <img src="{{ $food->first_image_url }}" onerror="this.src='https://via.placeholder.com/480x300?text=No+Image'" alt="{{ $food->name }}">
                         <div class="food-title">{{ $food->name }}</div>
                         <div class="mt-1">
                             @if($food->food_type === 'veg')

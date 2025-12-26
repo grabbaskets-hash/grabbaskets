@@ -37,13 +37,10 @@
                 @foreach($foods as $food)
                     <div class="col-12 col-md-6 col-lg-3">
                         <div class="card food-card h-100 shadow-sm">
-                            @if(!empty($food->images) && is_array($food->images) && !empty($food->images[0]))
-                                <img src="{{ $food->images[0] }}" class="card-img-top" alt="{{ $food->name }}" style="height: 180px; object-fit: cover;">
-                            @else
-                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                                    <i class="fas fa-utensils text-muted" style="font-size: 48px;"></i>
-                                </div>
-                            @endif
+                            <img src="{{ $food->first_image_url }}" class="card-img-top" alt="{{ $food->name }}" style="height: 180px; object-fit: cover;" onerror="this.onerror=null; this.src='https://via.placeholder.com/480x300?text=No+Image'; this.style.display='block'; this.nextElementSibling.style.display='none';">
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px; display:none;">
+                                <i class="fas fa-utensils text-muted" style="font-size: 48px;"></i>
+                            </div>
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ $food->name }}</h5>
                                 @if($food->rating)

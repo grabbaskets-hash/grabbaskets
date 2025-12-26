@@ -88,4 +88,16 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Display the user's wallet balance.
+     */
+    public function wallet()
+    {
+        $user = Auth::user();
+        $walletPoints = $user->wallet_point ?? 0;
+        $walletAmount = $walletPoints; // 1 point = 1 rupee
+        
+        return view('profile.wallet', compact('user', 'walletPoints', 'walletAmount'));
+    }
 }

@@ -193,6 +193,7 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/wallet', [ProfileController::class, 'wallet'])->name('wallet.show');
 });
 
 // Test route without middleware

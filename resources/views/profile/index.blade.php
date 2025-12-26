@@ -147,6 +147,16 @@
     </div>
   </div>
 
+  <!-- Wallet Information -->
+  <div class="section">
+    <h3>Wallet Balance</h3>
+    <div class="info-list">
+      <p><strong>Wallet Points:</strong> ₹{{ number_format($user->wallet_point ?? 0, 2) }} ({{ number_format($user->wallet_point ?? 0, 0) }} Points)
+        <a href="{{ route('wallet.show') }}" class="btn" style="text-decoration:none; margin-left: 10px;">View Wallet</a>
+      </p>
+    </div>
+  </div>
+
   <!-- Account Settings -->
   <div class="section">
     <h3>Account Settings</h3>

@@ -87,13 +87,75 @@ class FoodItem extends Model
     // app/Models/FoodItem.php
     public function getFirstImageUrlAttribute()
     {
-        if (!empty($this->images) && is_array($this->images) && !empty($this->images[0])) {
-            // If it's a local path, convert to public URL
-            if (strpos($this->images[0], 'http') !== 0) {
-                return Storage::url($this->images[0]);
-            }
-            return $this->images[0]; // Already a URL
+        // Check if single image field exists
+        if (!empty($this->image)) {
+            return $this->getImageUrl($this->image);
         }
+        
+        // Check images array
+        if (!empty($this->images) && is_array($this->images) && !empty($this->images[0])) {
+            return $this->getImageUrl($this->images[0]);
+        }
+        
         return 'https://via.placeholder.com/480x300?text=No+Image';
+    }
+    
+    /**
+     * Get image URL from AWS/R2 or serve-image route
+     */
+    private function getImageUrl($imagePath)
+    {
+        if (empty($imagePath)) {
+            return 'https://via.placeholder.com/480x300?text=No+Image';
+        }
+        
+        // If already a full URL, return as is
+        if (strpos($imagePath, 'http') === 0) {
+            return $imagePath;
+        }
+        
+        // Check if it's a static public image
+        if (str_starts_with($imagePath, 'images/')) {
+            return asset($imagePath);
+        }
+        
+        // Use serve-image route for AWS/R2 images
+        // Determine storage type (r2 for production, public for local)
+        $isLaravelCloud = (
+            env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
+            (app()->environment('production') &&
+             isset($_SERVER['SERVER_NAME']) &&
+             strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
+        );
+        $type = $isLaravelCloud ? 'r2' : 'public';
+        
+        return url('/serve-image/' . $type . '/' . ltrim($imagePath, '/'));
+    }
+    
+    /**
+     * Get all image URLs
+     */
+    public function getImageUrlsAttribute()
+    {
+        $urls = [];
+        
+        // Add single image if exists
+        if (!empty($this->image)) {
+            $urls[] = $this->getImageUrl($this->image);
+        }
+        
+        // Add images from array
+        if (!empty($this->images) && is_array($this->images)) {
+            foreach ($this->images as $img) {
+                if (!empty($img)) {
+                    $url = $this->getImageUrl($img);
+                    if (!in_array($url, $urls)) {
+                        $urls[] = $url;
+                    }
+                }
+            }
+        }
+        
+        return !empty($urls) ? $urls : ['https://via.placeholder.com/480x300?text=No+Image'];
     }
 }
