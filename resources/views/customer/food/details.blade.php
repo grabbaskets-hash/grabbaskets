@@ -41,11 +41,7 @@ body{ font-family:"Poppins",sans-serif; background:#f5f4f7; margin:0; }
 
 <div class="food-details">
   <!-- Image -->
-  @if(!empty($food->images) && is_array($food->images))
-    <img src="{{ $food->images[0] }}" alt="{{ $food->name }}">
-  @else
-    <img src="https://via.placeholder.com/480x300?text=No+Image" alt="{{ $food->name }}">
-  @endif
+  <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}" onerror="this.src='https://via.placeholder.com/480x300?text=No+Image'">
 
   <!-- Name -->
   <h3>{{ $food->name }}</h3>

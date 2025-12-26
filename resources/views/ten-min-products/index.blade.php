@@ -392,7 +392,7 @@ gap: 16px;
               <div class="ribbon">{{ $product->discount }}% OFF</div>
             @endif
             <div class="thumb">
-              <img src="{{ asset('product_images/'.$product->image) }}" alt="{{ $product->name }}">
+              <img src="{{ $product->image_url ?? asset('images/placeholder.png') }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('images/placeholder.png') }}'">
             </div>
             <h4>{{ $product->name }}</h4>
             <div class="meta-sub">{{ $product->subcategory?->name ?? 'Other' }}</div>
