@@ -11,7 +11,7 @@ class InternshipController extends Controller
 {
     // // Live Razorpay Keys (hardcoded)
 
-    
+
     public $razorpayId = 'rzp_live_RZLX30zmmnhHum';
     public $razorpaySecret = 'XKmsdH5PbR49EiT74CgehYYi';
 
@@ -20,7 +20,8 @@ class InternshipController extends Controller
         return view('intern.internship');
     }
 
-    public function job(){
+    public function job()
+    {
         return view('intern.job');
     }
     public function form(Request $request)
@@ -72,4 +73,11 @@ class InternshipController extends Controller
 
         return view('intern.success', ['intern' => $intern]);
     }
+
+    public function details()
+{
+    $intern = Internship::all();
+    return view('intern.details', compact('intern'));
+}
+
 }

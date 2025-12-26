@@ -1883,3 +1883,5 @@ Route::prefix('food')->group(function () {
 
 Route::get('/tenmins', [SellerController::class, 'tenmins']);
 Route::get('/joinus', [SellerController::class, 'joinus']);
+Route::get('/internship/details', [InternshipController::class, 'details'])
+     ->name('internship.details');
