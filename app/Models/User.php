@@ -29,6 +29,7 @@ class User extends Authenticatable
         'sex',
         'password',
         'dob',
+        'wallet_point',
         'default_address',
         'profile_picture',
     ];

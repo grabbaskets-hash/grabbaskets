@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Seller;
+use App\Models\Buyer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Show registration form
      */
     public function create(): View
     {
@@ -24,30 +24,31 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle registration
      */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'max:15', 'unique:users,phone'],
-            'billing_address' => ['required', 'string', 'max:255'],
-            'state' => ['required', 'string', 'max:100'],
-            'city' => ['required', 'string', 'max:100'],
-            'pincode' => ['required', 'string', 'max:10'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['required', 'unique:users,phone'],
+            'billing_address' => ['required'],
+            'state' => ['required'],
+            'city' => ['required'],
+            'pincode' => ['required'],
             'role' => ['required', 'in:seller,buyer'],
             'sex' => ['required', 'in:male,female,other'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'email.unique' => 'This email is already registered.',
-            'phone.unique' => 'This phone number is already registered.',
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | SELLER REGISTRATION
+        |--------------------------------------------------------------------------
+        */
         if ($request->role === 'seller') {
-            $seller = \App\Models\Seller::create([
+
+            Seller::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -58,7 +59,7 @@ class RegisteredUserController extends Controller
                 'sex' => $request->sex,
                 'password' => Hash::make($request->password),
             ]);
-            // Also ensure a corresponding users row exists for web auth
+
             $user = User::updateOrCreate(
                 ['email' => $request->email],
                 [
@@ -70,73 +71,65 @@ class RegisteredUserController extends Controller
                     'pincode' => $request->pincode,
                     'role' => 'seller',
                     'sex' => $request->sex,
-                    // Let the User model cast hash the password
-                    'password' => $request->password,
+                    'wallet_point' => 0, // ✅ Seller gets 0
+                    'password' => Hash::make($request->password),
                 ]
             );
+
             Auth::login($user);
-            
-            // Gender-based welcome message
-            $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
+
             return redirect()->route('seller.dashboard')->with([
-                'success' => $greeting,
-                'tamil_greeting' => true,
+                'success' => $this->greeting($request->sex, $user->name),
                 'login_success' => true
             ]);
-        } else {
-            $buyer = \App\Models\Buyer::create([
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | BUYER REGISTRATION
+        |--------------------------------------------------------------------------
+        */
+        Buyer::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'billing_address' => $request->billing_address,
+            'state' => $request->state,
+            'city' => $request->city,
+            'pincode' => $request->pincode,
+            'sex' => $request->sex,
+            'password' => Hash::make($request->password),
+        ]);
+
+        $user = User::updateOrCreate(
+            ['email' => $request->email],
+            [
                 'name' => $request->name,
-                'email' => $request->email,
                 'phone' => $request->phone,
                 'billing_address' => $request->billing_address,
                 'state' => $request->state,
                 'city' => $request->city,
                 'pincode' => $request->pincode,
+                'role' => 'buyer',
                 'sex' => $request->sex,
+                'wallet_point' => 150, // ✅ Buyer gets 150
                 'password' => Hash::make($request->password),
-            ]);
-            // Also ensure a corresponding users row exists for web auth
-            $user = User::updateOrCreate(
-                ['email' => $request->email],
-                [
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'billing_address' => $request->billing_address,
-                    'state' => $request->state,
-                    'city' => $request->city,
-                    'pincode' => $request->pincode,
-                    'role' => 'buyer',
-                    'sex' => $request->sex,
-                    // Let the User model cast hash the password
-                    'password' => $request->password,
-                ]
-            );
-            Auth::login($user);
-            
-            // Gender-based welcome message
-            $greeting = $this->getGenderBasedGreeting($request->sex, $user->name);
-            return redirect()->route('home')->with([
-                'success' => $greeting,
-                'tamil_greeting' => true,
-                'login_success' => true
-            ]);
-        }
+            ]
+        );
+
+        Auth::login($user);
+
+        return redirect()->route('home')->with([
+            'success' => $this->greeting($request->sex, $user->name),
+            'login_success' => true
+        ]);
     }
 
     /**
-     * Get gender-based greeting message
+     * Greeting message
      */
-    private function getGenderBasedGreeting(string $gender, string $name): string
+    private function greeting(string $sex, string $name): string
     {
-        switch ($gender) {
-            case 'male':
-                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
-            case 'female':
-                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
-            case 'other':
-                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
-            default:
-                return "வணக்கம் {$name}! Welcome to GrabBasket family!";
-        }
+        return "வணக்கம் {$name}! Welcome to GrabBasket family!";
     }
 }
