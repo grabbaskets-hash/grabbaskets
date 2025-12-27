@@ -32,11 +32,8 @@ class User extends Authenticatable
         'wallet_point',
         'default_address',
         'profile_picture',
-<<<<<<< HEAD
         'referral_code',
         'referrer_id',
-=======
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
     ];
 
     protected static function boot()

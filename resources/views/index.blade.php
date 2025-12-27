@@ -380,15 +380,6 @@
                 display: flex;
                 overflow-x: auto;
                 gap: 15px;
-            .nav-link-mobile {
-                gap: 5px;
-                color: #95a5a6;
-                transition: all 0.3s;
-            }
-            .nav-link-mobile i {
-                font-size: 1.5rem;
-                transition: transform 0.2s;
-=======
                 padding: 0 15px;
                 scrollbar-width: none;
             }
@@ -457,18 +448,9 @@
             .nav-link-mobile i {
                 font-size: 1.4rem;
                 margin-bottom: -2px;
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
             }
             .nav-link-mobile.active {
                 color: var(--primary);
-            }
-            .nav-link-mobile.active i {
-                transform: translateY(-2px);
-                filter: drop-shadow(0 4px 6px rgba(var(--primary-rgb), 0.3));
-            }
-            .nav-link-mobile span {
-                font-size: 0.7rem;
-                font-weight: 600;
             }
         }
 
@@ -718,11 +700,7 @@
 
         <main style="padding-bottom: 20px;">
             <div class="hero-banner">
-<<<<<<< HEAD
-                <span class="badge bg-warning text-dark mb-2">âš¡ Superfast Delivery</span>
-=======
                 <span class="badge bg-warning text-dark mb-2">⚡ Superfast Delivery</span>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 <h2>GrabBaskets<br>Ecommerce Website</h2>
                 <p>Your one-stop shop for all grocery needs with 10-minute delivery!</p>
                 <div class="down-arrow">
@@ -733,11 +711,7 @@
                 @foreach(($categories ?? [])->take(8) as $cat)
                 <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="category-item">
                     <div class="cat-icon-box shadow-sm-custom">
-<<<<<<< HEAD
-                        {{ $cat->emoji ?? 'ðŸ¥¬' }}
-=======
                         {{ $cat->emoji ?? '🥬' }}
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     </div>
                     <span class="fs-8 fw-semibold truncate-1">{{ $cat->name ?? 'Category' }}</span>
                 </a>
@@ -745,11 +719,7 @@
                 @if(count($categories ?? []) == 0)
                     @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning'] as $dummy)
                     <a href="#" class="category-item">
-<<<<<<< HEAD
-                        <div class="cat-icon-box shadow-sm-custom">ðŸ“¦</div>
-=======
                         <div class="cat-icon-box shadow-sm-custom">📦</div>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         <span class="fs-8 fw-semibold truncate-1">{{ $dummy }}</span>
                     </a>
                     @endforeach
@@ -757,11 +727,7 @@
             </div>
             <div class="product-rail">
                 <div class="rail-header">
-<<<<<<< HEAD
-                    <h5 class="fw-bold mb-0">ðŸ”¥ Trending Now</h5>
-=======
                     <h5 class="fw-bold mb-0">🔥 Trending Now</h5>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
                 </div>
                 <div class="rail-scroll">
@@ -773,13 +739,8 @@
                         <div class="fs-8 text-muted truncate-1">1 unit</div>
                         <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
                         <div class="d-flex align-items-center justify-content-between">
-<<<<<<< HEAD
-                            <span class="fs-7 fw-bold">â‚¹{{ number_format($prod->price, 0) }}</span>
-                            <s class="fs-8 text-muted">â‚¹{{ number_format($prod->price * 1.2, 0) }}</s>
-=======
                             <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
                             <s class="fs-8 text-muted">₹{{ number_format($prod->price * 1.2, 0) }}</s>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         </div>
 @auth
     <button 
@@ -800,21 +761,13 @@
                 </div>
             </div>
             <div class="munchies-banner">
-<<<<<<< HEAD
-                <h3>âš¡ Instant Munchies (Nearby)</h3>
-=======
                 <h3>⚡ Instant Munchies (Nearby)</h3>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 <p>Quick snacks and drinks delivered in minutes!</p>
                 <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="product-rail">
                 <div class="rail-header">
-<<<<<<< HEAD
-                    <h5 class="fw-bold mb-0">ðŸ¥¬ Fresh Vegetables</h5>
-=======
                     <h5 class="fw-bold mb-0">🥬 Fresh Vegetables</h5>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
                 </div>
                 <div class="rail-scroll">
@@ -826,11 +779,7 @@
                         <div class="fs-8 text-muted truncate-1">500g</div>
                         <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
                         <div class="d-flex align-items-center justify-content-between">
-<<<<<<< HEAD
-                            <span class="fs-7 fw-bold">â‚¹{{ number_format($prod->price, 0) }}</span>
-=======
                             <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
                     </div>
@@ -946,7 +895,7 @@
                             <div class="content">
                                 <h1>GrabBaskets Ecommerce Website</h1>
                                 <p>
-                                A dedicated e-commerce platform for Tamil Nadu products — buy Products like Groceries,Products,Gadgets and essentials
+                                A dedicated e-commerce platform for Tamil Nadu products — buy Products like Groceries,Products,Gadgets and essentials 
                                 from anywhere in Tamil Nadu with ease and Get Fast delivery.
                                 </p>
                                <a href="#daily"> <button class="btn btn-light rounded-pill px-4 fw-bold text-primary ">Shop Now</button></a>
@@ -1086,83 +1035,5 @@ function getUserLocation() {
 }
 </script>
 
-
-<!-- Referral Code Modal -->
-@auth
-    @if(!Auth::user()->referrer_id)
-    <div id="referralModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px);">
-        <div style="background-color: #fff; margin: 40% auto; padding: 20px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <div style="font-size: 50px;">🎁</div>
-            <h3 style="margin-top: 10px; color: #333; font-weight: 700;">Welcome Gift!</h3>
-            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Enter a referral code to get <span style="color: #2ecc71; font-weight: bold;">300 Points</span> in your wallet!</p>
-            
-            <input type="text" id="referralCodeInput" placeholder="Enter Code (e.g. ABC12345)" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; text-align: center; text-transform: uppercase;">
-            
-            <button onclick="applyReferral()" id="referralBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; width: 100%; font-weight: 600; cursor: pointer;">Redeem Now</button>
-            <button onclick="closeReferralModal()" style="background: transparent; color: #999; border: none; margin-top: 15px; cursor: pointer;">No, thanks</button>
-            <p id="referralMsg" style="margin-top: 10px; font-size: 12px;"></p>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if shown in this session
-            if (!sessionStorage.getItem('referralModalShown')) {
-                setTimeout(function() {
-                     document.getElementById('referralModal').style.display = 'block';
-                }, 1500); 
-                sessionStorage.setItem('referralModalShown', 'true');
-            }
-        });
-
-        function closeReferralModal() {
-            document.getElementById('referralModal').style.display = 'none';
-        }
-
-        function applyReferral() {
-            const code = document.getElementById('referralCodeInput').value.toUpperCase();
-            if (!code) return;
-
-            const btn = document.getElementById('referralBtn');
-            const msg = document.getElementById('referralMsg');
-            
-            btn.disabled = true;
-            btn.innerHTML = 'Verifying...';
-            msg.innerText = '';
-
-            fetch('{{ route("referral.apply") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ referral_code: code })
-            })
-            .then(response => response.json().then(data => ({status: response.status, body: data})))
-            .then(res => {
-                if (res.status === 200) {
-                    msg.style.color = 'green';
-                    msg.innerText = res.body.message;
-                    btn.innerHTML = 'Success!';
-                    setTimeout(closeReferralModal, 2000);
-                    // Update user wallet point logic if needed on UI
-                } else {
-                    msg.style.color = 'red';
-                    msg.innerText = res.body.message || 'Error occurred';
-                    btn.disabled = false;
-                    btn.innerHTML = 'Redeem Now';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                msg.style.color = 'red';
-                msg.innerText = 'Something went wrong';
-                btn.disabled = false;
-                btn.innerHTML = 'Redeem Now';
-            });
-        }
-    </script>
-    @endif
-@endauth
 </body>
 </html>
