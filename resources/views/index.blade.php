@@ -211,253 +211,175 @@
         /* ===== MOBILE VIEW ===== */
         @media (max-width: 991px) {
             .desktop-only { display: none !important; }
-            body { 
-                padding-bottom: calc(var(--bottom-nav-height) + 30px); 
-                background-color: #f8f9fa; /* Lighter background for better contrast */
-            }
-            
-            /* Premium Sticky Header */
+            body { padding-bottom: calc(var(--bottom-nav-height) + 20px); }
             .mobile-header {
                 position: sticky;
                 top: 0;
                 z-index: 1000;
-                padding: 15px 20px;
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                box-shadow: 0 4px 20px rgba(37, 117, 252, 0.2);
-                border-bottom-left-radius: 25px;
-                border-bottom-right-radius: 25px;
-                margin-bottom: 20px;
+                padding: 12px 15px;
             }
-
             .brand-mobile {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
                 font-weight: 800;
                 color: white;
                 text-decoration: none;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                letter-spacing: -0.5px;
-            }
-
-            /* Enhanced Search Bar */
-            .search-bar-container { 
-                margin-top: 15px; 
-                filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-            }
-            .search-input {
-                padding: 14px 20px 14px 50px;
-                border: none !important;
-                border-radius: 18px !important;
-                background: rgba(255, 255, 255, 0.95) !important;
-                color: #333 !important;
-                font-weight: 500;
-                font-size: 0.95rem;
-            }
-            .search-input::placeholder {
-                color: #888 !important;
-                font-weight: 400;
-            }
-            .search-icon { 
-                left: 18px; 
-                font-size: 1.1rem; 
-                color: var(--primary) !important;
-                opacity: 0.8;
-            }
-
-            /* Icon Buttons */
-            .mobile-icons {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-            .icon-btn {
-                width: 42px;
-                height: 42px;
-                border-radius: 12px !important;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(4px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-decoration: none;
-                transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-            .icon-btn i {
-                color: white !important;
-                font-size: 1.25rem;
-            }
-            .icon-btn:active {
-                transform: scale(0.95);
-            }
-
-            /* Refined Mobile Auth */
-            .mobile-auth-group {
                 display: flex;
                 align-items: center;
                 gap: 8px;
             }
-             .mobile-logout-btn {
-                width: 38px;
-                height: 38px;
-                border-radius: 12px;
-                background: rgba(255, 255, 255, 0.9);
-                color: var(--logout-red);
-                border: none;
+            .search-bar-container { margin-top: 12px; }
+            .search-input {
+                padding: 12px 15px 12px 48px;
+                border-radius: 12px !important;
+            }
+            .search-icon { left: 15px; font-size: 1.1rem; }
+
+            /* Mobile Icons - Now use navbar background */
+            .mobile-icons {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+            .icon-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px; /* Updated to 10px */
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Navbar bg */
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                text-decoration: none;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .icon-btn i {
+                color: var(--accent) !important; /* Gold icon */
+                font-size: 1.3rem;
+                font-weight: bold;
+            }
+            .icon-btn:hover {
+                transform: scale(1.08);
+                opacity: 0.9;
             }
 
-            /* Banners */
+            .mobile-auth-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .mobile-logout-btn {
+                background: var(--logout-red);
+                border: none;
+                color: white;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .mobile-logout-btn i {
+                font-size: 1.1rem;
+            }
+            .mobile-logout-btn:hover {
+                transform: scale(1.1);
+            }
+
+            /* Banners - Match desktop style */
             .hero-banner {
-                margin: 0 20px 25px;
-                border-radius: 24px;
-                background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); /* Fresh banner color */
-                height: auto;
-                min-height: 180px;
-                padding: 25px;
-                box-shadow: 0 10px 30px rgba(132, 250, 176, 0.3);
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                height: 250px;
+                border-radius: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 30px;
+                color: white;
+                margin: 20px 15px 20px;
+                position: relative;
             }
-            .hero-banner h2 {
-                color: #2d3436;
-                font-weight: 800;
+            .munchies-banner {
+                background: linear-gradient(135deg, #FFD700 0%, #FF9A00 100%);
+                height: 250px;
+                border-radius: 20px;
+                padding: 30px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: 20px 15px;
+            }
+            .munchies-banner h3 {
                 font-size: 1.8rem;
-                line-height: 1.2;
+                margin-bottom: 10px;
+                color: #212529;
+                font-weight: 700;
             }
-            .hero-banner p {
-                color: #636e72;
+            .munchies-banner p {
+                color: #5a5a5a;
+                margin-bottom: 20px;
                 font-weight: 500;
             }
-            
-            .munchies-banner {
-                margin: 20px 20px;
-                border-radius: 24px;
-                padding: 25px;
-                background: #FFF4E6; /* Light orange bg */
-                position: relative;
-                overflow: hidden;
+
+            .browse-btn {
+                background: #3C096C;
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                width: fit-content;
+            }
+            .browse-btn:hover {
+                background: #2a064d;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(60, 9, 108, 0.3);
             }
 
-            /* Category Grid - Perfectly Spaced */
             .category-grid {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 20px 10px;
-                padding: 0 20px 25px;
-                background: transparent;
+                gap: 15px 10px;
+                padding: 20px 15px;
+                background: #fff;
+                border-radius: 0 0 20px 20px;
+                margin-bottom: 10px;
             }
             .category-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+                text-align: center;
                 text-decoration: none;
-                width: 100%;
+                color: var(--text-main);
             }
             .cat-icon-box {
-                width: 65px;
-                height: 65px;
-                background: #ffffff;
-                border-radius: 18px;
+                width: 60px;
+                height: 60px;
+                background: #f0fdf4;
+                border-radius: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 2rem;
-                margin-bottom: 8px;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+                font-size: 1.8rem;
+                margin: 0 auto 8px;
                 transition: transform 0.2s;
+                
             }
-            .cat-icon-box:active { transform: scale(0.95); }
-            .category-item span {
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: #444;
-            }
-
-            /* Product Rails & Cards */
             .product-rail {
-                background: transparent;
-                padding: 10px 0 30px;
+                background: #fff;
+                padding: 20px 0;
+                margin-bottom: 10px;
             }
             .rail-header {
-                padding: 0 20px 15px;
                 display: flex;
-                align-items: center;
                 justify-content: space-between;
+                align-items: center;
+                padding: 0 15px 15px;
             }
-            .rail-header h5 {
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: #2d3436;
-            }
-
             .rail-scroll {
                 display: flex;
                 overflow-x: auto;
                 gap: 15px;
-                padding: 0 20px 20px; /* Bottom padding for shadows */
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
-            }
-            .product-card-mobile {
-                scroll-snap-align: start;
-                min-width: 160px;
-                width: 160px;
-                background: white;
-                border-radius: 20px;
-                padding: 12px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-                position: relative;
-                border: 1px solid rgba(0,0,0,0.02);
-            }
-            .pm-image-box {
-                height: 120px;
-                background: #f8f9fa;
-                border-radius: 16px;
-                margin-bottom: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: none;
-            }
-            .pm-image {
-                max-width: 80%;
-                max-height: 80%;
-                filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-            }
-            
-            .add-btn {
-                margin-top: 10px;
-                background: var(--bg-body);
-                color: var(--primary);
-                font-weight: 700;
-                border: 2px solid var(--primary-light);
-                border-radius: 12px;
-                padding: 8px 0;
-                width: 100%;
-                font-size: 0.9rem;
-                transition: all 0.2s;
-            }
-            .add-btn:active {
-                background: var(--primary);
-                color: white;
-                transform: scale(0.98);
-            }
-
-            /* Modern Bottom Nav */
-            .bottom-nav {
-                height: 75px;
-                background: rgba(255, 255, 255, 0.96);
-                backdrop-filter: blur(15px);
-                border-top: 1px solid rgba(0,0,0,0.05);
-                border-radius: 25px 25px 0 0;
-                box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
-                padding: 0 20px 15px; /* Adjust for safe area */
-                align-items: flex-start;
-                padding-top: 12px;
-            }
             .nav-link-mobile {
                 gap: 5px;
                 color: #95a5a6;
@@ -466,6 +388,76 @@
             .nav-link-mobile i {
                 font-size: 1.5rem;
                 transition: transform 0.2s;
+=======
+                padding: 0 15px;
+                scrollbar-width: none;
+            }
+            .rail-scroll::-webkit-scrollbar { display: none; }
+            .product-card-mobile {
+                min-width: 140px;
+                width: 140px;
+                flex-shrink: 0;
+            }
+            .pm-image-box {
+                width: 100%;
+                height: 140px;
+                background: #f8f9fa;
+                border-radius: 14px;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-light);
+            }
+            .pm-image {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                mix-blend-mode: multiply;
+            }
+            .add-btn {
+                background: #fff;
+                border: 1px solid var(--primary);
+                color: var(--primary);
+                padding: 5px 0;
+                width: 100%;
+                font-weight: 600;
+                font-size: 0.9rem;
+                margin-top: 5px;
+            }
+            .add-btn:active {
+                background: var(--primary);
+                color: #fff;
+            }
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: var(--bottom-nav-height);
+                background: #fff;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+                z-index: 1000;
+                padding-bottom: 5px;
+            }
+            .nav-link-mobile {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                font-weight: 500;
+                gap: 4px;
+            }
+            .nav-link-mobile i {
+                font-size: 1.4rem;
+                margin-bottom: -2px;
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
             }
             .nav-link-mobile.active {
                 color: var(--primary);
@@ -726,7 +718,11 @@
 
         <main style="padding-bottom: 20px;">
             <div class="hero-banner">
+<<<<<<< HEAD
                 <span class="badge bg-warning text-dark mb-2">âš¡ Superfast Delivery</span>
+=======
+                <span class="badge bg-warning text-dark mb-2">⚡ Superfast Delivery</span>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 <h2>GrabBaskets<br>Ecommerce Website</h2>
                 <p>Your one-stop shop for all grocery needs with 10-minute delivery!</p>
                 <div class="down-arrow">
@@ -737,7 +733,11 @@
                 @foreach(($categories ?? [])->take(8) as $cat)
                 <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="category-item">
                     <div class="cat-icon-box shadow-sm-custom">
+<<<<<<< HEAD
                         {{ $cat->emoji ?? 'ðŸ¥¬' }}
+=======
+                        {{ $cat->emoji ?? '🥬' }}
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     </div>
                     <span class="fs-8 fw-semibold truncate-1">{{ $cat->name ?? 'Category' }}</span>
                 </a>
@@ -745,7 +745,11 @@
                 @if(count($categories ?? []) == 0)
                     @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning'] as $dummy)
                     <a href="#" class="category-item">
+<<<<<<< HEAD
                         <div class="cat-icon-box shadow-sm-custom">ðŸ“¦</div>
+=======
+                        <div class="cat-icon-box shadow-sm-custom">📦</div>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         <span class="fs-8 fw-semibold truncate-1">{{ $dummy }}</span>
                     </a>
                     @endforeach
@@ -753,7 +757,11 @@
             </div>
             <div class="product-rail">
                 <div class="rail-header">
+<<<<<<< HEAD
                     <h5 class="fw-bold mb-0">ðŸ”¥ Trending Now</h5>
+=======
+                    <h5 class="fw-bold mb-0">🔥 Trending Now</h5>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
                 </div>
                 <div class="rail-scroll">
@@ -765,8 +773,13 @@
                         <div class="fs-8 text-muted truncate-1">1 unit</div>
                         <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
                         <div class="d-flex align-items-center justify-content-between">
+<<<<<<< HEAD
                             <span class="fs-7 fw-bold">â‚¹{{ number_format($prod->price, 0) }}</span>
                             <s class="fs-8 text-muted">â‚¹{{ number_format($prod->price * 1.2, 0) }}</s>
+=======
+                            <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
+                            <s class="fs-8 text-muted">₹{{ number_format($prod->price * 1.2, 0) }}</s>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         </div>
 @auth
     <button 
@@ -787,13 +800,21 @@
                 </div>
             </div>
             <div class="munchies-banner">
+<<<<<<< HEAD
                 <h3>âš¡ Instant Munchies (Nearby)</h3>
+=======
+                <h3>⚡ Instant Munchies (Nearby)</h3>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 <p>Quick snacks and drinks delivered in minutes!</p>
                 <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="product-rail">
                 <div class="rail-header">
+<<<<<<< HEAD
                     <h5 class="fw-bold mb-0">ðŸ¥¬ Fresh Vegetables</h5>
+=======
+                    <h5 class="fw-bold mb-0">🥬 Fresh Vegetables</h5>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
                 </div>
                 <div class="rail-scroll">
@@ -805,7 +826,11 @@
                         <div class="fs-8 text-muted truncate-1">500g</div>
                         <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $prod->name }}</div>
                         <div class="d-flex align-items-center justify-content-between">
+<<<<<<< HEAD
                             <span class="fs-7 fw-bold">â‚¹{{ number_format($prod->price, 0) }}</span>
+=======
+                            <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
                     </div>
@@ -906,7 +931,7 @@
                     <div class="text-muted fs-8 fw-bold mb-3 px-3 text-uppercase tracking-wider">Categories</div>
                     @foreach(($categories ?? [])->take(10) as $cat)
                     <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="side-link">
-                        <span class="fs-5">{{ $cat->emoji ?? 'ðŸ“¦' }}</span> {{ $cat->name ?? 'Category' }}
+                        <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span> {{ $cat->name ?? 'Category' }}
                     </a>
                     @endforeach
                     <a href="{{ route('categories.index') }}" class="side-link text-primary mt-2">
@@ -921,7 +946,7 @@
                             <div class="content">
                                 <h1>GrabBaskets Ecommerce Website</h1>
                                 <p>
-                                A dedicated e-commerce platform for Tamil Nadu products â€” buy Products like Groceries,Products,Gadgets and essentials 
+                                A dedicated e-commerce platform for Tamil Nadu products — buy Products like Groceries,Products,Gadgets and essentials
                                 from anywhere in Tamil Nadu with ease and Get Fast delivery.
                                 </p>
                                <a href="#daily"> <button class="btn btn-light rounded-pill px-4 fw-bold text-primary ">Shop Now</button></a>
@@ -933,7 +958,7 @@
                     </div>
                     <div class="col-4">
                         <div class="munchies-banner">
-                            <h3>âš¡ Instant Munchies (Nearby)</h3>
+                            <h3>⚡ Instant Munchies (Nearby)</h3>
                             <p>Quick snacks and drinks delivered in minutes!</p>
                             <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
                         </div>
@@ -953,8 +978,8 @@
                         <h6 class="fw-bold truncate-2 mb-3" style="min-height: 40px;">{{ $prod->name }}</h6>
                         <div class="d-flex justify-content-between align-items-end mt-auto">
                             <div>
-                                <div class="text-decoration-line-through text-muted fs-8">â‚¹{{ number_format($prod->price * 1.1, 0) }}</div>
-                                <div class="fw-bold fs-5">â‚¹{{ number_format($prod->price, 0) }}</div>
+                                <div class="text-decoration-line-through text-muted fs-8">₹{{ number_format($prod->price * 1.1, 0) }}</div>
+                                <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
                             </div>
                             <button class="btn btn-outline-primary rounded-3 px-3 fw-bold" onclick="addToCart({{ $prod->id }})">ADD</button>
                         </div>
@@ -979,7 +1004,7 @@
                         <div class="text-muted fs-8 mb-1">Pack</div>
                         <h6 class="fw-bold truncate-2 mb-3" style="min-height: 40px;">{{ $prod->name }}</h6>
                         <div class="d-flex justify-content-between align-items-end mt-auto">
-                            <div class="fw-bold fs-5">â‚¹{{ number_format($prod->price, 0) }}</div>
+                            <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
                             <button class="btn btn-outline-primary rounded-3 px-3 fw-bold" onclick="addToCart({{ $prod->id }})">ADD</button>
                         </div>
                     </div>
@@ -1010,7 +1035,7 @@
                     if (response.ok) {
                         const btn = event.target;
                         const originalText = btn.innerText;
-                        btn.innerText = 'âœ” Added';
+                        btn.innerText = '✔ Added';
                         btn.classList.remove('btn-outline-primary');
                         btn.classList.add('btn-success', 'text-white');
                         setTimeout(() => {

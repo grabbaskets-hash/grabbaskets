@@ -19,7 +19,11 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+<<<<<<< HEAD
 use App\models\TenMinGroceryCartItem;
+=======
+use App\Models\TenMinGroceryCartItem;
+>>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
 
 use Exception;
 #use Illuminate\Support\Facades\Storage;
