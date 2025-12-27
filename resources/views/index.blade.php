@@ -313,7 +313,7 @@
 
             /* Banners */
             .hero-banner {
-                margin: 0 15px 25px;
+                margin: 0 20px 25px;
                 border-radius: 24px;
                 background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); /* Fresh banner color */
                 height: auto;
@@ -333,7 +333,7 @@
             }
             
             .munchies-banner {
-                margin: 20px 15px;
+                margin: 20px 20px;
                 border-radius: 24px;
                 padding: 25px;
                 background: #FFF4E6; /* Light orange bg */
@@ -346,7 +346,7 @@
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 20px 10px;
-                padding: 0 15px 25px;
+                padding: 0 20px 25px;
                 background: transparent;
             }
             .category-item {
