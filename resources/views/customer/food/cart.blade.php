@@ -76,7 +76,7 @@
 
     <!-- NAVBAR -->
     <div class="navbar">
-    <div class="brand"><i class="fa-solid fa-basket-shopping"></i> GrabBasket</div>
+    <div class="brand"><i class="fa-solid fa-basket-shopping"></i> GrabBaskets</div>
 
     
 
