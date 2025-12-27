@@ -159,12 +159,14 @@
 
             <!-- Delivery Partner -->
             <div class="card">
-                <img src="https://img.freepik.com/free-vector/man-riding-scooter-white-background_1308-46379.jpg?semt=ais_hybrid&w=740&q=80" alt="Delivery Partner Bike">
+                <img src="https://img.freepik.com/free-vector/man-riding-scooter-white-background_1308-46379.jpg?semt=ais_hybrid&w=740&q=80"
+                    alt="Delivery Partner Bike">
                 <div class="card-body">
                     <i class="fa-solid fa-motorcycle"></i>
                     <h3>Delivery Partner</h3>
                     <p>Deliver orders using your bike and earn flexibly.</p>
-                    <button class="join-btn" onclick="window.location.href='delivery-partner/register'">Join Now</button>
+                    <button class="join-btn" onclick="window.location.href='delivery-partner/register'">Join
+                        Now</button>
                 </div>
             </div>
 
@@ -182,7 +184,7 @@
         </div>
     </div>
 
-    
+
 
 </body>
 
