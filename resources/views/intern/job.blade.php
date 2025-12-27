@@ -135,49 +135,76 @@
 
         <div class="row g-4">
 
-            <!-- Column 1 -->
+            <div class="col-md-6">
+                <div class="job-card">
+                    <h2 class="title">NQT Exam Openings</h2>
+                    <p class="subtext"><span class="highlight">Unlimited Attempts</span></p>
+
+                    <p class="subtext">
+                        <span class="highlight">
+                            <strong>Domain: NQT</strong>
+                        </span>
+                    </p>
+
+                    <p class="subtext">Exam Frequency: <span class="highlight">Weekly</span></p>
+                    <p class="subtext">Exam Fee: <span class="highlight">₹1,000</span></p>
+                    <p class="subtext">Eligibility: <span class="highlight">Any Degree</span></p>
+
+                    <button class="apply-btn mt-3"
+                        onclick="applyNow('NQT Exam', 1000, '3hrs', 'NQT')">
+                        Apply Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chennai Branch -->
             <div class="col-md-6">
                 <div class="job-card">
                     <h2 class="title">Chennai Branch Openings</h2>
                     <p class="subtext"><span class="highlight">90 Openings</span></p>
-                    <p class="subtext"><span class="highlight"><strong>Roles: Technical Associate</strong></span></p>
+
+                    <p class="subtext">
+                        <span class="highlight"><strong>Roles: Technical Associate</strong></span>
+                    </p>
 
                     <p class="subtext">Internship Period: <span class="highlight">3 Months</span></p>
                     <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹30,000</span></p>
-
                     <p class="subtext">Starting Monthly Package: <span class="highlight">₹17,000</span></p>
 
                     <button class="apply-btn mt-3"
-                        onclick="applyNow('Technical Associate', 30000, 12, 'IT / Section')">
+                        onclick="applyNow('Technical Associate', 30000, 12, 'IT Section')">
                         Apply Now
                     </button>
-
                 </div>
             </div>
 
-            <!-- Column 2 -->
+            <!-- Pondicherry Branch -->
             <div class="col-md-6">
                 <div class="job-card">
                     <h2 class="title">Pondicherry Branch Openings</h2>
                     <p class="subtext"><span class="highlight">30 Openings</span></p>
 
-                    <p class="subtext"><span class="highlight"><strong>Roles: Web Developer & Digital
-                                Marketing</strong></span></p>
+                    <p class="subtext">
+                        <span class="highlight">
+                            <strong>Roles: Web Developer & Digital Marketing</strong>
+                        </span>
+                    </p>
 
                     <p class="subtext">Internship Period: <span class="highlight">6 Months</span></p>
                     <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹50,000</span></p>
-
                     <p class="subtext">Monthly Package After Internship: <span class="highlight">₹24,000</span></p>
 
                     <button class="apply-btn mt-3"
-                        onclick="applyNow('Web Development', 50000, 24, 'IT SECTION')">
+                        onclick="applyNow('Web Development', 50000, 24, 'IT Section')">
                         Apply Now
                     </button>
-
                 </div>
             </div>
 
+            <!-- NQT Exam Opening -->
+
         </div>
+
     </div>
     <script>
         function applyNow(name, fee, weeks, domain) {
