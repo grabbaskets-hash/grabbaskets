@@ -195,6 +195,7 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/wallet', [ProfileController::class, 'wallet'])->name('wallet.show');
+    Route::post('/apply-referral', [App\Http\Controllers\ReferralController::class, 'apply'])->name('referral.apply');
 });
 
 // Test route without middleware

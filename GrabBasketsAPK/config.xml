@@ -5,7 +5,10 @@
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
     </author>
-    <content src="index.html" />
+    <content src="https://grabbaskets.com" />
+    <icon src="www/img/logo.png" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <allow-navigation href="https://grabbaskets.com/*" />
+    <allow-navigation href="https://*.grabbaskets.com/*" />
 </widget>
