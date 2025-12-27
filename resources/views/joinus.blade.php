@@ -153,7 +153,7 @@
                     <i class="fa-solid fa-store"></i>
                     <h3>Product Seller</h3>
                     <p>Sell groceries, vegetables and products to nearby customers.</p>
-                    <button class="join-btn">Join Now</button>
+                    <button class="join-btn" onclick="window.location.href='/register'">Join Now</button>
                 </div>
             </div>
 
