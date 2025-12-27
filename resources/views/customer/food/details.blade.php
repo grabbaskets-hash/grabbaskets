@@ -35,13 +35,17 @@ body{ font-family:"Poppins",sans-serif; background:#f5f4f7; margin:0; }
 <body>
 
 <div class="nav-app">
-<a href="{{ route('customer.food.index') }}" class="brand text-decoration-none">GrabBasket</a>
+<a href="{{ route('customer.food.index') }}" class="brand text-decoration-none">GrabBaskets</a>
   <button onclick="window.history.back()" class="btn btn-outline-secondary">Back</button>
 </div>
 
 <div class="food-details">
   <!-- Image -->
-  <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}" onerror="this.src='https://via.placeholder.com/480x300?text=No+Image'">
+  @if(!empty($food->images) && is_array($food->images))
+    <img src="{{ $food->images[0] }}" alt="{{ $food->name }}">
+  @else
+    <img src="https://via.placeholder.com/480x300?text=No+Image" alt="{{ $food->name }}">
+  @endif
 
   <!-- Name -->
   <h3>{{ $food->name }}</h3>
