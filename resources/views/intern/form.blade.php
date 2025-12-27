@@ -62,12 +62,13 @@
         <div class="company-info">
             <p><strong>Company:</strong> Swivel IT</p>
             <p><strong>Address:</strong> DLF IT Park, Porur, Chennai</p>
-            <!-- <p><strong>Program Highlights:</strong> Hands-on training, Real-time projects, Mentorship, Certificate</p> -->
+            <p><strong>Program Highlights:</strong> Hands-on training, Real-time projects, Mentorship, Certificate &</p>
+            <p><strong>NQT EXAM APPLICATION FORM</strong></p>
         </div>
 
         <form id="applicationForm">
             <!-- Internship Details -->
-            <h5 class="section-title">Program Details</h5>
+            <h5 class="section-title">Form Details</h5>
             <div class="mb-3">
                 <label class="form-label">Course Name</label>
                 <input type="text" class="form-control" id="courseName" name="courseName" readonly>
