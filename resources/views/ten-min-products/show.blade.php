@@ -366,10 +366,16 @@ document.addEventListener('DOMContentLoaded', function () {
     addBtn.onclick = () => {
         if (addBtn.disabled) return;
 
+        // Visual feedback
+        const originalText = addBtn.innerText;
+        addBtn.innerText = "Adding...";
+        addBtn.disabled = true;
+
         fetch("{{ route('tenmin.cart.add') }}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json",
                 "X-CSRF-TOKEN": csrfToken
             },
             body: JSON.stringify({
@@ -377,24 +383,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 quantity: qty
             })
         })
-        .then(response => response.json())
+        .then(async response => {
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+
+            if (!response.ok) {
+                const errorMsg = (data && (data.error || data.message)) || 'Failed to add to cart';
+                throw new Error(errorMsg);
+            }
+            return data;
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 // Update badge immediately
                 badge.innerText = data.cart_count;
                 updateCartBadge();
+                
+                addBtn.innerText = "Added!";
                 
                 // Redirect to cart page after short delay
                 setTimeout(() => {
                     window.location.href = "{{ route('tenmin.cart.view') }}";
                 }, 500);
             } else {
-                alert(data.error || 'Failed to add');
+                throw new Error((data && data.error) || 'Failed to add');
             }
         })
         .catch(err => {
             console.error('Error:', err);
-            alert('Failed to add to cart');
+            alert(err.message);
+            addBtn.innerText = originalText;
+            addBtn.disabled = false;
         });
     };
 
