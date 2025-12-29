@@ -831,10 +831,10 @@
                     @endauth
                 </div>
             </div>
-            <div class="search-bar-container">
-                <input type="text" class="search-input" placeholder="Search for products...">
+            <form action="{{ route('products.index') }}" method="GET" class="search-bar-container">
+                <input type="text" name="q" class="search-input" placeholder="Search for products...">
                 <i class="bi bi-search search-icon"></i>
-            </div>
+            </form>
         </div>
 
         <main style="padding-bottom: 20px;">
@@ -983,10 +983,10 @@
                     </div>
 
                 </div>
-                <div class="search-bar-container desktop-search">
-                    <input type="text" class="search-input" placeholder="Search for products, brands and more">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-container desktop-search">
+                    <input type="text" name="q" class="search-input" placeholder="Search for products, brands and more">
                     <i class="bi bi-search search-icon"></i>
-                </div>
+                </form>
                 <div class="nav-actions">
                     <button class="join-btn" onclick="window.location.href='/joinus'">
                         <i class="bi bi-shop"></i> Join With Us
@@ -1077,7 +1077,7 @@
                                     <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
                                 </div>
                                 <button class="btn btn-outline-primary rounded-3 px-3 fw-bold"
-                                    onclick="addToCart({{ $prod->id }})">ADD</button>
+                                    onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
                             </div>
                         </div>
                     @empty
@@ -1104,7 +1104,7 @@
                             <div class="d-flex justify-content-between align-items-end mt-auto">
                                 <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
                                 <button class="btn btn-outline-primary rounded-3 px-3 fw-bold"
-                                    onclick="addToCart({{ $prod->id }})">ADD</button>
+                                    onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
                             </div>
                         </div>
                     @endforeach

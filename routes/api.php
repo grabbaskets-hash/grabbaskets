@@ -35,7 +35,7 @@ Route::post('/order/{order}/update-location', [OrderController::class, 'apiUpdat
 // Mobile App API Routes
 // Public routes (no authentication required)
 Route::prefix('v1')->group(function () {
-    
+
     // Authentication routes
     Route::prefix('auth')->group(function () {
         Route::post('send-otp', [AuthController::class, 'sendOTP']);
@@ -65,7 +65,7 @@ Route::prefix('v1')->group(function () {
 
 // Protected routes (authentication required)
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
-    
+
     // Authentication
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
@@ -102,15 +102,15 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::post('move-to-cart', [WishlistController::class, 'moveToCart']);
     });
 
-    // Order management
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\OrderController::class, 'index']);
-        Route::post('/', [\App\Http\Controllers\Api\OrderController::class, 'store']);
-        Route::get('{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
-        Route::get('{id}/track', [\App\Http\Controllers\Api\OrderController::class, 'track']);
-        Route::get('{id}/location', [\App\Http\Controllers\Api\OrderController::class, 'getLocation']);
-        Route::post('{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
-    });
+    // Order management - Temporarily disabled due to missing controller
+    // Route::prefix('orders')->group(function () {
+    //     Route::get('/', [\App\Http\Controllers\Api\OrderController::class, 'index']);
+    //     Route::post('/', [\App\Http\Controllers\Api\OrderController::class, 'store']);
+    //     Route::get('{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
+    //     Route::get('{id}/track', [\App\Http\Controllers\Api\OrderController::class, 'track']);
+    //     Route::get('{id}/location', [\App\Http\Controllers\Api\OrderController::class, 'getLocation']);
+    //     Route::post('{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
+    // });
 
     // Payment
     Route::prefix('payment')->group(function () {
@@ -173,5 +173,5 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 // Webhook routes (for payment gateways, etc.)
 Route::prefix('webhooks')->group(function () {
     Route::post('razorpay', [PaymentController::class, 'razorpayWebhook']);
-    Route::post('delivery-status', [\App\Http\Controllers\Api\OrderController::class, 'deliveryStatusWebhook']);
+    // Route::post('delivery-status', [\App\Http\Controllers\Api\OrderController::class, 'deliveryStatusWebhook']);
 });

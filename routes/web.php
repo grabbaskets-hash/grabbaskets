@@ -202,7 +202,7 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
 // Test route without middleware
 Route::get('/test-seller-dashboard', function () {
     $controller = new App\Http\Controllers\SellerController();
-    return $controller->dashboard();
+    return $controller->dashboard(request());
 });
 
 // Verified user routes (buyer + seller)
