@@ -1250,24 +1250,24 @@
 
             <!-- Existing Addresses -->
             @if(count($addresses) > 0)
-              <div class="mb-4">
-                <h6 class="text-muted mb-3">SAVED ADDRESSES</h6>
-                @foreach($addresses as $index => $addr)
-                  <div class="address-card" onclick="selectAddress({{ $index }}, '{{ $addr }}')">
-                    <div class="address-type-badge badge-home">
-                      <i class="bi bi-house-fill"></i> Home
-                    </div>
-                    <div class="address-icon">
-                      <i class="bi bi-geo-alt-fill"></i>
-                    </div>
-                    <div class="address-text">{{ $addr }}</div>
-                    <div class="address-details">
-                      <i class="bi bi-telephone-fill"></i> {{ auth()->user()->phone ?? 'No phone' }}
-                    </div>
-                    <input type="radio" name="address" value="{{ $addr }}" style="display: none;" id="addr-{{ $index }}">
-                  </div>
-                @endforeach
+            <div class="mb-4">
+              <h6 class="text-muted mb-3">SAVED ADDRESSES</h6>
+              @foreach($addresses as $index => $addr)
+              <div class="address-card" onclick="selectAddress({{ $index }}, '{{ $addr }}')">
+                <div class="address-type-badge badge-home">
+                  <i class="bi bi-house-fill"></i> Home
+                </div>
+                <div class="address-icon">
+                  <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="address-text">{{ $addr }}</div>
+                <div class="address-details">
+                  <i class="bi bi-telephone-fill"></i> {{ auth()->user()->phone ?? 'No phone' }}
+                </div>
+                <input type="radio" name="address" value="{{ $addr }}" style="display: none;" id="addr-{{ $index }}">
               </div>
+              @endforeach
+            </div>
             @endif
 
             <!-- Add New Address Form -->
@@ -1628,44 +1628,44 @@
             <!-- Cart Items -->
             <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
               @foreach($items as $item)
-                <div class="summary-item">
-                  @php
-                    $imageUrl = null;
-                    // Check multiple image sources
-                    if (!empty($item->product->image)) {
-                      $imageUrl = $item->product->image;
-                    } elseif (!empty($item->product->images) && is_array(json_decode($item->product->images, true))) {
-                      $images = json_decode($item->product->images, true);
-                      $imageUrl = !empty($images) ? $images[0] : null;
-                    } elseif (!empty($item->product->main_image)) {
-                      $imageUrl = $item->product->main_image;
-                    }
+              <div class="summary-item">
+                @php
+                $imageUrl = null;
+                // Check multiple image sources
+                if (!empty($item->product->image)) {
+                $imageUrl = $item->product->image;
+                } elseif (!empty($item->product->images) && is_array(json_decode($item->product->images, true))) {
+                $images = json_decode($item->product->images, true);
+                $imageUrl = !empty($images) ? $images[0] : null;
+                } elseif (!empty($item->product->main_image)) {
+                $imageUrl = $item->product->main_image;
+                }
 
-                    // Ensure proper URL format
-                    if ($imageUrl && !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-                      $imageUrl = asset('storage/' . $imageUrl);
-                    }
-                  @endphp
+                // Ensure proper URL format
+                if ($imageUrl && !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                $imageUrl = asset('storage/' . $imageUrl);
+                }
+                @endphp
 
-                  @if($imageUrl)
-                    <img src="{{ $imageUrl }}" alt="{{ $item->product->name }}" class="item-image"
-                      onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="item-image"
-                      style="background: linear-gradient(135deg, #667eea, #764ba2); display: none; align-items: center; justify-content: center;">
-                      <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
-                    </div>
-                  @else
-                    <div class="item-image"
-                      style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
-                      <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
-                    </div>
-                  @endif
-                  <div class="item-info">
-                    <div class="item-name">{{ $item->product->name }}</div>
-                    <div class="item-qty">Qty: {{ $item->quantity }}</div>
-                  </div>
-                  <div class="item-price">₹{{ number_format($item->price * $item->quantity, 2) }}</div>
+                @if($imageUrl)
+                <img src="{{ $imageUrl }}" alt="{{ $item->product->name }}" class="item-image"
+                  onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="item-image"
+                  style="background: linear-gradient(135deg, #667eea, #764ba2); display: none; align-items: center; justify-content: center;">
+                  <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
                 </div>
+                @else
+                <div class="item-image"
+                  style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
+                </div>
+                @endif
+                <div class="item-info">
+                  <div class="item-name">{{ $item->product->name }}</div>
+                  <div class="item-qty">Qty: {{ $item->quantity }}</div>
+                </div>
+                <div class="item-price">₹{{ number_format($item->price * $item->quantity, 2) }}</div>
+              </div>
               @endforeach
             </div>
 
@@ -1684,9 +1684,9 @@
               <span><i class="bi bi-truck"></i> Delivery Charges</span>
               <strong class="text-success">
                 @if($totals['deliveryTotal'] == 0)
-                  FREE
+                FREE
                 @else
-                  ₹{{ number_format($totals['deliveryTotal'], 2) }}
+                ₹{{ number_format($totals['deliveryTotal'], 2) }}
                 @endif
               </strong>
             </div>
@@ -1737,7 +1737,7 @@
     }
 
     // Auto-detect location on page load
-    window.addEventListener('load', function () {
+    window.addEventListener('load', function() {
       console.log('Page loaded, starting location detection');
       detectLocationAuto();
       initGoogleMaps();
@@ -1759,14 +1759,21 @@
       }
 
       try {
-        const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // Bangalore
+        const defaultLocation = {
+          lat: 12.9716,
+          lng: 77.5946
+        }; // Bangalore
 
         map = new google.maps.Map(mapElement, {
           zoom: 14,
           center: defaultLocation,
-          styles: [
-            { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-          ],
+          styles: [{
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{
+              visibility: 'off'
+            }]
+          }],
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: true
@@ -1780,7 +1787,7 @@
           title: 'Your Delivery Location'
         });
 
-        marker.addListener('dragend', function () {
+        marker.addListener('dragend', function() {
           const position = marker.getPosition();
           document.getElementById('latitude').value = position.lat();
           document.getElementById('longitude').value = position.lng();
@@ -1830,7 +1837,7 @@
       console.log('Starting location detection');
 
       navigator.geolocation.getCurrentPosition(
-        function (position) {
+        function(position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           console.log('Location detected:', lat, lng);
@@ -1878,11 +1885,10 @@
               locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
             });
         },
-        function (error) {
+        function(error) {
           console.error('Geolocation error:', error.message);
           locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Click to detect location';
-        },
-        {
+        }, {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 0
@@ -1949,7 +1955,7 @@
 
     // Tab Navigation
     document.querySelectorAll('.tab-item').forEach(tab => {
-      tab.addEventListener('click', function () {
+      tab.addEventListener('click', function() {
         const targetTab = this.dataset.tab;
         switchTab(targetTab);
       });
@@ -1983,12 +1989,18 @@
       // Mark delivery step as completed
       document.querySelector('.tab-item[data-tab="delivery"]').classList.add('completed');
       switchTab('payment');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
 
     function goToAddress() {
       switchTab('address');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
 
     function goToDelivery() {
@@ -2008,7 +2020,10 @@
       checkDeliveryAvailability();
 
       switchTab('delivery');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
 
     // Check delivery availability based on distance
@@ -2016,7 +2031,7 @@
       // Get user's latitude and longitude
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          function (position) {
+          function(position) {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
 
@@ -2025,8 +2040,8 @@
             document.getElementById('user_longitude').value = userLng;
 
             // Store location (example: Theni, Tamil Nadu - you can change this)
-            const storeLat = 10.0104;  // Example: Theni latitude
-            const storeLng = 77.4768;  // Example: Theni longitude
+            const storeLat = 10.0104; // Example: Theni latitude
+            const storeLng = 77.4768; // Example: Theni longitude
 
             // Calculate distance
             const distance = calculateDistance(userLat, userLng, storeLat, storeLng);
@@ -2055,7 +2070,7 @@
               selectDeliveryType('standard');
             }
           },
-          function (error) {
+          function(error) {
             console.error('Geolocation error:', error);
             // Default to standard delivery if location unavailable
             document.getElementById('fast-unavailable-warning').style.display = 'block';
@@ -2302,7 +2317,7 @@
     }
 
     // Initialize peak hour check on page load
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       checkPeakHourSurge();
     });
 
@@ -2393,7 +2408,7 @@
     }
 
     // Place Order
-    document.getElementById('place-order-btn').addEventListener('click', function () {
+    document.getElementById('place-order-btn').addEventListener('click', function() {
       const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
       if (paymentMethod === 'razorpay') {
@@ -2417,12 +2432,12 @@
 
 
       fetch('{{ route("payment.createOrder") }}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-      })
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          }
+        })
         .then(response => {
           console.log('Payment API Response Status:', response.status);
           if (!response.ok) {
@@ -2476,11 +2491,11 @@
             theme: {
               color: '#667eea'
             },
-            handler: function (response) {
+            handler: function(response) {
               verifyPayment(response);
             },
             modal: {
-              ondismiss: function () {
+              ondismiss: function() {
                 placeOrderBtn.disabled = false;
                 btnText.textContent = 'Pay with Razorpay';
               }
@@ -2496,7 +2511,7 @@
             const rzp = new Razorpay(options);
 
             // Add error handler for Razorpay
-            rzp.on('payment.failed', function (response) {
+            rzp.on('payment.failed', function(response) {
               console.error('Razorpay payment failed:', response.error);
               alert('Payment failed: ' + response.error.description);
               placeOrderBtn.disabled = false;
@@ -2535,13 +2550,13 @@
       document.getElementById('loading-overlay').classList.add('active');
 
       fetch('{{ route("payment.verify") }}', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify(paymentData)
-      })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
+          body: JSON.stringify(paymentData)
+        })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -2562,8 +2577,6 @@
           btnText.textContent = 'Pay with Razorpay';
         });
     }
-
-
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

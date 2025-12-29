@@ -7,7 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($category) ? $category->name : (isset($subcategory) ? $subcategory->name : 'Products') }} |
-        {{ config('app.name', 'GrabBaskets') }}</title>
+        {{ config('app.name', 'GrabBaskets') }}
+    </title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
