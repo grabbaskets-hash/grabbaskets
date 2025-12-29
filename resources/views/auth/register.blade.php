@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -64,27 +65,27 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: 3px solid transparent;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         .role-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
         .role-card.active {
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(255,107,0,0.2);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.2);
         }
 
         .role-card.buyer.active {
             border-color: var(--buyer-color);
-            box-shadow: 0 10px 30px rgba(22,163,74,0.2);
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.2);
         }
 
         .role-card.seller.active {
             border-color: var(--seller-color);
-            box-shadow: 0 10px 30px rgba(109,40,217,0.2);
+            box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
         }
 
         .role-icon {
@@ -116,7 +117,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
         .form-header {
@@ -153,7 +154,8 @@
             margin-bottom: 8px;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 12px;
             padding: 0.75rem 1rem;
             border: 2px solid #e2e8f0;
@@ -161,9 +163,10 @@
             font-size: 0.95rem;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 0.2rem rgba(255,107,0,.15);
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, .15);
         }
 
         .btn-register {
@@ -180,7 +183,7 @@
 
         .btn-register:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255,107,0,0.3);
+            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
             color: white;
         }
 
@@ -254,6 +257,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="registration-container">
         <!-- Brand -->
@@ -292,26 +296,29 @@
 
             <form method="POST" action="{{ route('register') }}" novalidate>
                 @csrf
-                
+
                 <!-- Hidden role field -->
                 <input type="hidden" name="role" id="roleInput" value="{{ old('role') }}">
 
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="name" class="form-label">Full Name</label>
-                        <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required>
+                        <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}"
+                            required>
                         @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email</label>
-                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}"
+                            required>
                         @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label for="phone" class="form-label">Phone Number</label>
-                        <input id="phone" type="text" class="form-control" name="phone" value="{{ old('phone') }}" required>
+                        <input id="phone" type="text" class="form-control" name="phone" value="{{ old('phone') }}"
+                            required>
                         @error('phone') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
@@ -328,25 +335,29 @@
 
                     <div class="col-12">
                         <label for="billing_address" class="form-label">Address</label>
-                        <input id="billing_address" type="text" class="form-control" name="billing_address" value="{{ old('billing_address') }}" required>
+                        <input id="billing_address" type="text" class="form-control" name="billing_address"
+                            value="{{ old('billing_address') }}" required>
                         @error('billing_address') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-4">
                         <label for="state" class="form-label">State</label>
-                        <input id="state" type="text" class="form-control" name="state" value="{{ old('state') }}" required>
+                        <input id="state" type="text" class="form-control" name="state" value="{{ old('state') }}"
+                            required>
                         @error('state') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-4">
                         <label for="city" class="form-label">City</label>
-                        <input id="city" type="text" class="form-control" name="city" value="{{ old('city') }}" required>
+                        <input id="city" type="text" class="form-control" name="city" value="{{ old('city') }}"
+                            required>
                         @error('city') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-4">
                         <label for="pincode" class="form-label">Pincode</label>
-                        <input id="pincode" type="text" class="form-control" name="pincode" value="{{ old('pincode') }}" required>
+                        <input id="pincode" type="text" class="form-control" name="pincode" value="{{ old('pincode') }}"
+                            required>
                         @error('pincode') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
@@ -358,8 +369,24 @@
 
                     <div class="col-md-6">
                         <label for="password_confirmation" class="form-label">Confirm Password</label>
-                        <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required>
-                        @error('password_confirmation') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        <input id="password_confirmation" type="password" class="form-control"
+                            name="password_confirmation" required>
+                        @error('password_confirmation') <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <label for="referral_code_input" class="form-label">
+                            Referral Code <span class="text-muted small">(Optional)</span>
+                        </label>
+                        <input id="referral_code_input" type="text" class="form-control" name="referral_code_input"
+                            value="{{ old('referral_code_input') }}" placeholder="Enter referral code" maxlength="8"
+                            style="text-transform: uppercase;">
+                        <div class="form-text">
+                            <i class="fas fa-gift text-primary"></i>
+                            Have a referral code? Enter it here to participate in our referral program!
+                        </div>
+                        @error('referral_code_input') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
                 </div>
 
@@ -382,7 +409,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const roleSelection = document.getElementById('roleSelection');
             const registrationForm = document.getElementById('registrationForm');
             const roleCards = document.querySelectorAll('.role-card');
@@ -398,14 +425,14 @@
 
             // Role card click handlers
             roleCards.forEach(card => {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     const role = this.dataset.role;
                     selectRole(role);
                 });
             });
 
             // Change role button
-            changeRoleBtn.addEventListener('click', function() {
+            changeRoleBtn.addEventListener('click', function () {
                 roleSelection.classList.remove('hidden');
                 registrationForm.classList.add('hidden');
                 roleCards.forEach(card => card.classList.remove('active'));
@@ -438,4 +465,5 @@
         });
     </script>
 </body>
+
 </html>

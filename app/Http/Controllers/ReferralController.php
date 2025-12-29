@@ -34,16 +34,19 @@ class ReferralController extends Controller
         DB::transaction(function () use ($user, $referrer) {
             // Update User
             $user->referrer_id = $referrer->id;
-            $user->wallet_point += 300;
             $user->save();
 
-            // Optional: You could also reward the referrer here
-            // $referrer->wallet_point += 100;
-            // $referrer->save();
+            // Reward the referrer (300 points)
+            $referrer->addWalletPoints(
+                300,
+                'referrer_reward',
+                "Referral reward for inviting {$user->name}",
+                $user->id
+            );
         });
 
         return response()->json([
-            'message' => 'Referral code applied successfully! 300 points added.',
+            'message' => 'Referral code applied successfully! Your friend ' . $referrer->name . ' has received 300 points.',
             'new_balance' => $user->wallet_point
         ]);
     }

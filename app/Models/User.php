@@ -104,4 +104,44 @@ class User extends Authenticatable
     {
         return $this->hasMany(Product::class, 'seller_id');
     }
+
+    /**
+     * Get all wallet transactions for this user
+     */
+    public function walletTransactions()
+    {
+        return $this->hasMany(UserWalletTransaction::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get users who were referred by this user
+     */
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referrer_id');
+    }
+
+    /**
+     * Get the user who referred this user
+     */
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referrer_id');
+    }
+
+    /**
+     * Add points to user's wallet and create transaction record
+     */
+    public function addWalletPoints(int $amount, string $type, string $description, ?int $relatedUserId = null): void
+    {
+        // Create transaction record - wallet balance is automatically updated via UserWalletTransaction model booted event
+        UserWalletTransaction::create([
+            'user_id' => $this->id,
+            'type' => $type,
+            'amount' => $amount,
+            'description' => $description,
+            'related_user_id' => $relatedUserId,
+        ]);
+    }
 }
+

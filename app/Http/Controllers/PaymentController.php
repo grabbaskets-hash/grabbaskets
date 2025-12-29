@@ -57,23 +57,9 @@ class PaymentController extends Controller
             $totals = $this->calculateTotals($items);
             $address = $request->new_address ?: $request->address;
 
-            // Handle wallet discount if total > 2000 and wallet is used
-            $useWallet = $request->has('use_wallet') && $request->use_wallet == '1';
+            // Wallet discount logic removed as per request
+            $useWallet = false;
             $walletDiscount = 0;
-            
-            if ($useWallet && $totals['total'] > 2000) {
-                $user = Auth::user();
-                $walletPoints = $user->wallet_point ?? 0;
-                
-                // Check if user has enough wallet points (150 points = 150 rupees)
-                if ($walletPoints >= 150) {
-                    $walletDiscount = 150;
-                    $totals['total'] = max(0, $totals['total'] - $walletDiscount);
-                } else {
-                    // User doesn't have enough wallet points
-                    return response()->json(['error' => 'Insufficient wallet points. You need at least 150 points to use this offer.'], 400);
-                }
-            }
 
             // Validate that we have a valid address
             if (empty($address)) {
@@ -113,9 +99,9 @@ class PaymentController extends Controller
             $api = new Api($this->razorpayId, $this->razorpayKey);
 
             $orderData = [
-                'receipt'         => 'order_' . uniqid() . '_' . Auth::id(),
-                'amount'          => (int) ($totals['total'] * 100), // Convert to paise and ensure integer
-                'currency'        => 'INR',
+                'receipt' => 'order_' . uniqid() . '_' . Auth::id(),
+                'amount' => (int) ($totals['total'] * 100), // Convert to paise and ensure integer
+                'currency' => 'INR',
                 'payment_capture' => 1
             ];
 
@@ -338,50 +324,7 @@ class PaymentController extends Controller
                 }
             }
 
-            // Wallet point logic: Handle wallet points based on purchase
-            $user = Auth::user();
-            $useWallet = $checkoutData['use_wallet'] ?? false;
-            $walletDiscount = $checkoutData['wallet_discount'] ?? 0;
-            $originalTotal = $checkoutData['totals']['total'] ?? 0;
-            
-            // Calculate original purchase amount (before wallet discount)
-            $originalPurchaseAmount = $originalTotal + $walletDiscount;
-            
-            if ($user) {
-                // If wallet was used, deduct 150 points (150 rupees)
-                if ($useWallet && $walletDiscount > 0) {
-                    $currentWalletPoints = $user->wallet_point ?? 0;
-                    $newWalletPoints = max(0, $currentWalletPoints - $walletDiscount);
-                    
-                    $user->wallet_point = $newWalletPoints;
-                    $user->save();
-                    
-                    Log::info('Wallet points deducted for purchase', [
-                        'user_id' => $user->id,
-                        'points_deducted' => $walletDiscount,
-                        'previous_points' => $currentWalletPoints,
-                        'new_points' => $newWalletPoints
-                    ]);
-                }
-                
-                // After purchase, add 20 points to wallet ONLY if purchase amount is more than 2000 rupees
-                if ($originalPurchaseAmount > 2000) {
-                    $user->wallet_point = ($user->wallet_point ?? 0) + 20;
-                    $user->save();
-                    
-                    Log::info('Purchase reward points added (purchase > 2000)', [
-                        'user_id' => $user->id,
-                        'purchase_amount' => $originalPurchaseAmount,
-                        'points_added' => 20,
-                        'final_wallet_points' => $user->wallet_point
-                    ]);
-                } else {
-                    Log::info('No reward points added (purchase <= 2000)', [
-                        'user_id' => $user->id,
-                        'purchase_amount' => $originalPurchaseAmount
-                    ]);
-                }
-            }
+            // Wallet point logic removed as per request (Previously handles points for purchases > 2000)
 
             // Clear cart and session
             CartItem::where('user_id', Auth::id())->delete();
@@ -492,30 +435,30 @@ class PaymentController extends Controller
     }
 
     // Create Razorpay order
-public function createOrder1(Request $request)
-{
-    $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
+    public function createOrder1(Request $request)
+    {
+        $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
 
-    $amountInPaise = $request->amount * 100; // convert rupees to paise
+        $amountInPaise = $request->amount * 100; // convert rupees to paise
 
-    $order = $api->order->create([
-        'receipt' => 'order_rcptid_' . rand(1000, 9999),
-        'amount'  => $amountInPaise,
-        'currency'=> 'INR',
-    ]);
+        $order = $api->order->create([
+            'receipt' => 'order_rcptid_' . rand(1000, 9999),
+            'amount' => $amountInPaise,
+            'currency' => 'INR',
+        ]);
 
-    return response()->json([
-        'order_id' => $order['id'],
-        'key'      => $this->razorpayKeyId,
-        'amount'   => $amountInPaise,
+        return response()->json([
+            'order_id' => $order['id'],
+            'key' => $this->razorpayKeyId,
+            'amount' => $amountInPaise,
 
-        'customer' => [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ]
-    ]);
-}
+            'customer' => [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+            ]
+        ]);
+    }
 
 
 

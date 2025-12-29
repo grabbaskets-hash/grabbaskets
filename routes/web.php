@@ -323,12 +323,22 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 // Buyer dashboard & browsing - Anyone can view products
 Route::get('/buyer/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
 
+// Buyer referral page - View and share referral code
+Route::get('/buyer/referral', function () {
+    if (!auth()->check() || auth()->user()->role !== 'buyer') {
+        return redirect()->route('login')->with('error', 'Please login as a buyer to access referrals');
+    }
+    return view('buyer.referral');
+})->name('buyer.referral');
+
 // Test route to bypass controller and render view directly
 Route::get('/buyer/dashboard/test', function () {
     try {
-        $categories = \App\Models\Category::with(['subcategories' => function ($query) {
-            $query->withCount('products');
-        }])->withCount('products')->get();
+        $categories = \App\Models\Category::with([
+            'subcategories' => function ($query) {
+                $query->withCount('products');
+            }
+        ])->withCount('products')->get();
 
         return view('buyer.dashboard', compact('categories'));
     } catch (\Exception $e) {
@@ -353,9 +363,11 @@ Route::get('/buyer/dashboard/debug', function () {
 
         // Test 3: Category with relationships
         $output .= "3. Category Relationships: ";
-        $categories = \App\Models\Category::with(['subcategories' => function ($query) {
-            $query->withCount('products');
-        }])->withCount('products')->take(1)->get();
+        $categories = \App\Models\Category::with([
+            'subcategories' => function ($query) {
+                $query->withCount('products');
+            }
+        ])->withCount('products')->take(1)->get();
         $output .= "SUCCESS - Relationships loaded\n";
 
         // Test 4: View existence
@@ -600,9 +612,11 @@ Route::prefix('api/tracking')->group(function () {
 // API route for mobile category menu subcategories
 Route::get('/api/categories/{category}/subcategories', function ($categoryId) {
     try {
-        $category = \App\Models\Category::with(['subcategories' => function ($query) {
-            $query->withCount('products');
-        }])->findOrFail($categoryId);
+        $category = \App\Models\Category::with([
+            'subcategories' => function ($query) {
+                $query->withCount('products');
+            }
+        ])->findOrFail($categoryId);
 
         $subcategories = $category->subcategories->map(function ($subcat) {
             return [
@@ -1344,9 +1358,11 @@ Route::get('/debug/file-system', function (Request $request) {
 
 // Debug: Inspect a product's image resolution details by id or name
 Route::get('/debug/product-image', function (Request $request) {
-    $query = \App\Models\Product::with(['productImages' => function ($q) {
-        $q->orderByDesc('is_primary')->orderBy('id');
-    }]);
+    $query = \App\Models\Product::with([
+        'productImages' => function ($q) {
+            $q->orderByDesc('is_primary')->orderBy('id');
+        }
+    ]);
     if ($request->filled('id')) {
         $query->where('id', $request->id);
     } elseif ($request->filled('name')) {
@@ -1873,7 +1889,7 @@ Route::get('/ten-min/cart', [SellerController::class, 'tenMinCartView'])
     ->name('tenmin.cart.view');
 // Update cart item
 Route::post('/ten-min/cart/update', [SellerController::class, 'tenMinCartUpdate'])->name('tenmin.cart.update');
- //TEN MINS ORDER ROUTE
+//TEN MINS ORDER ROUTE
 Route::prefix('seller')
     ->name('seller.')
     ->middleware(['auth', 'verified'])
@@ -1885,20 +1901,20 @@ Route::prefix('seller')
 // Inside your seller group
 Route::post('/10-mins-orders/{id}/update-status', [TenMinsOrderController::class, 'updateStatus'])
     ->name('tenmins.orders.update');
- 
- 
+
+
 // REMOVE THIS LINE → Route::post('/ten-min/cart/remove', [SellerController::class, 'tenMinCartRemove']);
 // ADD THIS INSTEAD →
 Route::post('/ten-min/cart/remove', [SellerController::class, 'tenMinCartRemove'])->name('tenmin.cart.remove');
 
-    
+
 // ... other routes ...
 
 // In routes/web.php
 Route::get('/ten-min-checkout', [SellerController::class, 'tenMinCheckout'])
     ->name('tenmin.checkout')
     ->middleware('auth');
-    
+
 Route::get('/ten-min-order/success/{orderId}', [SellerController::class, 'tenMinOrderSuccess'])
     ->name('tenmin.order.success');
 
@@ -1929,12 +1945,12 @@ Route::prefix('food')->group(function () {
         Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
         Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
         // Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
-            Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
-        ->name('customer.food.order.success');
+        Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
+            ->name('customer.food.order.success');
     });
 });
 
 Route::get('/tenmins', [SellerController::class, 'tenmins']);
 Route::get('/joinus', [SellerController::class, 'joinus']);
 Route::get('/internship/details', [InternshipController::class, 'details'])
-     ->name('internship.details');
+    ->name('internship.details');

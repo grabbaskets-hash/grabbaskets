@@ -39,7 +39,21 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'in:seller,buyer'],
             'sex' => ['required', 'in:male,female,other'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'referral_code_input' => ['nullable', 'string', 'size:8', 'exists:users,referral_code'],
         ]);
+
+        // Check if referral code is provided and valid
+        $referrerId = null;
+        $referrer = null;
+        if ($request->filled('referral_code_input')) {
+            $referrer = User::where('referral_code', strtoupper($request->referral_code_input))
+                ->where('role', 'buyer') // Only buyers can refer
+                ->first();
+
+            if ($referrer) {
+                $referrerId = $referrer->id;
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -101,6 +115,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Determine wallet points based on referral (New behavior: New user gets 0)
+        $initialPoints = 0;
+
         $user = User::updateOrCreate(
             ['email' => $request->email],
             [
@@ -112,15 +129,31 @@ class RegisteredUserController extends Controller
                 'pincode' => $request->pincode,
                 'role' => 'buyer',
                 'sex' => $request->sex,
-                'wallet_point' => 150, // ✅ Buyer gets 150
+                'wallet_point' => $initialPoints,
                 'password' => Hash::make($request->password),
+                'referrer_id' => $referrerId, // Set referrer if code was used
             ]
         );
 
+        // If referred, award bonus to referrer (300 points)
+        if ($referrer) {
+            $referrer->addWalletPoints(
+                300,
+                'referrer_reward',
+                "Referral reward for inviting {$user->name}",
+                $user->id
+            );
+        }
+
         Auth::login($user);
 
+        $successMessage = $this->greeting($request->sex, $user->name);
+        if ($referrer) {
+            $successMessage .= " Thank you for joining using a referral code! Your friend {$referrer->name} has received 300 bonus points.";
+        }
+
         return redirect()->route('home')->with([
-            'success' => $this->greeting($request->sex, $user->name),
+            'success' => $successMessage,
             'login_success' => true
         ]);
     }
