@@ -1,560 +1,574 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Cart</title>
-  <link rel="icon" type="image/png" style="width:1500px;" href="{{ asset('build/assets/icon (3).png') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart | GrabBaskets</title>
+    <link rel="icon" type="image/png" href="{{ asset('build/assets/icon (3).png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        :root {
+            --primary-color: #ff6600;
+            --primary-light: #fff0e6;
+            --secondary-color: #1e1e37;
+            --bg-color: #f8f9fc;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --accent-pink: #ff4d94;
+        }
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      background-color: #f8f9fa;
-    }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: #2d3436;
+            padding-bottom: 100px; /* Space for sticky bar */
+        }
 
-    /* Main content wrapper */
-    main {
-      flex: 1;
-    }
+        /* Navbar Styling */
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
 
-    /* Navbar */
-    .navbar {
-      padding: 0.8rem 1rem;
-    }
+        .navbar-brand img {
+            height: 40px;
+            filter: brightness(1.2);
+        }
 
-    .navbar-brand {
-      font-size: 1.4rem;
-      letter-spacing: 1px;
-    }
+        .nav-link-custom {
+            color: white !important;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
 
-    /* Product Image */
-    .product-img {
-      width: 150px;
-      height: 150px;
-      border-radius: 12px;
-      object-fit: cover;
-      margin-right: 20px;
-      border: 1px solid #eee;
-    }
+        .nav-link-custom:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
 
-    /* Cart Items */
-    .cart-item {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+        /* Cart Content Styling */
+        .cart-header {
+            margin: 40px 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .cart-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.08);
-    }
+        .cart-title {
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin: 0;
+        }
 
-    /* Cart Summary */
-    .cart-summary {
-      background: white;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 90px;
-    }
+        .cart-count-badge {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
 
-    .cart-summary h5 {
-      font-weight: 600;
-    }
+        /* Item Card Styling */
+        .cart-item-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .cart-summary strong.text-danger {
-      font-size: 1.3rem;
-    }
+        .cart-item-card:hover {
+            transform: translateY(-5px);
+        }
 
-    .btn-lg {
-      padding: 0.8rem;
-    }
+        .product-image-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #f1f2f6;
+            flex-shrink: 0;
+        }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .product-img {
-        width: 100px;
-        height: 100px;
-      }
+        .product-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-      .cart-item {
-        flex-direction: column;
-        align-items: flex-start !important;
-      }
+        .item-details {
+            flex-grow: 1;
+            padding: 0 20px;
+        }
 
-      .cart-item .text-end {
-        margin-top: 10px;
-        width: 100%;
-      }
-    }
+        .item-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+            color: var(--secondary-color);
+        }
 
+        .item-meta {
+            font-size: 0.9rem;
+            color: #636e72;
+            margin-bottom: 12px;
+        }
 
-    .follow {
-      position: relative;
-      left: -40px;
-    }
+        /* Quantity Controls */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            background: #f1f2f6;
+            border-radius: 14px;
+            padding: 4px;
+            width: fit-content;
+        }
 
-    .para {
-      font-size: 15px;
-      top: 15px;
-      position: relative;
-    }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: none;
+            background: white;
+            color: var(--secondary-color);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-    .brand-column {
-      padding-left: 0;
-      margin-left: -0.5rem;
-    }
+        .qty-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
 
-    .brand-column h3,
-    .brand-column p {
-      margin-left: -3rem;
-    }
+        .qty-value {
+            padding: 0 15px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
 
-    .quick-links-column,
-    .support-column {
-      padding: 0 1rem;
-    }
+        .price-tag {
+            text-align: right;
+        }
 
-    .follow-column {
-      text-align: right;
-      padding-right: 0;
-    }
+        .line-total {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            display: block;
+        }
 
-    .follow-icons {
-      display: flex;
-      gap: 0.9rem;
-      justify-content: flex-end;
-    }
+        .unit-price {
+            font-size: 0.85rem;
+            color: #b2bec3;
+        }
 
-    .bottom-bar {
-      background-color: #212529;
-      padding: 10px 0;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #ccc;
-    }
+        .action-btns {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
 
-    /* Tablet */
-    @media (max-width: 991px) {
+        .action-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: #fff5f5;
+            color: #ff4757;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
 
+        .action-icon-btn:hover {
+            background: #ff4757;
+            color: white;
+        }
 
-      .brand-column {
-        grid-column: 1;
-        margin-left: -0.5rem;
-      }
+        .wishlist-icon-btn {
+            color: #ffa502;
+            background: #fffaf0;
+        }
 
-      .quick-links-column {
-        grid-column: 2;
-      }
+        .wishlist-icon-btn:hover {
+            background: #ffa502;
+            color: white;
+        }
 
-      .support-column {
-        grid-column: 1;
-      }
+        /* Summary Card */
+        .summary-card {
+            background: white;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 100px;
+        }
 
-      .follow-column {
-        grid-column: 2;
-        text-align: right;
-      }
-    }
+        .summary-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
 
-    /* Mobile */
-    @media (max-width: 767px) {
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 1rem;
+            color: #636e72;
+        }
 
+        .bill-row.total {
+            color: var(--secondary-color);
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #f1f2f6;
+        }
 
-      .brand-column {
-        grid-column: 1;
-        margin-left: 0;
-        padding-left: 0;
-      }
+        .checkout-btn {
+            background: linear-gradient(135deg, var(--primary-color), #ff8c00);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 24px;
+            box-shadow: 0 10px 20px rgba(255, 102, 0, 0.2);
+            transition: 0.3s;
+        }
 
-      .quick-links-column,
-      .support-column {
-        padding: 0;
-      }
+        .checkout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 25px rgba(255, 102, 0, 0.3);
+            color: white;
+        }
 
-      .follow-column {
-        text-align: left;
-        padding-right: 0;
-      }
+        /* Mobile Sticky Bar */
+        .mobile-checkout-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 24px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+            border-radius: 24px 24px 0 0;
+        }
 
-      .follow-icons {
-        justify-content: flex-start;
-        margin-top: 1rem;
-      }
-    }
+        .mobile-total-info {
+            display: flex;
+            flex-direction: column;
+        }
 
-    .footer {
-      font-size: 0.9rem;
-    }
+        .mobile-total-label {
+            font-size: 0.75rem;
+            color: #636e72;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .footer h6 {
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-      color: #fff;
-    }
+        .mobile-total-val {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
 
-    .footer a:hover {
-      color: #fff;
-      text-decoration: underline;
-    }
+        /* Empty State */
+        .empty-cart-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
 
-    .footer .social-icons i {
-      font-size: 1.3rem;
-      transition: color 0.3s;
-    }
+        .empty-icon {
+            font-size: 5rem;
+            color: #d1d8e0;
+            margin-bottom: 24px;
+        }
 
-    .footer .social-icons i:hover {
-      color: #fff;
-    }
+        @media (max-width: 991px) {
+            .cart-title { font-size: 1.6rem; }
+            .summary-card { margin-top: 30px; position: static; }
+        }
 
-
-    /* Extra Small */
-    @media (max-width: 575px) {
-      .footer-main-grid {
-        gap: 1.5rem;
-      }
-
-      .brand-column h3 {
-        font-size: 1.25rem;
-      }
-
-      .brand-column p {
-        font-size: 0.813rem;
-      }
-
-      .follow-icons {
-        flex-wrap: wrap;
-        gap: 0.75rem;
-      }
-    }
-    @media (max-width: 767px) {
-  .navbar .btn,
-  .navbar .dropdown-menu {
-    width: 100%;
-  }
-
-  .navbar .dropdown-menu {
-    margin-top: 0.5rem;
-  }
-}
-
-  </style>
+        @media (max-width: 768px) {
+            .mobile-checkout-bar { display: flex; align-items: center; justify-content: space-between; }
+            .cart-header { margin-top: 24px; }
+            .cart-item-card { flex-direction: row; align-items: flex-start; padding: 16px; }
+            .product-image-container { width: 80px; height: 80px; border-radius: 14px; }
+            .item-details { padding: 0 12px; }
+            .item-name { font-size: 1rem; }
+            .action-btns { top: 12px; right: 12px; }
+            .action-icon-btn { width: 30px; height: 30px; font-size: 0.9rem; }
+            .price-tag { align-self: flex-end; }
+            .line-total { font-size: 1.1rem; }
+            .navbar-brand img { height: 32px; }
+            .qty-controls { padding: 2px; }
+            .qty-btn { width: 28px; height: 28px; }
+            .qty-value { padding: 0 10px; font-size: 0.9rem; }
+            .desktop-summary { display: none; }
+        }
+    </style>
 </head>
-
 <body>
-  <x-back-button />
 
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
-  <div class="container-fluid">
-    <!-- Logo -->
-    <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
-      <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
-    </a>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a href="{{ url('/') }}" class="navbar-brand">
+                <img src="{{ asset('asset/images/logo-image.png') }}" alt="GrabBaskets">
+            </a>
 
-    <!-- Mobile Toggle Button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <!-- Mobile Account Icon -->
+                <div class="dropdown d-lg-none">
+                    <button class="nav-link-custom border-0 bg-transparent" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-4"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end rounded-4 border-0 shadow-lg p-2">
+                        <li><a class="dropdown-item rounded-3" href="{{ url('/profile') }}">Profile</a></li>
+                        <li><a class="dropdown-item rounded-3" href="{{ route('buyer.dashboard') }}">Shop</a></li>
+                        <li><a class="dropdown-item rounded-3" href="{{ url('/orders/track') }}">Orders</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button class="dropdown-item text-danger rounded-3">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
 
-    <!-- Navbar Content -->
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- Search Bar -->
-      <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
-        <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
-          aria-label="Search">
-        <button class="btn btn-outline-warning" type="submit">Search</button>
-      </form>
-
-      <!-- Right Side -->
-      <ul class="navbar-nav ms-auto align-items-lg-center">
-        <li class="nav-item d-none d-lg-block me-2">
-          <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
-        </li>
-
-        <!-- Account Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
-            id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle"></i> My Account
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
-            <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
-            <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a></li>
-            <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-            <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase"></i> My Orders</a></li>
-            <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-            <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
-          </ul>
-        </li>
-
-        <!-- Clear Cart Button -->
-        @if($items->count())
-        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-          <form method="POST" action="{{ route('cart.clear') }}">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100">
-              <i class="bi bi-trash"></i> Clear
-            </button>
-          </form>
-        </li>
-        @endif
-
-        <!-- Logout -->
-        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-          <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="bi bi-box-arrow-right"></i> Logout
-          </a>
-          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-            @csrf
-          </form>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
-  <!-- Main content -->
-  <main>
-    <div class="container mt-4">
-      <div class="row">
-        <!-- Cart Items -->
-        <div class="col-lg-8">
-          <h3 class="mb-4"><i class="bi bi-cart-check-fill text-primary"></i> My Shopping Cart</h3>
-
-          @if(session('success'))
-          <div class="alert alert-success">{{ session('success') }}</div>
-          @endif
-
-          @if(!$items->count())
-          <p class="text-muted">Your cart is empty.</p>
-          @else
-          @foreach($items as $item)
-          <div class="cart-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              @if($item->product)
-              <a href="{{ route('product.details', $item->product->id) }}" class="me-3">
-                @php
-                  $productImage = ($item->product->image || $item->product->image_data) ? 
-                                 $item->product->image_url : 
-                                 'https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Image';
-                @endphp
-                <img src="{{ $productImage }}" 
-                     alt="{{ $item->product->name }}" 
-                     class="product-img" 
-                     style="cursor: pointer; transition: transform 0.2s;" 
-                     onmouseover="this.style.transform='scale(1.1)'" 
-                     onmouseout="this.style.transform='scale(1)'"
-                     onerror="this.src='https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Image'">
-              </a>
-              @else
-              <div class="me-3">
-                <img src="https://via.placeholder.com/150x150/f8f9fa/6c757d?text=No+Product" 
-                     alt="No Product" 
-                     class="product-img">
-              </div>
-              @endif
-
-              <div>
-                <h5 class="fw-semibold mb-2">
-                  @if($item->product)
-                  <a href="{{ route('product.details', $item->product->id) }}" class="text-decoration-none text-dark">
-                    {{ $item->product->name }}
-                  </a>
-                  @else
-                  <span class="text-muted">Product Unavailable</span>
-                  @endif
-                </h5>
-                @if($item->product)
-                <p class="text-muted mb-2">
-                  Price: <strong>₹{{ number_format($item->price, 2) }}</strong> |
-                  Discount: <strong>{{ $item->discount ? $item->discount . '%' : '-' }}</strong> |
-                  Delivery:
-                  <strong>{{ $item->delivery_charge ? '₹' . number_format($item->delivery_charge, 2) : 'Free' }}</strong>
-                </p>
-                @else
-                <p class="text-muted mb-2">Product details unavailable</p>
-                @endif
-
-                @if($item->product)
-                <form method="POST" action="{{ route('cart.update', $item) }}" class="d-flex align-items-center">
-                  @csrf
-                  @method('PATCH')
-                  <input type="number" min="1" max="10" name="quantity" value="{{ $item->quantity }}"
-                    class="form-control form-control-sm me-2" style="width: 80px;">
-                  <button class="btn btn-sm btn-outline-primary">Update</button>
-                </form>
-                @else
-                <p class="text-muted small">Cannot update unavailable product</p>
-                @endif
-              </div>
+                <!-- Desktop Menu -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link-custom" href="{{ route('buyer.dashboard') }}">
+                                <i class="bi bi-shop"></i> Continue Shopping
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link-custom dropdown-toggle" href="#" id="accountDropdown" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end rounded-4 border-0 shadow-lg p-2" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item rounded-3" href="{{ url('/profile') }}"><i class="bi bi-person me-2"></i> Profile</a></li>
+                                <li><a class="dropdown-item rounded-3" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase me-2"></i> My Orders</a></li>
+                                <li><a class="dropdown-item rounded-3" href="{{ url('/wishlist') }}"><i class="bi bi-heart me-2"></i> Wishlist</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button class="dropdown-item text-danger rounded-3"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
-
-            <div class="text-end">
-              @php
-              $price = (float) $item->price;
-              $disc = (float) $item->discount;
-              $qty = (int) $item->quantity;
-              $delivery = (float) $item->delivery_charge;
-              $base = $price * $qty;
-              $less = $disc > 0 ? ($base * ($disc / 100)) : 0;
-              $lineTotal = $base - $less + $delivery;
-              @endphp
-              <h5 class="text-danger fw-bold">₹{{ number_format($lineTotal, 2) }}</h5>
-              <form method="POST" action="{{ route('cart.remove', $item) }}">
-                @csrf
-                @method('DELETE')
-                <button class="btn btn-sm btn-outline-danger mt-2"><i class="bi bi-x-circle"></i> Remove</button>
-              </form>
-              <form method="POST" action="{{ route('cart.moveToWishlist', $item) }}" class="mt-2">
-                @csrf
-                <button class="btn btn-sm btn-outline-warning"><i class="bi bi-heart"></i> Move to Wishlist</button>
-              </form>
-            </div>
-          </div>
-          @endforeach
-          @endif
         </div>
+    </nav>
 
-        <!-- Cart Summary -->
-        <div class="col-lg-4">
-          @if($items->count())
-          <div class="cart-summary">
-            <h5 class="mb-3">Order Summary</h5>
-            <div class="d-flex justify-content-between mb-2">
-              <span>Subtotal</span>
-              <span>₹{{ number_format($totals['subtotal'], 2) }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span>Discount</span>
-              <span>-₹{{ number_format($totals['discountTotal'], 2) }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span>Delivery</span>
-              <span>₹{{ number_format($totals['deliveryTotal'], 2) }}</span>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between">
-              <strong>Total</strong>
-              <strong class="text-danger">₹{{ number_format($totals['total'], 2) }}</strong>
-            </div>
-            <div class="d-grid gap-2 mt-4">
-              <a href="{{ route('cart.checkout.page') }}"
-                class="btn btn-success btn-lg fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                <i class="bi bi-bag-check-fill"></i> Checkout
-              </a>
-
-              <a href="{{ route('buyer.dashboard') }}"
-                class="btn btn-outline-primary btn-lg fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                <i class="bi bi-arrow-left-circle"></i> Continue Shopping
-              </a>
-            </div>
-          </div>
-          @endif
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <footer class="footer bg-dark text-white pt-5 pb-4 mt-5">
     <div class="container">
-      <div class="row">
+        @if(!$items->count())
+            <!-- EMPTY STATE -->
+            <div class="empty-cart-state">
+                <i class="bi bi-cart-x empty-icon"></i>
+                <h3 class="fw-bold">Your cart is feeling a bit light!</h3>
+                <p class="text-muted mb-4">Add some magic to it by exploring our products.</p>
+                <a href="{{ route('buyer.dashboard') }}" class="btn checkout-btn px-5 w-auto">Start Shopping</a>
+            </div>
+        @else
+            <!-- CART HEADER -->
+            <div class="cart-header">
+                <div>
+                    <h1 class="cart-title">My Basket</h1>
+                    <span class="cart-count-badge">{{ $items->count() }} {{ Str::plural('item', $items->count()) }}</span>
+                </div>
+                
+                <form method="POST" action="{{ route('cart.clear') }}" class="d-none d-md-block">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-link text-danger text-decoration-none fw-600">
+                        <i class="bi bi-trash-fill me-1"></i> Clear Entire Basket
+                    </button>
+                </form>
+            </div>
 
-        <!-- About -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">About</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Grabbasket Stories</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Corporate Info</a></li>
-          </ul>
-        </div>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
-        <!-- Group Companies -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Quick Links</h6>
-          <ul class="list-unstyled small">
-            <li><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
-            <li><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
-            <li><a href="/orders/track" class="text-white-50 text-decoration-none">Orders</a></li>
-          </ul>
-        </div>
+            <div class="row g-4">
+                <!-- ITEMS LIST -->
+                <div class="col-lg-8">
+                    @foreach($items as $item)
+                        <div class="cart-item-card d-flex">
+                            <div class="product-image-container">
+                                @php
+                                    $productImage = ($item->product && ($item->product->image || $item->product->image_data)) ? 
+                                                   $item->product->image_url : 
+                                                   'https://via.placeholder.com/150/f1f2f6/636e72?text=No+Image';
+                                @endphp
+                                <img src="{{ $productImage }}" alt="{{ $item->product->name ?? 'Product' }}">
+                            </div>
 
-        <!-- Help -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Help</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Payments</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Shipping</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Cancellation & Returns</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
-          </ul>
-        </div>
+                            <div class="item-details d-flex flex-column justify-content-between">
+                                <div>
+                                    <h3 class="item-name">
+                                        @if($item->product)
+                                            <a href="{{ route('product.details', $item->product->id) }}" class="text-decoration-none text-dark">
+                                                {{ $item->product->name }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">Product Unavailable</span>
+                                        @endif
+                                    </h3>
+                                    <div class="item-meta">
+                                        Standard Delivery • ₹{{ number_format($item->price, 0) }} / unit
+                                    </div>
+                                </div>
 
-        <!-- Policy -->
-        <div class="col-md-2 col-6 mb-3">
-          <h6 class="fw-bold text-uppercase">Consumer Policy</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Terms of Use</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Security</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Privacy</a></li>
-            <li><a href="#" class="text-white-50 text-decoration-none">Sitemap</a></li>
-          </ul>
-        </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    @if($item->product)
+                                        <div class="qty-controls">
+                                            <button class="qty-btn" onclick="updateQty({{ $item->id }}, -1)">−</button>
+                                            <span class="qty-value" id="qty-{{ $item->id }}">{{ $item->quantity }}</span>
+                                            <button class="qty-btn" onclick="updateQty({{ $item->id }}, 1)">+</button>
+                                        </div>
+                                        
+                                        <!-- Hidden update forms -->
+                                        <form id="update-form-{{ $item->id }}" method="POST" action="{{ route('cart.update', $item) }}" class="d-none">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="quantity" id="input-{{ $item->id }}" value="{{ $item->quantity }}">
+                                        </form>
+                                    @endif
 
-        <!-- Address -->
-        <div class="col-md-4 col-12 mb-3">
-          <h6 class="fw-bold text-uppercase">Registered Office Address</h6>
-          <p class="text-white-50 small mb-1">
-            Swivel IT and Training Institute<br>
-            Mahatma Gandhi Nagar Rd, near Annai Therasa English School,<br>
-            MRR Nagar, Palani Chettipatti,,<br>
-            Theni, 625531, TamilNadu, India.
-          </p>
-          <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
-          <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
-        </div>
-      </div>
+                                    <div class="price-tag">
+                                        @php
+                                            $lineTotal = ((float)$item->price * (int)$item->quantity) - 
+                                                        (((float)$item->price * (int)$item->quantity) * ((float)$item->discount / 100)) + 
+                                                        (float)$item->delivery_charge;
+                                        @endphp
+                                        <span class="line-total">₹{{ number_format($lineTotal, 0) }}</span>
+                                        @if($item->discount > 0)
+                                            <span class="text-success small fw-700">{{ $item->discount }}% OFF</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
 
-      <hr class="border-secondary">
+                            <div class="action-btns">
+                                <form method="POST" action="{{ route('cart.moveToWishlist', $item) }}">
+                                    @csrf
+                                    <button class="action-icon-btn wishlist-icon-btn" title="Move to Wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('cart.remove', $item) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="action-icon-btn" title="Remove Item">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
 
-      <!-- Bottom Row -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
-        <div class="mb-2 mb-md-0">
-          © 2025 grabbaskets.com
-        </div>
-        <div class="social-icons">
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
-          <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
-          <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
-        </div>
-      </div>
+                <!-- BILL SUMMARY (DESKTOP) -->
+                <div class="col-lg-4 desktop-summary">
+                    <div class="summary-card">
+                        <h2 class="summary-title">Bill Details</h2>
+                        <div class="bill-row">
+                            <span>Item Total</span>
+                            <span>₹{{ number_format($totals['subtotal'], 0) }}</span>
+                        </div>
+                        <div class="bill-row">
+                            <span>Product Discount</span>
+                            <span class="text-success">-₹{{ number_format($totals['discountTotal'], 0) }}</span>
+                        </div>
+                        <div class="bill-row">
+                            <span>Delivery Partner Fee</span>
+                            <span>₹{{ number_format($totals['deliveryTotal'], 0) }}</span>
+                        </div>
+                        
+                        <div class="bill-row total">
+                            <span>To Pay</span>
+                            <span>₹{{ number_format($totals['total'], 0) }}</span>
+                        </div>
+
+                        <a href="{{ route('cart.checkout.page') }}" class="btn checkout-btn">
+                            Proceed to Checkout <i class="bi bi-arrow-right-short fs-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
-  </footer>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- MOBILE STICKY BAR -->
+    @if($items->count())
+        <div class="mobile-checkout-bar">
+            <div class="mobile-total-info">
+                <span class="mobile-total-label">Grand Total</span>
+                <span class="mobile-total-val">₹{{ number_format($totals['total'], 0) }}</span>
+            </div>
+            <a href="{{ route('cart.checkout.page') }}" class="checkout-btn w-auto py-2 px-4 mt-0">
+                Checkout <i class="bi bi-chevron-right ms-1"></i>
+            </a>
+        </div>
+    @endif
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateQty(id, delta) {
+            const span = document.getElementById('qty-' + id);
+            const input = document.getElementById('input-' + id);
+            const form = document.getElementById('update-form-' + id);
+            
+            let current = parseInt(span.innerText);
+            let next = current + delta;
+            
+            if (next >= 1 && next <= 10) {
+                span.innerText = next;
+                input.value = next;
+                form.submit();
+            }
+        }
+    </script>
 </body>
-
 </html>

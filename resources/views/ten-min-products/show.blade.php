@@ -366,22 +366,16 @@ document.addEventListener('DOMContentLoaded', function () {
     addBtn.onclick = () => {
         if (addBtn.disabled) return;
 
-<<<<<<< HEAD
-=======
         // Visual feedback
         const originalText = addBtn.innerText;
         addBtn.innerText = "Adding...";
         addBtn.disabled = true;
 
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
         fetch("{{ route('tenmin.cart.add') }}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-<<<<<<< HEAD
-=======
                 "Accept": "application/json",
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 "X-CSRF-TOKEN": csrfToken
             },
             body: JSON.stringify({
@@ -389,11 +383,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 quantity: qty
             })
         })
-<<<<<<< HEAD
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-=======
         .then(async response => {
             const isJson = response.headers.get('content-type')?.includes('application/json');
             const data = isJson ? await response.json() : null;
@@ -406,37 +395,25 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(data => {
             if (data && data.success) {
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 // Update badge immediately
                 badge.innerText = data.cart_count;
                 updateCartBadge();
                 
-<<<<<<< HEAD
-=======
                 addBtn.innerText = "Added!";
                 
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
                 // Redirect to cart page after short delay
                 setTimeout(() => {
                     window.location.href = "{{ route('tenmin.cart.view') }}";
                 }, 500);
             } else {
-<<<<<<< HEAD
-                alert(data.error || 'Failed to add');
-=======
                 throw new Error((data && data.error) || 'Failed to add');
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
             }
         })
         .catch(err => {
             console.error('Error:', err);
-<<<<<<< HEAD
-            alert('Failed to add to cart');
-=======
             alert(err.message);
             addBtn.innerText = originalText;
             addBtn.disabled = false;
->>>>>>> a9bc5205ec22eeddf3f4ac9a1a0d9385b463a0cb
         });
     };
 

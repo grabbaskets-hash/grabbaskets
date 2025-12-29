@@ -9,7 +9,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places" async defer></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"
+    async defer></script>
   <style>
     * {
       margin: 0;
@@ -27,7 +29,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 12px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -43,7 +45,7 @@
     .location-icon {
       width: 40px;
       height: 40px;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -69,8 +71,8 @@
     }
 
     .change-location-btn {
-      background: rgba(255,255,255,0.2);
-      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
       color: white;
       padding: 8px 20px;
       border-radius: 20px;
@@ -81,14 +83,14 @@
     }
 
     .change-location-btn:hover {
-      background: rgba(255,255,255,0.3);
-      border-color: rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.6);
     }
 
     /* Checkout Progress Tabs */
     .checkout-tabs {
       background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       margin-bottom: 30px;
       border-radius: 12px;
       overflow: hidden;
@@ -172,8 +174,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Address Cards */
@@ -257,7 +266,7 @@
       width: 100%;
       border-radius: 12px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Order Summary Card */
@@ -265,7 +274,7 @@
       background: white;
       border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
       position: sticky;
       top: 100px;
     }
@@ -459,7 +468,7 @@
       background: white;
       border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
       margin-bottom: 24px;
     }
 
@@ -605,7 +614,7 @@
     }
 
     /* ============ BLINKIT-STYLE ENHANCEMENTS ============ */
-    
+
     /* Real-time Delivery Tracker */
     .delivery-tracker {
       background: linear-gradient(135deg, #fff9e6 0%, #fff4d1 100%);
@@ -629,8 +638,13 @@
     }
 
     @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
+      0% {
+        left: -100%;
+      }
+
+      100% {
+        left: 100%;
+      }
     }
 
     .tracker-steps {
@@ -670,8 +684,17 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-      50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+      }
+
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+      }
     }
 
     .tracker-step.completed .tracker-step-icon {
@@ -724,8 +747,15 @@
     }
 
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
     }
 
     .guaranteed-time-badge i {
@@ -734,8 +764,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     /* Time Slot Picker */
@@ -849,8 +884,15 @@
     }
 
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
     }
 
     .delivery-person-eta {
@@ -982,8 +1024,15 @@
     }
 
     @keyframes pulseGPS {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
     }
 
     .gps-text {
@@ -994,6 +1043,7 @@
 
     /* Mobile-specific hiding */
     @media (max-width: 768px) {
+
       /* Hide all floating elements on mobile */
       #floatingActionsContainer,
       #showFabBtn,
@@ -1089,7 +1139,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
@@ -1099,7 +1151,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(30, 30, 55);">
     <div class="container-fluid">
- 
+
       <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
         <img src="{{ asset('asset/images/logo-image.png') }}" alt="Logo" width="150" class="me-2">
       </a>
@@ -1189,7 +1241,7 @@
       <div class="row g-4">
         <!-- Left Column - Tab Content -->
         <div class="col-lg-8">
-          
+
           <!-- Step 1: Address Tab -->
           <div class="tab-content-wrapper active" id="address-tab">
             <h4 class="mb-4 fw-bold">
@@ -1243,17 +1295,17 @@
                   <div class="row g-3 mb-3">
                     <div class="col-md-4">
                       <label class="form-label fw-semibold">City</label>
-                      <input type="text" name="city" id="city" class="form-control-custom w-100" 
+                      <input type="text" name="city" id="city" class="form-control-custom w-100"
                         value="{{ old('city', $user->city) }}" placeholder="City">
                     </div>
                     <div class="col-md-4">
                       <label class="form-label fw-semibold">State</label>
-                      <input type="text" name="state" id="state" class="form-control-custom w-100" 
+                      <input type="text" name="state" id="state" class="form-control-custom w-100"
                         value="{{ old('state', $user->state) }}" placeholder="State">
                     </div>
                     <div class="col-md-4">
                       <label class="form-label fw-semibold">Pincode</label>
-                      <input type="text" name="pincode" id="pincode" class="form-control-custom w-100" 
+                      <input type="text" name="pincode" id="pincode" class="form-control-custom w-100"
                         value="{{ old('pincode', $user->pincode) }}" placeholder="6-digit pincode" pattern="[0-9]{6}">
                     </div>
                   </div>
@@ -1301,7 +1353,8 @@
 
             <div class="delivery-options-container">
               <p class="text-muted mb-4">
-                <i class="bi bi-info-circle"></i> All products support both delivery types. Choose based on your urgency.
+                <i class="bi bi-info-circle"></i> All products support both delivery types. Choose based on your
+                urgency.
               </p>
 
               <!-- Fast Delivery Option - Blinkit Style Enhanced -->
@@ -1322,7 +1375,7 @@
                     <i class="bi bi-clock-fill"></i>
                     <strong>Delivery in 10 minutes</strong>
                   </div>
-                  
+
                   <!-- Guaranteed Time Badge -->
                   <div class="guaranteed-time-badge">
                     <i class="bi bi-shield-check-fill"></i>
@@ -1335,11 +1388,13 @@
 
                   <!-- Real-time Delivery Tracker -->
                   <div class="delivery-tracker" id="express-tracker" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                       <strong style="color: #ff6b6b; font-size: 0.95rem;">
                         <i class="bi bi-truck"></i> Track Your Order
                       </strong>
-                      <span style="font-size: 0.85rem; color: #666;">ETA: <strong id="delivery-eta">10 mins</strong></span>
+                      <span style="font-size: 0.85rem; color: #666;">ETA: <strong id="delivery-eta">10
+                          mins</strong></span>
                     </div>
                     <div class="tracker-steps">
                       <div class="tracker-line">
@@ -1469,8 +1524,10 @@
               </div>
 
               <!-- Standard Delivery Option -->
-              <div class="delivery-option-card selected" onclick="selectDeliveryType('standard')" id="standard-delivery-option">
-                <input type="radio" name="delivery_option" value="standard" class="delivery-radio" id="standard-delivery" checked>
+              <div class="delivery-option-card selected" onclick="selectDeliveryType('standard')"
+                id="standard-delivery-option">
+                <input type="radio" name="delivery_option" value="standard" class="delivery-radio"
+                  id="standard-delivery" checked>
                 <div class="delivery-option-icon standard-delivery-icon">
                   <i class="bi bi-truck"></i>
                 </div>
@@ -1504,7 +1561,8 @@
 
               <div class="alert alert-warning mt-3" id="fast-unavailable-warning" style="display: none;">
                 <i class="bi bi-exclamation-triangle-fill"></i>
-                <strong>Express Delivery Unavailable:</strong> You're outside the 5km coverage area. Standard delivery is available.
+                <strong>Express Delivery Unavailable:</strong> You're outside the 5km coverage area. Standard delivery
+                is available.
               </div>
             </div>
 
@@ -1582,21 +1640,23 @@
                     } elseif (!empty($item->product->main_image)) {
                       $imageUrl = $item->product->main_image;
                     }
-                    
+
                     // Ensure proper URL format
                     if ($imageUrl && !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
                       $imageUrl = asset('storage/' . $imageUrl);
                     }
                   @endphp
-                  
+
                   @if($imageUrl)
-                    <img src="{{ $imageUrl }}" alt="{{ $item->product->name }}" class="item-image" 
-                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="item-image" style="background: linear-gradient(135deg, #667eea, #764ba2); display: none; align-items: center; justify-content: center;">
+                    <img src="{{ $imageUrl }}" alt="{{ $item->product->name }}" class="item-image"
+                      onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="item-image"
+                      style="background: linear-gradient(135deg, #667eea, #764ba2); display: none; align-items: center; justify-content: center;">
                       <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
                     </div>
                   @else
-                    <div class="item-image" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
+                    <div class="item-image"
+                      style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
                       <i class="bi bi-bag-fill" style="font-size: 1.5rem; color: white;"></i>
                     </div>
                   @endif
@@ -1631,26 +1691,7 @@
               </strong>
             </div>
 
-            @if($totals['total'] > 2000)
-            <!-- Wallet Option -->
-            <div class="summary-row" style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 12px;">
-              <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                <input type="checkbox" id="use_wallet" name="use_wallet" value="1" style="width: 20px; height: 20px; cursor: pointer;" onchange="updateWalletDiscount()">
-                <label for="use_wallet" style="flex: 1; cursor: pointer; margin: 0;">
-                  <strong style="color: #856404;">
-                    <i class="bi bi-wallet2"></i> Use Wallet Points
-                  </strong>
-                  <small class="d-block text-muted" style="font-size: 0.85rem;">
-                    Available: ₹{{ number_format(Auth::user()->wallet_point ?? 0, 2) }} | Save ₹150
-                  </small>
-                </label>
-              </div>
-            </div>
-            <div class="summary-row" id="wallet-discount-row" style="display: none;">
-              <span><i class="bi bi-wallet2 text-warning"></i> Wallet Discount</span>
-              <strong class="text-warning">-₹150.00</strong>
-            </div>
-            @endif
+
 
             <div class="summary-total">
               <span>Total Amount</span>
@@ -1696,7 +1737,7 @@
     }
 
     // Auto-detect location on page load
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       console.log('Page loaded, starting location detection');
       detectLocationAuto();
       initGoogleMaps();
@@ -1719,7 +1760,7 @@
 
       try {
         const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // Bangalore
-        
+
         map = new google.maps.Map(mapElement, {
           zoom: 14,
           center: defaultLocation,
@@ -1739,7 +1780,7 @@
           title: 'Your Delivery Location'
         });
 
-        marker.addListener('dragend', function() {
+        marker.addListener('dragend', function () {
           const position = marker.getPosition();
           document.getElementById('latitude').value = position.lat();
           document.getElementById('longitude').value = position.lng();
@@ -1760,7 +1801,7 @@
               marker.setPosition(pos);
               marker.setAnimation(google.maps.Animation.BOUNCE);
               setTimeout(() => marker.setAnimation(null), 1500);
-              
+
               document.getElementById('latitude').value = pos.lat;
               document.getElementById('longitude').value = pos.lng;
               geocodeLocation(pos.lat, pos.lng);
@@ -1779,7 +1820,7 @@
     // Auto-detect location for location bar
     function detectLocationAuto() {
       const locationElement = document.getElementById('current-location');
-      
+
       if (!navigator.geolocation) {
         locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Geolocation not supported';
         return;
@@ -1787,17 +1828,17 @@
 
       locationElement.innerHTML = '<i class="bi bi-hourglass-split"></i> Detecting your location...';
       console.log('Starting location detection');
-      
+
       navigator.geolocation.getCurrentPosition(
-        function(position) {
+        function (position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           console.log('Location detected:', lat, lng);
-          
+
           // Use Google Geocoding API
           const apiKey = '{{ config("services.google.maps_api_key") }}';
           const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-          
+
           fetch(geocodeUrl)
             .then(res => {
               if (!res.ok) {
@@ -1807,11 +1848,11 @@
             })
             .then(data => {
               console.log('Geocoding response:', data);
-              
+
               if (data.status === 'OK' && data.results && data.results[0]) {
                 const address = data.results[0].formatted_address;
                 locationElement.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${address}`;
-                
+
                 // Update form fields
                 const components = data.results[0].address_components;
                 components.forEach(comp => {
@@ -1825,7 +1866,7 @@
                     document.getElementById('pincode').value = comp.long_name;
                   }
                 });
-                
+
                 console.log('Location detected successfully:', address);
               } else {
                 console.error('Geocoding failed:', data.status);
@@ -1837,7 +1878,7 @@
               locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Unable to detect location';
             });
         },
-        function(error) {
+        function (error) {
           console.error('Geolocation error:', error.message);
           locationElement.innerHTML = '<i class="bi bi-geo-alt"></i> Click to detect location';
         },
@@ -1854,7 +1895,7 @@
       console.log('Geocoding location:', lat, lng);
       const apiKey = '{{ config("services.google.maps_api_key") }}';
       const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      
+
       fetch(geocodeUrl)
         .then(res => {
           if (!res.ok) {
@@ -1864,16 +1905,16 @@
         })
         .then(data => {
           console.log('Geocoding response:', data);
-          
+
           if (data.status === 'OK' && data.results && data.results[0]) {
             const addressComponents = data.results[0].address_components;
-            
+
             // Fill address field
             const addressField = document.getElementById('new_address');
             if (addressField) {
               addressField.value = data.results[0].formatted_address;
             }
-            
+
             // Fill city, state, pincode
             addressComponents.forEach(component => {
               if (component.types.includes('locality')) {
@@ -1895,7 +1936,7 @@
             if (locationElement) {
               locationElement.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${data.results[0].formatted_address}`;
             }
-            
+
             console.log('Address fields updated successfully');
           } else {
             console.error('Geocoding failed:', data.status);
@@ -1908,7 +1949,7 @@
 
     // Tab Navigation
     document.querySelectorAll('.tab-item').forEach(tab => {
-      tab.addEventListener('click', function() {
+      tab.addEventListener('click', function () {
         const targetTab = this.dataset.tab;
         switchTab(targetTab);
       });
@@ -1933,7 +1974,7 @@
     function goToPayment() {
       // Validate delivery type selection
       const selectedDelivery = document.querySelector('input[name="delivery_option"]:checked');
-      
+
       if (!selectedDelivery) {
         alert('Please select a delivery option');
         return;
@@ -1954,7 +1995,7 @@
       // Validate address selection
       const selectedAddress = document.querySelector('input[name="address"]:checked');
       const newAddress = document.getElementById('new_address').value;
-      
+
       if (!selectedAddress && !newAddress) {
         alert('Please select or add a delivery address');
         return;
@@ -1962,10 +2003,10 @@
 
       // Mark address step as completed
       document.querySelector('.tab-item[data-tab="address"]').classList.add('completed');
-      
+
       // Calculate distance and check fast delivery availability
       checkDeliveryAvailability();
-      
+
       switchTab('delivery');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1975,26 +2016,26 @@
       // Get user's latitude and longitude
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          function(position) {
+          function (position) {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
-            
+
             // Store coordinates in hidden fields
             document.getElementById('user_latitude').value = userLat;
             document.getElementById('user_longitude').value = userLng;
-            
+
             // Store location (example: Theni, Tamil Nadu - you can change this)
             const storeLat = 10.0104;  // Example: Theni latitude
             const storeLng = 77.4768;  // Example: Theni longitude
-            
+
             // Calculate distance
             const distance = calculateDistance(userLat, userLng, storeLat, storeLng);
             console.log('Distance from store:', distance, 'km');
-            
+
             // Update UI based on distance
             document.getElementById('distance-info').style.display = 'block';
             document.getElementById('user-distance-text').textContent = distance.toFixed(2) + ' km';
-            
+
             if (distance <= 5) {
               // Fast delivery available
               document.getElementById('fast-distance-badge').style.display = 'inline-flex';
@@ -2009,16 +2050,16 @@
               document.getElementById('fast-delivery-option').style.opacity = '0.6';
               document.getElementById('fast-delivery-option').style.pointerEvents = 'none';
               document.getElementById('fast-delivery').disabled = true;
-              
+
               // Auto-select standard delivery
               selectDeliveryType('standard');
             }
           },
-          function(error) {
+          function (error) {
             console.error('Geolocation error:', error);
             // Default to standard delivery if location unavailable
             document.getElementById('fast-unavailable-warning').style.display = 'block';
-            document.getElementById('fast-unavailable-warning').innerHTML = 
+            document.getElementById('fast-unavailable-warning').innerHTML =
               '<i class="bi bi-exclamation-triangle-fill"></i> <strong>Cannot detect location:</strong> Please enable location services. Standard delivery is available.';
             selectDeliveryType('standard');
           }
@@ -2034,11 +2075,11 @@
       const R = 6371; // Radius of the Earth in kilometers
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = R * c;
       return distance;
     }
@@ -2046,26 +2087,26 @@
     // Select delivery type
     function selectDeliveryType(type) {
       console.log('Selected delivery type:', type);
-      
+
       // Update hidden field
       document.getElementById('delivery_type').value = type;
-      
+
       // Remove selected class from all
       document.querySelectorAll('.delivery-option-card').forEach(card => {
         card.classList.remove('selected');
       });
-      
+
       // Add selected class to clicked option
       if (type === 'fast') {
         document.getElementById('fast-delivery-option').classList.add('selected');
         document.getElementById('fast-delivery').checked = true;
-        
+
         // Show Blinkit-style features for express delivery
         showExpressDeliveryFeatures();
       } else {
         document.getElementById('standard-delivery-option').classList.add('selected');
         document.getElementById('standard-delivery').checked = true;
-        
+
         // Hide express features
         hideExpressDeliveryFeatures();
       }
@@ -2130,7 +2171,7 @@
       element.classList.add('selected');
 
       console.log('Selected time slot:', slot);
-      
+
       // You can store the selected slot in a hidden field if needed
       // document.getElementById('selected_time_slot').value = slot;
     }
@@ -2139,14 +2180,14 @@
     function simulateDeliveryPersonAssignment() {
       const names = ['Rajesh Kumar', 'Amit Singh', 'Priya Sharma', 'Vikram Patel', 'Sneha Reddy'];
       const randomName = names[Math.floor(Math.random() * names.length)];
-      
+
       const nameElement = document.getElementById('delivery-person-name');
       const statusElement = document.getElementById('delivery-person-status');
 
       if (nameElement && statusElement) {
         // Simulate assignment animation
         statusElement.textContent = 'Finding nearby partner...';
-        
+
         setTimeout(() => {
           nameElement.textContent = randomName;
           statusElement.innerHTML = '<span class="status-dot"></span> Partner assigned & heading to store';
@@ -2168,7 +2209,7 @@
       if (!tracker) return;
 
       tracker.style.display = 'block';
-      
+
       let currentStep = 1;
       const totalSteps = 4;
       const stepDuration = 2500; // 2.5 seconds per step (10 mins / 4 steps)
@@ -2203,7 +2244,7 @@
         const eta = 10 - (currentStep * 2.5);
         const etaElement = document.getElementById('delivery-eta');
         const liveEtaElement = document.getElementById('live-eta');
-        
+
         if (etaElement) {
           etaElement.textContent = Math.ceil(eta) + ' mins';
         }
@@ -2218,16 +2259,16 @@
     // Update delivery ETA countdown
     function startETACountdown(minutes) {
       let seconds = minutes * 60;
-      
+
       const countdown = setInterval(() => {
         seconds--;
-        
+
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        
+
         const etaElement = document.getElementById('delivery-eta');
         const liveEtaElement = document.getElementById('live-eta');
-        
+
         if (etaElement) {
           etaElement.textContent = mins + ' mins ' + secs + ' secs';
         }
@@ -2249,10 +2290,10 @@
     function checkPeakHourSurge() {
       const hour = new Date().getHours();
       const surgePricingElement = document.getElementById('express-surge-pricing');
-      
+
       // Peak hours: 12-2 PM and 7-10 PM
       const isPeakHour = (hour >= 12 && hour <= 14) || (hour >= 19 && hour <= 22);
-      
+
       if (surgePricingElement) {
         surgePricingElement.style.display = isPeakHour ? 'flex' : 'none';
       }
@@ -2261,7 +2302,7 @@
     }
 
     // Initialize peak hour check on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       checkPeakHourSurge();
     });
 
@@ -2271,13 +2312,13 @@
       document.querySelectorAll('.address-card').forEach(card => {
         card.classList.remove('selected');
       });
-      
+
       // Add selected class to clicked
       event.currentTarget.classList.add('selected');
-      
+
       // Check the radio button
       document.getElementById('addr-' + index).checked = true;
-      
+
       selectedAddressIndex = index;
     }
 
@@ -2287,7 +2328,7 @@
       if (form.style.display === 'none') {
         form.style.display = 'block';
         console.log('Address form opened, checking map initialization');
-        
+
         // Initialize map when form is opened
         if (typeof google !== 'undefined' && google.maps && !map) {
           console.log('Initializing map for new address form');
@@ -2302,7 +2343,7 @@
               initMap();
             }
           }, 200);
-          
+
           // Clear interval after 5 seconds to prevent infinite loop
           setTimeout(() => clearInterval(checkGoogleMaps), 5000);
         }
@@ -2324,7 +2365,7 @@
 
       // Hide the form
       toggleAddressForm();
-      
+
       // Continue to payment
       goToPayment();
     }
@@ -2335,13 +2376,13 @@
       document.querySelectorAll('.payment-option').forEach(option => {
         option.classList.remove('selected');
       });
-      
+
       // Add selected class to clicked
       event.currentTarget.classList.add('selected');
-      
+
       // Update radio button
       document.getElementById(method).checked = true;
-      
+
       // Update button text
       const btnText = document.getElementById('btn-text');
       if (method === 'razorpay') {
@@ -2352,7 +2393,7 @@
     }
 
     // Place Order
-    document.getElementById('place-order-btn').addEventListener('click', function() {
+    document.getElementById('place-order-btn').addEventListener('click', function () {
       const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
       if (paymentMethod === 'razorpay') {
@@ -2367,17 +2408,13 @@
     function initiateRazorpayPayment() {
       const placeOrderBtn = document.getElementById('place-order-btn');
       const btnText = document.getElementById('btn-text');
-      
+
       placeOrderBtn.disabled = true;
       btnText.textContent = 'Processing...';
 
       const formData = new FormData(document.getElementById('checkout-form'));
-      
-      // Include wallet checkbox value
-      const useWalletCheckbox = document.getElementById('use_wallet');
-      if (useWalletCheckbox) {
-        formData.append('use_wallet', useWalletCheckbox.checked ? '1' : '0');
-      }
+
+
 
       fetch('{{ route("payment.createOrder") }}', {
         method: 'POST',
@@ -2386,117 +2423,117 @@
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
       })
-      .then(response => {
-        console.log('Payment API Response Status:', response.status);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Payment API Response Data:', data);
-        
-        if (data.error) {
-          console.error('Payment API Error:', data.error);
-          alert(data.error);
-          placeOrderBtn.disabled = false;
-          btnText.textContent = 'Pay with Razorpay';
-          return;
-        }
-
-        if (!data.success || !data.order_id) {
-          console.error('Invalid payment response:', data);
-          alert('Invalid payment response. Please try again.');
-          placeOrderBtn.disabled = false;
-          btnText.textContent = 'Pay with Razorpay';
-          return;
-        }
-
-        // Get Razorpay key from API response (more reliable than config)
-        const razorpayKey = data.key || '{{ config("services.razorpay.key") }}';
-        if (!razorpayKey || razorpayKey === '') {
-          console.error('Razorpay key not configured');
-          alert('Payment system not configured. Please contact support.');
-          placeOrderBtn.disabled = false;
-          btnText.textContent = 'Pay with Razorpay';
-          return;
-        }
-
-        console.log('Initializing Razorpay with:', {
-          key: razorpayKey.substring(0, 15) + '...', // Log partial key for security
-          amount: data.amount,
-          order_id: data.order_id
-        });
-
-        const options = {
-          key: razorpayKey,
-          amount: data.amount,
-          currency: data.currency,
-          name: data.name,
-          description: data.description,
-          order_id: data.order_id,
-          prefill: data.prefill,
-          theme: {
-            color: '#667eea'
-          },
-          handler: function(response) {
-            verifyPayment(response);
-          },
-          modal: {
-            ondismiss: function() {
-              placeOrderBtn.disabled = false;
-              btnText.textContent = 'Pay with Razorpay';
-            }
+        .then(response => {
+          console.log('Payment API Response Status:', response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
-        };
+          return response.json();
+        })
+        .then(data => {
+          console.log('Payment API Response Data:', data);
 
-        try {
-          // Check if Razorpay is loaded
-          if (typeof Razorpay === 'undefined') {
-            throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
-          }
-
-          const rzp = new Razorpay(options);
-          
-          // Add error handler for Razorpay
-          rzp.on('payment.failed', function (response) {
-            console.error('Razorpay payment failed:', response.error);
-            alert('Payment failed: ' + response.error.description);
+          if (data.error) {
+            console.error('Payment API Error:', data.error);
+            alert(data.error);
             placeOrderBtn.disabled = false;
             btnText.textContent = 'Pay with Razorpay';
+            return;
+          }
+
+          if (!data.success || !data.order_id) {
+            console.error('Invalid payment response:', data);
+            alert('Invalid payment response. Please try again.');
+            placeOrderBtn.disabled = false;
+            btnText.textContent = 'Pay with Razorpay';
+            return;
+          }
+
+          // Get Razorpay key from API response (more reliable than config)
+          const razorpayKey = data.key || '{{ config("services.razorpay.key") }}';
+          if (!razorpayKey || razorpayKey === '') {
+            console.error('Razorpay key not configured');
+            alert('Payment system not configured. Please contact support.');
+            placeOrderBtn.disabled = false;
+            btnText.textContent = 'Pay with Razorpay';
+            return;
+          }
+
+          console.log('Initializing Razorpay with:', {
+            key: razorpayKey.substring(0, 15) + '...', // Log partial key for security
+            amount: data.amount,
+            order_id: data.order_id
           });
 
-          rzp.open();
-        } catch (razorpayError) {
-          console.error('Razorpay initialization error:', razorpayError);
-          alert('Payment system error: ' + razorpayError.message);
+          const options = {
+            key: razorpayKey,
+            amount: data.amount,
+            currency: data.currency,
+            name: data.name,
+            description: data.description,
+            order_id: data.order_id,
+            prefill: data.prefill,
+            theme: {
+              color: '#667eea'
+            },
+            handler: function (response) {
+              verifyPayment(response);
+            },
+            modal: {
+              ondismiss: function () {
+                placeOrderBtn.disabled = false;
+                btnText.textContent = 'Pay with Razorpay';
+              }
+            }
+          };
+
+          try {
+            // Check if Razorpay is loaded
+            if (typeof Razorpay === 'undefined') {
+              throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
+            }
+
+            const rzp = new Razorpay(options);
+
+            // Add error handler for Razorpay
+            rzp.on('payment.failed', function (response) {
+              console.error('Razorpay payment failed:', response.error);
+              alert('Payment failed: ' + response.error.description);
+              placeOrderBtn.disabled = false;
+              btnText.textContent = 'Pay with Razorpay';
+            });
+
+            rzp.open();
+          } catch (razorpayError) {
+            console.error('Razorpay initialization error:', razorpayError);
+            alert('Payment system error: ' + razorpayError.message);
+            placeOrderBtn.disabled = false;
+            btnText.textContent = 'Pay with Razorpay';
+          }
+        })
+        .catch(error => {
+          console.error('Payment initialization error:', error);
+          let errorMessage = 'Payment initialization failed. ';
+
+          if (error.message.includes('HTTP 5')) {
+            errorMessage += 'Server error. Please try again in a moment.';
+          } else if (error.message.includes('HTTP 4')) {
+            errorMessage += 'Please check your information and try again.';
+          } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+            errorMessage += 'Network error. Please check your connection and try again.';
+          } else {
+            errorMessage += 'Please try again or contact support.';
+          }
+
+          alert(errorMessage);
           placeOrderBtn.disabled = false;
           btnText.textContent = 'Pay with Razorpay';
-        }
-      })
-      .catch(error => {
-        console.error('Payment initialization error:', error);
-        let errorMessage = 'Payment initialization failed. ';
-        
-        if (error.message.includes('HTTP 5')) {
-          errorMessage += 'Server error. Please try again in a moment.';
-        } else if (error.message.includes('HTTP 4')) {
-          errorMessage += 'Please check your information and try again.';
-        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-          errorMessage += 'Network error. Please check your connection and try again.';
-        } else {
-          errorMessage += 'Please try again or contact support.';
-        }
-        
-        alert(errorMessage);
-        placeOrderBtn.disabled = false;
-        btnText.textContent = 'Pay with Razorpay';
-      });
+        });
     }
 
     function verifyPayment(paymentData) {
       document.getElementById('loading-overlay').classList.add('active');
-      
+
       fetch('{{ route("payment.verify") }}', {
         method: 'POST',
         headers: {
@@ -2505,49 +2542,28 @@
         },
         body: JSON.stringify(paymentData)
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert(data.message);
-          window.location.href = data.redirect;
-        } else {
-          alert(data.error || 'Payment verification failed');
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            window.location.href = data.redirect;
+          } else {
+            alert(data.error || 'Payment verification failed');
+            document.getElementById('loading-overlay').classList.remove('active');
+            placeOrderBtn.disabled = false;
+            btnText.textContent = 'Pay with Razorpay';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Payment verification failed. Please contact support.');
           document.getElementById('loading-overlay').classList.remove('active');
           placeOrderBtn.disabled = false;
           btnText.textContent = 'Pay with Razorpay';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Payment verification failed. Please contact support.');
-        document.getElementById('loading-overlay').classList.remove('active');
-        placeOrderBtn.disabled = false;
-        btnText.textContent = 'Pay with Razorpay';
-      });
+        });
     }
 
-    // Wallet discount function
-    function updateWalletDiscount() {
-      const useWallet = document.getElementById('use_wallet');
-      const walletDiscountRow = document.getElementById('wallet-discount-row');
-      const finalTotalElement = document.getElementById('final-total');
-      
-      if (!useWallet || !walletDiscountRow || !finalTotalElement) {
-        return;
-      }
 
-      const originalTotal = {{ $totals['total'] }};
-      const walletDiscount = 150;
-
-      if (useWallet.checked) {
-        walletDiscountRow.style.display = 'flex';
-        const newTotal = originalTotal - walletDiscount;
-        finalTotalElement.textContent = '₹' + newTotal.toFixed(2);
-      } else {
-        walletDiscountRow.style.display = 'none';
-        finalTotalElement.textContent = '₹' + originalTotal.toFixed(2);
-      }
-    }
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
