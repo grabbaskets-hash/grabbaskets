@@ -574,7 +574,7 @@ Route::get('/api/nearby-stores', [ProductController::class, 'getNearbyStores'])-
 Route::get('/api/product/{id}/check-10min', [ProductController::class, 'check10MinDelivery'])->middleware('auth')->name('api.product.check10min');
 
 
-// Public product search - Anyone can search (Zepto/Blinkit style)
+// Public product search - Anyone can search (Zepto/Blinkit style..)
 Route::get('/products', [App\Http\Controllers\BuyerController::class, 'search'])->name('products.index');
 
 // Food delivery products route
