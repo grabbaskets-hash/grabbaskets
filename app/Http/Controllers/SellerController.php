@@ -53,7 +53,8 @@ class SellerController extends Controller
         $updatedImages = 0;
         foreach ($rows as $row) {
             $data = array_combine($header, $row);
-            if (!$data) continue;
+            if (!$data)
+                continue;
             $data['seller_id'] = $sellerId;
             // Check if product exists by unique_id for this seller
             $product = null;
@@ -1047,17 +1048,17 @@ class SellerController extends Controller
         ]);
         // ---------------- VALIDATION ----------------
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_id'       => 'required|integer|exists:categories,id',
-            'subcategory_id'    => 'required|integer|exists:subcategories,id',
-            'description'       => 'required|string',
-            'price'             => 'required|numeric',
-            'discount'          => 'nullable|numeric',
-            'delivery_charge'   => 'nullable|numeric',
-            'gift_option'       => 'nullable|string|in:yes,no',
-            'stock'             => 'required|integer',
-            'image'             => 'nullable|image|mimes:jpg,jpeg,png,webp',
-            'ten_min_delivery'  => 'required|in:yes,no',
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|integer|exists:categories,id',
+            'subcategory_id' => 'required|integer|exists:subcategories,id',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'discount' => 'nullable|numeric',
+            'delivery_charge' => 'nullable|numeric',
+            'gift_option' => 'nullable|string|in:yes,no',
+            'stock' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'ten_min_delivery' => 'required|in:yes,no',
         ]);
 
         // ---------------- UNIQUE ID ----------------
@@ -1189,11 +1190,11 @@ class SellerController extends Controller
         }
     }
 
-//     public function showTenMinProducts(Request $request)
+    //     public function showTenMinProducts(Request $request)
 //     {
 //         $selectedCategoryId = $request->query('category');
 
-//         // Fetch only categories that have 10-min products
+    //         // Fetch only categories that have 10-min products
 //         $categories = Category::whereHas('tenMinProducts')
 //             ->with(['tenMinProducts.subcategory'])
 //             ->get()
@@ -1205,15 +1206,15 @@ class SellerController extends Controller
 //                     ->unique('id')
 //                     ->values();
 
-//                 $cat->filteredSubcategories = $subcategories;
+    //                 $cat->filteredSubcategories = $subcategories;
 
-//                 return $cat;
+    //                 return $cat;
 //             });
 
-//         // Determine active category safely
+    //         // Determine active category safely
 //         $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
 
-//         // Prepare JS-ready data
+    //         // Prepare JS-ready data
 //         $jsCategories = $categories->map(function ($cat) {
 //             return [
 //                 'id' => $cat->id,
@@ -1234,21 +1235,21 @@ class SellerController extends Controller
 //             ];
 //         })->toArray();
 
-//         return view('ten-min-products/index', compact('categories', 'jsCategories', 'activeCategory'));
+    //         return view('ten-min-products/index', compact('categories', 'jsCategories', 'activeCategory'));
 //     }
 
-// // ✅ ADD THESE METHODS BELOW showTenMinProducts
+    // // ✅ ADD THESE METHODS BELOW showTenMinProducts
 
-// public function tenMinCartAdd(Request $request)
+    // public function tenMinCartAdd(Request $request)
 // {
 //     $request->validate([
 //         'product_id' => 'required|exists:ten_min_products,id'
 //     ]);
 
-//     $product = \App\Models\TenMinProduct::findOrFail($request->product_id);
+    //     $product = \App\Models\TenMinProduct::findOrFail($request->product_id);
 //     $cart = session()->get('cart_tenmin', []);
 
-//     if (isset($cart[$product->id])) {
+    //     if (isset($cart[$product->id])) {
 //         $cart[$product->id]['quantity']++;
 //     } else {
 //         $cart[$product->id] = [
@@ -1260,24 +1261,24 @@ class SellerController extends Controller
 //         ];
 //     }
 
-//     session()->put('cart_tenmin', $cart);
+    //     session()->put('cart_tenmin', $cart);
 
-//     return redirect()->route('tenmin.cart')->with('success', 'Added to quick basket!');
+    //     return redirect()->route('tenmin.cart')->with('success', 'Added to quick basket!');
 // }
 
-// public function tenMinCartIndex()
+    // public function tenMinCartIndex()
 // {
 //     $cart = session()->get('cart_tenmin', []);
 //     $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
 //     return view('ten_min_cart', compact('cart', 'total'));
 // }
 
-// public function tenMinCartUpdate(Request $request, $productId)
+    // public function tenMinCartUpdate(Request $request, $productId)
 // {
 //     $request->validate(['quantity' => 'required|integer|min:1']);
 //     $cart = session()->get('cart_tenmin', []);
 
-//     if (isset($cart[$productId])) {
+    //     if (isset($cart[$productId])) {
 //         if ($request->quantity <= 0) {
 //             unset($cart[$productId]);
 //         } else {
@@ -1286,10 +1287,10 @@ class SellerController extends Controller
 //         session()->put('cart_tenmin', $cart);
 //     }
 
-//     return redirect()->route('tenmin.cart');
+    //     return redirect()->route('tenmin.cart');
 // }
 
-// public function tenMinCartRemove($productId)
+    // public function tenMinCartRemove($productId)
 // {
 //     $cart = session()->get('cart_tenmin', []);
 //     unset($cart[$productId]);
@@ -1297,30 +1298,30 @@ class SellerController extends Controller
 //     return redirect()->route('tenmin.cart')->with('success', 'Removed from basket.');
 // }
 
-// public function tenMinCheckout()
+    // public function tenMinCheckout()
 // {
 //     $cart = session()->get('cart_tenmin', []);
 //     if (empty($cart)) {
 //         return redirect()->route('tenmin.cart')->with('error', 'Your quick basket is empty.');
 //     }
 
-//     $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+    //     $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
 
-//     // Example: ₹100 minimum for 10-min basket (adjust as needed)
+    //     // Example: ₹100 minimum for 10-min basket (adjust as needed)
 //     if ($total < 100) {
 //         return back()->with('error', 'Minimum order ₹100 for 10-minute delivery.');
 //     }
 
-//     // 🚨 IMPORTANT: You need to decide how to store this order.
+    //     // 🚨 IMPORTANT: You need to decide how to store this order.
 //     // Since you're reusing the food system, we'll create a special "grab basket" vendor
 //     // or use a placeholder hotel_owner_id (e.g., ID 1 as admin/store)
 
-//     $grabBasketVendorId = 1; // ← Set this to a valid hotel_owner_id that handles 10-min orders
+    //     $grabBasketVendorId = 1; // ← Set this to a valid hotel_owner_id that handles 10-min orders
 
-//     $deliveryFee = 30; // or 0, or 50 — your choice
+    //     $deliveryFee = 30; // or 0, or 50 — your choice
 //     $totalAmount = $total + $deliveryFee;
 
-//     $order = \App\Models\FoodOrder::create([
+    //     $order = \App\Models\FoodOrder::create([
 //         'hotel_owner_id' => $grabBasketVendorId,
 //         'customer_name' => 'Quick Customer',
 //         'customer_phone' => '0123456789', // replace with real data if logged in
@@ -1333,7 +1334,7 @@ class SellerController extends Controller
 //         // Optional: add a note or flag if you extend the table later
 //     ]);
 
-//     foreach ($cart as $item) {
+    //     foreach ($cart as $item) {
 //         \App\Models\FoodOrderItem::create([
 //             'food_order_id' => $order->id,
 //             'food_item_id' => null, // not a food item
@@ -1344,330 +1345,316 @@ class SellerController extends Controller
 //         ]);
 //     }
 
-//     session()->forget('cart_tenmin');
+    //     session()->forget('cart_tenmin');
 //     return redirect()->route('tenmin.order.success', $order->id);
 // }
 
-// public function tenMinOrderSuccess($orderId)
+    // public function tenMinOrderSuccess($orderId)
 // {
 //     $order = \App\Models\FoodOrder::with('items')->findOrFail($orderId);
 //     return view('ten_min_order_success', compact('order'));
 // }
 
-public function showTenMinProducts(Request $request)
-{
-    // Fetch categories that have at least one in-stock 10-minute delivery product
-    $categories = Category::whereHas('tenMinProducts', function ($query) {
+    public function showTenMinProducts(Request $request)
+    {
+        // Fetch categories that have at least one in-stock 10-minute delivery product
+        $categories = Category::whereHas('tenMinProducts', function ($query) {
             $query->where('stock', '>', 0);
         })
-        ->with(['tenMinProducts' => function ($query) {
-            $query->where('stock', '>', 0)
-                  ->with('subcategory'); // Ensure subcategory relation is loaded
-        }])
-        ->get()
-        ->filter(fn ($cat) => $cat->tenMinProducts->isNotEmpty())
-        ->values();
+            ->with([
+                'tenMinProducts' => function ($query) {
+                    $query->where('stock', '>', 0)
+                        ->with('subcategory'); // Ensure subcategory relation is loaded
+                }
+            ])
+            ->get()
+            ->filter(fn($cat) => $cat->tenMinProducts->isNotEmpty())
+            ->values();
 
-    // Determine active category: from query param or fallback to first
-    $activeCategory = null;
-    if ($categories->isNotEmpty()) {
-        $selectedCategoryId = $request->query('category');
-        $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
-    }
-
-    // Safely attach filteredSubcategories to every category (including active one)
-    $categories = $categories->map(function ($cat) {
-        $cat->filteredSubcategories = $cat->tenMinProducts
-            ->pluck('subcategory')     // Extract subcategory relation
-            ->filter()                 // Remove nulls (if subcategory_id was null)
-            ->unique('id')             // Avoid duplicates
-            ->values();                // Re-index as [0, 1, 2...]
-        return $cat;
-    });
-
-    // Reassign activeCategory from updated $categories to ensure it has filteredSubcategories
-    if ($activeCategory) {
-        $activeCategory = $categories->firstWhere('id', $activeCategory->id);
-    }
-
-    // Prepare JS-friendly data structure
-    $jsCategories = $categories->map(function ($cat) {
-        return [
-            'id' => $cat->id,
-            'name' => $cat->name,
-            'icon' => $cat->icon ?? '🛒',
-            'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
-                'id' => $s->id,
-                'name' => $s->name,
-            ])->toArray(),
-            'products' => $cat->tenMinProducts->map(function ($p) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'subcategory' => $p->subcategory?->name ?? 'Other',
-                    'img' => asset('product_images/' . $p->image),
-                    'price' => $p->price,
-                    'discount' => $p->discount ?? 0,
-                ];
-            })->toArray(),
-        ];
-    })->toArray();
-
-    return view('ten-min-products.index', compact('categories', 'jsCategories', 'activeCategory'));
-}
-public function show($id)
-{
-    $product = TenMinDeliveryProduct::with(['category', 'subcategory', 'seller'])
-        ->where('stock', '>', 0)
-        ->findOrFail($id);
-
-    return view('ten-min-products.show', compact('product'));
-}
-// ✅ ADD THESE METHODS BELOW showTenMinProductsuse Illuminate\Http\Request;
-
-// Real-time API
-public function getProductDetails($id)
-{
-    $product = TenMinDeliveryProduct::where('id', $id)
-        ->where('stock', '>', 0)
-        ->select('id', 'price', 'stock')
-        ->first();
-
-    if (!$product) {
-        return response()->json(['error' => 'Unavailable'], 404);
-    }
-
-    return response()->json($product);
-}
-
-// Add to cart
-// In your controller (e.g., TenMinController.php)
-
-public function tenMinCartAdd(Request $request)
-{
-    if (!auth()->check()) {
-        return response()->json(['error' => 'Please login to add items to cart'], 401);
-    }
-
-    $request->validate([
-        'product_id' => 'required|exists:ten_min_delivery_products,id',
-        'quantity' => 'required|integer|min:1'
-    ]);
-
-    $userId = auth()->id();
-    $product = TenMinDeliveryProduct::findOrFail($request->product_id);
-
-    // 🔒 ENFORCE SINGLE SELLER RULE
-    $existingCartItem = TenMinGroceryCartItem::where('user_id', $userId)->first();
-
-    if ($existingCartItem) {
-        // If cart already has items, ensure new product is from the SAME seller
-        if ($existingCartItem->seller_id != $product->seller_id) {
-            $existingStoreName = $existingCartItem->seller?->name ?? 'another store';
-            return response()->json([
-                'error' => "You're already ordering from {$existingStoreName}. Please complete or clear your basket before adding items from a different store.",
-                'current_seller_id' => $existingCartItem->seller_id,
-                'new_seller_id' => $product->seller_id,
-            ], 409); // Conflict
+        // Determine active category: from query param or fallback to first
+        $activeCategory = null;
+        if ($categories->isNotEmpty()) {
+            $selectedCategoryId = $request->query('category');
+            $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
         }
+
+        // Safely attach filteredSubcategories to every category (including active one)
+        $categories = $categories->map(function ($cat) {
+            $cat->filteredSubcategories = $cat->tenMinProducts
+                ->pluck('subcategory')     // Extract subcategory relation
+                ->filter()                 // Remove nulls (if subcategory_id was null)
+                ->unique('id')             // Avoid duplicates
+                ->values();                // Re-index as [0, 1, 2...]
+            return $cat;
+        });
+
+        // Reassign activeCategory from updated $categories to ensure it has filteredSubcategories
+        if ($activeCategory) {
+            $activeCategory = $categories->firstWhere('id', $activeCategory->id);
+        }
+
+        // Prepare JS-friendly data structure
+        $jsCategories = $categories->map(function ($cat) {
+            return [
+                'id' => $cat->id,
+                'name' => $cat->name,
+                'icon' => $cat->icon ?? '🛒',
+                'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                ])->toArray(),
+                'products' => $cat->tenMinProducts->map(function ($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'subcategory' => $p->subcategory?->name ?? 'Other',
+                        'img' => asset('product_images/' . $p->image),
+                        'price' => $p->price,
+                        'discount' => $p->discount ?? 0,
+                    ];
+                })->toArray(),
+            ];
+        })->toArray();
+
+        return view('ten-min-products.index', compact('categories', 'jsCategories', 'activeCategory'));
     }
 
-    // Check stock
-    if ($product->stock < $request->quantity) {
-        return response()->json(['error' => 'Not enough stock'], 422);
+    public function show($id)
+    {
+        $product = TenMinDeliveryProduct::with(['category', 'subcategory', 'seller'])
+            ->where('stock', '>', 0)
+            ->findOrFail($id);
+
+        return view('ten-min-products.show', compact('product'));
     }
 
-    // Add or update cart item
-    $cartItem = TenMinGroceryCartItem::firstOrNew([
-        'user_id' => $userId,
-        'product_id' => $product->id,
-    ]);
+    // Real-time API
+    public function getProductDetails($id)
+    {
+        $product = TenMinDeliveryProduct::where('id', $id)
+            ->where('stock', '>', 0)
+            ->select('id', 'price', 'stock')
+            ->first();
 
-    if ($cartItem->exists) {
-        $newQuantity = $cartItem->quantity + $request->quantity;
-        if ($newQuantity > $product->stock) {
+        if (!$product) {
+            return response()->json(['error' => 'Unavailable'], 404);
+        }
+
+        return response()->json($product);
+    }
+
+    public function tenMinCartAdd(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Please login to add items to cart'], 401);
+        }
+
+        $request->validate([
+            'product_id' => 'required|exists:ten_min_delivery_products,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $userId = auth()->id();
+        $product = TenMinDeliveryProduct::findOrFail($request->product_id);
+
+        // ✅ ALLOW MULTIPLE SELLERS — NO SELLER CHECK HERE
+
+        // Check stock
+        if ($product->stock < $request->quantity) {
             return response()->json(['error' => 'Not enough stock'], 422);
         }
-        $cartItem->quantity = $newQuantity;
-    } else {
-        $cartItem->fill([
+
+        $cartItem = TenMinGroceryCartItem::firstOrNew([
+            'user_id' => $userId,
+            'product_id' => $product->id,
+        ]);
+
+        if ($cartItem->exists) {
+            $newQuantity = $cartItem->quantity + $request->quantity;
+            if ($newQuantity > $product->stock) {
+                return response()->json(['error' => 'Not enough stock'], 422);
+            }
+            $cartItem->quantity = $newQuantity;
+        } else {
+            $cartItem->fill([
+                'seller_id' => $product->seller_id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $request->quantity,
+            ]);
+        }
+
+        $cartItem->save();
+
+        $cartCount = TenMinGroceryCartItem::where('user_id', $userId)->sum('quantity');
+
+        return response()->json([
+            'success' => true,
+            'cart_count' => $cartCount,
             'seller_id' => $product->seller_id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'image' => $product->image,
-            'quantity' => $request->quantity,
+            'message' => 'Item added successfully',
         ]);
     }
-
-    $cartItem->save();
-
-    $cartCount = TenMinGroceryCartItem::where('user_id', $userId)->sum('quantity');
-
-    return response()->json([
-        'success' => true,
-        'cart_count' => $cartCount,
-        'seller_id' => $product->seller_id,
-        'message' => 'Item added successfully',
-    ]);
-}
-// View cart
+    // View cart
 // SellerController.php
-public function tenMinCartView()
-{
-    $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
-    $cartCount = $cartItems->sum('quantity');
-    return view('ten-min-products.cart', compact('cartItems', 'cartCount'));
-}
-// Update item quantity
-public function tenMinCartUpdate(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:ten_min_delivery_products,id',
-        'quantity' => 'required|integer|min:1'
-    ]);
+    public function tenMinCartView()
+    {
+        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
+        $cartCount = $cartItems->sum('quantity');
+        return view('ten-min-products.cart', compact('cartItems', 'cartCount'));
+    }
+    // Update item quantity
+    public function tenMinCartUpdate(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:ten_min_delivery_products,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-    $cartItem = TenMinGroceryCartItem::where('user_id', auth()->id())
-        ->where('product_id', $request->product_id)
-        ->first();
+        $cartItem = TenMinGroceryCartItem::where('user_id', auth()->id())
+            ->where('product_id', $request->product_id)
+            ->first();
 
-    if (!$cartItem) {
-        return response()->json(['error' => 'Item not in cart'], 404);
+        if (!$cartItem) {
+            return response()->json(['error' => 'Item not in cart'], 404);
+        }
+
+        $product = TenMinDeliveryProduct::find($cartItem->product_id);
+        if (!$product || $product->stock < $request->quantity) {
+            return response()->json(['error' => 'Not enough stock'], 422);
+        }
+
+        $cartItem->quantity = $request->quantity;
+        $cartItem->save();
+
+        return response()->json(['success' => true]);
     }
 
-    $product = TenMinDeliveryProduct::find($cartItem->product_id);
-    if (!$product || $product->stock < $request->quantity) {
-        return response()->json(['error' => 'Not enough stock'], 422);
+    // Remove item
+    public function tenMinCartRemove(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:ten_min_delivery_products,id'
+        ]);
+
+        TenMinGroceryCartItem::where('user_id', auth()->id())
+            ->where('product_id', $request->product_id)
+            ->delete();
+
+        return response()->json(['success' => true]);
     }
+    // In your controller
+    public function tenMinCheckout()
+    {
+        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
 
-    $cartItem->quantity = $request->quantity;
-    $cartItem->save();
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('tenmin.cart.view')
+                ->with('error', 'Your quick basket is empty.');
+        }
 
-    return response()->json(['success' => true]);
-}
+        // Group cart items by seller
+        $grouped = $cartItems->groupBy('seller_id');
+        $orders = [];
 
-// Remove item
-public function tenMinCartRemove(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:ten_min_delivery_products,id'
-    ]);
+        foreach ($grouped as $sellerId => $items) {
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
 
-    TenMinGroceryCartItem::where('user_id', auth()->id())
-        ->where('product_id', $request->product_id)
-        ->delete();
+            // Enforce ₹200 minimum per seller
+            if ($subtotal < 200) {
+                $storeName = $items->first()->seller?->name ?? 'this store';
+                return back()->with('error', "Minimum ₹200 required for {$storeName} (currently ₹" . number_format($subtotal, 2) . ").");
+            }
 
-    return response()->json(['success' => true]);
-}
-// In your controller
-public function tenMinCheckout()
-{
-    $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
+            $orders[] = [
+                'seller_id' => $sellerId,
+                'store_name' => $items->first()->seller?->name ?? 'Store',
+                'items' => $items,
+                'subtotal' => $subtotal,
+                'delivery_fee' => 50,
+                'total' => $subtotal + 50,
+            ];
+        }
 
-    if ($cartItems->isEmpty()) {
-        return redirect()->route('tenmin.cart.view')
-            ->with('error', 'Your quick basket is empty.');
-    }
-
-    // 🔒 ENFORCE: All items must belong to the same seller
-    $sellerIds = $cartItems->pluck('seller_id')->unique();
-    if ($sellerIds->count() > 1) {
-        return redirect()->route('tenmin.cart.view')
-            ->with('error', 'Your cart contains items from multiple stores. Please keep only one store’s items to proceed.');
-    }
-
-    $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
-
-    if ($subtotal < 200) {
-        return back()->with('error', 'Minimum order ₹200 for 10-minute delivery.');
-    }
-
-    $deliveryFee = 50;
-    $total = $subtotal + $deliveryFee;
-
-    // Only one store, so safe to get first
-    $storeName = $cartItems->first()->seller?->name ?? 'Store';
-
-    return view('ten-min-products.checkout', [
-        'cartItems' => $cartItems,
-        'cartSubtotal' => $subtotal,
-        'deliveryFee' => $deliveryFee,
-        'total' => $total,
-        'storeNames' => $storeName, // 👈 Now just one store
-        'customerName' => auth()->user()->name,
-        'deliveryAddress' => auth()->user()->address ?? '123 Test Street',
-        'customerEmail' => auth()->user()->email ?? '',
-        'customerPhone' => auth()->user()->phone ?? '0123456789',
-    ]);
-}
-public function tenMinOrderSuccess($orderId)
-{
-    $order = \App\Models\TenMinOrder::with('items')->findOrFail($orderId);
-    return view('ten-min-products.order-success', compact('order'));
-}
-public function placeTenMinGroceryOrder(Request $request)
-{
-    $request->validate([
-        'delivery_address' => 'required|string|max:255',
-        'phone' => 'required|string|max:15',
-        'email' => 'required|email',
-        'payment_method' => 'required|in:cod,upi,card',
-    ]);
-
-    $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
-
-    if ($cartItems->isEmpty()) {
-        return back()->with('error', 'Cart is empty.');
-    }
-
-    
-
-    $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
-    if ($subtotal < 200) {
-        return back()->with('error', 'Minimum order ₹200 required.');
-    }
-
-    $deliveryFee = 50;
-    $totalAmount = $subtotal + $deliveryFee;
-
-    $order = \App\Models\TenMinOrder::create([
-        'user_id' => auth()->id(),
-        'customer_name' => auth()->user()->name,
-        'customer_phone' => $request->phone,
-        // 'customer_email' => $request->email,
-        'delivery_address' => $request->delivery_address,
-        'payment_method' => $request->payment_method,
-        'order_total' => $subtotal,
-        'delivery_fee' => $deliveryFee,
-        'total_amount' => $totalAmount,
-        'status' => 'pending',
-        'estimated_delivery_time' => now()->addMinutes(10),
-    ]);
-
-    foreach ($cartItems as $item) {
-        \App\Models\TenMinOrderItem::create([
-            'ten_min_order_id' => $order->id,
-            'product_id' => $item->product_id,
-            'product_name' => $item->name,
-            'price' => $item->price,
-            'quantity' => $item->quantity,
-            'seller_id' => $item->seller_id,
-            
+        // Pass shared customer info + grouped orders
+        return view('ten-min-products.checkout', [
+            'orders' => $orders,
+            'customerName' => auth()->user()->name,
+            'deliveryAddress' => auth()->user()->address ?? '123 Test Street',
+            'customerEmail' => auth()->user()->email ?? '',
+            'customerPhone' => auth()->user()->phone ?? '0123456789',
         ]);
     }
+    public function tenMinOrderSuccess($orderId)
+    {
+        $order = \App\Models\TenMinOrder::with('items')->findOrFail($orderId);
+        return view('ten-min-products.order-success', compact('order'));
+    }
+    public function placeTenMinGroceryOrder(Request $request)
+    {
+        $request->validate([
+            'delivery_address' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'required|email',
+            'payment_method' => 'required|in:cod,upi,card',
+        ]);
 
-    TenMinGroceryCartItem::where('user_id', auth()->id())->delete();
+        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
 
-    // At the end of placeTenMinGroceryOrder()
-if ($request->expectsJson()) {
-    return response()->json([
-        'success' => true,
-        'order_id' => $order->id,
-        'redirect_url' => route('tenmin.order.success', $order->id)
-    ]);
-}
+        if ($cartItems->isEmpty()) {
+            return back()->with('error', 'Cart is empty.');
+        }
 
-return redirect()->route('tenmin.order.success', $order->id);
-}
+
+
+        $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        if ($subtotal < 200) {
+            return back()->with('error', 'Minimum order ₹200 required.');
+        }
+
+        $deliveryFee = 50;
+        $totalAmount = $subtotal + $deliveryFee;
+
+        $order = \App\Models\TenMinOrder::create([
+            'user_id' => auth()->id(),
+            'customer_name' => auth()->user()->name,
+            'customer_phone' => $request->phone,
+            // 'customer_email' => $request->email,
+            'delivery_address' => $request->delivery_address,
+            'payment_method' => $request->payment_method,
+            'order_total' => $subtotal,
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
+            'status' => 'pending',
+            'estimated_delivery_time' => now()->addMinutes(10),
+        ]);
+
+        foreach ($cartItems as $item) {
+            \App\Models\TenMinOrderItem::create([
+                'ten_min_order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->name,
+                'price' => $item->price,
+                'quantity' => $item->quantity,
+                'seller_id' => $item->seller_id,
+
+            ]);
+        }
+
+        TenMinGroceryCartItem::where('user_id', auth()->id())->delete();
+
+        // At the end of placeTenMinGroceryOrder()
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'order_id' => $order->id,
+                'redirect_url' => route('tenmin.order.success', $order->id)
+            ]);
+        }
+
+        return redirect()->route('tenmin.order.success', $order->id);
+    }
 
     public function updateProduct(Request $request, Product $product)
     {
@@ -1722,16 +1709,16 @@ return redirect()->route('tenmin.order.success', $order->id);
             if ($exists) {
                 // UPDATE existing record
                 $exists->update([
-                    'name'            => $product->name,
-                    'category_id'     => $product->category_id,
-                    'subcategory_id'  => $product->subcategory_id,
-                    'description'     => $product->description,
-                    'price'           => $product->price,
-                    'discount'        => $product->discount,
+                    'name' => $product->name,
+                    'category_id' => $product->category_id,
+                    'subcategory_id' => $product->subcategory_id,
+                    'description' => $product->description,
+                    'price' => $product->price,
+                    'discount' => $product->discount,
                     'delivery_charge' => $product->delivery_charge,
-                    'image'           => $product->image,
-                    'gift_option'     => $product->gift_option,
-                    'stock'           => $product->stock,
+                    'image' => $product->image,
+                    'gift_option' => $product->gift_option,
+                    'stock' => $product->stock,
                 ]);
             } else {
                 // INSERT new record
@@ -1933,7 +1920,7 @@ return redirect()->route('tenmin.order.success', $order->id);
         ];
 
         // Create the export class
-        $export = new class($sampleData) implements FromArray, WithHeadings {
+        $export = new class ($sampleData) implements FromArray, WithHeadings {
             protected $data;
 
             public function __construct($data)
@@ -2189,7 +2176,8 @@ return redirect()->route('tenmin.order.success', $order->id);
 
     private function deleteDirectory($dir)
     {
-        if (!is_dir($dir)) return;
+        if (!is_dir($dir))
+            return;
 
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
@@ -2431,11 +2419,13 @@ return redirect()->route('tenmin.order.success', $order->id);
         return false;
     }
 
-    public function tenmins(){
+    public function tenmins()
+    {
         return view('tenmins');
     }
 
-    public function joinus(){
+    public function joinus()
+    {
         return view('joinus');
     }
 }

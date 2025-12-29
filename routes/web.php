@@ -30,13 +30,14 @@ use App\Http\Controllers\InternshipController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\TenMinsOrderController;
+use App\Http\Controllers\DeliveryModeController;
+
 
 // Test image upload route
 #use Illuminate\Http\Request;
 #use Illuminate\Support\Facades\Storage;
 // Universal image serving route for public and R2 disks
 use App\Http\Controllers\ImageServeController;
-use App\Http\Controllers\DeliveryModeController;
 
 
 
