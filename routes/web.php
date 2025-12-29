@@ -563,8 +563,8 @@ Route::get('/buyer/subcategory/{subcategory_id}', [BuyerController::class, 'prod
 Route::get('/store/{seller}', [SellerController::class, 'storeProducts'])->name('store.products');
 
 // Product details & reviews - Anyone can view (no auth required)
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
-Route::post('/product/{id}/review', [ProductController::class, 'addReview'])
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.details');
+Route::post('/products/{id}/review', [ProductController::class, 'addReview'])
     ->middleware(['auth', 'verified'])
     ->name('product.addReview');
 
@@ -575,7 +575,7 @@ Route::get('/api/product/{id}/check-10min', [ProductController::class, 'check10M
 
 
 // Public product search - Anyone can search (Zepto/Blinkit style)
-Route::get('/products', [App\Http\Controllers\SimpleSearchController::class, 'search'])->name('products.index');
+Route::get('/products', [App\Http\Controllers\BuyerController::class, 'search'])->name('products.index');
 
 // Food delivery products route
 Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('products.food-delivery');

@@ -150,37 +150,47 @@
             <!-- Navbar Content -->
             <div class="collapse navbar-collapse" id="navbarContent">
                 <!-- Search Bar -->
-                <form class="d-flex mx-lg-auto my-3 my-lg-0" role="search" style="max-width: 600px; width: 100%;">
-                    <input class="form-control me-2" type="search" placeholder="Search products, brands and more..."
-                        aria-label="Search">
+                <form action="{{ route('products.index') }}" method="GET" class="d-flex mx-lg-auto my-3 my-lg-0"
+                    role="search" style="max-width: 600px; width: 100%;">
+                    <input class="form-control me-2" type="search" name="q"
+                        placeholder="Search products, brands and more..." aria-label="Search">
                     <button class="btn btn-outline-warning" type="submit">Search</button>
                 </form>
 
                 <!-- Right Side -->
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item d-none d-lg-block me-2">
-                        <span class="text-light small">Hello, {{ Auth::user()->name }}</span>
+                        <a href="{{ route('profile.show') }}" class="text-light small text-decoration-none">Hello,
+                            {{ Auth::user()->name }}</a>
                     </li>
-<li class="nav-item d-flex align-items-center me-2">
-    <x-notification-bell />
-</li>                    <!-- Account Dropdown -->
+                    <li class="nav-item d-flex align-items-center me-2">
+                        <x-notification-bell />
+                    </li> <!-- Account Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1" href="#"
-                            id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="btn btn-outline-warning btn-sm dropdown-toggle d-flex align-items-center gap-1"
+                            href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i> My Account
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown" style="min-width: 220px;">
-                            <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a></li>
-                            <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i class="bi bi-shop"></i> Shop</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i class="bi bi-briefcase"></i> My Orders</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown"
+                            style="min-width: 220px;">
+                            <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person"></i>
+                                    Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/cart') }}"><i class="bi bi-cart"></i> Cart</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('buyer.dashboard') }}"><i
+                                        class="bi bi-shop"></i> Shop</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/orders/track') }}"><i
+                                        class="bi bi-briefcase"></i> My Orders</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/wishlist') }}"><i class="bi bi-heart"></i>
+                                    Wishlist</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/') }}"><i class="bi bi-house"></i> Dashboard</a>
+                            </li>
                         </ul>
                     </li>
 
                     <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-                        <a href="{{ route('logout') }}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
+                        <a href="{{ route('logout') }}"
+                            class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 w-100"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
@@ -196,20 +206,20 @@
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             @php
-            $user = Auth::user();
-            $gender = $user->sex ?? 'other';
-            $greeting = match ($gender) {
-            'male' => "Welcome back, Mr. {$user->name}!",
-            'female' => "Welcome back, Ms. {$user->name}!",
-            default => "Welcome back, {$user->name}!"
-            };
+                $user = Auth::user();
+                $gender = $user->sex ?? 'other';
+                $greeting = match ($gender) {
+                    'male' => "Welcome back, Mr. {$user->name}!",
+                    'female' => "Welcome back, Ms. {$user->name}!",
+                    default => "Welcome back, {$user->name}!"
+                };
             @endphp
             <h2>{{ $greeting }}</h2>
             <p class="mb-0">Discover amazing products and great deals!</p>
         </div>
 
         @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         <!-- Quick Stats -->
@@ -251,13 +261,13 @@
             <h4 class="mb-3"><i class="bi bi-grid-3x3-gap"></i> Browse by Categories</h4>
             <div class="row">
                 @foreach($categories as $category)
-                <div class="col-md-2 col-sm-4 col-6 mb-3">
-                    <a href="{{ route('buyer.productsByCategory', $category->id) }}"
-                        class="btn btn-outline-primary w-100 py-3 text-center">
-                        <i class="bi bi-tag d-block mb-2"></i>
-                        {{ $category->name }}
-                    </a>
-                </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ route('buyer.productsByCategory', $category->id) }}"
+                            class="btn btn-outline-primary w-100 py-3 text-center">
+                            <i class="bi bi-tag d-block mb-2"></i>
+                            {{ $category->name }}
+                        </a>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -266,65 +276,65 @@
         <h4 class="mb-3"><i class="bi bi-star"></i> Latest Products</h4>
         <div class="row">
             @foreach($products as $product)
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="product-card position-relative">
-                    @if($product->discount > 0)
-                    <span class="discount-badge">{{ $product->discount }}% OFF</span>
-                    @endif
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="product-card position-relative">
+                        @if($product->discount > 0)
+                            <span class="discount-badge">{{ $product->discount }}% OFF</span>
+                        @endif
 
-                    @if($product->image || $product->image_data)
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
-                        onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
-                    @else
-                    <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                    </div>
-                    @endif
+                        @if($product->image || $product->image_data)
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img"
+                                onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                        @else
+                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        @endif
 
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0 flex-grow-1">{{ $product->name }}</h6>
-                            <x-wishlist-heart :product="$product" />
-                        </div>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-0 flex-grow-1">{{ $product->name }}</h6>
+                                <x-wishlist-heart :product="$product" />
+                            </div>
 
-                        <p class="text-muted small mb-2">{{ Str::limit($product->description, 60) }}</p>
+                            <p class="text-muted small mb-2">{{ Str::limit($product->description, 60) }}</p>
 
-                        <div class="mb-2">
-                            @if($product->gift_option === 'yes')
-                            <span class="badge gift-badge me-1">
-                                <i class="bi bi-gift"></i> Gift Option
-                            </span>
-                            @endif
-                            @if($product->delivery_charge == 0)
-                            <span class="badge bg-success">Free Delivery</span>
-                            @endif
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="price-tag">₹{{ number_format($product->price, 2) }}</span>
-                                @if($product->delivery_charge > 0)
-                                <small class="text-muted d-block">+ ₹{{ $product->delivery_charge }} delivery</small>
+                            <div class="mb-2">
+                                @if($product->gift_option === 'yes')
+                                    <span class="badge gift-badge me-1">
+                                        <i class="bi bi-gift"></i> Gift Option
+                                    </span>
+                                @endif
+                                @if($product->delivery_charge == 0)
+                                    <span class="badge bg-success">Free Delivery</span>
                                 @endif
                             </div>
-                        </div>
 
-                        <div class="mt-3 d-grid gap-2">
-                            <form method="POST" action="{{ route('cart.add') }}">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-cart-plus"></i> Add to Cart
-                                </button>
-                            </form>
-                            <a href="{{ route('product.details', $product->id) }}"
-                                class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-eye"></i> View Details
-                            </a>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="price-tag">₹{{ number_format($product->price, 2) }}</span>
+                                    @if($product->delivery_charge > 0)
+                                        <small class="text-muted d-block">+ ₹{{ $product->delivery_charge }} delivery</small>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="mt-3 d-grid gap-2">
+                                <form method="POST" action="{{ route('cart.add') }}">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </form>
+                                <a href="{{ route('product.details', $product->id) }}"
+                                    class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             @endforeach
         </div>
 
@@ -392,7 +402,8 @@
                         Theni, 625531, TamilNadu, India.
                     </p>
                     <!-- <p class="text-white-50 small mb-0">CIN: U51109KA2012PTC066107</p> -->
-                    <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230" class="text-white-50 text-decoration-none">+91 8300504230</a></p>
+                    <p class="text-white-50 small mb-0">Contact us: <a href="tel:+91 8300504230"
+                            class="text-white-50 text-decoration-none">+91 8300504230</a></p>
                 </div>
             </div>
 
@@ -407,7 +418,8 @@
                     <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook"></i></a>
                     <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter"></i></a>
                     <a href="#" class="text-white-50 me-3"><i class="bi bi-youtube"></i></a>
-                    <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i class="bi bi-instagram"></i></a>
+                    <a href="https://www.instagram.com/grab_baskets/" class="text-white-50"><i
+                            class="bi bi-instagram"></i></a>
                 </div>
             </div>
         </div>
