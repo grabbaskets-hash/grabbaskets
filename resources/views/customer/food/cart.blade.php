@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GrabBaskets - Your Cart</title>
 
     <!-- UI Libraries -->
@@ -20,21 +21,21 @@
             --primary-dark: #e65100;
             --primary-light: #fff0e6;
             --accent: #2ecc71;
-            
+
             --bg-body: #f4f6f8;
             --bg-card: #ffffff;
-            
+
             --text-main: #1e293b;
             --text-muted: #64748b;
-            
+
             --border-color: #e2e8f0;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            
+
             --radius-md: 0.75rem;
             --radius-lg: 1rem;
-            
+
             --font-main: 'Plus Jakarta Sans', sans-serif;
             --font-heading: 'Poppins', sans-serif;
         }
@@ -43,7 +44,8 @@
             background-color: var(--bg-body);
             font-family: var(--font-main);
             color: var(--text-main);
-            padding-bottom: 100px; /* Space for mobile sticky bar */
+            padding-bottom: 100px;
+            /* Space for mobile sticky bar */
             -webkit-font-smoothing: antialiased;
         }
 
@@ -69,7 +71,7 @@
             gap: 12px;
             letter-spacing: -0.5px;
         }
-        
+
         .brand-logo i {
             font-size: 1.4rem;
         }
@@ -79,7 +81,7 @@
             padding: 5px;
             transition: transform 0.2s;
         }
-        
+
         .cart-badge-wrapper:hover {
             transform: scale(1.05);
         }
@@ -96,7 +98,8 @@
 
         /* Cart Items List */
         .cart-container {
-            max-width: 1200px; /* Limit width for large screens */
+            max-width: 1200px;
+            /* Limit width for large screens */
             margin: 0 auto;
         }
 
@@ -116,9 +119,10 @@
             position: relative;
             overflow: hidden;
             display: flex;
-            align-items: flex-start; /* Better alignment for varied content height */
+            align-items: flex-start;
+            /* Better alignment for varied content height */
         }
-        
+
         .cart-item:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
@@ -140,7 +144,7 @@
             object-fit: cover;
             transition: transform 0.5s ease;
         }
-        
+
         .cart-item:hover .item-img-wrapper img {
             transform: scale(1.05);
         }
@@ -193,7 +197,8 @@
             align-items: center;
             background: #f8fafc;
             border: 1px solid var(--border-color);
-            border-radius: 50px; /* Pill shape */
+            border-radius: 50px;
+            /* Pill shape */
             padding: 4px;
             gap: 2px;
         }
@@ -208,7 +213,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             transition: all 0.2s;
             cursor: pointer;
             font-size: 0.9rem;
@@ -218,7 +223,7 @@
             background: var(--primary);
             color: #fff;
         }
-        
+
         .qty-btn:active {
             transform: scale(0.95);
         }
@@ -277,7 +282,7 @@
             font-size: 0.95rem;
             color: var(--text-muted);
         }
-        
+
         .summary-row span:last-child {
             font-weight: 600;
             color: var(--text-main);
@@ -290,7 +295,7 @@
             font-size: 1.25rem;
             color: var(--text-main);
         }
-        
+
         .summary-row.total span:last-child {
             font-weight: 800;
             color: var(--primary);
@@ -377,7 +382,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 1.5rem;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
             display: none;
             z-index: 1001;
             border-top: 1px solid var(--border-color);
@@ -387,30 +392,38 @@
             .cart-item {
                 padding: 1rem;
             }
+
             .item-img-wrapper {
                 width: 90px;
                 height: 90px;
             }
+
             .item-content {
                 padding-left: 1rem;
                 min-height: 90px;
             }
+
             .item-name {
                 font-size: 1rem;
             }
+
             .item-desc {
-                display: none; /* Hide Description on small screens */
+                display: none;
+                /* Hide Description on small screens */
             }
+
             .remove-btn-icon {
                 width: 32px;
                 height: 32px;
             }
+
             .remove-label {
                 display: none;
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- NAVBAR -->
@@ -481,7 +494,7 @@
                     <button class="btn btn-continue" onclick="continueShopping()">
                         Add More Items
                     </button>
-                    
+
                     <div class="mt-4 pt-3 border-top d-flex align-items-center justify-content-center text-muted gap-2">
                         <i class="fa-solid fa-lock" style="color: var(--accent);"></i>
                         <small>100% Secure Checkout</small>
@@ -503,7 +516,7 @@
             </button>
         </div>
         <div class="text-center mt-2">
-             <small class="text-muted" style="font-size: 0.7rem;" onclick="continueShopping()">continue shopping</small>
+            <small class="text-muted" style="font-size: 0.7rem;" onclick="continueShopping()">continue shopping</small>
         </div>
     </div>
 
@@ -548,7 +561,7 @@
 
         function renderCart() {
             itemsContainer.innerHTML = '';
-            
+
             if (cart.length === 0) {
                 emptyState.style.display = 'block';
                 cartList.style.display = 'none';
@@ -561,9 +574,9 @@
             emptyState.style.display = 'none';
             cartList.style.display = 'block';
             summarySection.classList.remove('d-none');
-            
+
             // Mobile bar visibility logic
-            if(window.innerWidth < 992) {
+            if (window.innerWidth < 992) {
                 mobileBottomBar.style.display = 'block';
             } else {
                 mobileBottomBar.style.display = 'none';
@@ -573,7 +586,7 @@
             cart.forEach(entry => {
                 const prod = findProduct(entry.id);
                 if (!prod) return;
-                
+
                 const itemTotal = prod.price * entry.qty;
                 subtotal += itemTotal;
 
@@ -625,7 +638,7 @@
             taxEl.textContent = '₹' + tax;
             totalEl.textContent = '₹' + grand.toFixed(0);
             mobileTotalEl.textContent = '₹' + grand.toFixed(0);
-            
+
             const count = cart.reduce((s, c) => s + c.qty, 0);
             cartCountEl.textContent = count;
         }
@@ -639,7 +652,7 @@
                 removeItem(id);
                 return;
             }
-            
+
             // Optimistic Update
             const oldQty = entry.qty;
             entry.qty = newQty;
@@ -653,7 +666,9 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': CSRF_TOKEN
                     },
-                    body: JSON.stringify({ quantity: newQty })
+                    body: JSON.stringify({
+                        quantity: newQty
+                    })
                 });
 
                 if (!response.ok) {
@@ -684,18 +699,20 @@
             try {
                 const response = await fetch(url, {
                     method: 'GET',
-                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN }
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN
+                    }
                 });
 
                 if (response.ok) {
-                     cart = cart.filter(c => c.id !== id);
-                     if (row) {
+                    cart = cart.filter(c => c.id !== id);
+                    if (row) {
                         row.style.transform = 'scale(0.95)';
                         row.style.opacity = '0';
                         setTimeout(() => renderCart(), 200);
-                     } else {
-                         renderCart();
-                     }
+                    } else {
+                        renderCart();
+                    }
                 } else {
                     if (row) {
                         row.style.opacity = '1';
@@ -742,5 +759,7 @@
         // Initial Render
         renderCart();
     </script>
+
 </body>
+
 </html>
