@@ -304,7 +304,12 @@
                 position: sticky;
                 top: 0;
                 z-index: 1000;
-                padding: 12px 15px;
+                padding: 15px;
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                margin-bottom: 0;
+                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
             }
 
             .brand-mobile {
@@ -331,38 +336,36 @@
                 font-size: 1.1rem;
             }
 
-            /* Mobile Icons - Now use navbar background */
+            /* Mobile Icons - Consistent styling */
             .mobile-icons {
                 display: flex;
                 align-items: center;
-                gap: 14px;
+                gap: 10px;
             }
 
             .icon-btn {
-                width: 44px;
-                height: 44px;
+                width: 40px;
+                height: 40px;
                 border-radius: 10px;
-                /* Updated to 10px */
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                /* Navbar bg */
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-decoration: none;
                 transition: all 0.2s ease;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             }
 
             .icon-btn i {
                 color: var(--accent) !important;
-                /* Gold icon */
-                font-size: 1.3rem;
+                font-size: 1.2rem;
                 font-weight: bold;
             }
 
             .icon-btn:hover {
-                transform: scale(1.08);
-                opacity: 0.9;
+                transform: scale(1.05);
+                background: rgba(255, 255, 255, 0.3);
             }
 
             .mobile-auth-group {
@@ -495,13 +498,14 @@
 
             .munchies-banner {
                 background: linear-gradient(135deg, #FFD700 0%, #FF9A00 100%);
-                height: 250px;
+                min-height: 220px;
                 border-radius: 20px;
-                padding: 30px;
+                padding: 25px 20px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 margin: 20px 15px;
+                box-shadow: 0 4px 15px rgba(255, 154, 0, 0.25);
             }
 
             .munchies-banner h3 {
@@ -539,32 +543,40 @@
 
             .category-grid {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr); /* 3 items per row */
-                gap: 15px 10px;
+                grid-template-columns: repeat(4, 1fr); /* 4 items per row for better fit */
+                gap: 12px 8px;
                 padding: 20px 15px;
                 background: #fff;
-                border-radius: 0 0 20px 20px; /* Only bottom rounded */
-                margin-bottom: 10px;
+                border-radius: 20px;
+                margin: 15px 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             }
 
             .category-item {
                 text-align: center;
                 text-decoration: none;
                 color: var(--text-main);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
 
             .cat-icon-box {
                 width: 60px;
                 height: 60px;
-                background: #f0fdf4;
-                border-radius: 16px;
+                background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+                border-radius: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.8rem;
-                margin: 0 auto 8px;
-                transition: transform 0.2s;
+                font-size: 1.6rem;
+                margin: 0 auto 6px;
+                transition: all 0.2s;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            }
 
+            .category-item:active .cat-icon-box {
+                transform: scale(0.95);
             }
 
             .product-rail {
@@ -672,15 +684,8 @@
                 flex-direction: column;
             }
 
-            /* Mobile Header Enhancements */
-            .mobile-header {
-                padding: 15px 15px 20px;
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                border-bottom-left-radius: 20px;
-                border-bottom-right-radius: 20px;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
-            }
+            /* Mobile Header - Remove duplicate */
+            /* Already defined above */
             
             main {
                 padding-left: 5px;
@@ -702,32 +707,39 @@
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
-                z-index: 1000;
-                padding-bottom: 5px; /* Adjust for iPhone home indicator safety if needed */
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+                z-index: 1050;
+                padding: 5px 0;
+                border-top: 1px solid var(--border-light);
             }
 
             .nav-link-mobile {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center; /* Center aligned */
+                justify-content: center;
                 text-decoration: none;
                 color: var(--text-muted);
-                font-size: 0.7rem; /* Slightly smaller text for better fit */
-                font-weight: 500;
-                gap: 4px;
-                flex: 1; /* Distribute space evenly */
+                font-size: 0.7rem;
+                font-weight: 600;
+                gap: 3px;
+                flex: 1;
                 height: 100%;
+                transition: all 0.2s;
             }
 
             .nav-link-mobile i {
-                font-size: 1.4rem;
-                margin-bottom: -2px;
+                font-size: 1.5rem;
+                margin-bottom: 0;
             }
 
             .nav-link-mobile.active {
                 color: var(--primary);
+                font-weight: 700;
+            }
+
+            .nav-link-mobile.active i {
+                transform: scale(1.1);
             }
         }
 
