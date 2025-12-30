@@ -453,6 +453,8 @@ class CustomerFoodController extends Controller
 
         $query = FoodItem::with('hotelOwner')
             ->where('is_available', 1)
+            ->whereNotNull('image') // Only show items with images
+            ->where('image', '!=', '') // Exclude empty strings
             ->whereHas('hotelOwner', function ($q) use ($currentTime, $today) {
                 $q->where('is_active', true)
                     ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")

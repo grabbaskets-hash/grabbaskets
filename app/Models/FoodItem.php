@@ -97,7 +97,8 @@ class FoodItem extends Model
             return $this->getImageUrl($this->images[0]);
         }
         
-        return 'https://via.placeholder.com/480x300?text=No+Image';
+        // No placeholder - return null if no image
+        return null;
     }
     
     /**
@@ -156,6 +157,6 @@ class FoodItem extends Model
             }
         }
         
-        return !empty($urls) ? $urls : ['https://via.placeholder.com/480x300?text=No+Image'];
+        return $urls; // Return empty array if no images
     }
 }

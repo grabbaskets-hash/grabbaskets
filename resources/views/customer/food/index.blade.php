@@ -597,7 +597,7 @@
             @forelse($foods as $food)
                 <a href="{{ route('customer.food.details', $food->id) }}" class="premium-food-card">
                     <div class="card-img-container">
-                        <img src="{{ $food->first_image_url }}" onerror="this.src='https://via.placeholder.com/480x300?text=Delicious+Food'" alt="{{ $food->name }}">
+                        <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}">
                         
                         <div class="img-overlay-gradient"></div>
                         
