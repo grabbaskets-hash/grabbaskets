@@ -1702,13 +1702,13 @@ Route::prefix('hotel-owner')->name('hotel-owner.')->group(function () {
                 ->name('withdraw');
         });
 
-        // Orders Management - Commented out until HotelOwner\OrderController is created
-        // Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
-        //     ->name('orders');
-        // Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
-        //     ->name('orders.show');
-        // Route::patch('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
-        //     ->name('orders.update-status');
+        // Orders Management
+        Route::get('/orders', [App\Http\Controllers\HotelOwner\OrderController::class, 'index'])
+            ->name('orders.index');
+        Route::get('/orders/{order}', [App\Http\Controllers\HotelOwner\OrderController::class, 'show'])
+            ->name('orders.show');
+        Route::put('/orders/{order}/status', [App\Http\Controllers\HotelOwner\OrderController::class, 'updateStatus'])
+            ->name('orders.update-status');
 
         // Analytics and Reports - Commented out until AnalyticsController is created  
         // Route::get('/analytics', [App\Http\Controllers\HotelOwner\AnalyticsController::class, 'index'])

@@ -49,4 +49,16 @@ class FoodOrder extends Model
     // {
     //     return $this->belongsTo(User::class, 'delivery_partner_id');
     // }
+
+    public function getSubtotalAttribute()
+    {
+        return $this->food_total;
+    }
+
+    public function getDiscountAmountAttribute()
+    {
+        // If you add a discount column later, use it here.
+        // For now, return 0 or calculate if logic exists.
+        return 0.00; 
+    }
 }

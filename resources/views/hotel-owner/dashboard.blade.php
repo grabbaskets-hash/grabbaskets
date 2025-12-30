@@ -23,10 +23,10 @@
                 <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.food-items.index') }}">
                     <i class="fas fa-utensils me-2 text-secondary"></i> Menu
                 </a>
-              <a class="nav-link py-2 mb-1 rounded disabled-link" href="javascript:void(0)">
-    <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders (Coming Soon)
-    <span class="badge bg-warning text-dark ms-2">{{ $stats['pending_orders'] ?? 0 }}</span>
-</a>
+              <a class="nav-link py-2 mb-1 rounded" href="{{ route('hotel-owner.orders.index') }}">
+                  <i class="fas fa-concierge-bell me-2 text-secondary"></i> Orders
+                  <span class="badge bg-warning text-dark ms-2">{{ $stats['pending_orders'] ?? 0 }}</span>
+              </a>
 
                 <a class="nav-link py-2 mb-1 rounded" href="{{ \Illuminate\Support\Facades\Route::has('hotel-owner.earnings.index') ? route('hotel-owner.earnings.index') : '#' }}">
                     <i class="fas fa-wallet me-2 text-secondary"></i> Earnings
