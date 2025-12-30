@@ -1,352 +1,649 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GrabBaskets — Indian Menu</title>
+    <title>GrabBasket — Food Delivery</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        :root{
-            --accent:#FF6B00;
-            --rating:#28a745;
-            --bg:#f5f4f7;
-        }
-        body{ font-family:"Poppins",sans-serif; background:var(--bg); margin:0; }
-        .nav-app{
-            background:rgba(255,255,255,0.9);
-            backdrop-filter:blur(10px);
-            padding:15px 25px;
-            box-shadow:0 4px 20px rgba(0,0,0,0.08);
-            position:sticky;top:0;z-index:1000;
-        }
-        .brand{
-            font-weight:700;font-size:1.6rem;color:var(--accent);
-            display:flex;align-items:center;gap:6px;
-        }
-        .location-input,.search-input{
-            border-radius:30px;border:1px solid #ddd;padding:8px 16px;
-            color: #212529;
-            caret-color: var(--accent);
-        }
-        .btn-outline-secondary, .btn-primary{
-            transition:0.3s;
-        }
-        .btn-primary{
-            background:var(--accent);border:none;
-        }
-        .btn-primary:hover{
-            background:#e75e00;
-        }
-        .hamburger-btn {
-            display: none;
-            font-size: 1.4rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-right: 12px;
-        }
-        .nav-items {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        @media (max-width: 767px) {
-            .nav-items {
-                width: 100%;
-                flex-direction: column;
-                align-items: flex-start;
-                padding-top: 10px;
-                border-top: 1px solid #eee;
-                background: white;
-                margin-top: 10px;
-                display: none;
-            }
-            .nav-items.active { display: flex !important; }
-            .location-input, .search-input { width: 100% !important; font-size: 14px; }
-            .nav-items form { width: 100%; }
-        }
-        @media (min-width: 768px) {
-            .search-input { width: 320px !important; }
-        }
-        .page-wrapper{max-width:1250px;margin:auto;padding:20px 20px 20px 20px;}
-        @media(max-width:767px){ .page-wrapper { padding-top: 80px; } }
-        .category-wrapper{
-            position:relative;padding:12px 0;
-            display:flex;align-items:center;justify-content:center;
-        }
-        .categories-scroll{
-            display:flex;gap:16px;overflow-x:auto;padding:16px 6px;
-            width:85%;
-        }
-        .categories-scroll::-webkit-scrollbar{display:none;}
-        .category-card{
-            min-width:90px;text-align:center;cursor:pointer;
-        }
-        .category-card img{
-            width:85px;height:85px;border-radius:50%;object-fit:cover;
-            border:4px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,0.08);
-        }
-        .category-card small{display:block;margin-top:6px;font-weight:600;color:#444;}
-        .controls-row{display:flex;gap:10px;align-items:center;margin:22px 0;}
-        .filter-pill{
-            background:var(--accent);color:#fff;padding:10px 16px;border-radius:22px;
-            border:none;cursor:pointer;font-weight:600;display:flex;gap:10px;align-items:center;
-        }
-        .food-card{
-            background:#fff;border-radius:14px;padding:12px;
-            box-shadow:0 10px 28px rgba(0,0,0,0.06);display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .food-card img{width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom: 10px;}
-        .food-title{font-weight:700;margin-top:10px;color:#111;font-size:1rem; flex-grow: 1;}
-        .food-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-weight:700;}
-        .price{color:var(--accent);}
-        .rating{color:var(--rating);}
-        .food-card > *:last-child { margin-bottom: 0; }
-        @media(max-width:575px){.col-sm-responsive{flex:0 0 50%;max-width:50%;}}
-        @media(min-width:576px)and (max-width:991px){.col-sm-responsive{flex:0 0 33%;max-width:33%;}}
-        @media(min-width:992px){.col-sm-responsive{flex:0 0 25%;max-width:25%;}}
-        @media(max-width:767px){
-            .hamburger-btn { display: block; margin-right: 12px; }
-            .nav-items {
-                display: none;
-                flex-direction: column;
-                gap: 12px;
-                width: 100%;
-                padding: 15px 0;
-                border-top: 1px solid #eee;
-                background: white;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                z-index: 999;
-            }
+        :root {
+            --primary: #FF6B00;
+            --primary-dark: #E65A00;
+            --secondary: #282C3F;
+            --text-main: #3D4152;
+            --text-light: #686B78;
+            --bg-gray: #F1F4F6;
+            --rating: #48C479;
+            --white: #FFFFFF;
+            --border-light: #E9E9EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --sticky-offset: 70px;
         }
 
-        /* Search in navbar */
-        .search-form {
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-main);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- NAVBAR --- */
+        .swiggy-nav {
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            box-shadow: 0 15px 40px -20px rgba(40, 44, 63, 0.15);
+            padding: 0 20px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .left-nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .logo-box:hover { transform: scale(1.02); }
+
+        .logo-box i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .location-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            border-left: 2px solid var(--text-main);
+            padding-left: 30px;
+            cursor: pointer;
+        }
+
+        .location-bold {
+            font-weight: 700;
+            border-bottom: 2px solid var(--text-main);
+            margin-right: 5px;
+        }
+
+        .location-box:hover { color: var(--primary); }
+        .location-box:hover .location-bold { border-bottom-color: var(--primary); }
+
+        .right-nav {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .nav-link-item {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+
+        .nav-link-item:hover { color: var(--primary); }
+
+        .nav-link-item i { font-size: 1.2rem; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .swiggy-nav { height: 60px; padding: 0 15px; }
+            .location-box { display: none; }
+            .right-nav { gap: 20px; }
+            .nav-link-item span { display: none; }
+            .logo-text { font-size: 1.2rem; }
+        }
+
+        /* --- SEARCH BOX --- */
+        .search-section {
+            padding: 30px 0;
+            background: var(--white);
+            position: sticky;
+            top: 80px;
+            z-index: 1050;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .swiggy-search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+
+        .swiggy-search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.15);
+        }
+
+        .search-icon-inside {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .search-section { top: 60px; padding: 15px 15px; }
+            .swiggy-search-input { padding: 10px 15px 10px 45px; font-size: 0.9rem; }
+        }
+
+        /* --- CATEGORIES --- */
+        .section-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--secondary);
+        }
+
+        .categories-carousel {
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .categories-carousel::-webkit-scrollbar { display: none; }
+
+        .cat-item {
+            min-width: 140px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .cat-item:hover { transform: translateY(-5px); }
+
+        .cat-image-wrapper {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--bg-gray);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .cat-item.active .cat-image-wrapper { border-color: var(--primary); }
+
+        .cat-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cat-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 768px) {
+            .cat-item { min-width: 90px; }
+            .cat-image-wrapper { width: 90px; height: 90px; }
+            .section-title { font-size: 1.25rem; margin-bottom: 15px; }
+        }
+
+        /* --- FILTER BAR --- */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 170px;
+            background: var(--white);
+            padding: 10px 0;
+            z-index: 1040;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .filter-pill {
+            padding: 8px 18px;
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            background: var(--white);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .search-form .search-input {
-            padding: 9px 16px;
-            font-size: 0.92rem;
-            min-width: 250px;
+
+        .filter-pill:hover, .filter-pill.active {
+            background: var(--bg-gray);
+            border-color: var(--text-main);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .search-form .btn-primary {
-            padding: 9px 16px;
-            font-size: 0.92rem;
-            border-radius: 30px;
+
+        .filter-pill select {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-weight: 600;
+            cursor: pointer;
         }
+
+        @media (max-width: 768px) {
+            .filter-bar { top: 120px; padding-left: 15px; padding-right: 15px; margin-left: -20px; margin-right: -20px; }
+        }
+
+        /* --- FOOD CARDS --- */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .premium-food-card {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .premium-food-card:hover { transform: scale(0.96); }
+
+        .card-img-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-overlay-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .discount-tag {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        .food-info {
+            padding: 0 4px;
+        }
+
+        .food-name-h {
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-main);
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .rating-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--rating);
+            color: var(--white);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .delivery-time { color: var(--text-main); }
+        .dot-sep { width: 4px; height: 4px; background: var(--text-light); border-radius: 50%; opacity: 0.5; }
+
+        .food-details-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .price-tag {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .veg-nonveg-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid #ddd;
+        }
+
+        .veg-indicator { color: var(--rating); border-color: var(--rating); }
+        .nonveg-indicator { color: #D12939; border-color: #D12939; }
+
+        @media (max-width: 576px) {
+            .items-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+            .card-img-container { height: 140px; border-radius: 12px; }
+            .food-name-h { font-size: 1rem; }
+            .discount-tag { font-size: 0.9rem; }
+            .meta-row { gap: 6px; font-size: 0.85rem; }
+            .rating-box { font-size: 0.75rem; padding: 1px 4px; }
+        }
+
+        /* --- FOOTER SPACING --- */
+        .footer-spacer { height: 100px; }
     </style>
 </head>
+
 <body>
 
-<div class="nav-app" id="navBar">
-    <div class="d-flex justify-content-between align-items-center flex-wrap w-100">
-        <div class="d-flex align-items-center">
-            <button class="hamburger-btn d-md-none" id="hamburgerBtn">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="brand"><i class="fa-solid fa-basket-shopping"></i> GrabBaskets</div>
-        </div>
+    <!-- STICKY NAVBAR -->
+    <nav class="swiggy-nav">
+        <div class="nav-content">
+            <div class="left-nav">
+                <a href="{{ url('/') }}" class="logo-box">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span class="logo-text">GrabBasket</span>
+                </a>
+                <div class="location-box">
+                    <span class="location-bold">Other</span>
+                    <span>Bengaluru, Karnataka, India</span>
+                    <i class="fa-solid fa-chevron-down ms-2 text-primary"></i>
+                </div>
+            </div>
 
-        <div class="nav-items" id="navItems">
-            <div class="d-md-flex d-none align-items-center gap-3">
-                <form method="GET" class="search-form">
-                    <input name="search" class="search-input" placeholder="Search food or item..." value="{{ request('search') }}" />
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
+            <div class="right-nav">
+                <a href="{{ route('customer.food.cart') }}" class="nav-link-item position-relative">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    @if(session('cart_count', 0) > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ session('cart_count') }}
+                        </span>
+                    @endif
+                </a>
 
                 @auth
                     <div class="dropdown">
-                        <a class="text-decoration-none d-flex align-items-center gap-1 text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                        <a href="#" class="nav-link-item dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="fa-solid fa-user"></i>
                             <span>{{ Auth::user()->name }}</span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('customer.food.cart') }}"><i class="fa-solid fa-cart-shopping"></i> My Cart</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="fa-solid fa-user-circle me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('customer.food.cart') }}"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                    <button type="submit" class="dropdown-item text-danger py-2">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                                     </button>
                                 </form>
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('customer.food.cart') }}" class="btn btn-outline-secondary position-relative">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        @if(session('cart_count', 0) > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ session('cart_count') }}
-                            </span>
-                        @endif
-                    </a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-user"></i> Login
-                    </a>
-                    <a href="{{ route('register') }}" class="btn btn-primary">
-                        <i class="fa-solid fa-user-plus"></i> Signup
+                    <a href="{{ route('login') }}" class="nav-link-item">
+                        <i class="fa-solid fa-sign-in-alt"></i>
+                        <span>Login</span>
                     </a>
                 @endauth
             </div>
-
-            <div class="d-md-none d-flex flex-column gap-3 mt-3">
-                <form method="GET" class="search-form">
-                    <input name="search" class="search-input" placeholder="Search food or item..." value="{{ request('search') }}" />
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-
-                <div class="d-flex align-items-center gap-2 w-100">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <input class="location-input" placeholder="Enter your location" style="width:100%;" />
-                </div>
-
-                @auth
-                    <div class="w-100">
-                        <div class="text-center mb-2">Hello, {{ Auth::user()->name }}!</div>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('customer.food.cart') }}" class="btn btn-outline-secondary w-50">
-                                <i class="fa-solid fa-cart-shopping"></i> Cart
-                                @if(session('cart_count', 0) > 0)
-                                    <span class="badge bg-danger ms-1">{{ session('cart_count') }}</span>
-                                @endif
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}" class="w-50">
-                                @csrf
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    <div class="d-flex gap-2 w-100">
-                        <a href="{{ route('login') }}" class="btn btn-outline-secondary w-50">
-                            <i class="fa-solid fa-user"></i> Login
-                        </a>
-                        <a href="{{ route('register') }}" class="btn btn-primary w-50">
-                            <i class="fa-solid fa-user-plus"></i> Signup
-                        </a>
-                    </div>
-                @endauth
-            </div>
         </div>
-    </div>
-</div>
+    </nav>
 
-<div class="page-wrapper">
-    <div class="my-3">
-        <h5 class="mb-2">Categories</h5>
-        <div class="category-wrapper">
-            <div class="categories-scroll">
-                @foreach($foodCategories as $cat)
-                    <a href="?category={{ $cat['id'] }}" class="category-card text-decoration-none">
-                        <img src="{{ asset('category_icons/' . ($cat['icon_image'] ?? 'placeholder.png')) }}" 
-                             onerror="this.src='https://via.placeholder.com/85?text={{ $cat['name'][0] }}'" />
-                        <small class="text-muted">
-                            {{ $cat['name'] }}
-                        </small>
-                    </a>
-                @endforeach
-            </div>
+    <!-- STICKY SEARCH BAR -->
+    <div class="search-section">
+        <div class="search-container px-3">
+            <form method="GET" action="{{ route('customer.food.index') }}">
+                <i class="fa-solid fa-magnifying-glass search-icon-inside"></i>
+                <input name="search" class="swiggy-search-input" placeholder="Search for restaurant, cuisine or a dish" value="{{ request('search') }}" autocomplete="off" />
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                <input type="hidden" name="veg" value="{{ request('veg') }}">
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            </form>
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="controls-row">
-            @if(request('category') || request('search') || request('sort') || request('veg'))
-                <a href="{{ route('customer.food.index') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa fa-arrow-left"></i> All
+    <div class="section-container">
+        <!-- WHAT'S ON YOUR MIND (CATEGORIES) -->
+        <h2 class="section-title">What's on your mind?</h2>
+        <div class="categories-carousel">
+            @foreach($foodCategories as $cat)
+                @php
+                    $categoryName = strtolower($cat['id']);
+                    $isActive = request('category') === $cat['id'];
+                    $url = route('customer.food.index', ['category' => $cat['id'], 'veg' => request('veg'), 'sort' => request('sort')]);
+
+                    $categoryImages = [
+                        'dessert' => asset('images/categories/dessert.jpeg'),
+                        'beverage' => asset('images/categories/beverage.jpeg'),
+                        'appetizer' => asset('images/categories/appetizer.jpeg'),
+                        'main_course' => asset('images/categories/main_course.jpeg'),
+                        'snack' => asset('images/categories/snack.jpeg'),
+                        'salad' => asset('images/categories/salad.jpeg'),
+                        'soup' => asset('images/categories/soup.jpeg'),
+                        'staters' => asset('images/categories/staters.jpeg'),
+                        'rice' => asset('images/categories/rice.jpeg'),
+                        'seafood' => asset('images/categories/seafood.jpeg'),
+                        'chicken' => asset('images/categories/chicken.jpeg'),
+                        'mutton' => asset('images/categories/mutton.jpeg'),
+                        'burger' => asset('images/categories/burger.jpeg'),
+                        'pizza' => asset('images/categories/pizza.jpeg'),
+                        'briyani' => asset('images/categories/briyani.jpeg'),
+                    ];
+                    $image = $categoryImages[$categoryName] ?? asset('images/categories/default.png');
+                @endphp
+
+                <a href="{{ $url }}" class="cat-item {{ $isActive ? 'active' : '' }}">
+                    <div class="cat-image-wrapper">
+                        <img src="{{ $image }}" alt="{{ $cat['name'] }}" />
+                    </div>
+                    <div class="cat-name">{{ ucwords($cat['name']) }}</div>
                 </a>
-            @endif
+            @endforeach
+        </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <form method="GET" style="display:inline;">
-                    <input type="hidden" name="search" value="{{ request('search') }}" />
-                    <input type="hidden" name="category" value="{{ request('category') }}" />
-                    <input type="hidden" name="sort" value="{{ request('sort') }}" />
-                    <select name="veg" onchange="this.form.submit()" class="filter-pill" style="background:#444;">
-                        <option value="">All Food</option>
+        <hr class="my-5 opacity-10">
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+            <a href="{{ route('customer.food.index') }}" class="filter-pill {{ !request('category') && !request('search') ? 'active' : '' }}">
+                <i class="fa-solid fa-list"></i> All
+            </a>
+
+            <form method="GET" style="display:inline;">
+                <input type="hidden" name="search" value="{{ request('search') }}" />
+                <input type="hidden" name="category" value="{{ request('category') }}" />
+                <input type="hidden" name="sort" value="{{ request('sort') }}" />
+                <label class="filter-pill {{ request('veg') === '1' ? 'active' : '' }}">
+                    <i class="fa-solid fa-leaf text-success"></i>
+                    <select name="veg" onchange="this.form.submit()" style="font-size: inherit; color: inherit;">
+                        <option value="">Dietary</option>
                         <option value="1" {{ request('veg') === '1' ? 'selected' : '' }}>Veg Only</option>
+                        <option value="0" {{ request('veg') === '0' ? 'selected' : '' }}>Non-Veg</option>
                     </select>
-                </form>
+                </label>
+            </form>
 
-                <form method="GET" style="display:inline;">
-                    <input type="hidden" name="search" value="{{ request('search') }}" />
-                    <input type="hidden" name="category" value="{{ request('category') }}" />
-                    <input type="hidden" name="veg" value="{{ request('veg') }}" />
-                    <select name="sort" onchange="this.form.submit()" class="filter-pill">
-                        <option value="">Sort</option>
-                        <option value="costLow" {{ request('sort') === 'costLow' ? 'selected' : '' }}>Cost: Low to High</option>
-                        <option value="costHigh" {{ request('sort') === 'costHigh' ? 'selected' : '' }}>Cost: High to Low</option>
+            <form method="GET" style="display:inline;">
+                <input type="hidden" name="search" value="{{ request('search') }}" />
+                <input type="hidden" name="category" value="{{ request('category') }}" />
+                <input type="hidden" name="veg" value="{{ request('veg') }}" />
+                <label class="filter-pill {{ request('sort') ? 'active' : '' }}">
+                    <i class="fa-solid fa-sort"></i>
+                    <select name="sort" onchange="this.form.submit()" style="font-size: inherit; color: inherit;">
+                        <option value="">Sort By</option>
+                        <option value="costLow" {{ request('sort') === 'costLow' ? 'selected' : '' }}>Price: Low to High</option>
+                        <option value="costHigh" {{ request('sort') === 'costHigh' ? 'selected' : '' }}>Price: High to Low</option>
                         <option value="ratingHigh" {{ request('sort') === 'ratingHigh' ? 'selected' : '' }}>Ratings: High to Low</option>
                     </select>
-                </form>
-            </div>
+                </label>
+            </form>
+            
+            @if(request('category'))
+                <div class="filter-pill active">
+                    <i class="fa-solid fa-tag"></i> {{ ucwords(request('category')) }}
+                </div>
+            @endif
         </div>
-        <div id="itemCount">Showing {{ $foods->count() }} items</div>
-    </div>
 
-    <h5 class="mt-3">
-        @if(request('search'))
-            Search Results for "{{ request('search') }}"
-        @elseif(request('category'))
-            {{ $foodCategories->firstWhere('id', request('category'))['name'] ?? ucwords(str_replace('_', ' ', request('category'))) }}
-        @else
-            All Food Items
-        @endif
-    </h5>
+        <!-- ITEMS SECTION -->
+        <h2 class="section-title">
+            @if(request('search'))
+                Results for "{{ request('search') }}"
+            @elseif(request('category'))
+                {{ ucwords(str_replace('_', ' ', request('category'))) }} Specialists
+            @else
+                Top Restaurants for you
+            @endif
+        </h2>
 
-    <div id="foodItemsContainer" class="d-flex flex-wrap">
-        @forelse($foods as $food)
-            <div class="col-sm-responsive p-2">
-                <a href="{{ route('customer.food.details', $food->id) }}" class="text-decoration-none">
-                    <div class="food-card">
+        <div class="items-grid">
+            @forelse($foods as $food)
+                <a href="{{ route('customer.food.details', $food->id) }}" class="premium-food-card">
+                    <div class="card-img-container">
                         @if(!empty($food->images) && is_array($food->images))
-                            <img src="{{ $food->images[0] }}" onerror="this.src='https://via.placeholder.com/480x300?text=No+Image'">
+                            <img src="{{ $food->images[0] }}" onerror="this.src='https://via.placeholder.com/480x300?text=Delicious+Food'">
                         @else
-                            <img src="https://via.placeholder.com/480x300?text=No+Image" />
+                            <img src="https://via.placeholder.com/480x300?text=Delicious+Food" />
                         @endif
-                        <div class="food-title">{{ $food->name }}</div>
-                        <div class="mt-1">
-                            @if($food->food_type === 'veg')
-                                <span class="badge bg-success">Veg</span>
-                            @elseif($food->food_type === 'non-veg')
-                                <span class="badge bg-danger">Non-Veg</span>
-                            @endif
+                        
+                        <div class="img-overlay-gradient"></div>
+                        
+                        @php $discount = rand(10, 60); @endphp
+                        <div class="discount-tag">{{ $discount }}% OFF UPTO ₹120</div>
+                        
+                        <div class="veg-nonveg-indicator {{ $food->food_type === 'veg' ? 'veg-indicator' : 'nonveg-indicator' }}">
+                            <i class="fa-solid fa-circle" style="font-size: 0.6rem;"></i> 
+                            {{ $food->food_type }}
                         </div>
-                        <div class="food-meta">
-                            <span class="price">₹{{ number_format($food->discounted_price ?? $food->price, 0) }}</span>
-                            <span class="rating">
-                                <i class="fa-solid fa-star"></i> {{ number_format($food->rating ?? 4.0, 1) }}
-                            </span>
+                    </div>
+
+                    <div class="food-info">
+                        <div class="food-name-h">{{ $food->name }}</div>
+                        <div class="meta-row">
+                            <div class="rating-box">
+                                <i class="fa-solid fa-star"></i>
+                                {{ number_format($food->rating ?? 4.0, 1) }}
+                            </div>
+                            <div class="dot-sep"></div>
+                            <div class="delivery-time">{{ rand(20, 45) }} mins</div>
                         </div>
-                        <div>
-                            <i class="fa-solid fa-location-dot"></i>
-                            {{ $food->hotelOwner ? $food->hotelOwner->restaurant_name : 'Unknown Hotel' }}
+                        <div class="food-details-text">
+                            {{ $food->hotelOwner ? $food->hotelOwner->name : 'Gourmet Kitchen' }}
+                        </div>
+                        <div class="price-tag">
+                            ₹{{ number_format($food->discounted_price ?? $food->price, 0) }} for one
                         </div>
                     </div>
                 </a>
-            </div>
-        @empty
-            <div class="col-12 text-center py-5">No food items found.</div>
-        @endforelse
+            @empty
+                <div class="col-12 text-center py-5">
+                    <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/2x_empty_cart_ybi7ss" alt="Empty" style="width: 200px; opacity: 0.5;">
+                    <h5 class="mt-4 text-muted">No items found matching your criteria</h5>
+                </div>
+            @endforelse
+        </div>
+
+        <div class="footer-spacer"></div>
     </div>
-</div>
 
-<script>
-document.getElementById('hamburgerBtn').addEventListener('click', () => {
-    document.getElementById('navItems').classList.toggle('active');
-});
-</script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

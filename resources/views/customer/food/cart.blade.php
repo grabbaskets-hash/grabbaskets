@@ -9,7 +9,9 @@
     <!-- UI Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -435,7 +437,9 @@
             <div class="cart-badge-wrapper">
                 <a href="#" class="text-dark fs-4 position-relative" id="cartBtn" title="Your Cart">
                     <i class="fa-solid fa-bag-shopping" style="color: var(--text-main);"></i>
-                    <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.65rem; padding: 0.35em 0.65em;">0</span>
+                    <span id="cartCount"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white"
+                        style="font-size: 0.65rem; padding: 0.35em 0.65em;">0</span>
                 </a>
             </div>
         </div>
@@ -460,7 +464,9 @@
                     </div>
                     <h3 class="empty-title">Your cart is empty</h3>
                     <p class="text-muted mb-4">Looks like you haven't indulged in anything yet.</p>
-                    <a href="{{ route('customer.food.index') }}" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold" style="background: var(--primary); border: none;">
+                    <a href="{{ route('customer.food.index') }}"
+                        class="btn btn-primary rounded-pill px-5 py-2 fw-semibold"
+                        style="background: var(--primary); border: none;">
                         Internal Menu
                     </a>
                 </div>
@@ -473,6 +479,24 @@
                     <div class="summary-row">
                         <span>Subtotal</span>
                         <span id="subtotal">₹0</span>
+                    </div>
+                    <div id="walletSection" style="display:none;" class="card bg-light border-0 mb-3">
+                        <div class="card-body p-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="useWalletCheckbox"
+                                    onchange="toggleWallet(this.checked)">
+                                <label class="form-check-label fw-bold text-dark" for="useWalletCheckbox">Use Wallet
+                                    (Save 15%)</label>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">Available: ₹{{ $walletPoint }}</span>
+                                <span id="walletDiscount" class="fw-bold" style="color: var(--accent);">-₹0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="noWalletMsg" style="display:none;" class="alert alert-warning py-2 mb-3">
+                        <small><i class="fa-solid fa-circle-info"></i> No amount in your wallet to apply
+                            discount.</small>
                     </div>
                     <div class="summary-row">
                         <span>Delivery Fee</span>
@@ -631,7 +655,38 @@
 
             const delivery = 50;
             const tax = Math.round(subtotal * 0.05);
-            const grand = subtotal + delivery + tax;
+            const rawGrand = subtotal + delivery + tax;
+
+            // Wallet Discount 15%
+            const walletBalance = parseFloat("{{ $walletPoint }}");
+            let walletDiscount = 0;
+            const walletSection = document.getElementById('walletSection');
+            const noWalletMsg = document.getElementById('noWalletMsg');
+            const walletCheckbox = document.getElementById('useWalletCheckbox');
+
+            if (walletBalance > 0) {
+                walletSection.style.display = 'block';
+                noWalletMsg.style.display = 'none';
+
+                // Check localStorage for preference, default to true
+                const useWalletPref = localStorage.getItem('food_use_wallet') !== 'false';
+                walletCheckbox.checked = useWalletPref;
+
+                if (useWalletPref) {
+                    walletDiscount = Math.min(rawGrand * 0.15, walletBalance);
+                    document.getElementById('walletDiscount').textContent = '-₹' + walletDiscount.toFixed(0);
+                    document.getElementById('walletDiscount').style.opacity = '1';
+                } else {
+                    document.getElementById('walletDiscount').textContent = '₹0';
+                    document.getElementById('walletDiscount').style.opacity = '0.5';
+                }
+            } else {
+                walletSection.style.display = 'none';
+                noWalletMsg.style.display = 'block';
+                localStorage.setItem('food_use_wallet', 'false');
+            }
+
+            const grand = rawGrand - walletDiscount;
 
             subtotalEl.textContent = '₹' + subtotal.toFixed(0);
             deliveryEl.textContent = '₹' + delivery;
@@ -641,6 +696,11 @@
 
             const count = cart.reduce((s, c) => s + c.qty, 0);
             cartCountEl.textContent = count;
+        }
+
+        function toggleWallet(checked) {
+            localStorage.setItem('food_use_wallet', checked);
+            renderCart();
         }
 
         async function changeQty(id, delta) {

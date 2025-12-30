@@ -392,8 +392,7 @@
 //         return view('customer.food.order-success', compact('order'));
 //     }
 
-   
-// }
+
 //  <?php
 
 namespace App\Http\Controllers\Customer;
@@ -405,11 +404,17 @@ use App\Models\FoodOrderItem;
 use App\Models\FoodCart;
 use App\Models\FoodCartItem;
 use App\Models\HotelOwner;
+use App\Models\UserWalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Razorpay\Api\Api;
 
 class CustomerFoodController extends Controller
 {
+    private $razorpayKeyId = 'rzp_live_RZLX30zmmnhHum';
+    private $razorpayKeySecret = 'XKmsdH5PbR49EiT74CgehYYi';
+
     public function index(Request $request)
     {
         $now = now();
@@ -417,30 +422,30 @@ class CustomerFoodController extends Controller
         $today = strtolower($now->format('l'));
 
         $categoryMap = [
-            'appetizer'    => ['name' => 'Appetizer',    'icon' => 'appetizer.png'],
-            'main_course'  => ['name' => 'Main Course',  'icon' => 'main-course.png'],
-            'dessert'      => ['name' => 'Dessert',      'icon' => 'dessert.png'],
-            'beverages'    => ['name' => 'Beverage',     'icon' => 'beverage.png'],
-            'snack'        => ['name' => 'Snack',        'icon' => 'snack.png'],
-            'salad'        => ['name' => 'Salad',        'icon' => 'salad.png'],
-            'soup'         => ['name' => 'Soup',         'icon' => 'soup.png'],
-            'staters'      => ['name' => 'Starters',     'icon' => 'starters.png'],
-            'rice'         => ['name' => 'Rice',         'icon' => 'rice.png'],
-            'chicken'      => ['name' => 'Chicken',      'icon' => 'chicken.png'],
-            'seefood'      => ['name' => 'Seafood',      'icon' => 'seafood.png'],
-            'burger'       => ['name' => 'Burger',       'icon' => 'burger.png'],
-            'pizza'        => ['name' => 'Pizza',        'icon' => 'pizza.png'],
-            'mutton'       => ['name' => 'Mutton',       'icon' => 'mutton.png'],
-            'briyani'      => ['name' => 'Briyani',      'icon' => 'biryani.png'],
+            'appetizer' => ['name' => 'Appetizer', 'icon' => 'appetizer.png'],
+            'main_course' => ['name' => 'Main Course', 'icon' => 'main-course.png'],
+            'dessert' => ['name' => 'Dessert', 'icon' => 'dessert.png'],
+            'beverages' => ['name' => 'Beverage', 'icon' => 'beverage.png'],
+            'snack' => ['name' => 'Snack', 'icon' => 'snack.png'],
+            'salad' => ['name' => 'Salad', 'icon' => 'salad.png'],
+            'soup' => ['name' => 'Soup', 'icon' => 'soup.png'],
+            'staters' => ['name' => 'Starters', 'icon' => 'starters.png'],
+            'rice' => ['name' => 'Rice', 'icon' => 'rice.png'],
+            'chicken' => ['name' => 'Chicken', 'icon' => 'chicken.png'],
+            'seefood' => ['name' => 'Seafood', 'icon' => 'seafood.png'],
+            'burger' => ['name' => 'Burger', 'icon' => 'burger.png'],
+            'pizza' => ['name' => 'Pizza', 'icon' => 'pizza.png'],
+            'mutton' => ['name' => 'Mutton', 'icon' => 'mutton.png'],
+            'briyani' => ['name' => 'Briyani', 'icon' => 'biryani.png'],
         ];
 
         $availableCategoryKeys = FoodItem::where('is_available', 1)
             ->distinct()
             ->pluck('category')
-            ->filter(fn ($key) => isset($categoryMap[$key]))
+            ->filter(fn($key) => isset($categoryMap[$key]))
             ->values();
 
-        $foodCategories = $availableCategoryKeys->map(fn ($key) => [
+        $foodCategories = $availableCategoryKeys->map(fn($key) => [
             'id' => $key,
             'name' => $categoryMap[$key]['name'],
             'icon_image' => $categoryMap[$key]['icon'],
@@ -450,9 +455,9 @@ class CustomerFoodController extends Controller
             ->where('is_available', 1)
             ->whereHas('hotelOwner', function ($q) use ($currentTime, $today) {
                 $q->where('is_active', true)
-                  ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
-                  ->where('opening_time', '<=', $currentTime)
-                  ->where('closing_time', '>=', $currentTime);
+                    ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
+                    ->where('opening_time', '<=', $currentTime)
+                    ->where('closing_time', '>=', $currentTime);
             });
 
         $search = $request->search;
@@ -463,16 +468,19 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category) $query->where('category', $category);
-            if ($veg === '1') $query->where('food_type', 'veg');
-            if ($veg === '0') $query->where('food_type', 'non-veg');
+            if ($category)
+                $query->where('category', $category);
+            if ($veg === '1')
+                $query->where('food_type', 'veg');
+            if ($veg === '0')
+                $query->where('food_type', 'non-veg');
         }
 
         match ($sort) {
-            'costLow'   => $query->orderBy('price', 'asc'),
-            'costHigh'  => $query->orderBy('price', 'desc'),
-            'ratingHigh'=> $query->orderBy('rating', 'desc'),
-            default     => $query->latest()
+            'costLow' => $query->orderBy('price', 'asc'),
+            'costHigh' => $query->orderBy('price', 'desc'),
+            'ratingHigh' => $query->orderBy('rating', 'desc'),
+            default => $query->latest()
         };
 
         $foods = $query->get();
@@ -489,7 +497,7 @@ class CustomerFoodController extends Controller
                 ->filter()
                 ->unique()
                 ->values()
-                ->map(fn ($name) => (object)['id' => $name, 'name' => $name]),
+                ->map(fn($name) => (object) ['id' => $name, 'name' => $name]),
         ];
 
         return view('customer.food.index', compact(
@@ -511,15 +519,22 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category) $query->where('category', $category);
-            if ($vegFilter === '1') $query->where('food_type', 'veg');
-            elseif ($vegFilter === '0') $query->where('food_type', 'non-veg');
+            if ($category)
+                $query->where('category', $category);
+            if ($vegFilter === '1')
+                $query->where('food_type', 'veg');
+            elseif ($vegFilter === '0')
+                $query->where('food_type', 'non-veg');
         }
 
-        if ($sort === 'costLow') $query->orderBy('price', 'asc');
-        elseif ($sort === 'costHigh') $query->orderBy('price', 'desc');
-        elseif ($sort === 'ratingHigh') $query->orderBy('rating', 'desc');
-        else $query->latest();
+        if ($sort === 'costLow')
+            $query->orderBy('price', 'asc');
+        elseif ($sort === 'costHigh')
+            $query->orderBy('price', 'desc');
+        elseif ($sort === 'ratingHigh')
+            $query->orderBy('rating', 'desc');
+        else
+            $query->latest();
 
         $foods = $query->get();
 
@@ -553,7 +568,7 @@ class CustomerFoodController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         $food = FoodItem::select(
             'id',
             'name',
@@ -627,7 +642,8 @@ class CustomerFoodController extends Controller
             ];
         })->values()->all();
 
-        return view('customer.food.cart', compact('cartData', 'foodsForJs'));
+        $walletPoint = $user->wallet_point ?? 0;
+        return view('customer.food.cart', compact('cartData', 'foodsForJs', 'walletPoint'));
     }
 
     public function cartUpdate(Request $request, $foodId)
@@ -706,150 +722,330 @@ class CustomerFoodController extends Controller
         $cart->items()->delete();
         return redirect()->route('customer.food.order.success', $order->id);
     }
-    
-public function showCheckout()
-{
-    $user = Auth::user();
-    $cart = FoodCart::with('items')->firstOrCreate(['user_id' => $user->id]);
-    $cartItems = $cart->items;
-    
-    if ($cartItems->isEmpty()) {
-        return redirect()->route('customer.food.cart')->with('error', 'Cart is empty.');
-    }
-    
-    // Group items by seller/hotel owner
-    $groupedItems = $cartItems->groupBy('hotel_owner_id');
-    
-    // Prepare seller groups with their items and totals
-    $sellerGroups = [];
-    foreach ($groupedItems as $hotelOwnerId => $items) {
-        $hotel = HotelOwner::find($hotelOwnerId);
-        // Use the correct field name from your model
-        $restaurantName = $hotel ? $hotel->restaurant_name : 'Unknown Restaurant';
-        
-        $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
-        $deliveryFee = 50.00; // Fixed delivery fee per seller
-        $total = $foodTotal + $deliveryFee;
-        
-        $sellerGroups[] = [
-            'hotel_owner_id' => $hotelOwnerId,
-            'restaurant_name' => $restaurantName,  // Use consistent field name
-            'items' => $items,
-            'food_total' => $foodTotal,
-            'delivery_fee' => $deliveryFee,
-            'total' => $total,
-            'estimated_delivery_time' => now()->addMinutes(10),
-        ];
-    }
-    
-    $customerName = $user->name ?? 'Buyer';
-    $customerPhone = $user->phone ?? '0123456789';
-    $customerEmail = $user->email ?? 'user@example.com';
-    $deliveryAddress = $user->address ?? '123 Test Street';
-    
-    return view('customer.food.checkout', compact(
-        'sellerGroups',
-        'customerName',
-        'customerPhone',
-        'customerEmail',
-        'deliveryAddress'
-    ));
-}
 
-public function placeOrder(Request $request)
-{
-    try {
+    public function showCheckout()
+    {
         $user = Auth::user();
         $cart = FoodCart::with('items')->firstOrCreate(['user_id' => $user->id]);
         $cartItems = $cart->items;
-        
+
         if ($cartItems->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart is empty.'
-            ], 400);
+            return redirect()->route('customer.food.cart')->with('error', 'Cart is empty.');
         }
-        
-        // Group items by seller
+
+        // Group items by seller/hotel owner
         $groupedItems = $cartItems->groupBy('hotel_owner_id');
-        
-        $customerPhone = $request->input('phone', $user->phone ?? '0123456789');
-        $customerEmail = $request->input('email', $user->email);
-        $deliveryAddress = $request->input('delivery_address', $user->address ?? '123 Test Street');
-        $paymentMethod = $request->input('payment_method', 'cod');
-        
-        $orderIds = [];
-        
-        // Create an order for each seller
+
+        // Prepare seller groups with their items and totals
+        $sellerGroups = [];
         foreach ($groupedItems as $hotelOwnerId => $items) {
             $hotel = HotelOwner::find($hotelOwnerId);
-            $shopName = $hotel ? $hotel->restaurant_name : 'Unknown Shop';
-            $shopAddress = $hotel ? $hotel->restaurant_address : 'Address not available';
-            
+            // Use the correct field name from your model
+            $restaurantName = $hotel ? $hotel->restaurant_name : 'Unknown Restaurant';
+
             $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
-            $deliveryFee = 50.00;
-            $total = $foodTotal + $deliveryFee;
-            
-            $order = FoodOrder::create([
+            $deliveryFee = 50.00; // Fixed delivery fee per seller
+            $tax = round($foodTotal * 0.05); // Integer rounding
+            $total = $foodTotal + $deliveryFee + $tax;
+
+            $sellerGroups[] = [
                 'hotel_owner_id' => $hotelOwnerId,
-                'shop_name' => $shopName,
-                'shop_address' => $shopAddress,
-                'customer_name' => $user->name ?? 'Customer',
-                'customer_phone' => $customerPhone,
-                'customer_email' => $customerEmail,
-                'delivery_address' => $deliveryAddress,
+                'restaurant_name' => $restaurantName,  // Use consistent field name
+                'items' => $items,
                 'food_total' => $foodTotal,
                 'delivery_fee' => $deliveryFee,
-                'total_amount' => $total,
-                'payment_method' => $paymentMethod,
-                'status' => 'pending',
+                'tax' => $tax,
+                'total' => $total,
                 'estimated_delivery_time' => now()->addMinutes(10),
-            ]);
-            
-            foreach ($items as $item) {
-                FoodOrderItem::create([
-                    'food_order_id' => $order->id,
-                    'food_item_id' => $item->food_item_id,
-                    'food_name' => $item->name,
-                    'price' => $item->price,
-                    'quantity' => $item->quantity,
-                    'food_type' => $item->food_type,
+            ];
+        }
+
+        $customerName = $user->name ?? 'Buyer';
+        $customerPhone = $user->phone ?? '0123456789';
+        $customerEmail = $user->email ?? 'user@example.com';
+        $deliveryAddress = $user->address ?? '123 Test Street';
+
+        $walletPoint = $user->wallet_point ?? 0;
+
+        return view('customer.food.checkout', compact(
+            'sellerGroups',
+            'customerName',
+            'customerPhone',
+            'customerEmail',
+            'deliveryAddress',
+            'walletPoint'
+        ));
+    }
+
+    public function placeOrder(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $cart = FoodCart::with('items')->firstOrCreate(['user_id' => $user->id]);
+            $cartItems = $cart->items;
+
+            if ($cartItems->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart is empty.'
+                ], 400);
+            }
+
+            $customerPhone = $request->input('phone', $user->phone ?? '0123456789');
+            $customerEmail = $request->input('email', $user->email);
+            $deliveryAddress = $request->input('delivery_address', $user->address ?? '123 Test Street');
+            $paymentMethod = $request->input('payment_method', 'cod');
+
+            // Group items by seller to calculate totals
+            $groupedItems = $cartItems->groupBy('hotel_owner_id');
+            $grandTotal = 0;
+
+            foreach ($groupedItems as $hotelOwnerId => $items) {
+                $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($foodTotal * 0.05);
+                $grandTotal += ($foodTotal + $deliveryFee + $tax);
+            }
+
+            $useWallet = $request->boolean('use_wallet');
+            $totalWalletDiscount = 0;
+            if ($useWallet && $user->wallet_point > 0) {
+                // Round to match frontend .toFixed(0)
+                $totalWalletDiscount = round(min(0.15 * $grandTotal, $user->wallet_point));
+            }
+            $finalGrandTotal = $grandTotal - $totalWalletDiscount;
+
+            if ($paymentMethod !== 'cod') {
+                // Razorpay Order Creation
+                $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
+
+                $razorpayOrder = $api->order->create([
+                    'receipt' => 'food_order_' . time() . '_' . $user->id,
+                    'amount' => (int) ($finalGrandTotal * 100), // convert to paise
+                    'currency' => 'INR',
+                ]);
+
+                // Store checkout data in session
+                session([
+                    'food_checkout_data' => [
+                        'customer_phone' => $customerPhone,
+                        'customer_email' => $customerEmail,
+                        'delivery_address' => $deliveryAddress,
+                        'payment_method' => $paymentMethod,
+                        'razorpay_order_id' => $razorpayOrder['id'],
+                        'use_wallet' => $useWallet,
+                        'wallet_discount' => $totalWalletDiscount,
+                    ]
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'payment_required' => true,
+                    'razorpay_order_id' => $razorpayOrder['id'],
+                    'amount' => (int) ($finalGrandTotal * 100),
+                    'key' => $this->razorpayKeyId,
+                    'customer' => [
+                        'name' => $user->name,
+                        'email' => $customerEmail,
+                        'contact' => $customerPhone,
+                    ]
                 ]);
             }
-            
-            $orderIds[] = $order->id;
+
+            // COD Flow
+            $orderIds = [];
+            foreach ($groupedItems as $hotelOwnerId => $items) {
+                $hotel = HotelOwner::find($hotelOwnerId);
+                $shopName = $hotel ? $hotel->restaurant_name : 'Unknown Shop';
+                $shopAddress = $hotel ? $hotel->restaurant_address : 'Address not available';
+
+                $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($foodTotal * 0.05);
+                $sellerSubtotal = $foodTotal + $deliveryFee + $tax;
+
+                // Proportional discount distribution
+                $sellerDiscount = ($grandTotal > 0) ? ($sellerSubtotal / $grandTotal) * $totalWalletDiscount : 0;
+                $sellerFinalTotal = $sellerSubtotal - $sellerDiscount;
+
+                $order = FoodOrder::create([
+                    'hotel_owner_id' => $hotelOwnerId,
+                    'shop_name' => $shopName,
+                    'shop_address' => $shopAddress,
+                    'customer_name' => $user->name ?? 'Customer',
+                    'customer_phone' => $customerPhone,
+                    'customer_email' => $customerEmail,
+                    'delivery_address' => $deliveryAddress,
+                    'food_total' => $foodTotal,
+                    'delivery_fee' => $deliveryFee,
+                    'total_amount' => $sellerFinalTotal,
+                    'wallet_discount' => $sellerDiscount,
+                    'payment_method' => 'cod',
+                    'status' => 'pending',
+                    'estimated_delivery_time' => now()->addMinutes(10),
+                ]);
+
+                foreach ($items as $item) {
+                    FoodOrderItem::create([
+                        'food_order_id' => $order->id,
+                        'food_item_id' => $item->food_item_id,
+                        'food_name' => $item->name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                        'food_type' => $item->food_type,
+                    ]);
+                }
+
+                $orderIds[] = $order->id;
+            }
+
+            // Deduct from wallet if COD
+            if ($totalWalletDiscount > 0) {
+                UserWalletTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$totalWalletDiscount, // Negative for debit
+                    'type' => 'debit',
+                    'description' => 'Wallet points used for food order ' . implode(',', $orderIds),
+                ]);
+            }
+
+            // Clear the cart
+            $cart->items()->delete();
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('customer.food.order.success', ['orderIds' => implode(',', $orderIds)])
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Order placement failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to place order: ' . $e->getMessage()
+            ], 500);
         }
-        
-        // Clear the cart
-        $cart->items()->delete();
-        
-        return response()->json([
-            'success' => true,
-            'redirect_url' => route('customer.food.order.success', ['orderIds' => implode(',', $orderIds)])
-        ]);
-        
-    } catch (\Exception $e) {
-        \Log::error('Order placement failed: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to place order: ' . $e->getMessage()
-        ], 500);
-    }
-}
-public function orderSuccess(Request $request)
-{
-    $orderIds = $request->query('orderIds', '');
-    if (!$orderIds) {
-        return redirect()->route('customer.food.index')->with('error', 'No order found.');
     }
 
-    $orderIds = explode(',', $orderIds);
-    $orders = FoodOrder::with('items')->whereIn('id', $orderIds)->get();
+    public function verifyPayment(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $checkoutData = session('food_checkout_data');
 
-    if ($orders->isEmpty()) {
-        return redirect()->route('customer.food.index')->with('error', 'Orders not found.');
+            if (!$checkoutData || $checkoutData['razorpay_order_id'] !== $request->razorpay_order_id) {
+                return response()->json(['success' => false, 'message' => 'Invalid session or order.'], 400);
+            }
+
+            // Verify Signature
+            $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
+            $attributes = [
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature
+            ];
+
+            $api->utility->verifyPaymentSignature($attributes);
+
+            // Payment Verified - Create Orders
+            $cart = FoodCart::with('items')->where('user_id', $user->id)->first();
+            $cartItems = $cart->items;
+            $groupedItems = $cartItems->groupBy('hotel_owner_id');
+
+            // Recalculate original grand total to distribute discount proportionally
+            $originalGrandTotal = 0;
+            foreach ($groupedItems as $hotelOwnerId => $items) {
+                $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($foodTotal * 0.05);
+                $originalGrandTotal += ($foodTotal + $deliveryFee + $tax);
+            }
+
+            $totalWalletDiscount = $checkoutData['wallet_discount'] ?? 0;
+
+            $orderIds = [];
+            foreach ($groupedItems as $hotelOwnerId => $items) {
+                $hotel = HotelOwner::find($hotelOwnerId);
+                $shopName = $hotel ? $hotel->restaurant_name : 'Unknown Shop';
+                $shopAddress = $hotel ? $hotel->restaurant_address : 'Address not available';
+
+                $foodTotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($foodTotal * 0.05);
+                $sellerSubtotal = $foodTotal + $deliveryFee + $tax;
+
+                // Proportional discount distribution
+                $sellerDiscount = ($originalGrandTotal > 0) ? ($sellerSubtotal / $originalGrandTotal) * $totalWalletDiscount : 0;
+                $sellerFinalTotal = $sellerSubtotal - $sellerDiscount;
+
+                $order = FoodOrder::create([
+                    'hotel_owner_id' => $hotelOwnerId,
+                    'shop_name' => $shopName,
+                    'shop_address' => $shopAddress,
+                    'customer_name' => $user->name ?? 'Customer',
+                    'customer_phone' => $checkoutData['customer_phone'],
+                    'customer_email' => $checkoutData['customer_email'],
+                    'delivery_address' => $checkoutData['delivery_address'],
+                    'food_total' => $foodTotal,
+                    'delivery_fee' => $deliveryFee,
+                    'total_amount' => $sellerFinalTotal,
+                    'wallet_discount' => $sellerDiscount,
+                    'payment_method' => $checkoutData['payment_method'],
+                    'status' => 'paid', // Mark as paid for online payments
+                    'payment_reference' => $request->razorpay_payment_id,
+                    'estimated_delivery_time' => now()->addMinutes(10),
+                ]);
+
+                foreach ($items as $item) {
+                    FoodOrderItem::create([
+                        'food_order_id' => $order->id,
+                        'food_item_id' => $item->food_item_id,
+                        'food_name' => $item->name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                        'food_type' => $item->food_type,
+                    ]);
+                }
+                $orderIds[] = $order->id;
+            }
+
+            // Deduct from wallet if used
+            if ($totalWalletDiscount > 0) {
+                UserWalletTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$totalWalletDiscount, // Negative for debit
+                    'type' => 'debit',
+                    'description' => 'Wallet points used for food order ' . implode(',', $orderIds),
+                ]);
+            }
+
+            // Clear Cart
+            $cart->items()->delete();
+            session()->forget('food_checkout_data');
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('customer.food.order.success', ['orderIds' => implode(',', $orderIds)])
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Razorpay verification failed: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Payment verification failed.'], 500);
+        }
     }
+    public function orderSuccess(Request $request)
+    {
+        $orderIds = $request->query('orderIds', '');
+        if (!$orderIds) {
+            return redirect()->route('customer.food.index')->with('error', 'No order found.');
+        }
 
-    return view('customer.food.order-success', compact('orders')); // plural
-}
+        $orderIds = explode(',', $orderIds);
+        $orders = FoodOrder::with('items')->whereIn('id', $orderIds)->get();
+
+        if ($orders->isEmpty()) {
+            return redirect()->route('customer.food.index')->with('error', 'Orders not found.');
+        }
+
+        return view('customer.food.order-success', compact('orders')); // plural
+    }
 }

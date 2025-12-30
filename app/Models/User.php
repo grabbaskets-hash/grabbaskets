@@ -100,6 +100,17 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'seller_id');
     }
 
+    /**
+     * Get all orders for the user (as buyer or seller)
+     */
+    public function orders()
+    {
+        if ($this->role === 'seller') {
+            return $this->sellerOrders();
+        }
+        return $this->buyerOrders();
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'seller_id');

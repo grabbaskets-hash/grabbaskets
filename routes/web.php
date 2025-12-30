@@ -1925,8 +1925,6 @@ Route::post('/ten-min/order/place', [SellerController::class, 'placeTenMinGrocer
     ->middleware('auth');
 
 
-
-
 use App\Http\Controllers\Customer\CustomerFoodController;
 
 Route::prefix('food')->group(function () {
@@ -1945,6 +1943,7 @@ Route::prefix('food')->group(function () {
         Route::get('/cart/remove/{foodId}', [CustomerFoodController::class, 'cartRemove'])->name('customer.food.cart.remove');
         Route::get('/checkout', [CustomerFoodController::class, 'showCheckout'])->name('customer.food.checkout');
         Route::post('/checkout/place', [CustomerFoodController::class, 'placeOrder'])->name('customer.food.checkout.place');
+        Route::post('/payment/verify', [CustomerFoodController::class, 'verifyPayment'])->name('customer.food.payment.verify');
         // Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
         Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
             ->name('customer.food.order.success');
