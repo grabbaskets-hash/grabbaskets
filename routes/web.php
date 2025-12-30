@@ -1878,7 +1878,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/ten-min-products', [SellerController::class, 'showTenMinProducts'])->name('ten.min.products');
 
 
-Route::get('/product/{id}', [SellerController::class, 'show'])->name('product.details'); // ✅ Renamed!
+Route::get('/product/{id}', [SellerController::class, 'show'])->name('tenmin.product.details'); // ✅ Renamed!
 Route::get('/api/product/{id}', [SellerController::class, 'getProductDetails']);
 // In routes/web.php
 

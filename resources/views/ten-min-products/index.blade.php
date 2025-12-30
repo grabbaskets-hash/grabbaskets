@@ -708,7 +708,7 @@
                 <div class="product-grid" id="productGrid">
                     @foreach($activeCategory->tenMinProducts as $product)
                         <div class="product-card" data-subcat="{{ $product->subcategory?->name ?? 'Other' }}"
-                            onclick="window.location.href='{{ route('product.details', $product->id) }}'">
+                            onclick="window.location.href='{{ route('tenmin.product.details', $product->id) }}'">
 
                             @if($product->discount > 0)
                                 <div class="discount-badge">{{ $product->discount }}% OFF</div>
