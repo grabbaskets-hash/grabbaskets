@@ -269,6 +269,27 @@
             animation: bounce 2s infinite;
         }
 
+        /* Firework Animation (Global) */
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58; }
+            100% { transform: scale(1.5); opacity: 0; box-shadow: -20px -30px 0 #fdcf58, 20px -30px 0 #ff00ea, -30px 10px 0 #00ffea, 30px 10px 0 #ff004c, -10px -50px 0 #ffac38, 10px -50px 0 #ffac38, -40px 0px 0 #ffac38, 40px 0px 0 #ffac38; }
+        }
+
+        .firework {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: explode 1.5s infinite ease-out;
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none; /* Prevent clicking interaction issues */
+        }
+        .fw-1 { top: 20%; left: 20%; animation-delay: 0s; }
+        .fw-2 { top: 30%; right: 20%; animation-delay: 0.5s; }
+        .fw-3 { bottom: 30%; left: 40%; animation-delay: 1s; }
+        .fw-4 { top: 15%; right: 40%; animation-delay: 0.8s; }
+
         /* ===== MOBILE VIEW ===== */
         @media (max-width: 991px) {
             .desktop-only {
@@ -371,16 +392,105 @@
 
             /* Banners - Match desktop style */
             .hero-banner {
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                height: 250px;
-                border-radius: 20px;
+                /* Premium Image - Dark City Night for Fireworks */
+                background: url('https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1674&q=80');
+                background-size: cover;
+                background-position: center;
+                animation: kenBurns 20s ease-in-out infinite alternate;
+                height: auto;
+                min-height: 260px;
+                border-radius: 24px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                padding: 30px;
+                align-items: center; /* Center Content */
+                text-align: center; /* Center Text */
+                padding: 35px 25px;
                 color: white;
-                margin: 20px 15px 20px;
+                margin: 0; /* Margin handled by carousel */
                 position: relative;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Second Hiring Slide - Dark Team Theme + Fireworks */
+            .hero-banner-hiring-2 {
+                /* Dark overlay to make fireworks pop on office image */
+                background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
+                background-size: cover;
+                background-position: center;
+            }
+
+            /* Partnership Slide */
+            .hero-banner-alt {
+                background: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1769&q=80');
+                background-size: cover;
+                background-position: center;
+            }
+
+            @keyframes kenBurns {
+                0% { background-size: 100%; transform: scale(1); }
+                100% { background-size: 120%; transform: scale(1.05); }
+            }
+
+
+
+            /* REMOVED: Decorative Circle / Overlay Effect */
+            .hero-banner::before {
+                display: none;
+            }
+
+            .hero-banner h2 {
+                font-size: 1.8rem;
+                font-weight: 800;
+                margin-bottom: 12px;
+                line-height: 1.2;
+                color: #fff;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.9); /* Stronger shadow for night mode */
+                z-index: 2;
+                position: relative;
+            }
+
+            .hero-banner p {
+                 font-size: 1rem;
+                 opacity: 1; /* Full opacity */
+                 margin-bottom: 24px;
+                 font-weight: 500;
+                 line-height: 1.5;
+                 color: #f1f1f1;
+                 text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+                 z-index: 2;
+                 position: relative;
+            }
+            
+            .style-join-btn {
+                position: relative;
+                z-index: 2;
+                display: inline-block; /* Ensure centering works */
+            }
+
+            .join-btn-banner {
+                background: #ffffff;
+                color: var(--primary);
+                border: none;
+                padding: 12px 30px;
+                font-weight: 700;
+                border-radius: 50px; /* Pillow shape */
+                text-align: center;
+                text-decoration: none;
+                width: fit-content;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                transition: transform 0.2s, box-shadow 0.2s;
+                font-size: 1rem;
+                z-index: 2;
+                display: inline-block;
+            }
+
+            .join-btn-banner:hover {
+                 transform: translateY(-2px);
+                 box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                 background: #f8f9fa;
             }
 
             .munchies-banner {
@@ -429,11 +539,11 @@
 
             .category-grid {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr); /* 3 items per row */
                 gap: 15px 10px;
                 padding: 20px 15px;
                 background: #fff;
-                border-radius: 0 0 20px 20px;
+                border-radius: 0 0 20px 20px; /* Only bottom rounded */
                 margin-bottom: 10px;
             }
 
@@ -517,6 +627,64 @@
                 font-weight: 600;
                 font-size: 0.9rem;
                 margin-top: 5px;
+                border-radius: 8px; /* Rounded */
+                transition: all 0.2s;
+            }
+
+            /* Quantity Control Styles */
+            .qty-control {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: var(--primary);
+                border-radius: 8px;
+                padding: 4px;
+                width: 100%;
+                margin-top: 5px;
+                height: 33px;
+            }
+
+            .qty-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-weight: 700;
+                width: 24px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+
+            .qty-val {
+                color: white;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            /* Fix product card layout shift */
+            .product-card-mobile {
+                min-width: 140px;
+                width: 140px;
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Mobile Header Enhancements */
+            .mobile-header {
+                padding: 15px 15px 20px;
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+            }
+            
+            main {
+                padding-left: 5px;
+                padding-right: 5px;
             }
 
             .add-btn:active {
@@ -536,18 +704,21 @@
                 align-items: center;
                 box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
                 z-index: 1000;
-                padding-bottom: 5px;
+                padding-bottom: 5px; /* Adjust for iPhone home indicator safety if needed */
             }
 
             .nav-link-mobile {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center; /* Center aligned */
                 text-decoration: none;
                 color: var(--text-muted);
-                font-size: 0.75rem;
+                font-size: 0.7rem; /* Slightly smaller text for better fit */
                 font-weight: 500;
                 gap: 4px;
+                flex: 1; /* Distribute space evenly */
+                height: 100%;
             }
 
             .nav-link-mobile i {
@@ -713,31 +884,91 @@
                 color: #fff;
             }
 
+            /* Banners - Match Mobile Elegant Style */
             .hero-banner {
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                height: 250px;
-                border-radius: 20px;
+                /* Premium Image - Dark City Night for Fireworks */
+                background: url('https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1674&q=80');
+                background-size: cover;
+                background-position: center;
+                animation: kenBurns 20s ease-in-out infinite alternate;
+                height: auto;
+                min-height: 260px;
+                border-radius: 24px;
                 display: flex;
-                align-items: center;
-                padding: 40px;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center; /* Center Content */
+                text-align: center; /* Center Text */
+                padding: 35px 25px;
                 color: white;
                 margin-bottom: 30px;
                 position: relative;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
-            .hero-banner .content {
+            /* Second Hiring Slide */
+            .hero-banner-hiring-2 {
+                background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
+                background-size: cover;
+                background-position: center;
+            }
+
+            /* Partnership Slide */
+            .hero-banner-alt {
+                background: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1769&q=80');
+                background-size: cover;
+                background-position: center;
+            }
+
+            /* REMOVED: Decorative Circle / Overlay */
+            .hero-banner::before {
+                display: none;
+            }
+
+            .hero-banner h2 {
+                font-size: 2rem;
+                font-weight: 800;
+                margin-bottom: 12px;
+                line-height: 1.2;
+                background: linear-gradient(to right, #fff, #e0e0e0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
                 z-index: 2;
             }
 
-            .hero-banner h1 {
-                font-size: 2.2rem;
-                margin-bottom: 10px;
+            .hero-banner p {
+                 font-size: 1.1rem;
+                 opacity: 0.95;
+                 margin-bottom: 24px;
+                 font-weight: 400;
+                 line-height: 1.5;
+                 color: rgba(255, 255, 255, 0.9);
+                 z-index: 2;
             }
 
-            .hero-banner p {
-                opacity: 0.9;
-                margin-bottom: 20px;
-                font-size: 1.1rem;
+            .join-btn-banner {
+                background: #ffffff;
+                color: var(--primary);
+                border: none;
+                padding: 12px 30px;
+                font-weight: 700;
+                border-radius: 50px;
+                text-align: center;
+                text-decoration: none;
+                width: fit-content;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                transition: transform 0.2s, box-shadow 0.2s;
+                font-size: 1rem;
+                z-index: 2;
+                display: inline-block;
+            }
+
+            .join-btn-banner:hover {
+                 transform: translateY(-2px);
+                 box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                 background: #f8f9fa;
             }
 
             .munchies-banner {
@@ -838,16 +1069,58 @@
         </div>
 
         <main style="padding-bottom: 20px;">
-            <div class="hero-banner">
-                <span class="badge bg-warning text-dark mb-2">⚡ Superfast Delivery</span>
-                <h2>GrabBaskets<br>Ecommerce Website</h2>
-                <p>Your one-stop shop for all grocery needs with 10-minute delivery!</p>
-                <div class="down-arrow">
-                    <i class="bi bi-chevron-down text-white fs-4"></i>
+            <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+                <div class="carousel-inner" style="border-radius: 24px; overflow: hidden;">
+                    <!-- Slide 1: Hiring / Night City / Fireworks -->
+                    <div class="carousel-item active">
+                        <div class="hero-banner">
+                            <div class="firework fw-1"></div>
+                            <div class="firework fw-2"></div>
+                            <div class="firework fw-3"></div>
+                            <div class="firework fw-4"></div>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                            <h2>We Are Hiring: Secure Your Future</h2>
+                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                Join Now
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Slide 2: Hiring / Dark Team / Fireworks (Duplicate Content) -->
+                    <div class="carousel-item">
+                         <div class="hero-banner hero-banner-hiring-2">
+                            <div class="firework fw-1"></div>
+                            <div class="firework fw-2"></div>
+                            <div class="firework fw-3"></div>
+                            <div class="firework fw-4"></div>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                            <h2>We Are Hiring: Secure Your Future</h2>
+                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                Join Now
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Slide 3: Partnership -->
+                    <div class="carousel-item">
+                        <div class="hero-banner hero-banner-alt">
+                            <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
+                            <h2>Unlock Your Potential: Earn Big</h2>
+                            <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                Join Now
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="category-grid">
-                @foreach(($categories ?? [])->take(8) as $cat)
+                @foreach(($categories ?? []) as $cat)
                     <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="category-item">
                         <div class="cat-icon-box shadow-sm-custom">
                             {{ $cat->emoji ?? '🥬' }}
@@ -856,7 +1129,7 @@
                     </a>
                 @endforeach
                 @if(count($categories ?? []) == 0)
-                    @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning'] as $dummy)
+                    @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning', 'Home', 'Beauty', 'Pharma', 'Pet'] as $dummy)
                         <a href="#" class="category-item">
                             <div class="cat-icon-box shadow-sm-custom">📦</div>
                             <span class="fs-8 fw-semibold truncate-1">{{ $dummy }}</span>
@@ -883,15 +1156,31 @@
                                 <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
                                 <s class="fs-8 text-muted">₹{{ number_format($prod->price * 1.2, 0) }}</s>
                             </div>
-                            @auth
-                                <button class="add-btn" onclick="event.stopPropagation(); addToCart({{ $prod->id }})">
-                                    ADD
-                                </button>
-                            @else
-                                <a href="{{ route('login') }}" class="add-btn" style="text-align:center; text-decoration:none;">
-                                    Login
-                                </a>
-                            @endauth
+                            <div id="btn-container-{{ $prod->id }}">
+                                @auth
+                                    @php
+                                        $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
+                                                    ->where('product_id', $prod->id)
+                                                    ->first();
+                                        $qty = $cartItem ? $cartItem->quantity : 0;
+                                    @endphp
+                                    @if($qty > 0)
+                                        <div class="qty-control" onclick="event.stopPropagation();">
+                                            <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'decrease')">-</button>
+                                            <span class="qty-val">{{ $qty }}</span>
+                                            <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'increase')">+</button>
+                                        </div>
+                                    @else
+                                        <button class="add-btn" onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">
+                                            ADD
+                                        </button>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="add-btn" style="text-align:center; text-decoration:none;">
+                                        Login
+                                    </a>
+                                @endauth
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -919,8 +1208,28 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="fs-7 fw-bold">₹{{ number_format($prod->price, 0) }}</span>
                             </div>
-                            <button class="add-btn"
-                                onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+                            <div id="btn-container-{{ $prod->id }}">
+                                @auth
+                                    @php
+                                        $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
+                                                    ->where('product_id', $prod->id)
+                                                    ->first();
+                                        $qty = $cartItem ? $cartItem->quantity : 0;
+                                    @endphp
+                                    @if($qty > 0)
+                                        <div class="qty-control" onclick="event.stopPropagation();">
+                                            <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'decrease')">-</button>
+                                            <span class="qty-val">{{ $qty }}</span>
+                                            <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'increase')">+</button>
+                                        </div>
+                                    @else
+                                        <button class="add-btn"
+                                            onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="add-btn" style="text-align:center; text-decoration:none; display:block;">Login</a>
+                                @endauth
+                            </div>
                         </div>
                     @empty
                         <div class="p-3 text-center w-100 text-muted">No items available</div>
@@ -940,8 +1249,8 @@
             </a>
             <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
                 <i class="bi bi-cart3"></i>
-                <span class="position-absolute translate-middle badge rounded-pill bg-danger"
-                    style="top: 5px; right: 15px; font-size: 0.6rem;">
+                <span id="mobile-cart-badge" class="position-absolute translate-middle badge rounded-pill bg-danger"
+                    style="top: 5px; right: 15px; font-size: 0.6rem; display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
                     @auth
                         {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
                     @else
@@ -992,8 +1301,16 @@
                         <i class="bi bi-shop"></i> Join With Us
                     </button>
 
-                    <a href="{{ route('cart.index') }}" class="cart-btn">
+                    <a href="{{ route('cart.index') }}" class="cart-btn position-relative">
                         <i class="bi bi-cart3"></i> Cart
+                        <span id="desktop-cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                             style="font-size: 0.6rem; display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
+                            @auth
+                                {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
+                            @else
+                                0
+                            @endauth
+                        </span>
                     </a>
                     @auth
                         <div class="d-flex align-items-center gap-2">
@@ -1031,20 +1348,54 @@
             <main>
                 <div class="row mb-5">
                     <div class="col-8">
-                        <div class="hero-banner position-relative">
-                            <div class="content">
-                                <h1>GrabBaskets Ecommerce Website</h1>
-                                <p>
-                                    A dedicated e-commerce platform for Tamil Nadu products — buy Products like
-                                    Groceries,Products,Gadgets and essentials
-                                    from anywhere in Tamil Nadu with ease and Get Fast delivery.
-                                </p>
-                                <a href="#daily"> <button
-                                        class="btn btn-light rounded-pill px-4 fw-bold text-primary ">Shop
-                                        Now</button></a>
+                        <div id="desktopBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
+                             <div class="carousel-indicators">
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                             </div>
-                            <div class="down-arrow">
-                                <i class="bi bi-chevron-down text-white fs-4"></i>
+                            <div class="carousel-inner" style="border-radius: 24px; overflow: hidden;">
+                                <!-- Slide 1: Hiring / Night City -->
+                                <div class="carousel-item active">
+                                    <div class="hero-banner">
+                                        <div class="firework fw-1"></div>
+                                        <div class="firework fw-2"></div>
+                                        <div class="firework fw-3"></div>
+                                        <div class="firework fw-4"></div>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <h2>We Are Hiring: Secure Your Future</h2>
+                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Slide 2: Hiring / Dark Team -->
+                                <div class="carousel-item">
+                                    <div class="hero-banner hero-banner-hiring-2">
+                                        <div class="firework fw-1"></div>
+                                        <div class="firework fw-2"></div>
+                                        <div class="firework fw-3"></div>
+                                        <div class="firework fw-4"></div>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <h2>We Are Hiring: Secure Your Future</h2>
+                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Slide 3: Partnership -->
+                                <div class="carousel-item">
+                                    <div class="hero-banner hero-banner-alt">
+                                        <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
+                                        <h2>Unlock Your Potential: Earn Big</h2>
+                                        <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1076,8 +1427,30 @@
                                         ₹{{ number_format($prod->price * 1.1, 0) }}</div>
                                     <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
                                 </div>
-                                <button class="btn btn-outline-primary rounded-3 px-3 fw-bold"
-                                    onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+                                <div id="btn-container-{{ $prod->id }}" style="width: 100px;"> <!-- Fixed width wrapper -->
+                                    @auth
+                                        @php
+                                            $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
+                                                        ->where('product_id', $prod->id)
+                                                        ->first();
+                                            $qty = $cartItem ? $cartItem->quantity : 0;
+                                        @endphp
+                                        @if($qty > 0)
+                                            <div class="qty-control" onclick="event.stopPropagation();">
+                                                <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'decrease')">-</button>
+                                                <span class="qty-val">{{ $qty }}</span>
+                                                <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'increase')">+</button>
+                                            </div>
+                                        @else
+                                            <button class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100"
+                                                onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
+                                        @endif
+                                    @else
+                                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
+                                            Login
+                                        </a>
+                                    @endauth
+                                </div>
                             </div>
                         </div>
                     @empty
@@ -1103,8 +1476,30 @@
                             <h6 class="fw-bold truncate-2 mb-3" style="min-height: 40px;">{{ $prod->name }}</h6>
                             <div class="d-flex justify-content-between align-items-end mt-auto">
                                 <div class="fw-bold fs-5">₹{{ number_format($prod->price, 0) }}</div>
-                                <button class="btn btn-outline-primary rounded-3 px-3 fw-bold"
-                                    onclick="event.stopPropagation(); addToCart({{ $prod->id }})">ADD</button>
+                                <div id="btn-container-{{ $prod->id }}" style="width: 100px;">
+                                    @auth
+                                        @php
+                                            $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
+                                                        ->where('product_id', $prod->id)
+                                                        ->first();
+                                            $qty = $cartItem ? $cartItem->quantity : 0;
+                                        @endphp
+                                        @if($qty > 0)
+                                            <div class="qty-control" onclick="event.stopPropagation();">
+                                                <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'decrease')">-</button>
+                                                <span class="qty-val">{{ $qty }}</span>
+                                                <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'increase')">+</button>
+                                            </div>
+                                        @else
+                                            <button class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100"
+                                                onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
+                                        @endif
+                                    @else
+                                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
+                                            Login
+                                        </a>
+                                    @endauth
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -1117,8 +1512,35 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/location-delivery.js') }}"></script>
     <script>
-        function addToCart(productId) {
+        // Update Cart Logic (Handles Add, Increase, Decrease)
+        function updateCart(productId, action) {
             @auth
+                let quantityChange = 0;
+                let currentQty = parseInt(document.querySelector(`#btn-container-${productId} .qty-val`)?.innerText || 0);
+
+                if (action === 'add') {
+                    quantityChange = 1;
+                    currentQty = 1;
+                } else if (action === 'increase') {
+                    quantityChange = 1;
+                    currentQty++;
+                } else if (action === 'decrease') {
+                    quantityChange = -1;
+                    currentQty--;
+                }
+
+                // Optimistic UI Update
+                renderProductButton(productId, currentQty);
+                
+                // Optimistic Badge Update
+                 const mobileBadge = document.getElementById('mobile-cart-badge');
+                 if (mobileBadge) {
+                     let currentCount = parseInt(mobileBadge.innerText || 0);
+                     let newCount = currentCount + quantityChange;
+                     updateCartBadge(newCount);
+                 }
+
+                // Server Request
                 fetch('{{ route('cart.add') }}', {
                     method: 'POST',
                     headers: {
@@ -1127,29 +1549,60 @@
                     },
                     body: JSON.stringify({
                         product_id: productId,
-                        quantity: 1
+                        quantity: quantityChange // delta
                     })
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            const btn = event.target;
-                            const originalText = btn.innerText;
-                            btn.innerText = '✔ Added';
-                            btn.classList.remove('btn-outline-primary');
-                            btn.classList.add('btn-success', 'text-white');
-                            setTimeout(() => {
-                                btn.innerText = originalText;
-                                btn.classList.add('btn-outline-primary');
-                                btn.classList.remove('btn-success', 'text-white');
-                            }, 1000);
-                        } else {
-                            window.location.href = '{{ route('login') }}';
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cart_count !== undefined) {
+                        updateCartBadge(data.cart_count);
+                    } else {
+                        refreshCartCount(); 
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             @else
                 window.location.href = '{{ route('login') }}';
             @endauth
+        }
+
+        // Render Button State (Add vs +/-)
+        function renderProductButton(productId, qty) {
+            const container = document.getElementById(`btn-container-${productId}`);
+            if (!container) return;
+
+            if (qty > 0) {
+                container.innerHTML = `
+                    <div class="qty-control" onclick="event.stopPropagation();">
+                        <button class="qty-btn" onclick="updateCart(${productId}, 'decrease')">-</button>
+                        <span class="qty-val">${qty}</span>
+                        <button class="qty-btn" onclick="updateCart(${productId}, 'increase')">+</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button class="add-btn" onclick="event.stopPropagation(); updateCart(${productId}, 'add')">
+                        ADD
+                    </button>
+                `;
+            }
+        }
+
+        function updateCartBadge(count) {
+             const mobileBadge = document.getElementById('mobile-cart-badge');
+             if (mobileBadge) {
+                 mobileBadge.innerText = count;
+                 mobileBadge.style.display = count > 0 ? 'inline-block' : 'none';
+             }
+        }
+
+        function refreshCartCount() {
+             fetch('{{ route('cart.index') }}');
+        }
+
+        // Desktop Backwards Compatibility
+        function addToCart(productId) {
+            updateCart(productId, 'add');
         }
     </script>
 
