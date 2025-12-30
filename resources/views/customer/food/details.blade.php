@@ -368,16 +368,14 @@
                 <!-- Left: Image -->
                 <div class="col-md-5 product-gallery">
                     <div class="main-image-wrapper">
-                        @if(!empty($food->images) && is_array($food->images))
-                            <img src="{{ $food->images[0] }}" class="main-image" alt="{{ $food->name }}">
-                        @else
-                            <img src="https://via.placeholder.com/600x600?text=No+Image" class="main-image" alt="{{ $food->name }}">
+                        @if($food->first_image_url)
+                            <img src="{{ $food->first_image_url }}" class="main-image" alt="{{ $food->name }}">
                         @endif
                     </div>
-                    <!-- Placeholder for thumbnails if multiple images exist -->
-                    @if(!empty($food->images) && count($food->images) > 1)
+                    <!-- Thumbnails for multiple images -->
+                    @if(!empty($food->image_urls) && count($food->image_urls) > 1)
                     <div class="d-flex gap-2 mt-3 justify-content-center">
-                         @foreach($food->images as $img)
+                         @foreach($food->image_urls as $img)
                             <img src="{{ $img }}" style="width:60px; height:60px; border-radius:4px; border:1px solid #ddd; cursor:pointer; object-fit:cover;">
                          @endforeach
                     </div>
@@ -450,6 +448,8 @@
                         ? $food->hotelOwner->foodItems()
                             ->where('id', '!=', $food->id)
                             ->where('is_available', 1)
+                            ->whereNotNull('image')
+                            ->where('image', '!=', '')
                             ->take(5)
                             ->get()
                         : collect();
@@ -458,7 +458,9 @@
                 @forelse($recommended as $item)
                 <div class="col">
                     <a href="{{ route('customer.food.details', $item->id) }}" class="related-card">
-                        <img src="{{ $item->images[0] ?? 'https://via.placeholder.com/200?text=Item' }}" class="related-img" alt="{{ $item->name }}">
+                        @if($item->first_image_url)
+                            <img src="{{ $item->first_image_url }}" class="related-img" alt="{{ $item->name }}">
+                        @endif
                         <div class="related-body">
                             <div class="related-title">{{ $item->name }}</div>
                             <div class="d-flex justify-content-between align-items-center mt-1">

@@ -423,6 +423,125 @@
             .rating-box { font-size: 0.75rem; padding: 1px 4px; }
         }
 
+        /* --- BOTTOM CATEGORIES GRID --- */
+        .categories-bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            text-decoration: none;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--white);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card.active {
+            border: 3px solid var(--primary);
+        }
+
+        .category-card-image {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .category-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover .category-card-image img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 70%);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .category-card:hover .category-overlay {
+            opacity: 0.9;
+        }
+
+        .category-card-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--white);
+        }
+
+        .category-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin: 0 0 8px 0;
+            transition: color 0.2s;
+        }
+
+        .category-card:hover .category-card-title {
+            color: var(--primary);
+        }
+
+        .category-card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .categories-bottom-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .category-card {
+                height: 220px;
+            }
+
+            .category-card-image {
+                height: 130px;
+            }
+
+            .category-card-content {
+                padding: 12px;
+            }
+
+            .category-card-title {
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+
+            .category-card-subtitle {
+                font-size: 0.8rem;
+            }
+        }
+
         /* --- FOOTER SPACING --- */
         .footer-spacer { height: 100px; }
     </style>
@@ -634,6 +753,51 @@
                     <h5 class="mt-4 text-muted">No items found matching your criteria</h5>
                 </div>
             @endforelse
+        </div>
+
+        <!-- Food Categories Section at Bottom -->
+        <hr class="my-5 opacity-10">
+        
+        <h2 class="section-title">Browse All Food Categories</h2>
+        
+        <div class="categories-bottom-grid">
+            @foreach($foodCategories as $cat)
+                @php
+                    $categoryName = strtolower($cat['id']);
+                    $isActive = request('category') === $cat['id'];
+                    $url = route('customer.food.index', ['category' => $cat['id']]);
+
+                    $categoryImages = [
+                        'dessert' => asset('images/categories/dessert.jpeg'),
+                        'beverage' => asset('images/categories/beverage.jpeg'),
+                        'appetizer' => asset('images/categories/appetizer.jpeg'),
+                        'main_course' => asset('images/categories/main_course.jpeg'),
+                        'snack' => asset('images/categories/snack.jpeg'),
+                        'salad' => asset('images/categories/salad.jpeg'),
+                        'soup' => asset('images/categories/soup.jpeg'),
+                        'staters' => asset('images/categories/staters.jpeg'),
+                        'rice' => asset('images/categories/rice.jpeg'),
+                        'seafood' => asset('images/categories/seafood.jpeg'),
+                        'chicken' => asset('images/categories/chicken.jpeg'),
+                        'mutton' => asset('images/categories/mutton.jpeg'),
+                        'burger' => asset('images/categories/burger.jpeg'),
+                        'pizza' => asset('images/categories/pizza.jpeg'),
+                        'briyani' => asset('images/categories/briyani.jpeg'),
+                    ];
+                    $image = $categoryImages[$categoryName] ?? asset('images/categories/default.png');
+                @endphp
+
+                <a href="{{ $url }}" class="category-card {{ $isActive ? 'active' : '' }}">
+                    <div class="category-card-image">
+                        <img src="{{ $image }}" alt="{{ $cat['name'] }}" />
+                        <div class="category-overlay"></div>
+                    </div>
+                    <div class="category-card-content">
+                        <h3 class="category-card-title">{{ ucwords($cat['name']) }}</h3>
+                        <p class="category-card-subtitle">Explore delicious {{ strtolower($cat['name']) }}</p>
+                    </div>
+                </a>
+            @endforeach
         </div>
 
         <div class="footer-spacer"></div>
