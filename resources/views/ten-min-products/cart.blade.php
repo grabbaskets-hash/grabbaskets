@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,7 @@
             --secondary: #9333ea;
             --success: #16a34a;
             --bg: #f8f9fa;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             --font: 'Poppins', sans-serif;
         }
 
@@ -30,7 +31,7 @@
         /* Navbar */
         .navbar-custom {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 8px 30px rgba(109,40,217,.4);
+            box-shadow: 0 8px 30px rgba(109, 40, 217, .4);
             padding: 15px 0;
             position: sticky;
             top: 0;
@@ -62,8 +63,8 @@
         }
 
         .logout-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: #fff;
             padding: 8px 16px;
             border-radius: 8px;
@@ -76,7 +77,7 @@
         }
 
         .logout-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             color: #fff;
         }
 
@@ -205,7 +206,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -233,6 +234,54 @@
         }
 
         /* Summary & Buttons */
+        .cart-summary {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .summary-row.total {
+            border-top: 1.5px solid #f1f1f1;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .wallet-promo {
+            background: #f0fdf4;
+            border: 1.5px dashed #22c55e;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-promo input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .wallet-promo label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #166534;
+            cursor: pointer;
+        }
+
         .cart-footer {
             margin-top: 30px;
             display: flex;
@@ -240,7 +289,8 @@
             justify-content: space-between;
         }
 
-        .continue-btn, .checkout-btn {
+        .continue-btn,
+        .checkout-btn {
             padding: 14px 28px;
             border-radius: 12px;
             font-weight: 700;
@@ -265,13 +315,13 @@
         .checkout-btn {
             background: linear-gradient(135deg, var(--success), #22c55e);
             color: white;
-            box-shadow: 0 6px 18px rgba(22,163,74,0.3);
+            box-shadow: 0 6px 18px rgba(22, 163, 74, 0.3);
             border: none;
         }
 
         .checkout-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(22,163,74,0.4);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
             color: white;
         }
 
@@ -298,7 +348,7 @@
             right: 0;
             background: #fff;
             padding: 15px 20px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
             display: none;
             z-index: 1001;
             border-top-left-radius: 20px;
@@ -328,7 +378,8 @@
                 flex-direction: column;
             }
 
-            .continue-btn, .checkout-btn {
+            .continue-btn,
+            .checkout-btn {
                 width: 100%;
                 justify-content: center;
             }
@@ -360,6 +411,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- NAVBAR -->
@@ -373,7 +425,7 @@
                 @auth
                     <div class="user-name">
                         <i class="fa-solid fa-user-circle"></i>
-                        <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+                        <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" class="d-inline">
                         @csrf
@@ -434,20 +486,22 @@
                                     <!-- Price Section (Left Side) -->
                                     <div class="item-price-section">
                                         <div class="price-label">Total</div>
-                                        <div class="price-value price-total">₹{{ number_format($item->price * $item->quantity, 2) }}</div>
+                                        <div class="price-value price-total">
+                                            ₹{{ number_format((float) ($item->price * $item->quantity), 0) }}</div>
                                     </div>
 
                                     <!-- Image -->
                                     <div class="item-img-wrapper">
-                                        <img src="{{ $item->image ? asset('product_images/' . $item->image) : 'https://via.placeholder.com/80' }}" 
-                                             alt="{{ $item->name }}">
+                                        <img src="{{ $item->image ? asset('product_images/' . $item->image) : 'https://via.placeholder.com/80' }}"
+                                            alt="{{ $item->name }}">
                                     </div>
 
                                     <!-- Details -->
                                     <div class="item-details">
                                         <div class="item-name">{{ $item->name }}</div>
                                         <div class="item-unit-price">
-                                            ₹{{ number_format($item->price, 2) }} × <span class="qty-display">{{ $item->quantity }}</span>
+                                            ₹{{ number_format((float) $item->price, 0) }} × <span
+                                                class="qty-display">{{ $item->quantity }}</span>
                                         </div>
 
                                         <div class="qty-controls">
@@ -461,6 +515,29 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+
+                    <!-- Summary Box -->
+                    <div class="cart-summary">
+                        <div class="wallet-promo">
+                            <input type="checkbox" id="cartUseWallet" onchange="renderCartTotals()">
+                            <label for="cartUseWallet">
+                                🎁 Use Wallet (Save 15%) — Balance: ₹{{ number_format($walletPoint, 0) }}
+                            </label>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="summarySubtotal">₹0</span>
+                        </div>
+                        <div class="summary-row" id="walletDiscountRow" style="display: none; color: var(--success);">
+                            <span>Wallet Discount (15%)</span>
+                            <span id="summaryDiscount">-₹0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Grand Total</span>
+                            <span id="summaryGrandTotal">₹0</span>
+                        </div>
                     </div>
 
                     <!-- Footer Buttons -->
@@ -489,17 +566,58 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const csrfToken = '{{ csrf_token() }}';
+            const walletPoint = {{ $walletPoint }};
+
+            // Load wallet preference
+            const savedWalletPref = localStorage.getItem('tenmin_use_wallet');
+            if (savedWalletPref === 'true') {
+                document.getElementById('cartUseWallet').checked = true;
+            }
+
+            renderCartTotals();
+
+            function renderCartTotals() {
+                const items = document.querySelectorAll('.cart-item');
+                let subtotal = 0;
+                items.forEach(item => {
+                    const price = parseFloat(item.dataset.price);
+                    const qty = parseInt(item.querySelector('.qty-value').textContent);
+                    subtotal += price * qty;
+                });
+
+                document.getElementById('summarySubtotal').textContent = '₹' + subtotal.toFixed(0);
+
+                const useWallet = document.getElementById('cartUseWallet').checked;
+                localStorage.setItem('tenmin_use_wallet', useWallet);
+
+                let discount = 0;
+                if (useWallet && walletPoint > 0) {
+                    discount = Math.round(Math.min(0.15 * subtotal, walletPoint));
+                }
+
+                if (discount > 0) {
+                    document.getElementById('walletDiscountRow').style.display = 'flex';
+                    document.getElementById('summaryDiscount').textContent = '-₹' + discount;
+                } else {
+                    document.getElementById('walletDiscountRow').style.display = 'none';
+                }
+
+                const grandTotal = subtotal - discount;
+                document.getElementById('summaryGrandTotal').textContent = '₹' + grandTotal.toFixed(0);
+            }
+
+            window.renderCartTotals = renderCartTotals; // Expose to global if needed
 
             // Update quantity (+ / -)
             document.querySelectorAll('.plus').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const id = this.dataset.id;
                     updateQuantity(id, 1);
                 });
             });
 
             document.querySelectorAll('.minus').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const id = this.dataset.id;
                     updateQuantity(id, -1);
                 });
@@ -507,26 +625,26 @@
 
             // Remove item
             document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     if (!confirm('Remove this item from your cart?')) return;
                     const id = this.dataset.id;
-                    
+
                     fetch("{{ route('tenmin.cart.remove') }}", {
                         method: "POST",
-                        headers: { 
+                        headers: {
                             "X-CSRF-TOKEN": csrfToken,
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({ product_id: id })
                     })
-                    .then(res => res.json())
-                    .then(() => {
-                        location.reload();
-                    })
-                    .catch(err => {
-                        console.error('Remove failed:', err);
-                        alert('Failed to remove item');
-                    });
+                        .then(res => res.json())
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch(err => {
+                            console.error('Remove failed:', err);
+                            alert('Failed to remove item');
+                        });
                 });
             });
 
@@ -545,29 +663,31 @@
 
                 fetch("{{ route('tenmin.cart.update') }}", {
                     method: "POST",
-                    headers: { 
+                    headers: {
                         "X-CSRF-TOKEN": csrfToken,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ product_id: productId, quantity: newQty })
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        qtyEl.textContent = newQty;
-                        qtyDisplay.textContent = newQty;
-                        totalEl.textContent = '₹' + (unitPrice * newQty).toFixed(2);
-                    } else {
-                        alert(data.error || 'Failed to update quantity');
-                    }
-                })
-                .catch(err => {
-                    console.error('Update failed:', err);
-                    alert('Failed to update item');
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            qtyEl.textContent = newQty;
+                            qtyDisplay.textContent = newQty;
+                            totalEl.textContent = '₹' + (unitPrice * newQty).toFixed(0);
+                            renderCartTotals();
+                        } else {
+                            alert(data.error || 'Failed to update quantity');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Update failed:', err);
+                        alert('Failed to update item');
+                    });
             }
         });
     </script>
 
 </body>
+
 </html>

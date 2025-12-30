@@ -10,14 +10,18 @@ class TenMinOrder extends Model
 
     protected $fillable = [
         'user_id',
+        'seller_id', // 👈 per-seller order
         'customer_name',
         'customer_phone',
-        'customer_email', // 👈 Add this if you collect email
+        'customer_email',
         'delivery_address',
         'order_total',
         'delivery_fee',
+        'tax',
+        'wallet_discount',
         'total_amount',
-        'payment_method', // 👈 Add if you store it
+        'payment_method',
+        'payment_reference',
         'status',
         'estimated_delivery_time',
     ];

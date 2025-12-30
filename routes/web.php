@@ -1924,6 +1924,10 @@ Route::post('/ten-min/order/place', [SellerController::class, 'placeTenMinGrocer
     ->name('tenmin.grocery.order.place')
     ->middleware('auth');
 
+Route::post('/ten-min/payment/verify', [SellerController::class, 'verifyTenMinPayment'])
+    ->name('tenmin.payment.verify')
+    ->middleware('auth');
+
 
 use App\Http\Controllers\Customer\CustomerFoodController;
 

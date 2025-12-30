@@ -24,9 +24,15 @@ use App\Models\TenMinGroceryCartItem;
 use Exception;
 #use Illuminate\Support\Facades\Storage;
 use ZipArchive;
+use Razorpay\Api\Api;
+use App\Models\UserWalletTransaction;
 
 class SellerController extends Controller
 {
+    // Razorpay Live Keys
+    private $razorpayKeyId = 'rzp_live_RZLX30zmmnhHum';
+    private $razorpayKeySecret = 'XKmsdH5PbR49EiT74CgehYYi';
+
     // ...existing code...
 
     // Bulk product upload: CSV + images
@@ -1500,9 +1506,14 @@ class SellerController extends Controller
 // SellerController.php
     public function tenMinCartView()
     {
-        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        $cartItems = TenMinGroceryCartItem::where('user_id', $user->id)->get();
         $cartCount = $cartItems->sum('quantity');
-        return view('ten-min-products.cart', compact('cartItems', 'cartCount'));
+        $walletPoint = $user->wallet_point ?? 0;
+        return view('ten-min-products.cart', compact('cartItems', 'cartCount', 'walletPoint'));
     }
     // Update item quantity
     public function tenMinCartUpdate(Request $request)
@@ -1545,9 +1556,12 @@ class SellerController extends Controller
         return response()->json(['success' => true]);
     }
     // In your controller
+
+
     public function tenMinCheckout()
     {
-        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
+        $user = auth()->user();
+        $cartItems = TenMinGroceryCartItem::where('user_id', $user->id)->get();
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('tenmin.cart.view')
@@ -1567,23 +1581,31 @@ class SellerController extends Controller
                 return back()->with('error', "Minimum ₹200 required for {$storeName} (currently ₹" . number_format($subtotal, 2) . ").");
             }
 
+            $deliveryFee = 50;
+            $tax = round($subtotal * 0.05); // 5% Tax rounded to integer
+            $total = $subtotal + $deliveryFee + $tax;
+
             $orders[] = [
                 'seller_id' => $sellerId,
                 'store_name' => $items->first()->seller?->name ?? 'Store',
                 'items' => $items,
                 'subtotal' => $subtotal,
-                'delivery_fee' => 50,
-                'total' => $subtotal + 50,
+                'delivery_fee' => $deliveryFee,
+                'tax' => $tax,
+                'total' => $total,
             ];
         }
 
-        // Pass shared customer info + grouped orders
+        $walletPoint = $user->wallet_point ?? 0;
+
+        // Pass shared customer info + grouped orders + walletPoint
         return view('ten-min-products.checkout', [
             'orders' => $orders,
-            'customerName' => auth()->user()->name,
-            'deliveryAddress' => auth()->user()->address ?? '123 Test Street',
-            'customerEmail' => auth()->user()->email ?? '',
-            'customerPhone' => auth()->user()->phone ?? '0123456789',
+            'customerName' => $user->name,
+            'deliveryAddress' => $user->address ?? '123 Test Street',
+            'customerEmail' => $user->email ?? '',
+            'customerPhone' => $user->phone ?? '0123456789',
+            'walletPoint' => $walletPoint,
         ]);
     }
     public function tenMinOrderSuccess($orderId)
@@ -1593,6 +1615,7 @@ class SellerController extends Controller
     }
     public function placeTenMinGroceryOrder(Request $request)
     {
+        $user = auth()->user();
         $request->validate([
             'delivery_address' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
@@ -1600,60 +1623,218 @@ class SellerController extends Controller
             'payment_method' => 'required|in:cod,upi,card',
         ]);
 
-        $cartItems = TenMinGroceryCartItem::where('user_id', auth()->id())->get();
-
+        $cartItems = TenMinGroceryCartItem::where('user_id', $user->id)->get();
         if ($cartItems->isEmpty()) {
-            return back()->with('error', 'Cart is empty.');
+            return response()->json(['success' => false, 'message' => 'Cart is empty.'], 400);
         }
 
+        // Group by seller for calculation
+        $groupedItems = $cartItems->groupBy('seller_id');
+        $grandTotal = 0;
 
-
-        $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
-        if ($subtotal < 200) {
-            return back()->with('error', 'Minimum order ₹200 required.');
+        foreach ($groupedItems as $sellerId => $items) {
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+            $deliveryFee = 50.00;
+            $tax = round($subtotal * 0.05);
+            $grandTotal += ($subtotal + $deliveryFee + $tax);
         }
 
-        $deliveryFee = 50;
-        $totalAmount = $subtotal + $deliveryFee;
+        $useWallet = $request->boolean('use_wallet');
+        $totalWalletDiscount = 0;
+        if ($useWallet && $user->wallet_point > 0) {
+            $totalWalletDiscount = round(min(0.15 * $grandTotal, $user->wallet_point));
+        }
+        $finalGrandTotal = $grandTotal - $totalWalletDiscount;
 
-        $order = \App\Models\TenMinOrder::create([
-            'user_id' => auth()->id(),
-            'customer_name' => auth()->user()->name,
-            'customer_phone' => $request->phone,
-            // 'customer_email' => $request->email,
-            'delivery_address' => $request->delivery_address,
-            'payment_method' => $request->payment_method,
-            'order_total' => $subtotal,
-            'delivery_fee' => $deliveryFee,
-            'total_amount' => $totalAmount,
-            'status' => 'pending',
-            'estimated_delivery_time' => now()->addMinutes(10),
-        ]);
-
-        foreach ($cartItems as $item) {
-            \App\Models\TenMinOrderItem::create([
-                'ten_min_order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'product_name' => $item->name,
-                'price' => $item->price,
-                'quantity' => $item->quantity,
-                'seller_id' => $item->seller_id,
-
+        if ($request->payment_method !== 'cod') {
+            // Razorpay Order Creation
+            $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
+            $razorpayOrder = $api->order->create([
+                'receipt' => 'tenmin_' . time() . '_' . $user->id,
+                'amount' => (int) ($finalGrandTotal * 100),
+                'currency' => 'INR',
             ]);
-        }
 
-        TenMinGroceryCartItem::where('user_id', auth()->id())->delete();
+            session([
+                'tenmin_checkout_data' => [
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'delivery_address' => $request->delivery_address,
+                    'payment_method' => $request->payment_method,
+                    'razorpay_order_id' => $razorpayOrder['id'],
+                    'use_wallet' => $useWallet,
+                    'wallet_discount' => $totalWalletDiscount,
+                ]
+            ]);
 
-        // At the end of placeTenMinGroceryOrder()
-        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'order_id' => $order->id,
-                'redirect_url' => route('tenmin.order.success', $order->id)
+                'payment_required' => true,
+                'razorpay_order_id' => $razorpayOrder['id'],
+                'amount' => (int) ($finalGrandTotal * 100),
+                'key' => $this->razorpayKeyId,
+                'customer' => [
+                    'name' => $user->name,
+                    'email' => $request->email,
+                    'contact' => $request->phone,
+                ]
             ]);
         }
 
-        return redirect()->route('tenmin.order.success', $order->id);
+        // COD Flow
+        $orderIds = [];
+        foreach ($groupedItems as $sellerId => $items) {
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+            $deliveryFee = 50.00;
+            $tax = round($subtotal * 0.05);
+            $sellerSubtotal = $subtotal + $deliveryFee + $tax;
+
+            $sellerDiscount = ($grandTotal > 0) ? ($sellerSubtotal / $grandTotal) * $totalWalletDiscount : 0;
+            $sellerFinalTotal = $sellerSubtotal - $sellerDiscount;
+
+            $order = \App\Models\TenMinOrder::create([
+                'user_id' => $user->id,
+                'seller_id' => $sellerId,
+                'customer_name' => $user->name,
+                'customer_phone' => $request->phone,
+                'customer_email' => $request->email,
+                'delivery_address' => $request->delivery_address,
+                'order_total' => $subtotal,
+                'delivery_fee' => $deliveryFee,
+                'tax' => $tax,
+                'total_amount' => $sellerFinalTotal,
+                'wallet_discount' => $sellerDiscount,
+                'payment_method' => 'cod',
+                'status' => 'pending',
+                'estimated_delivery_time' => now()->addMinutes(10),
+            ]);
+
+            foreach ($items as $item) {
+                \App\Models\TenMinOrderItem::create([
+                    'ten_min_order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->name,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'seller_id' => $item->seller_id,
+                ]);
+            }
+            $orderIds[] = $order->id;
+        }
+
+        // Handle Wallet Deduction for COD
+        if ($totalWalletDiscount > 0) {
+            UserWalletTransaction::create([
+                'user_id' => $user->id,
+                'amount' => -$totalWalletDiscount,
+                'description' => 'Wallet points used for 10-Min Order',
+                'transaction_type' => 'debit',
+                'status' => 'completed',
+            ]);
+        }
+
+        TenMinGroceryCartItem::where('user_id', $user->id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'order_id' => $orderIds[0], // Redirect to first order or success page
+            'redirect_url' => route('tenmin.order.success', $orderIds[0])
+        ]);
+    }
+
+    public function verifyTenMinPayment(Request $request)
+    {
+        $user = auth()->user();
+        $checkoutData = session('tenmin_checkout_data');
+
+        if (!$checkoutData || $checkoutData['razorpay_order_id'] !== $request->razorpay_order_id) {
+            return response()->json(['success' => false, 'message' => 'Invalid session or order ID.'], 400);
+        }
+
+        try {
+            $api = new Api($this->razorpayKeyId, $this->razorpayKeySecret);
+            $api->utility->verifyPaymentSignature([
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature,
+            ]);
+
+            $cartItems = TenMinGroceryCartItem::where('user_id', $user->id)->get();
+            $groupedItems = $cartItems->groupBy('seller_id');
+            $originalGrandTotal = 0;
+
+            foreach ($groupedItems as $sellerId => $items) {
+                $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($subtotal * 0.05);
+                $originalGrandTotal += ($subtotal + $deliveryFee + $tax);
+            }
+
+            $totalWalletDiscount = $checkoutData['wallet_discount'] ?? 0;
+            $orderIds = [];
+
+            foreach ($groupedItems as $sellerId => $items) {
+                $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+                $deliveryFee = 50.00;
+                $tax = round($subtotal * 0.05);
+                $sellerSubtotal = $subtotal + $deliveryFee + $tax;
+
+                $sellerDiscount = ($originalGrandTotal > 0) ? ($sellerSubtotal / $originalGrandTotal) * $totalWalletDiscount : 0;
+                $sellerFinalTotal = $sellerSubtotal - $sellerDiscount;
+
+                $order = \App\Models\TenMinOrder::create([
+                    'user_id' => $user->id,
+                    'seller_id' => $sellerId,
+                    'customer_name' => $user->name,
+                    'customer_phone' => $checkoutData['phone'],
+                    'customer_email' => $checkoutData['email'],
+                    'delivery_address' => $checkoutData['delivery_address'],
+                    'order_total' => $subtotal,
+                    'delivery_fee' => $deliveryFee,
+                    'tax' => $tax,
+                    'total_amount' => $sellerFinalTotal,
+                    'wallet_discount' => $sellerDiscount,
+                    'payment_method' => $checkoutData['payment_method'],
+                    'payment_reference' => $request->razorpay_payment_id,
+                    'status' => 'paid',
+                    'estimated_delivery_time' => now()->addMinutes(10),
+                ]);
+
+                foreach ($items as $item) {
+                    \App\Models\TenMinOrderItem::create([
+                        'ten_min_order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                        'seller_id' => $item->seller_id,
+                    ]);
+                }
+                $orderIds[] = $order->id;
+            }
+
+            if ($totalWalletDiscount > 0) {
+                UserWalletTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$totalWalletDiscount,
+                    'description' => 'Wallet points used for 10-Min Order',
+                    'transaction_type' => 'debit',
+                    'status' => 'completed',
+                ]);
+            }
+
+            TenMinGroceryCartItem::where('user_id', $user->id)->delete();
+            session()->forget('tenmin_checkout_data');
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('tenmin.order.success', $orderIds[0])
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Razorpay Verification Error (TenMin): ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Payment verification failed.'], 400);
+        }
     }
 
     public function updateProduct(Request $request, Product $product)
