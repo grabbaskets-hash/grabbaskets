@@ -741,6 +741,119 @@
             .nav-link-mobile.active i {
                 transform: scale(1.1);
             }
+
+            /* Mobile Categories Sidebar */
+            .mobile-sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 2000;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .mobile-sidebar-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .mobile-categories-sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                max-width: 320px;
+                height: 100%;
+                background: #fff;
+                z-index: 2001;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .mobile-categories-sidebar.active {
+                left: 0;
+            }
+
+            .sidebar-header {
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                color: white;
+                padding: 20px 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .sidebar-header h3 {
+                margin: 0;
+                font-size: 1.3rem;
+                font-weight: 700;
+            }
+
+            .sidebar-close-btn {
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .sidebar-close-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+
+            .sidebar-category-list {
+                padding: 10px 0;
+            }
+
+            .sidebar-category-item {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                text-decoration: none;
+                color: var(--text-main);
+                transition: all 0.2s;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .sidebar-category-item:hover,
+            .sidebar-category-item:active {
+                background: var(--bg-body);
+                padding-left: 25px;
+            }
+
+            .sidebar-category-icon {
+                width: 45px;
+                height: 45px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+                background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+                border-radius: 12px;
+                margin-right: 15px;
+                flex-shrink: 0;
+            }
+
+            .sidebar-category-name {
+                font-weight: 600;
+                font-size: 1rem;
+            }
         }
 
         /* ===== DESKTOP VIEW ===== */
@@ -1080,6 +1193,35 @@
             </form>
         </div>
 
+        <!-- Mobile Categories Sidebar -->
+        <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
+        <div class="mobile-categories-sidebar" id="mobileCategoriesSidebar">
+            <div class="sidebar-header">
+                <h3><i class="bi bi-grid-fill me-2"></i>Categories</h3>
+                <button class="sidebar-close-btn" onclick="closeMobileSidebar()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="sidebar-category-list">
+                @foreach(($categories ?? []) as $cat)
+                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="sidebar-category-item">
+                        <div class="sidebar-category-icon">
+                            {{ $cat->emoji ?? '📦' }}
+                        </div>
+                        <div class="sidebar-category-name">{{ $cat->name ?? 'Category' }}</div>
+                    </a>
+                @endforeach
+                @if(count($categories ?? []) == 0)
+                    @foreach(['Fruits' => '🍎', 'Veggies' => '🥬', 'Dairy' => '🥛', 'Bakery' => '🍞', 'Munchies' => '🍿', 'Cold Drinks' => '🥤', 'Instant' => '⚡', 'Cleaning' => '🧹', 'Home' => '🏠', 'Beauty' => '💄', 'Pharma' => '💊', 'Pet' => '🐾'] as $name => $emoji)
+                        <a href="#" class="sidebar-category-item">
+                            <div class="sidebar-category-icon">{{ $emoji }}</div>
+                            <div class="sidebar-category-name">{{ $name }}</div>
+                        </a>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+
         <main style="padding-bottom: 20px;">
             <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
                 <div class="carousel-indicators">
@@ -1248,6 +1390,72 @@
                     @endforelse
                 </div>
             </div>
+
+            <!-- Food Delivery Section -->
+            <div class="product-rail" style="margin-top: 30px;">
+                <div class="rail-header">
+                    <h5 class="fw-bold mb-0">🍔 Food Delivery</h5>
+                    <a href="{{ route('customer.food.index') }}" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
+                </div>
+                
+                @php
+                    $foodItems = \App\Models\FoodItem::with('hotelOwner')
+                        ->where('is_available', 1)
+                        ->whereNotNull('image')
+                        ->where('image', '!=', '')
+                        ->whereHas('hotelOwner', function($q) {
+                            $now = now();
+                            $currentTime = $now->format('H:i:s');
+                            $today = strtolower($now->format('l'));
+                            $q->where('is_active', true)
+                                ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
+                                ->where('opening_time', '<=', $currentTime)
+                                ->where('closing_time', '>=', $currentTime);
+                        })
+                        ->latest()
+                        ->take(8)
+                        ->get();
+                @endphp
+                
+                <div class="rail-scroll">
+                    @forelse($foodItems as $food)
+                        <div class="product-card-mobile"
+                            onclick="window.location.href='{{ route('customer.food.details', $food->id) }}'">
+                            <div class="pm-image-box" style="position: relative;">
+                                @if($food->first_image_url)
+                                    <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}"
+                                        class="pm-image">
+                                @endif
+                                <span style="position: absolute; top: 5px; right: 5px; background: {{ $food->food_type === 'veg' ? '#48C479' : '#D12939' }}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">
+                                    {{ strtoupper($food->food_type) }}
+                                </span>
+                            </div>
+                            <div class="fs-8 text-muted truncate-1">
+                                {{ $food->hotelOwner ? $food->hotelOwner->restaurant_name : 'Restaurant' }}
+                            </div>
+                            <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $food->name }}</div>
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="fs-7 fw-bold">₹{{ number_format($food->getFinalPrice(), 0) }}</span>
+                                @if($food->rating)
+                                    <span class="badge" style="background: #48C479; font-size: 0.65rem;">
+                                        ⭐ {{ number_format($food->rating, 1) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <a href="{{ route('customer.food.details', $food->id) }}" 
+                                   class="add-btn" 
+                                   onclick="event.stopPropagation();"
+                                   style="text-align:center; text-decoration:none; display:block;">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-3 text-center w-100 text-muted">No food items available right now</div>
+                    @endforelse
+                </div>
+            </div>
         </main>
 
         <nav class="bottom-nav">
@@ -1255,7 +1463,7 @@
                 <i class="bi bi-house-door-fill"></i>
                 <span>Home</span>
             </a>
-            <a href="{{ route('categories.index') }}" class="nav-link-mobile">
+            <a href="#" class="nav-link-mobile" onclick="event.preventDefault(); openMobileSidebar();">
                 <i class="bi bi-grid"></i>
                 <span>Categories</span>
             </a>
@@ -1647,6 +1855,29 @@
                         "Please enable location access";
                 }
             );
+        }
+
+        // Mobile Categories Sidebar Functions
+        function openMobileSidebar() {
+            const sidebar = document.getElementById('mobileCategoriesSidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('mobileCategoriesSidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
         }
     </script>
 

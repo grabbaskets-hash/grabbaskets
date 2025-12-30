@@ -241,9 +241,36 @@
         }
 
         @media (max-width: 768px) {
-            .cat-item { min-width: 90px; }
-            .cat-image-wrapper { width: 90px; height: 90px; }
-            .section-title { font-size: 1.25rem; margin-bottom: 15px; }
+            .section-container {
+                padding: 0 10px;
+                margin: 15px auto;
+            }
+            
+            .categories-carousel {
+                gap: 15px;
+                padding: 0 5px 15px;
+            }
+            
+            .cat-item { 
+                min-width: 80px;
+                flex-shrink: 0;
+            }
+            
+            .cat-image-wrapper { 
+                width: 80px; 
+                height: 80px;
+                margin-bottom: 8px;
+            }
+            
+            .cat-name {
+                font-size: 0.75rem;
+            }
+            
+            .section-title { 
+                font-size: 1.1rem; 
+                margin-bottom: 12px;
+                padding: 0 5px;
+            }
         }
 
         /* --- FILTER BAR --- */
@@ -415,12 +442,63 @@
         .nonveg-indicator { color: #D12939; border-color: #D12939; }
 
         @media (max-width: 576px) {
-            .items-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-            .card-img-container { height: 140px; border-radius: 12px; }
-            .food-name-h { font-size: 1rem; }
-            .discount-tag { font-size: 0.9rem; }
-            .meta-row { gap: 6px; font-size: 0.85rem; }
-            .rating-box { font-size: 0.75rem; padding: 1px 4px; }
+            .items-grid { 
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 5px;
+            }
+            
+            .premium-food-card {
+                margin-bottom: 0;
+            }
+            
+            .card-img-container { 
+                height: 130px; 
+                border-radius: 10px;
+                margin-bottom: 8px;
+            }
+            
+            .food-info {
+                padding: 0 2px;
+            }
+            
+            .food-name-h { 
+                font-size: 0.9rem;
+                margin-bottom: 3px;
+            }
+            
+            .discount-tag { 
+                font-size: 0.75rem;
+                bottom: 8px;
+                left: 8px;
+            }
+            
+            .meta-row { 
+gap: 4px;
+                font-size: 0.75rem;
+                margin-bottom: 3px;
+            }
+            
+            .rating-box { 
+                font-size: 0.65rem; 
+                padding: 1px 3px;
+            }
+            
+            .food-details-text {
+                font-size: 0.75rem;
+                margin-bottom: 2px;
+            }
+            
+            .price-tag {
+                font-size: 0.85rem;
+            }
+            
+            .veg-nonveg-indicator {
+                top: 8px;
+                right: 8px;
+                padding: 1px 6px;
+                font-size: 0.6rem;
+            }
         }
 
         /* --- BOTTOM CATEGORIES GRID --- */
