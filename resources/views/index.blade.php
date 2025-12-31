@@ -1240,7 +1240,7 @@
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
                             <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                 Join Now
                             </button>
                         </div>
@@ -1255,7 +1255,7 @@
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
                             <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                 Join Now
                             </button>
                         </div>
@@ -1266,7 +1266,7 @@
                             <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
                             <h2>Unlock Your Potential: Earn Big</h2>
                             <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                 Join Now
                             </button>
                         </div>
@@ -1585,7 +1585,7 @@
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
                                         <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                             Join Now
                                         </button>
                                     </div>
@@ -1600,7 +1600,7 @@
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
                                         <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                             Join Now
                                         </button>
                                     </div>
@@ -1611,7 +1611,7 @@
                                         <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
                                         <h2>Unlock Your Potential: Earn Big</h2>
                                         <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/68qbSngL12fNT1BB9'">
                                             Join Now
                                         </button>
                                     </div>
