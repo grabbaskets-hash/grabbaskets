@@ -128,20 +128,11 @@ class FoodItem extends Model
         $isCloud = $this->isLaravelCloud();
         
         if ($isCloud) {
-            // Use direct URL only if a public URL (CDN/Custom Domain) is explicitly configured
-            $r2PublicUrl = config('filesystems.disks.r2.url');
-            if (!empty($r2PublicUrl)) {
-                try {
-                    return Storage::disk('r2')->url($cleanPath);
-                } catch (\Throwable $e) {
-                    // Fallback to proxy
-                }
-            }
-            // Use relative path to ensure it works across different domains/environments
-            return '/serve-image/r2/' . $cleanPath;
+            // Always use proxy for cloud images to ensure correct serving logic
+            return url('/serve-image/r2/' . $cleanPath);
         }
         
-        return '/serve-image/public/' . $cleanPath;
+        return url('/serve-image/public/' . $cleanPath);
     }
 
     private function isLaravelCloud() {

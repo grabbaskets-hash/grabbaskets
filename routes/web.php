@@ -1079,7 +1079,7 @@ Route::get('/debug-bulk-system', function () {
 // Log facade is available via global alias; explicit import not required here
 
 Route::get('/serve-image/{type}/{path}', function ($type, $path) {
-    // Force a log entry even if others fail
+    error_log("SERVE-IMAGE HIT: type=$type, path=$path");
     \Log::info("DEBUG: /serve-image hit", ['type' => $type, 'path' => $path]);
     
     try {
@@ -1226,17 +1226,16 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
 
         Log::warning("/serve-image: File not found in any disk", ['path' => $storagePath]);
 
-        // Return 404 - no placeholder
-        return response()->json(['error' => 'Image not found', 'path' => $storagePath], 404);
+        // Return a placeholder image instead of 404 JSON for better UX
+        return redirect('https://via.placeholder.com/480x300?text=Image+Not+Found');
     } catch (\Throwable $e) {
         Log::error('Error in /serve-image route', [
             'type' => $type,
             'path' => $path,
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
+            'message' => $e->getMessage()
         ]);
-        // Fail closed as 404 rather than 500 for better UX when images are missing
-        return response()->json(['error' => 'Not Found'], 404);
+        // Fallback to placeholder on fatal error too
+        return redirect('https://via.placeholder.com/480x300?text=Error+Loading+Image');
     }
 })->where('path', '.*');
 
