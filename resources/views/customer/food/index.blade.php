@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GrabBasket — Food Delivery</title>
+    <title>GrabBaskets — Food Delivery</title>
     <!-- Google Fonts: Inter & Outfit -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -633,7 +633,7 @@ gap: 4px;
             <div class="left-nav">
                 <a href="{{ url('/') }}" class="logo-box">
                     <i class="fa-solid fa-basket-shopping"></i>
-                    <span class="logo-text">GrabBasket</span>
+                    <span class="logo-text">GrabBaskets</span>
                 </a>
                 <div class="location-box">
                     <span class="location-bold">Other</span>

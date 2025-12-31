@@ -36,7 +36,7 @@
 
                         {{-- IMAGE --}}
                         @if($item->image)
-                            <img src="{{ $item->first_image_url }}"
+                            <img src="{{ Storage::url($item->image) }}"
                                  class="card-img-top"
                                  style="height:200px; object-fit:contain;"
                                  alt="{{ $item->name }}">

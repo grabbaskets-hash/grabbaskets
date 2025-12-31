@@ -290,6 +290,40 @@
         .fw-3 { bottom: 30%; left: 40%; animation-delay: 1s; }
         .fw-4 { top: 15%; right: 40%; animation-delay: 0.8s; }
 
+        /* ===== GLOBAL ANIMATIONS & STYLES ===== */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes floatBanner {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .fast-delivery-badge {
+            background: #ff0000;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            width: fit-content;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        /* Third Hiring Slide - Elegant Theme */
+        .hero-banner-hiring-3 {
+             /* New Business/Future Theme - Cache Busting Applied */
+             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1932&q=80&v=2') !important;
+             background-size: cover !important;
+             background-position: center !important;
+        }
+
         /* ===== MOBILE VIEW ===== */
         @media (max-width: 991px) {
             .desktop-only {
@@ -304,12 +338,7 @@
                 position: sticky;
                 top: 0;
                 z-index: 1000;
-                padding: 15px;
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                border-bottom-left-radius: 20px;
-                border-bottom-right-radius: 20px;
-                margin-bottom: 0;
-                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+                padding: 12px 15px;
             }
 
             .brand-mobile {
@@ -336,36 +365,38 @@
                 font-size: 1.1rem;
             }
 
-            /* Mobile Icons - Consistent styling */
+            /* Mobile Icons - Now use navbar background */
             .mobile-icons {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 14px;
             }
 
             .icon-btn {
-                width: 40px;
-                height: 40px;
+                width: 44px;
+                height: 44px;
                 border-radius: 10px;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(10px);
+                /* Updated to 10px */
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                /* Navbar bg */
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-decoration: none;
                 transition: all 0.2s ease;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             }
 
             .icon-btn i {
                 color: var(--accent) !important;
-                font-size: 1.2rem;
+                /* Gold icon */
+                font-size: 1.3rem;
                 font-weight: bold;
             }
 
             .icon-btn:hover {
-                transform: scale(1.05);
-                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.08);
+                opacity: 0.9;
             }
 
             .mobile-auth-group {
@@ -432,6 +463,8 @@
                 background-position: center;
             }
 
+
+
             @keyframes kenBurns {
                 0% { background-size: 100%; transform: scale(1); }
                 100% { background-size: 120%; transform: scale(1.05); }
@@ -497,32 +530,41 @@
             }
 
             .munchies-banner {
-                background: linear-gradient(135deg, #FFD700 0%, #FF9A00 100%);
-                min-height: 220px;
+                background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+                background-size: cover;
+                background-position: center;
+                height: 250px;
                 border-radius: 20px;
-                padding: 25px 20px;
+                padding: 30px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 margin: 20px 15px;
-                box-shadow: 0 4px 15px rgba(255, 154, 0, 0.25);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.2);
+                animation: floatBanner 4s ease-in-out infinite;
             }
 
             .munchies-banner h3 {
                 font-size: 1.8rem;
-                margin-bottom: 10px;
-                color: #212529;
-                font-weight: 700;
+                margin-bottom: 5px;
+                color: #ffffff;
+                font-weight: 800;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             }
 
             .munchies-banner p {
-                color: #5a5a5a;
+                color: #f1f1f1;
                 margin-bottom: 20px;
                 font-weight: 500;
+                font-size: 1.1rem;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             }
+            
+
 
             .browse-btn {
-                background: #3C096C;
+                background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
                 color: white;
                 border: none;
                 padding: 10px 24px;
@@ -543,40 +585,32 @@
 
             .category-grid {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr); /* 4 items per row for better fit */
-                gap: 12px 8px;
+                grid-template-columns: repeat(3, 1fr); /* 3 items per row */
+                gap: 15px 10px;
                 padding: 20px 15px;
                 background: #fff;
-                border-radius: 20px;
-                margin: 15px 10px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                border-radius: 0 0 20px 20px; /* Only bottom rounded */
+                margin-bottom: 10px;
             }
 
             .category-item {
                 text-align: center;
                 text-decoration: none;
                 color: var(--text-main);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
             }
 
             .cat-icon-box {
                 width: 60px;
                 height: 60px;
-                background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
-                border-radius: 14px;
+                background: #f0fdf4;
+                border-radius: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.6rem;
-                margin: 0 auto 6px;
-                transition: all 0.2s;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            }
+                font-size: 1.8rem;
+                margin: 0 auto 8px;
+                transition: transform 0.2s;
 
-            .category-item:active .cat-icon-box {
-                transform: scale(0.95);
             }
 
             .product-rail {
@@ -684,8 +718,15 @@
                 flex-direction: column;
             }
 
-            /* Mobile Header - Remove duplicate */
-            /* Already defined above */
+            /* Mobile Header Enhancements */
+            .mobile-header {
+                padding: 15px 15px 20px;
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+            }
             
             main {
                 padding-left: 5px;
@@ -707,152 +748,32 @@
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
-                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-                z-index: 1050;
-                padding: 5px 0;
-                border-top: 1px solid var(--border-light);
+                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+                z-index: 1000;
+                padding-bottom: 5px; /* Adjust for iPhone home indicator safety if needed */
             }
 
             .nav-link-mobile {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
+                justify-content: center; /* Center aligned */
                 text-decoration: none;
                 color: var(--text-muted);
-                font-size: 0.7rem;
-                font-weight: 600;
-                gap: 3px;
-                flex: 1;
+                font-size: 0.7rem; /* Slightly smaller text for better fit */
+                font-weight: 500;
+                gap: 4px;
+                flex: 1; /* Distribute space evenly */
                 height: 100%;
-                transition: all 0.2s;
             }
 
             .nav-link-mobile i {
-                font-size: 1.5rem;
-                margin-bottom: 0;
+                font-size: 1.4rem;
+                margin-bottom: -2px;
             }
 
             .nav-link-mobile.active {
                 color: var(--primary);
-                font-weight: 700;
-            }
-
-            .nav-link-mobile.active i {
-                transform: scale(1.1);
-            }
-
-            /* Mobile Categories Sidebar */
-            .mobile-sidebar-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 2000;
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
-            }
-
-            .mobile-sidebar-overlay.active {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .mobile-categories-sidebar {
-                position: fixed;
-                top: 0;
-                left: -100%;
-                width: 80%;
-                max-width: 320px;
-                height: 100%;
-                background: #fff;
-                z-index: 2001;
-                transition: left 0.3s ease;
-                overflow-y: auto;
-                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
-            }
-
-            .mobile-categories-sidebar.active {
-                left: 0;
-            }
-
-            .sidebar-header {
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                color: white;
-                padding: 20px 15px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                position: sticky;
-                top: 0;
-                z-index: 10;
-            }
-
-            .sidebar-header h3 {
-                margin: 0;
-                font-size: 1.3rem;
-                font-weight: 700;
-            }
-
-            .sidebar-close-btn {
-                background: rgba(255, 255, 255, 0.2);
-                border: none;
-                color: white;
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.5rem;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .sidebar-close-btn:hover {
-                background: rgba(255, 255, 255, 0.3);
-                transform: scale(1.1);
-            }
-
-            .sidebar-category-list {
-                padding: 10px 0;
-            }
-
-            .sidebar-category-item {
-                display: flex;
-                align-items: center;
-                padding: 15px 20px;
-                text-decoration: none;
-                color: var(--text-main);
-                transition: all 0.2s;
-                border-bottom: 1px solid var(--border-light);
-            }
-
-            .sidebar-category-item:hover,
-            .sidebar-category-item:active {
-                background: var(--bg-body);
-                padding-left: 25px;
-            }
-
-            .sidebar-category-icon {
-                width: 45px;
-                height: 45px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.8rem;
-                background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
-                border-radius: 12px;
-                margin-right: 15px;
-                flex-shrink: 0;
-            }
-
-            .sidebar-category-name {
-                font-weight: 600;
-                font-size: 1rem;
             }
         }
 
@@ -1097,32 +1018,40 @@
             }
 
             .munchies-banner {
-                background: linear-gradient(135deg, #FFD700 0%, #FF9A00 100%);
+                background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+                background-size: cover;
+                background-position: center;
                 height: 250px;
-                width: 370px;
+                /* width: 370px; removed for responsiveness */
                 border-radius: 20px;
                 padding: 30px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 margin-top: 10px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.2);
+                animation: floatBanner 4s ease-in-out infinite;
             }
 
             .munchies-banner h3 {
                 font-size: 1.8rem;
-                margin-bottom: 10px;
-                color: #212529;
-                font-weight: 700;
+                margin-bottom: 5px;
+                color: #ffffff;
+                font-weight: 800;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             }
 
             .munchies-banner p {
-                color: #5a5a5a;
+                color: #f1f1f1;
                 margin-bottom: 20px;
                 font-weight: 500;
+                font-size: 1.1rem;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             }
 
             .browse-btn {
-                background: #3C096C;
+                background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
                 color: white;
                 border: none;
                 padding: 10px 24px;
@@ -1193,35 +1122,6 @@
             </form>
         </div>
 
-        <!-- Mobile Categories Sidebar -->
-        <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
-        <div class="mobile-categories-sidebar" id="mobileCategoriesSidebar">
-            <div class="sidebar-header">
-                <h3><i class="bi bi-grid-fill me-2"></i>Categories</h3>
-                <button class="sidebar-close-btn" onclick="closeMobileSidebar()">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-            <div class="sidebar-category-list">
-                @foreach(($categories ?? []) as $cat)
-                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="sidebar-category-item">
-                        <div class="sidebar-category-icon">
-                            {{ $cat->emoji ?? '📦' }}
-                        </div>
-                        <div class="sidebar-category-name">{{ $cat->name ?? 'Category' }}</div>
-                    </a>
-                @endforeach
-                @if(count($categories ?? []) == 0)
-                    @foreach(['Fruits' => '🍎', 'Veggies' => '🥬', 'Dairy' => '🥛', 'Bakery' => '🍞', 'Munchies' => '🍿', 'Cold Drinks' => '🥤', 'Instant' => '⚡', 'Cleaning' => '🧹', 'Home' => '🏠', 'Beauty' => '💄', 'Pharma' => '💊', 'Pet' => '🐾'] as $name => $emoji)
-                        <a href="#" class="sidebar-category-item">
-                            <div class="sidebar-category-icon">{{ $emoji }}</div>
-                            <div class="sidebar-category-name">{{ $name }}</div>
-                        </a>
-                    @endforeach
-                @endif
-            </div>
-        </div>
-
         <main style="padding-bottom: 20px;">
             <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
                 <div class="carousel-indicators">
@@ -1240,7 +1140,7 @@
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
                             <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
@@ -1255,18 +1155,23 @@
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
                             <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
                     </div>
                     <!-- Slide 3: Partnership -->
+                    <!-- Slide 3: Hiring / Delivery Theme -->
                     <div class="carousel-item">
-                        <div class="hero-banner hero-banner-alt">
-                            <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
-                            <h2>Unlock Your Potential: Earn Big</h2>
-                            <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                        <div class="hero-banner hero-banner-hiring-3">
+                            <div class="firework fw-1"></div>
+                            <div class="firework fw-2"></div>
+                            <div class="firework fw-3"></div>
+                            <div class="firework fw-4"></div>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                            <h2>We Are Hiring: Secure Your Future</h2>
+                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
@@ -1340,7 +1245,8 @@
                 </div>
             </div>
             <div class="munchies-banner">
-                <h3>⚡ Instant Munchies (Nearby)</h3>
+                <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
+                <h3>⚡ Instant Munchies</h3>
                 <p>Quick snacks and drinks delivered in minutes!</p>
                 <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
             </div>
@@ -1390,72 +1296,6 @@
                     @endforelse
                 </div>
             </div>
-
-            <!-- Food Delivery Section -->
-            <div class="product-rail" style="margin-top: 30px;">
-                <div class="rail-header">
-                    <h5 class="fw-bold mb-0">🍔 Food Delivery</h5>
-                    <a href="{{ route('customer.food.index') }}" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
-                </div>
-                
-                @php
-                    $foodItems = \App\Models\FoodItem::with('hotelOwner')
-                        ->where('is_available', 1)
-                        ->whereNotNull('image')
-                        ->where('image', '!=', '')
-                        ->whereHas('hotelOwner', function($q) {
-                            $now = now();
-                            $currentTime = $now->format('H:i:s');
-                            $today = strtolower($now->format('l'));
-                            $q->where('is_active', true)
-                                ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
-                                ->where('opening_time', '<=', $currentTime)
-                                ->where('closing_time', '>=', $currentTime);
-                        })
-                        ->latest()
-                        ->take(8)
-                        ->get();
-                @endphp
-                
-                <div class="rail-scroll">
-                    @forelse($foodItems as $food)
-                        <div class="product-card-mobile"
-                            onclick="window.location.href='{{ route('customer.food.details', $food->id) }}'">
-                            <div class="pm-image-box" style="position: relative;">
-                                @if($food->first_image_url)
-                                    <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}"
-                                        class="pm-image">
-                                @endif
-                                <span style="position: absolute; top: 5px; right: 5px; background: {{ $food->food_type === 'veg' ? '#48C479' : '#D12939' }}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">
-                                    {{ strtoupper($food->food_type) }}
-                                </span>
-                            </div>
-                            <div class="fs-8 text-muted truncate-1">
-                                {{ $food->hotelOwner ? $food->hotelOwner->restaurant_name : 'Restaurant' }}
-                            </div>
-                            <div class="fs-7 fw-bold truncate-2 mb-1" style="height: 38px;">{{ $food->name }}</div>
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fs-7 fw-bold">₹{{ number_format($food->getFinalPrice(), 0) }}</span>
-                                @if($food->rating)
-                                    <span class="badge" style="background: #48C479; font-size: 0.65rem;">
-                                        ⭐ {{ number_format($food->rating, 1) }}
-                                    </span>
-                                @endif
-                            </div>
-                            <div style="margin-top: 8px;">
-                                <a href="{{ route('customer.food.details', $food->id) }}" 
-                                   class="add-btn" 
-                                   onclick="event.stopPropagation();"
-                                   style="text-align:center; text-decoration:none; display:block;">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="p-3 text-center w-100 text-muted">No food items available right now</div>
-                    @endforelse
-                </div>
-            </div>
         </main>
 
         <nav class="bottom-nav">
@@ -1463,7 +1303,7 @@
                 <i class="bi bi-house-door-fill"></i>
                 <span>Home</span>
             </a>
-            <a href="#" class="nav-link-mobile" onclick="event.preventDefault(); openMobileSidebar();">
+            <a href="{{ route('categories.index') }}" class="nav-link-mobile">
                 <i class="bi bi-grid"></i>
                 <span>Categories</span>
             </a>
@@ -1585,7 +1425,7 @@
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
                                         <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
@@ -1600,18 +1440,23 @@
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
                                         <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
                                 </div>
                                 <!-- Slide 3: Partnership -->
+                                <!-- Slide 3: Hiring / Delivery Theme -->
                                 <div class="carousel-item">
-                                    <div class="hero-banner hero-banner-alt">
-                                        <span class="badge bg-light text-primary mb-2" style="position:relative; z-index:2;">🤝 Partnership</span>
-                                        <h2>Unlock Your Potential: Earn Big</h2>
-                                        <p>Collaborate with the best in the industry. Meaningful work, guaranteed growth.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='/joinus'">
+                                    <div class="hero-banner hero-banner-hiring-3">
+                                        <div class="firework fw-1"></div>
+                                        <div class="firework fw-2"></div>
+                                        <div class="firework fw-3"></div>
+                                        <div class="firework fw-4"></div>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <h2>We Are Hiring: Secure Your Future</h2>
+                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
@@ -1621,7 +1466,8 @@
                     </div>
                     <div class="col-4">
                         <div class="munchies-banner">
-                            <h3>⚡ Instant Munchies (Nearby)</h3>
+                            <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
+                            <h3>⚡ Instant Munchies</h3>
                             <p>Quick snacks and drinks delivered in minutes!</p>
                             <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
                         </div>
@@ -1855,29 +1701,6 @@
                         "Please enable location access";
                 }
             );
-        }
-
-        // Mobile Categories Sidebar Functions
-        function openMobileSidebar() {
-            const sidebar = document.getElementById('mobileCategoriesSidebar');
-            const overlay = document.getElementById('mobileSidebarOverlay');
-            
-            if (sidebar && overlay) {
-                sidebar.classList.add('active');
-                overlay.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
-            }
-        }
-
-        function closeMobileSidebar() {
-            const sidebar = document.getElementById('mobileCategoriesSidebar');
-            const overlay = document.getElementById('mobileSidebarOverlay');
-            
-            if (sidebar && overlay) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
-            }
         }
     </script>
 

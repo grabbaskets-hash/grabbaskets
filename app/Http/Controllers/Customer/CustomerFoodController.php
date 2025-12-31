@@ -415,37 +415,39 @@ class CustomerFoodController extends Controller
     private $razorpayKeyId = 'rzp_live_RZLX30zmmnhHum';
     private $razorpayKeySecret = 'XKmsdH5PbR49EiT74CgehYYi';
 
+   
     public function index(Request $request)
     {
         $now = now();
+        
         $currentTime = $now->format('H:i:s');
         $today = strtolower($now->format('l'));
 
         $categoryMap = [
-            'appetizer' => ['name' => 'Appetizer', 'icon' => 'appetizer.png'],
-            'main_course' => ['name' => 'Main Course', 'icon' => 'main-course.png'],
-            'dessert' => ['name' => 'Dessert', 'icon' => 'dessert.png'],
-            'beverages' => ['name' => 'Beverage', 'icon' => 'beverage.png'],
-            'snack' => ['name' => 'Snack', 'icon' => 'snack.png'],
-            'salad' => ['name' => 'Salad', 'icon' => 'salad.png'],
-            'soup' => ['name' => 'Soup', 'icon' => 'soup.png'],
-            'staters' => ['name' => 'Starters', 'icon' => 'starters.png'],
-            'rice' => ['name' => 'Rice', 'icon' => 'rice.png'],
-            'chicken' => ['name' => 'Chicken', 'icon' => 'chicken.png'],
-            'seefood' => ['name' => 'Seafood', 'icon' => 'seafood.png'],
-            'burger' => ['name' => 'Burger', 'icon' => 'burger.png'],
-            'pizza' => ['name' => 'Pizza', 'icon' => 'pizza.png'],
-            'mutton' => ['name' => 'Mutton', 'icon' => 'mutton.png'],
-            'briyani' => ['name' => 'Briyani', 'icon' => 'biryani.png'],
+            'appetizer'    => ['name' => 'Appetizer',    'icon' => 'appetizer.png'],
+            'main_course'  => ['name' => 'Main Course',  'icon' => 'main-course.png'],
+            'dessert'      => ['name' => 'Dessert',      'icon' => 'dessert.png'],
+            'beverages'    => ['name' => 'Beverage',     'icon' => 'beverage.png'],
+            'snack'        => ['name' => 'Snack',        'icon' => 'snack.png'],
+            'salad'        => ['name' => 'Salad',        'icon' => 'salad.png'],
+            'soup'         => ['name' => 'Soup',         'icon' => 'soup.png'],
+            'staters'      => ['name' => 'Starters',     'icon' => 'starters.png'],
+            'rice'         => ['name' => 'Rice',         'icon' => 'rice.png'],
+            'chicken'      => ['name' => 'Chicken',      'icon' => 'chicken.png'],
+            'seefood'      => ['name' => 'Seafood',      'icon' => 'seafood.png'],
+            'burger'       => ['name' => 'Burger',       'icon' => 'burger.png'],
+            'pizza'        => ['name' => 'Pizza',        'icon' => 'pizza.png'],
+            'mutton'       => ['name' => 'Mutton',       'icon' => 'mutton.png'],
+            'briyani'      => ['name' => 'Briyani',      'icon' => 'biryani.png'],
         ];
 
         $availableCategoryKeys = FoodItem::where('is_available', 1)
             ->distinct()
             ->pluck('category')
-            ->filter(fn($key) => isset($categoryMap[$key]))
+            ->filter(fn ($key) => isset($categoryMap[$key]))
             ->values();
 
-        $foodCategories = $availableCategoryKeys->map(fn($key) => [
+        $foodCategories = $availableCategoryKeys->map(fn ($key) => [
             'id' => $key,
             'name' => $categoryMap[$key]['name'],
             'icon_image' => $categoryMap[$key]['icon'],
@@ -453,13 +455,11 @@ class CustomerFoodController extends Controller
 
         $query = FoodItem::with('hotelOwner')
             ->where('is_available', 1)
-            ->whereNotNull('image') // Only show items with images
-            ->where('image', '!=', '') // Exclude empty strings
             ->whereHas('hotelOwner', function ($q) use ($currentTime, $today) {
                 $q->where('is_active', true)
-                    ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
-                    ->where('opening_time', '<=', $currentTime)
-                    ->where('closing_time', '>=', $currentTime);
+                  ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
+                  ->where('opening_time', '<=', $currentTime)
+                  ->where('closing_time', '>=', $currentTime);
             });
 
         $search = $request->search;
@@ -470,19 +470,16 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category)
-                $query->where('category', $category);
-            if ($veg === '1')
-                $query->where('food_type', 'veg');
-            if ($veg === '0')
-                $query->where('food_type', 'non-veg');
+            if ($category) $query->where('category', $category);
+            if ($veg === '1') $query->where('food_type', 'veg');
+            if ($veg === '0') $query->where('food_type', 'non-veg');
         }
 
         match ($sort) {
-            'costLow' => $query->orderBy('price', 'asc'),
-            'costHigh' => $query->orderBy('price', 'desc'),
-            'ratingHigh' => $query->orderBy('rating', 'desc'),
-            default => $query->latest()
+            'costLow'   => $query->orderBy('price', 'asc'),
+            'costHigh'  => $query->orderBy('price', 'desc'),
+            'ratingHigh'=> $query->orderBy('rating', 'desc'),
+            default     => $query->latest()
         };
 
         $foods = $query->get();
@@ -499,7 +496,7 @@ class CustomerFoodController extends Controller
                 ->filter()
                 ->unique()
                 ->values()
-                ->map(fn($name) => (object) ['id' => $name, 'name' => $name]),
+                ->map(fn ($name) => (object)['id' => $name, 'name' => $name]),
         ];
 
         return view('customer.food.index', compact(
@@ -534,22 +531,15 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category)
-                $query->where('category', $category);
-            if ($vegFilter === '1')
-                $query->where('food_type', 'veg');
-            elseif ($vegFilter === '0')
-                $query->where('food_type', 'non-veg');
+            if ($category) $query->where('category', $category);
+            if ($vegFilter === '1') $query->where('food_type', 'veg');
+            elseif ($vegFilter === '0') $query->where('food_type', 'non-veg');
         }
 
-        if ($sort === 'costLow')
-            $query->orderBy('price', 'asc');
-        elseif ($sort === 'costHigh')
-            $query->orderBy('price', 'desc');
-        elseif ($sort === 'ratingHigh')
-            $query->orderBy('rating', 'desc');
-        else
-            $query->latest();
+        if ($sort === 'costLow') $query->orderBy('price', 'asc');
+        elseif ($sort === 'costHigh') $query->orderBy('price', 'desc');
+        elseif ($sort === 'ratingHigh') $query->orderBy('rating', 'desc');
+        else $query->latest();
 
         $foods = $query->get();
 
