@@ -212,9 +212,9 @@
 
                         <div class="mb-3">
                             <label for="image" class="form-label">Food Image</label>
-                            @if($foodItem->image)
+                            @if($foodItem->first_image_url)
                             <div class="mb-2">
-                                <img src="{{ asset('storage/' . $foodItem->image) }}" alt="{{ $foodItem->name }}"
+                                <img src="{{ $foodItem->first_image_url }}" alt="{{ $foodItem->name }}"
                                     class="img-thumbnail" style="max-height: 150px;">
                                 <p class="small text-muted mt-1">Current image</p>
                             </div>

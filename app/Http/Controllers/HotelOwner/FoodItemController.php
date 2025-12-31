@@ -107,13 +107,23 @@ class FoodItemController extends Controller
             // Auto switch between cloud & local
             $disk = $this->isLaravelCloud() ? 'r2' : 'public';
 
-            $imagePath = $image->storeAs($folder, $filename, $disk);
+            try {
+                $imagePath = $image->storeAs($folder, $filename, $disk);
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+                return back()->with('error', 'Failed to upload image: ' . $e->getMessage())->withInput();
+            }
         }
 
         $validated['image'] = $imagePath;
 
         // ---------------- CREATE FOOD ITEM ----------------
-        FoodItem::create($validated);
+        try {
+            FoodItem::create($validated);
+        } catch (\Exception $e) {
+            Log::error('Food creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to save food item: ' . $e->getMessage())->withInput();
+        }
 
         return redirect()->route('hotel-owner.food-items.index')
             ->with('success', 'Food item created successfully!');

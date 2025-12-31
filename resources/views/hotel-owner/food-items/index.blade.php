@@ -35,8 +35,8 @@
                     <div class="card h-100 shadow-sm">
 
                         {{-- IMAGE --}}
-                        @if($item->image)
-                            <img src="{{ Storage::url($item->image) }}"
+                        @if($item->first_image_url)
+                            <img src="{{ $item->first_image_url }}"
                                  class="card-img-top"
                                  style="height:200px; object-fit:contain;"
                                  alt="{{ $item->name }}">
