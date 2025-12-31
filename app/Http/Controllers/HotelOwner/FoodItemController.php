@@ -38,27 +38,14 @@ class FoodItemController extends Controller
 
     private function isLaravelCloud()
     {
-        // Priority 1: Explicit Laravel Cloud deployment flag
-        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
-            return true;
-        }
+        // Use config() for safety with cached configurations
+        $isProduction = app()->environment('production') || config('app.env') === 'production';
+        
+        $hasR2Config = config('filesystems.disks.r2') !== null;
+        
+        $isExplicitCloud = config('filesystems.disks.r2.driver') === 's3' && !empty(config('filesystems.disks.r2.bucket'));
 
-        // Priority 2: Standard Production Environment
-        if (app()->environment('production')) {
-            return true;
-        }
-
-        // Priority 3: Check URL (legacy check)
-        if (isset($_SERVER['SERVER_NAME']) && str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
-            return true;
-        }
-
-        // Priority 4: Vapor environment
-        if (env('VAPOR_ENVIRONMENT') !== null) {
-            return true;
-        }
-
-        return false;
+        return $isProduction && $hasR2Config && $isExplicitCloud;
     }
     public function store(Request $request)
     {
