@@ -125,14 +125,25 @@ class FoodItem extends Model
         
         // Use serve-image route for AWS/R2 images
         // Determine storage type (r2 for production, public for local)
-        $isLaravelCloud = (
+        $isLaravelCloud = $this->isLaravelCloud();
+        
+        if ($isLaravelCloud) {
+             // Return direct R2 URL if available (preferred for CDN/Public access)
+             return Storage::disk('r2')->url($imagePath);
+             
+             // Fallback to proxy if needed (though direct URL is best)
+             // return url('/serve-image/r2/' . ltrim($imagePath, '/'));
+        }
+        
+        return url('/serve-image/public/' . ltrim($imagePath, '/'));
+    }
+
+    private function isLaravelCloud() {
+        return (
             env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
             app()->environment('production') ||
             (isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
         );
-        $type = $isLaravelCloud ? 'r2' : 'public';
-        
-        return url('/serve-image/' . $type . '/' . ltrim($imagePath, '/'));
     }
     
     /**
