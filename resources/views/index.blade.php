@@ -142,23 +142,156 @@
             background: linear-gradient(135deg, var(--primary-light), #7b2cbf);
         }
 
-        /* Auth buttons */
-        .auth-name {
-            color: var(--primary);
-            font-weight: 700;
-            text-decoration: none;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.95);
-            transition: all 0.3s ease;
-            display: inline-flex;
+        /* Mobile Header Redesign Styles */
+        .mobile-only .mobile-header {
+            padding: 15px 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .mobile-menu-trigger {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .mobile-icon-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .mobile-profile-link img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .mobile-search-wrapper {
+            margin-top: 10px;
+        }
+
+        .search-bar-modern {
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar-modern i {
+            color: #6a11cb;
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+
+        .search-bar-modern input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Quick Services Grid */
+        .quick-services-section {
+            padding: 20px 15px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .service-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            padding: 12px 5px;
+            border-radius: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-tile:active {
+            transform: scale(0.92);
+        }
+
+        .tile-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .tile-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2;
+            color: #444;
+        }
+
+        .grocery-tile { border: 1px solid #e1f5fe; background: #f1faff; }
+        .food-tile { border: 1px solid #fff3e0; background: #fff8eb; }
+        .meat-tile { border: 1px solid #ffebee; background: #fff5f6; }
+        .library-tile { border: 1px solid #f3e5f5; background: #f9f2fa; }
+
+        .mobile-main-content {
+            padding-bottom: 80px;
+        }
+
+        /* Responsive Categories */
+        .category-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 15px 25px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .category-grid::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-icon-box {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
         }
 
         .auth-name i {
@@ -1220,44 +1353,69 @@
     <!-- MOBILE VIEW -->
     <div class="mobile-only">
         <div class="mobile-header navbar-gradient">
-            <div class="d-flex align-items-center justify-content-between">
-                <a href="{{ route('home') }}" class="brand-mobile">
-                    <i class="bi bi-bag-check-fill"></i> GrabBaskets
-                </a>
+            <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="d-flex align-items-center">
-                    <div class="mobile-icons">
-                        <a href="#" class="icon-btn" title="Join With Us">
-                            <i class="bi bi-shop"></i>
-                        </a>
-                        <a href="{{ route('cart.index') }}" class="icon-btn" title="Cart">
-                            <i class="bi bi-cart3"></i>
-                        </a>
-                    </div>
+                    <button class="mobile-menu-trigger me-2">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <a href="{{ route('home') }}" class="brand-mobile">
+                        <i class="bi bi-bag-check-fill ms-1"></i> GrabBaskets
+                    </a>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('cart.index') }}" class="mobile-icon-btn position-relative">
+                        <i class="bi bi-cart3"></i>
+                        @auth
+                            @php $cartCount = \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity'); @endphp
+                            @if($cartCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                    {{ $cartCount }}
+                                </span>
+                            @endif
+                        @endauth
+                    </a>
                     @auth
-                        <div class="mobile-auth-group">
-                            <a href="{{ route('profile.show') }}" class="auth-name"
-                                style="font-size: 0.95rem;">{{ Auth::user()->name }}</a>
-                            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="mobile-logout-btn" title="Logout">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                </button>
-                            </form>
-                        </div>
+                        <a href="{{ route('profile.show') }}" class="mobile-profile-link">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=fff&color=6a11cb" alt="User">
+                        </a>
                     @else
-                        <a href="{{ route('login') }}" class="icon-btn" title="Login">
-                            <i class="bi bi-person-fill"></i>
+                        <a href="{{ route('login') }}" class="mobile-icon-btn">
+                            <i class="bi bi-person-circle"></i>
                         </a>
                     @endauth
                 </div>
             </div>
-            <form action="{{ route('products.index') }}" method="GET" class="search-bar-container">
-                <input type="text" name="q" class="search-input" placeholder="Search for products...">
-                <i class="bi bi-search search-icon"></i>
-            </form>
+            
+            <div class="mobile-search-wrapper">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-modern">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="q" placeholder="Search for groceries, food & more..." autocomplete="off">
+                </form>
+            </div>
         </div>
 
-        <main style="padding-bottom: 20px;">
+        <main class="mobile-main-content">
+            <!-- Quick Services Section -->
+            <section class="quick-services-section">
+                <div class="services-grid">
+                    <a href="#" class="service-tile grocery-tile">
+                        <div class="tile-icon">🛒</div>
+                        <div class="tile-label">10 Mins<br>Delivery</div>
+                    </a>
+                    <a href="{{ route('customer.food.index') }}" class="service-tile food-tile">
+                        <div class="tile-icon">🥘</div>
+                        <div class="tile-label">Delicious<br>Food</div>
+                    </a>
+                    <a href="#" class="service-tile meat-tile">
+                        <div class="tile-icon">🥩</div>
+                        <div class="tile-label">Fish &<br>Meat</div>
+                    </a>
+                    <a href="#" class="service-tile library-tile">
+                        <div class="tile-icon">📚</div>
+                        <div class="tile-label">Library &<br>Books</div>
+                    </a>
+                </div>
+            </section>
             <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -1332,23 +1490,9 @@
                 @endif
             </div>
 
-            <div class="product-rail"><div class="food-promo-section">
-                    <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
-                        <div class="food-promo-card">
-                            <div class="food-promo-content">
-                                <div class="food-badge">
-                                    <i class="bi bi-fire"></i> Hot & Fresh
-                                </div>
-                                <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
-                                <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
-                                <span class="cta-food-btn">
-                                    Order Now <i class="bi bi-arrow-right"></i>
-                                </span>
-                            </div>
-                            <div class="food-promo-image">
-                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
-                            </div>
-                
+
+
+            <div class="product-rail">
                 <div class="rail-header">
                     <h5 class="fw-bold mb-0">🔥 Trending Now</h5>
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
@@ -1449,26 +1593,7 @@
                 </div>
             </div>
 
-            <!-- Food Order Promotion -->
-            <div class="food-promo-section">
-                <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
-                    <div class="food-promo-card">
-                        <div class="food-promo-content">
-                            <div class="food-badge">
-                                <i class="bi bi-fire"></i> Hot & Fresh
-                            </div>
-                            <h2 class="promo-title">Delicious Food Delivered To You</h2>
-                            <p class="promo-text">Restaurants, Cafes and Local Kitchens - All in one place.</p>
-                            <span class="cta-food-btn">
-                                Order Now <i class="bi bi-arrow-right"></i>
-                            </span>
-                        </div>
-                        <div class="food-promo-image">
-                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
-                        </div>
-                    </div>
-                </a>
-            </div>
+
         </main>
 
         <nav class="bottom-nav">
