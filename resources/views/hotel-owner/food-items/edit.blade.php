@@ -214,8 +214,11 @@
                             <label for="image" class="form-label">Food Image</label>
                             @if($foodItem->first_image_url)
                             <div class="mb-2">
-                                <img src="{{ $foodItem->first_image_url }}" alt="{{ $foodItem->name }}"
-                                    class="img-thumbnail" style="max-height: 150px;">
+                                <img src="{{ $foodItem->first_image_url }}"
+                                     alt="{{ $foodItem->name }}"
+                                     class="img-thumbnail"
+                                     style="max-height: 150px;"
+                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Error+Loading';">
                                 <p class="small text-muted mt-1">Current image</p>
                             </div>
                             @endif
