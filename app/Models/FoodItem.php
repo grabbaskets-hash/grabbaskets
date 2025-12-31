@@ -123,16 +123,14 @@ class FoodItem extends Model
             return asset($imagePath);
         }
         
-        // Use serve-image route for AWS/R2 images
-        // Determine storage type (r2 for production, public for local)
-        $isLaravelCloud = $this->isLaravelCloud();
+        $isCloud = $this->isLaravelCloud();
         
-        if ($isLaravelCloud) {
+        if ($isCloud) {
              try {
-                 // Return direct R2 URL if available (preferred for CDN/Public access)
+                 // Return direct R2 URL if available
                  return Storage::disk('r2')->url($imagePath);
              } catch (\Throwable $e) {
-                 // Fallback to proxy if R2 disk is not configured correctly or fails
+                 // Fallback to proxy
                  return url('/serve-image/r2/' . ltrim($imagePath, '/'));
              }
         }
@@ -141,15 +139,14 @@ class FoodItem extends Model
     }
 
     private function isLaravelCloud() {
-        // Only classify as cloud if we can successfully load the R2 disk config
-        // AND we are in an appropriate environment
-        $isEnvMatch = (
-            env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
-            app()->environment('production') ||
-            (isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
-        );
+        // Use config() for safety with cached configurations
+        $isProduction = app()->environment('production') || config('app.env') === 'production';
         
-        return $isEnvMatch && config('filesystems.disks.r2');
+        $hasR2Config = config('filesystems.disks.r2') !== null;
+        
+        $isExplicitCloud = config('filesystems.disks.r2.driver') === 's3' && !empty(config('filesystems.disks.r2.bucket'));
+
+        return $isProduction && $hasR2Config && $isExplicitCloud;
     }
     
     /**
