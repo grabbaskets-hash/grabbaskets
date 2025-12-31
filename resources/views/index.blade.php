@@ -1078,6 +1078,140 @@
         .location-tracker:hover {
             opacity: 0.8;
         }
+
+        /* Food Promo Section - Premium Design */
+        .food-promo-section {
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+
+        .food-promo-card {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF2D00 100%);
+            border-radius: 30px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(255, 107, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .food-promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(255, 107, 0, 0.4);
+        }
+
+        .food-promo-content {
+            flex: 1;
+            z-index: 2;
+            color: white;
+            text-align: left;
+        }
+
+        .food-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .promo-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1.1;
+            color: white !important;
+            text-shadow: none !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        .promo-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 450px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-food-btn {
+            background: white;
+            color: #FF6B00;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-food-btn:hover {
+            transform: scale(1.05);
+            background: #fff;
+            color: #FF2D00;
+        }
+
+        .food-promo-image {
+            flex: 0 0 300px;
+            height: 300px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .food-promo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            transform: rotate(5deg);
+            box-shadow: -20px 20px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s ease;
+        }
+
+        .food-promo-card:hover .food-promo-image img {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        @media (max-width: 991px) {
+            .food-promo-section {
+                margin: 40px 15px;
+            }
+            .food-promo-card {
+                flex-direction: column;
+                padding: 30px;
+                text-align: center;
+            }
+            .food-promo-content {
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            .promo-title {
+                font-size: 1.8rem;
+            }
+            .promo-text {
+                margin: 0 auto 20px;
+                font-size: 1rem;
+            }
+            .food-promo-image {
+                flex: 0 0 220px;
+                height: 220px;
+                width: 220px;
+            }
+            .food-promo-image img {
+                transform: rotate(0deg);
+            }
+        }
     </style>
 </head>
 
@@ -1295,6 +1429,27 @@
                         <div class="p-3 text-center w-100 text-muted">No items available</div>
                     @endforelse
                 </div>
+            </div>
+
+            <!-- Food Order Promotion -->
+            <div class="food-promo-section">
+                <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                    <div class="food-promo-card">
+                        <div class="food-promo-content">
+                            <div class="food-badge">
+                                <i class="bi bi-fire"></i> Hot & Fresh
+                            </div>
+                            <h2 class="promo-title">Delicious Food Delivered To You</h2>
+                            <p class="promo-text">Restaurants, Cafes and Local Kitchens - All in one place.</p>
+                            <span class="cta-food-btn">
+                                Order Now <i class="bi bi-arrow-right"></i>
+                            </span>
+                        </div>
+                        <div class="food-promo-image">
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
+                        </div>
+                    </div>
+                </a>
             </div>
         </main>
 
@@ -1569,6 +1724,27 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+
+                <!-- Food Order Promotion -->
+                <div class="food-promo-section">
+                    <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                        <div class="food-promo-card">
+                            <div class="food-promo-content">
+                                <div class="food-badge">
+                                    <i class="bi bi-fire"></i> Hot & Fresh
+                                </div>
+                                <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
+                                <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
+                                <span class="cta-food-btn">
+                                    Order Now <i class="bi bi-arrow-right"></i>
+                                </span>
+                            </div>
+                            <div class="food-promo-image">
+                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </main>
         </div>

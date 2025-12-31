@@ -103,9 +103,6 @@ class FoodItem extends Model
     /**
      * Get image URL from AWS/R2 or serve-image route
      */
-    /**
-     * Get image URL from AWS/R2 or serve-image route
-     */
     private function getImageUrl($imagePath)
     {
         if (empty($imagePath)) {
@@ -127,22 +124,28 @@ class FoodItem extends Model
         if (str_starts_with($cleanPath, 'images/')) {
             return asset($cleanPath);
         }
-
-        // Use direct R2 public URL (Laravel Cloud) - Matches Product model logic
-        $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
-        return "{$r2PublicUrl}/{$cleanPath}";
+        
+        $isCloud = $this->isLaravelCloud();
+        
+        if ($isCloud) {
+            // Use direct URL only if a public URL (CDN/Custom Domain) is explicitly configured
+            $r2PublicUrl = config('filesystems.disks.r2.url');
+            if (!empty($r2PublicUrl)) {
+                try {
+                    return Storage::disk('r2')->url($cleanPath);
+                } catch (\Throwable $e) {
+                    // Fallback to proxy
+                }
+            }
+            // Use relative path to ensure it works across different domains/environments
+            return '/serve-image/r2/' . $cleanPath;
+        }
+        
+        return '/serve-image/public/' . $cleanPath;
     }
 
-    private function isLaravelCloud()
-    {
-        // Use config() for safety with cached configurations
-        $isProduction = app()->environment('production') || config('app.env') === 'production';
-
-        $hasR2Config = config('filesystems.disks.r2') !== null;
-
-        $isExplicitCloud = config('filesystems.disks.r2.driver') === 's3' && !empty(config('filesystems.disks.r2.bucket'));
-
-        return $isProduction && $hasR2Config && $isExplicitCloud;
+    private function isLaravelCloud() {
+        return !empty(config('filesystems.disks.r2.bucket'));
     }
 
     /**

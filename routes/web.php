@@ -1079,28 +1079,28 @@ Route::get('/debug-bulk-system', function () {
 // Log facade is available via global alias; explicit import not required here
 
 Route::get('/serve-image/{type}/{path}', function ($type, $path) {
-    Log::info("/serve-image route hit", ['type' => $type, 'path' => $path]);
-    // Wrap the entire closure in try/catch for error logging
+    // Force a log entry even if others fail
+    \Log::info("DEBUG: /serve-image hit", ['type' => $type, 'path' => $path]);
+    
     try {
-        // Validate allowed types
         $allowedTypes = ['products', 'public', 'library', 'r2'];
         if (!in_array($type, $allowedTypes, true)) {
-            Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
+            \Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
             return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
         }
 
-        // Normalize the storage-relative path
         $leafPath = ltrim($path, '/');
+        $storagePath = $leafPath;
+        
         if ($type === 'public') {
             $storagePath = preg_replace('/^public\//', '', $leafPath);
         } elseif ($type === 'library') {
             $storagePath = 'library/' . $leafPath;
-        } elseif ($type === 'r2') {
-            $storagePath = $leafPath;
-        } else {
-            // products
+        } elseif ($type === 'products') {
             $storagePath = 'products/' . $leafPath;
         }
+        
+        \Log::info("/serve-image: Resolved storage path", ['storagePath' => $storagePath, 'type' => $type]);
 
         // Try public disk first
         try {

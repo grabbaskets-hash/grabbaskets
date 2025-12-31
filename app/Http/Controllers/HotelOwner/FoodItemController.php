@@ -39,14 +39,7 @@ class FoodItemController extends Controller
 
     private function isLaravelCloud()
     {
-        // Use config() for safety with cached configurations
-        $isProduction = app()->environment('production') || config('app.env') === 'production';
-        
-        $hasR2Config = config('filesystems.disks.r2') !== null;
-        
-        $isExplicitCloud = config('filesystems.disks.r2.driver') === 's3' && !empty(config('filesystems.disks.r2.bucket'));
-
-        return $isProduction && $hasR2Config && $isExplicitCloud;
+        return !empty(config('filesystems.disks.r2.bucket'));
     }
     public function store(Request $request)
     {
