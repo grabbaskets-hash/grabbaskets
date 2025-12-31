@@ -368,9 +368,10 @@
                 <!-- Left: Image -->
                 <div class="col-md-5 product-gallery">
                     <div class="main-image-wrapper">
-                        @if($food->first_image_url)
-                            <img src="{{ $food->first_image_url }}" class="main-image" alt="{{ $food->name }}">
-                        @endif
+                        <img src="{{ $food->first_image_url ?: 'https://via.placeholder.com/600x400?text=' . urlencode($food->name) }}" 
+                             class="main-image" 
+                             alt="{{ $food->name }}"
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=No+Image';">
                     </div>
                     <!-- Thumbnails for multiple images -->
                     @if(!empty($food->image_urls) && count($food->image_urls) > 1)
@@ -458,9 +459,10 @@
                 @forelse($recommended as $item)
                 <div class="col">
                     <a href="{{ route('customer.food.details', $item->id) }}" class="related-card">
-                        @if($item->first_image_url)
-                            <img src="{{ $item->first_image_url }}" class="related-img" alt="{{ $item->name }}">
-                        @endif
+                        <img src="{{ $item->first_image_url ?: 'https://via.placeholder.com/300x200?text=' . urlencode($item->name) }}" 
+                             class="related-img" 
+                             alt="{{ $item->name }}"
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=No+Image';">
                         <div class="related-body">
                             <div class="related-title">{{ $item->name }}</div>
                             <div class="d-flex justify-content-between align-items-center mt-1">

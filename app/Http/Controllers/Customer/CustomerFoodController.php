@@ -455,6 +455,8 @@ class CustomerFoodController extends Controller
 
         $query = FoodItem::with('hotelOwner')
             ->where('is_available', 1)
+            ->whereNotNull('image') // Only show items with images
+            ->where('image', '!=', '') // Exclude empty strings
             ->whereHas('hotelOwner', function ($q) use ($currentTime, $today) {
                 $q->where('is_active', true)
                   ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
@@ -485,11 +487,21 @@ class CustomerFoodController extends Controller
         $foods = $query->get();
 
         $activeCategoryKey = $category ?: ($foodCategories->first()['id'] ?? null);
-        $categoryFoods = $foods->where('category', $activeCategoryKey);
+        
+        // Use empty string placeholder if null
+        $safeName = 'All';
+        if ($activeCategoryKey && isset($categoryMap[$activeCategoryKey])) {
+            $safeName = $categoryMap[$activeCategoryKey]['name'];
+        }
+
+        $categoryFoods = $foods; // Default to all if not specifically targeted
+        if ($category) {
+            $categoryFoods = $foods->where('category', $category);
+        }
 
         $activeCategory = (object) [
             'id' => $activeCategoryKey,
-            'name' => $categoryMap[$activeCategoryKey]['name'] ?? 'All',
+            'name' => $safeName,
             'tenMinProducts' => $categoryFoods,
             'filteredSubcategories' => $categoryFoods
                 ->pluck('subcategory')

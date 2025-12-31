@@ -794,7 +794,9 @@ gap: 4px;
             @forelse($foods as $food)
                 <a href="{{ route('customer.food.details', $food->id) }}" class="premium-food-card">
                     <div class="card-img-container">
-                        <img src="{{ $food->first_image_url }}" alt="{{ $food->name }}">
+                        <img src="{{ $food->first_image_url ?: 'https://via.placeholder.com/480x300?text=' . urlencode($food->name) }}" 
+                             alt="{{ $food->name }}"
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/480x300?text=No+Image';">
                         
                         <div class="img-overlay-gradient"></div>
                         

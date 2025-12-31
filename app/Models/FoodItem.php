@@ -110,7 +110,7 @@ class FoodItem extends Model
             return 'https://via.placeholder.com/480x300?text=No+Image';
         }
         
-        // Normalize slashes
+        // Normalize slashes (replace all backslashes with forward slashes)
         $imagePath = str_replace('\\', '/', $imagePath);
         
         // If already a full URL, return as is
@@ -118,24 +118,27 @@ class FoodItem extends Model
             return $imagePath;
         }
         
+        // Remove any leading slashes for cloud storage path consistency
+        $cleanPath = ltrim($imagePath, '/');
+
         // Check if it's a static public image
-        if (str_starts_with($imagePath, 'images/')) {
-            return asset($imagePath);
+        if (str_starts_with($cleanPath, 'images/')) {
+            return asset($cleanPath);
         }
         
         $isCloud = $this->isLaravelCloud();
         
         if ($isCloud) {
              try {
-                 // Return direct R2 URL if available
-                 return Storage::disk('r2')->url($imagePath);
+                 // Return direct R2 URL if available. Ensure no leading slash for the key.
+                 return Storage::disk('r2')->url($cleanPath);
              } catch (\Throwable $e) {
                  // Fallback to proxy
-                 return url('/serve-image/r2/' . ltrim($imagePath, '/'));
+                 return url('/serve-image/r2/' . $cleanPath);
              }
         }
         
-        return url('/serve-image/public/' . ltrim($imagePath, '/'));
+        return url('/serve-image/public/' . $cleanPath);
     }
 
     private function isLaravelCloud() {
