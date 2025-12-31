@@ -418,6 +418,7 @@ class CustomerFoodController extends Controller
     public function index(Request $request)
     {
         $now = now();
+        
         $currentTime = $now->format('H:i:s');
         $today = strtolower($now->format('l'));
 
