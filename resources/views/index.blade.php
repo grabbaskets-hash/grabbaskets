@@ -1216,6 +1216,7 @@
 </head>
 
 <body>
+
     <!-- MOBILE VIEW -->
     <div class="mobile-only">
         <div class="mobile-header navbar-gradient">
@@ -1330,7 +1331,24 @@
                     @endforeach
                 @endif
             </div>
-            <div class="product-rail">
+
+            <div class="product-rail"><div class="food-promo-section">
+                    <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                        <div class="food-promo-card">
+                            <div class="food-promo-content">
+                                <div class="food-badge">
+                                    <i class="bi bi-fire"></i> Hot & Fresh
+                                </div>
+                                <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
+                                <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
+                                <span class="cta-food-btn">
+                                    Order Now <i class="bi bi-arrow-right"></i>
+                                </span>
+                            </div>
+                            <div class="food-promo-image">
+                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
+                            </div>
+                
                 <div class="rail-header">
                     <h5 class="fw-bold mb-0">🔥 Trending Now</h5>
                     <a href="#" class="text-primary text-decoration-none fs-7 fw-bold">See All</a>
