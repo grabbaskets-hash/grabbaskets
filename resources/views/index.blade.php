@@ -249,6 +249,120 @@
             margin-bottom: 8px;
         }
 
+        /* Mobile Category Drawer Styles */
+        .mobile-category-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        .mobile-category-drawer.active {
+            left: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .drawer-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-right-radius: 25px;
+        }
+
+        .drawer-header h5 {
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .close-drawer {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 15px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            background: #f8f9fa;
+        }
+
+        .drawer-item:active {
+            background: #e9ecef;
+            transform: scale(0.98);
+        }
+
+        .drawer-item .item-emoji {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 45px;
+            height: 45px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .drawer-item .item-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Hide category grid on mobile home */
+        .mobile-only .category-grid {
+            display: none !important;
+        }
+
         .tile-label {
             font-size: 0.7rem;
             font-weight: 700;
@@ -1471,24 +1585,7 @@
                     </div>
                 </div>
             </div>
-            <div class="category-grid">
-                @foreach(($categories ?? []) as $cat)
-                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="category-item">
-                        <div class="cat-icon-box shadow-sm-custom">
-                            {{ $cat->emoji ?? '🥬' }}
-                        </div>
-                        <span class="fs-8 fw-semibold truncate-1">{{ $cat->name ?? 'Category' }}</span>
-                    </a>
-                @endforeach
-                @if(count($categories ?? []) == 0)
-                    @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning', 'Home', 'Beauty', 'Pharma', 'Pet'] as $dummy)
-                        <a href="#" class="category-item">
-                            <div class="cat-icon-box shadow-sm-custom">📦</div>
-                            <span class="fs-8 fw-semibold truncate-1">{{ $dummy }}</span>
-                        </a>
-                    @endforeach
-                @endif
-            </div>
+
 
 
 
@@ -1601,7 +1698,7 @@
                 <i class="bi bi-house-door-fill"></i>
                 <span>Home</span>
             </a>
-            <a href="{{ route('categories.index') }}" class="nav-link-mobile">
+            <a href="javascript:void(0)" onclick="toggleCategoryDrawer()" class="nav-link-mobile">
                 <i class="bi bi-grid"></i>
                 <span>Categories</span>
             </a>
@@ -1893,7 +1990,48 @@
         </div>
     </div>
 
+    <!-- Mobile Category Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleCategoryDrawer()"></div>
+    <div class="mobile-category-drawer" id="categoryDrawer">
+        <div class="drawer-header">
+            <h5><i class="bi bi-grid-fill me-2"></i> Categories</h5>
+            <button class="close-drawer" onclick="toggleCategoryDrawer()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="drawer-body">
+            @foreach(($categories ?? []) as $cat)
+                <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-item">
+                    <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
+                    <div class="item-text">{{ $cat->name ?? 'Category' }}</div>
+                </a>
+            @endforeach
+            @if(count($categories ?? []) == 0)
+                @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning', 'Home', 'Beauty', 'Pharma', 'Pet'] as $dummy)
+                    <a href="#" class="drawer-item">
+                        <div class="item-emoji">📦</div>
+                        <div class="item-text">{{ $dummy }}</div>
+                    </a>
+                @endforeach
+            @endif
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script>
+        function toggleCategoryDrawer() {
+            const drawer = document.getElementById('categoryDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (drawer.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/location-delivery.js') }}"></script>
     <script>
