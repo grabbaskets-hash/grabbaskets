@@ -71,8 +71,6 @@ class FoodItemController extends Controller
             'is_available' => 'boolean',
             'is_popular' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'serves' => 'nullable|integer|min:1',
-            'is_featured' => 'boolean',
         ]);
 
         // ---------------- AUTH ----------------
@@ -83,8 +81,10 @@ class FoodItemController extends Controller
 
         $validated['hotel_owner_id'] = $hotelOwner->id;
         $validated['is_available'] = $request->boolean('is_available', true);
-        $validated['is_popular'] = $request->boolean('is_popular', false);
-        $validated['is_featured'] = $request->boolean('is_featured', false);
+        $validated['is_popular'] = $request->boolean('is_featured', false);
+
+        // Remove image from validated to handle it separately
+        unset($validated['image']);
 
         // ---------------- IMAGE UPLOAD (CLOUD READY) ----------------
         $imagePath = null;
@@ -107,8 +107,10 @@ class FoodItemController extends Controller
                 return back()->with('error', 'Failed to upload image: ' . $e->getMessage())->withInput();
             }
         }
-
-        $validated['image'] = $imagePath;
+        
+        if ($imagePath) {
+            $validated['image'] = $imagePath;
+        }
 
         // ---------------- CREATE FOOD ITEM ----------------
         try {
@@ -163,8 +165,6 @@ class FoodItemController extends Controller
         'is_available' => 'boolean',
         'is_popular' => 'boolean',
         'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        'serves' => 'nullable|integer|min:1',
-        'is_featured' => 'boolean',
     ]);
 
     // ---------------- AUTH ----------------
@@ -173,9 +173,14 @@ class FoodItemController extends Controller
         return back()->with('error', 'Authentication error');
     }
 
+    $validated['is_available'] = $request->boolean('is_available');
+    $validated['is_popular'] = $request->boolean('is_featured');
+
+    // Remove image from validated to handle it separately
+    unset($validated['image']);
+
     // ---------------- IMAGE UPDATE ----------------
     if ($request->hasFile('image')) {
-
         // Auto disk selection (local / cloud)
         $disk = $this->isLaravelCloud() ? 'r2' : 'public';
 
@@ -198,10 +203,6 @@ class FoodItemController extends Controller
             return back()->with('error', 'Failed to upload new image: ' . $e->getMessage())->withInput();
         }
     }
-
-    $validated['is_available'] = $request->boolean('is_available');
-    $validated['is_popular'] = $request->boolean('is_popular');
-    $validated['is_featured'] = $request->boolean('is_featured');
 
     // ---------------- UPDATE FOOD ITEM ----------------
     try {

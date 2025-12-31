@@ -29,9 +29,7 @@ class FoodItem extends Model
         'rating',
         'total_orders',
         'sort_order',
-        'image', // ✅ REQUIRED
-        'serves',
-        'is_featured',
+        'image',
     ];
 
     protected $casts = [
@@ -42,8 +40,6 @@ class FoodItem extends Model
         'rating' => 'decimal:2',
         'is_available' => 'boolean',
         'is_popular' => 'boolean',
-        'serves' => 'integer',
-        'is_featured' => 'boolean',
     ];
 
     // Relationships
