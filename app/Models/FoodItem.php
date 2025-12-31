@@ -110,6 +110,9 @@ class FoodItem extends Model
             return 'https://via.placeholder.com/480x300?text=No+Image';
         }
         
+        // Normalize slashes
+        $imagePath = str_replace('\\', '/', $imagePath);
+        
         // If already a full URL, return as is
         if (strpos($imagePath, 'http') === 0) {
             return $imagePath;

@@ -511,7 +511,20 @@ class CustomerFoodController extends Controller
 
     public function ajaxIndex(Request $request)
     {
-        $query = FoodItem::with('hotelOwner')->where('is_available', 1);
+        $now = now();
+        $currentTime = $now->format('H:i:s');
+        $today = strtolower($now->format('l'));
+
+        $query = FoodItem::with('hotelOwner')
+            ->where('is_available', 1)
+            ->whereNotNull('image') // Only show items with images
+            ->where('image', '!=', '') // Exclude empty strings
+            ->whereHas('hotelOwner', function ($q) use ($currentTime, $today) {
+                $q->where('is_active', true)
+                    ->whereRaw("JSON_CONTAINS(operating_days, '" . json_encode($today) . "')")
+                    ->where('opening_time', '<=', $currentTime)
+                    ->where('closing_time', '>=', $currentTime);
+            });
 
         $search = $request->input('search');
         $category = $request->input('category');

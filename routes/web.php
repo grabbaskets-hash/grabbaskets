@@ -1083,7 +1083,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     // Wrap the entire closure in try/catch for error logging
     try {
         // Validate allowed types
-        $allowedTypes = ['products', 'public', 'library'];
+        $allowedTypes = ['products', 'public', 'library', 'r2'];
         if (!in_array($type, $allowedTypes, true)) {
             Log::warning("/serve-image: Invalid type", ['type' => $type, 'path' => $path]);
             return response()->json(['error' => 'Invalid type', 'type' => $type], 404);
@@ -1095,6 +1095,8 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
             $storagePath = preg_replace('/^public\//', '', $leafPath);
         } elseif ($type === 'library') {
             $storagePath = 'library/' . $leafPath;
+        } elseif ($type === 'r2') {
+            $storagePath = $leafPath;
         } else {
             // products
             $storagePath = 'products/' . $leafPath;
