@@ -128,22 +128,28 @@ class FoodItem extends Model
         $isLaravelCloud = $this->isLaravelCloud();
         
         if ($isLaravelCloud) {
-             // Return direct R2 URL if available (preferred for CDN/Public access)
-             return Storage::disk('r2')->url($imagePath);
-             
-             // Fallback to proxy if needed (though direct URL is best)
-             // return url('/serve-image/r2/' . ltrim($imagePath, '/'));
+             try {
+                 // Return direct R2 URL if available (preferred for CDN/Public access)
+                 return Storage::disk('r2')->url($imagePath);
+             } catch (\Throwable $e) {
+                 // Fallback to proxy if R2 disk is not configured correctly or fails
+                 return url('/serve-image/r2/' . ltrim($imagePath, '/'));
+             }
         }
         
         return url('/serve-image/public/' . ltrim($imagePath, '/'));
     }
 
     private function isLaravelCloud() {
-        return (
+        // Only classify as cloud if we can successfully load the R2 disk config
+        // AND we are in an appropriate environment
+        $isEnvMatch = (
             env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
             app()->environment('production') ||
             (isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
         );
+        
+        return $isEnvMatch && config('filesystems.disks.r2');
     }
     
     /**
