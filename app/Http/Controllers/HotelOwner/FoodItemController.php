@@ -184,23 +184,33 @@ class FoodItemController extends Controller
         // Auto disk selection (local / cloud)
         $disk = $this->isLaravelCloud() ? 'r2' : 'public';
 
-        // Delete old image if exists
-        if ($foodItem->image && \Storage::disk($disk)->exists($foodItem->image)) {
-            \Storage::disk($disk)->delete($foodItem->image);
+        try {
+            // Delete old image if exists
+            if ($foodItem->image && \Storage::disk($disk)->exists($foodItem->image)) {
+                \Storage::disk($disk)->delete($foodItem->image);
+            }
+
+            $image = $request->file('image');
+            $folder = 'food-items/hotel-' . $hotelOwner->id;
+
+            $filename = Str::slug(
+                pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+            ) . '-' . time() . '.' . $image->getClientOriginalExtension();
+
+            $validated['image'] = $image->storeAs($folder, $filename, $disk);
+        } catch (\Exception $e) {
+            Log::error('Image update failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to upload new image: ' . $e->getMessage())->withInput();
         }
-
-        $image = $request->file('image');
-        $folder = 'food-items/hotel-' . $hotelOwner->id;
-
-        $filename = Str::slug(
-            pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-        ) . '-' . time() . '.' . $image->getClientOriginalExtension();
-
-        $validated['image'] = $image->storeAs($folder, $filename, $disk);
     }
 
     // ---------------- UPDATE FOOD ITEM ----------------
-    $foodItem->update($validated);
+    try {
+        $foodItem->update($validated);
+    } catch (\Exception $e) {
+        Log::error('Food update failed: ' . $e->getMessage());
+        return back()->with('error', 'Failed to update food item: ' . $e->getMessage())->withInput();
+    }
 
     return redirect()->route('hotel-owner.food-items.index')
         ->with('success', 'Food item updated successfully!');
