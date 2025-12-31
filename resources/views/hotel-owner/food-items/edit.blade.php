@@ -149,7 +149,7 @@
                                 <select class="form-select @error('food_type') is-invalid @enderror" id="food_type" name="food_type" required>
                                     <option value="">Select Type</option>
                                     <option value="veg" {{ old('food_type', $foodItem->food_type) == 'veg' ? 'selected' : '' }}>Vegetarian</option>
-                                    <option value="non_veg" {{ old('food_type', $foodItem->food_type) == 'non_veg' ? 'selected' : '' }}>Non-Vegetarian</option>
+                                    <option value="non-veg" {{ old('food_type', $foodItem->food_type) == 'non-veg' ? 'selected' : '' }}>Non-Vegetarian</option>
                                 </select>
                                 @error('food_type')
                                 <div class="invalid-feedback">{{ $message }}</div>

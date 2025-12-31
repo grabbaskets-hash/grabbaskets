@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\FoodItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FoodItemController extends Controller
 {
@@ -61,7 +62,7 @@ class FoodItemController extends Controller
             'price' => 'required|numeric|min:0',
             'discounted_price' => 'nullable|numeric|min:0',
             'category' => 'required|string|max:100',
-            'food_type' => 'required|in:veg,non_veg,vegan',
+            'food_type' => 'required|in:veg,non-veg,vegan',
             'preparation_time' => 'nullable|integer|min:1',
             'ingredients' => 'nullable|string',
             'spice_level' => 'nullable|in:mild,medium,hot,very_hot',
@@ -70,6 +71,8 @@ class FoodItemController extends Controller
             'is_available' => 'boolean',
             'is_popular' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'serves' => 'nullable|integer|min:1',
+            'is_featured' => 'boolean',
         ]);
 
         // ---------------- AUTH ----------------
@@ -79,6 +82,9 @@ class FoodItemController extends Controller
         }
 
         $validated['hotel_owner_id'] = $hotelOwner->id;
+        $validated['is_available'] = $request->boolean('is_available', true);
+        $validated['is_popular'] = $request->boolean('is_popular', false);
+        $validated['is_featured'] = $request->boolean('is_featured', false);
 
         // ---------------- IMAGE UPLOAD (CLOUD READY) ----------------
         $imagePath = null;
@@ -96,7 +102,7 @@ class FoodItemController extends Controller
 
             try {
                 $imagePath = $image->storeAs($folder, $filename, $disk);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Log::error('Image upload failed: ' . $e->getMessage());
                 return back()->with('error', 'Failed to upload image: ' . $e->getMessage())->withInput();
             }
@@ -107,7 +113,7 @@ class FoodItemController extends Controller
         // ---------------- CREATE FOOD ITEM ----------------
         try {
             FoodItem::create($validated);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Food creation failed: ' . $e->getMessage());
             return back()->with('error', 'Failed to save food item: ' . $e->getMessage())->withInput();
         }
@@ -148,7 +154,7 @@ class FoodItemController extends Controller
         'price' => 'required|numeric|min:0',
         'discounted_price' => 'nullable|numeric|min:0',
         'category' => 'required|string|max:100',
-        'food_type' => 'required|in:veg,non_veg,vegan',
+        'food_type' => 'required|in:veg,non-veg,vegan',
         'preparation_time' => 'nullable|integer|min:1',
         'ingredients' => 'nullable|string',
         'spice_level' => 'nullable|in:mild,medium,hot,very_hot',
@@ -157,6 +163,8 @@ class FoodItemController extends Controller
         'is_available' => 'boolean',
         'is_popular' => 'boolean',
         'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'serves' => 'nullable|integer|min:1',
+        'is_featured' => 'boolean',
     ]);
 
     // ---------------- AUTH ----------------
@@ -173,8 +181,8 @@ class FoodItemController extends Controller
 
         try {
             // Delete old image if exists
-            if ($foodItem->image && \Storage::disk($disk)->exists($foodItem->image)) {
-                \Storage::disk($disk)->delete($foodItem->image);
+            if ($foodItem->image && Storage::disk($disk)->exists($foodItem->image)) {
+                Storage::disk($disk)->delete($foodItem->image);
             }
 
             $image = $request->file('image');
@@ -185,16 +193,20 @@ class FoodItemController extends Controller
             ) . '-' . time() . '.' . $image->getClientOriginalExtension();
 
             $validated['image'] = $image->storeAs($folder, $filename, $disk);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Image update failed: ' . $e->getMessage());
             return back()->with('error', 'Failed to upload new image: ' . $e->getMessage())->withInput();
         }
     }
 
+    $validated['is_available'] = $request->boolean('is_available');
+    $validated['is_popular'] = $request->boolean('is_popular');
+    $validated['is_featured'] = $request->boolean('is_featured');
+
     // ---------------- UPDATE FOOD ITEM ----------------
     try {
         $foodItem->update($validated);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         Log::error('Food update failed: ' . $e->getMessage());
         return back()->with('error', 'Failed to update food item: ' . $e->getMessage())->withInput();
     }
