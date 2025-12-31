@@ -120,21 +120,14 @@ class FoodItem extends Model
         // Remove any leading slashes for cloud storage path consistency
         $cleanPath = ltrim($imagePath, '/');
 
-        // Check if it's a static public image
+        // Priority: Cloudflare R2 direct URL (same logic as Product model)
+        // Static public images shipped with app (e.g., images/...)
         if (str_starts_with($cleanPath, 'images/')) {
             return asset($cleanPath);
         }
-        
-        $isCloud = $this->isLaravelCloud();
-        
-        if ($isCloud) {
-            // Priority: Cloudflare R2 direct URL (same logic as Product model)
-            $r2PublicUrl = config('filesystems.disks.r2.url') ?: 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
-            return rtrim($r2PublicUrl, '/') . '/' . $cleanPath;
-        }
-        
-        // Fallback to proxy for local development or non-cloud environments
-        return url('/serve-image/public/' . $cleanPath);
+
+        $r2PublicUrl = config('filesystems.disks.r2.url') ?: 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+        return rtrim($r2PublicUrl, '/') . '/' . $cleanPath;
     }
 
     private function isLaravelCloud() {
