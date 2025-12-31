@@ -90,16 +90,19 @@ class FoodItem extends Model
         if (!empty($this->image)) {
             return $this->getImageUrl($this->image);
         }
-        
+
         // Check images array
         if (!empty($this->images) && is_array($this->images) && !empty($this->images[0])) {
             return $this->getImageUrl($this->images[0]);
         }
-        
+
         // No placeholder - return null if no image
         return null;
     }
-    
+
+    /**
+     * Get image URL from AWS/R2 or serve-image route
+     */
     /**
      * Get image URL from AWS/R2 or serve-image route
      */
@@ -108,15 +111,15 @@ class FoodItem extends Model
         if (empty($imagePath)) {
             return 'https://via.placeholder.com/480x300?text=No+Image';
         }
-        
+
         // Normalize slashes (replace all backslashes with forward slashes)
         $imagePath = str_replace('\\', '/', $imagePath);
-        
+
         // If already a full URL, return as is
         if (strpos($imagePath, 'http') === 0) {
             return $imagePath;
         }
-        
+
         // Remove any leading slashes for cloud storage path consistency
         $cleanPath = ltrim($imagePath, '/');
 
@@ -124,45 +127,36 @@ class FoodItem extends Model
         if (str_starts_with($cleanPath, 'images/')) {
             return asset($cleanPath);
         }
-        
-        $isCloud = $this->isLaravelCloud();
-        
-        if ($isCloud) {
-             try {
-                 // Return direct R2 URL if available. Ensure no leading slash for the key.
-                 return Storage::disk('r2')->url($cleanPath);
-             } catch (\Throwable $e) {
-                 // Fallback to proxy
-                 return url('/serve-image/r2/' . $cleanPath);
-             }
-        }
-        
-        return url('/serve-image/public/' . $cleanPath);
+
+        // Use direct R2 public URL (Laravel Cloud) - Matches Product model logic
+        $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+        return "{$r2PublicUrl}/{$cleanPath}";
     }
 
-    private function isLaravelCloud() {
+    private function isLaravelCloud()
+    {
         // Use config() for safety with cached configurations
         $isProduction = app()->environment('production') || config('app.env') === 'production';
-        
+
         $hasR2Config = config('filesystems.disks.r2') !== null;
-        
+
         $isExplicitCloud = config('filesystems.disks.r2.driver') === 's3' && !empty(config('filesystems.disks.r2.bucket'));
 
         return $isProduction && $hasR2Config && $isExplicitCloud;
     }
-    
+
     /**
      * Get all image URLs
      */
     public function getImageUrlsAttribute()
     {
         $urls = [];
-        
+
         // Add single image if exists
         if (!empty($this->image)) {
             $urls[] = $this->getImageUrl($this->image);
         }
-        
+
         // Add images from array
         if (!empty($this->images) && is_array($this->images)) {
             foreach ($this->images as $img) {
@@ -174,7 +168,7 @@ class FoodItem extends Model
                 }
             }
         }
-        
+
         return $urls; // Return empty array if no images
     }
 }
