@@ -63,6 +63,7 @@ return [
                 PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', true),
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                 PDO::ATTR_TIMEOUT => 5,
+                PDO::ATTR_EMULATE_PREPARES => true, // Added fix
             ]) : [],
         ],
 

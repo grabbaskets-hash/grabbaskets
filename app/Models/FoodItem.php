@@ -127,9 +127,8 @@ class FoodItem extends Model
         // Determine storage type (r2 for production, public for local)
         $isLaravelCloud = (
             env('LARAVEL_CLOUD_DEPLOYMENT') === true ||
-            (app()->environment('production') &&
-             isset($_SERVER['SERVER_NAME']) &&
-             strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
+            app()->environment('production') ||
+            (isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], '.laravel.cloud') !== false)
         );
         $type = $isLaravelCloud ? 'r2' : 'public';
         

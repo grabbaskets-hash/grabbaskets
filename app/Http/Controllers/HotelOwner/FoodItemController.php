@@ -43,17 +43,17 @@ class FoodItemController extends Controller
             return true;
         }
 
-        // Priority 2: Check if actually running on Laravel Cloud infrastructure
-        // (not just having APP_URL set to laravel.cloud)
-        if (
-            app()->environment('production') &&
-            isset($_SERVER['SERVER_NAME']) &&
-            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')
-        ) {
+        // Priority 2: Standard Production Environment
+        if (app()->environment('production')) {
             return true;
         }
 
-        // Priority 3: Vapor environment (Laravel Cloud uses Vapor)
+        // Priority 3: Check URL (legacy check)
+        if (isset($_SERVER['SERVER_NAME']) && str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+
+        // Priority 4: Vapor environment
         if (env('VAPOR_ENVIRONMENT') !== null) {
             return true;
         }
