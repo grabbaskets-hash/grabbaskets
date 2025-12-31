@@ -37,9 +37,25 @@ class FoodItemController extends Controller
      * Store a newly created resource in storage.
      */
 
-    private function isLaravelCloud()
-    {
-        return !empty(config('filesystems.disks.r2.bucket'));
+    private function isLaravelCloud() {
+        // Explicit flag takes precedence
+        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
+            return true;
+        }
+
+        // Check bucket config
+        if (!empty(config('filesystems.disks.r2.bucket'))) {
+            return true;
+        }
+
+        // Check if running on Laravel Cloud based on server name
+        if (app()->environment('production') && 
+            isset($_SERVER['SERVER_NAME']) && 
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+
+        return false;
     }
     public function store(Request $request)
     {

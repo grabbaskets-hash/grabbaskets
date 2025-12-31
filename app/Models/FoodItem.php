@@ -128,15 +128,34 @@ class FoodItem extends Model
         $isCloud = $this->isLaravelCloud();
         
         if ($isCloud) {
-            // Always use proxy for cloud images to ensure correct serving logic
-            return url('/serve-image/r2/' . $cleanPath);
+            // Priority: Cloudflare R2 direct URL (same logic as Product model)
+            $r2PublicUrl = config('filesystems.disks.r2.url') ?: 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+            return rtrim($r2PublicUrl, '/') . '/' . $cleanPath;
         }
         
+        // Fallback to proxy for local development or non-cloud environments
         return url('/serve-image/public/' . $cleanPath);
     }
 
     private function isLaravelCloud() {
-        return !empty(config('filesystems.disks.r2.bucket'));
+        // Explicit flag takes precedence
+        if (env('LARAVEL_CLOUD_DEPLOYMENT') === true) {
+            return true;
+        }
+
+        // Check bucket config
+        if (!empty(config('filesystems.disks.r2.bucket'))) {
+            return true;
+        }
+
+        // Check if running on Laravel Cloud based on server name
+        if (app()->environment('production') && 
+            isset($_SERVER['SERVER_NAME']) && 
+            str_contains($_SERVER['SERVER_NAME'], '.laravel.cloud')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
