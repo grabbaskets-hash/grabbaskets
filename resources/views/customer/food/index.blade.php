@@ -31,6 +31,7 @@
             color: var(--text-main);
             margin: 0;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         /* --- NAVBAR --- */
@@ -242,13 +243,14 @@
 
         @media (max-width: 768px) {
             .section-container {
-                padding: 0 10px;
+                padding: 0 15px;
                 margin: 15px auto;
             }
             
             .categories-carousel {
                 gap: 15px;
-                padding: 0 5px 15px;
+                padding: 0 0 15px;
+                margin: 0 -5px;
             }
             
             .cat-item { 
@@ -269,7 +271,7 @@
             .section-title { 
                 font-size: 1.1rem; 
                 margin-bottom: 12px;
-                padding: 0 5px;
+                padding: 0;
             }
         }
 
@@ -317,7 +319,24 @@
         }
 
         @media (max-width: 768px) {
-            .filter-bar { top: 120px; padding-left: 15px; padding-right: 15px; margin-left: -20px; margin-right: -20px; }
+            .filter-bar { 
+                top: 120px; 
+                padding: 10px 15px;
+                margin: 0 -15px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            
+            .filter-bar::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .filter-pill {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
         }
 
         /* --- FOOD CARDS --- */
@@ -445,11 +464,13 @@
             .items-grid { 
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
-                padding: 0 5px;
+                padding: 0;
+                margin: 0 -5px;
             }
             
             .premium-food-card {
                 margin-bottom: 0;
+                width: 100%;
             }
             
             .card-img-container { 
@@ -474,7 +495,7 @@
             }
             
             .meta-row { 
-gap: 4px;
+                gap: 4px;
                 font-size: 0.75rem;
                 margin-bottom: 3px;
             }
@@ -594,29 +615,30 @@ gap: 4px;
 
         @media (max-width: 768px) {
             .categories-bottom-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0;
             }
 
             .category-card {
-                height: 220px;
+                height: 200px;
             }
 
             .category-card-image {
-                height: 130px;
+                height: 120px;
             }
 
             .category-card-content {
-                padding: 12px;
+                padding: 10px;
             }
 
             .category-card-title {
-                font-size: 1rem;
+                font-size: 0.95rem;
                 margin-bottom: 4px;
             }
 
             .category-card-subtitle {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
             }
         }
 
