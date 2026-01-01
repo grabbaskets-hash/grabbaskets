@@ -407,6 +407,10 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.06);
             transition: all 0.2s ease;
         }
+.auth-name{
+    color:white
+    
+}
 
         .auth-name i {
             color: var(--primary);
@@ -985,43 +989,99 @@
                 color: #fff;
             }
 
+            /* ===== PREMIUM BOTTOM NAV ===== */
             .bottom-nav {
                 position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: var(--bottom-nav-height);
-                background: #fff;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 400px;
+                height: 70px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
                 display: flex;
-                justify-content: space-around;
+                justify-content: space-evenly;
                 align-items: center;
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255,255,255,0.5);
                 z-index: 1000;
-                padding-bottom: 5px; /* Adjust for iPhone home indicator safety if needed */
+                border-radius: 25px;
+                padding: 0 5px;
             }
 
             .nav-link-mobile {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+<<<<<<< HEAD
                 color:red;
                 justify-content: center; /* Center aligned */
+=======
+                justify-content: center;
+>>>>>>> 3b00340d (order tracking)
                 text-decoration: none;
-                color: var(--text-muted);
-                font-size: 0.7rem; /* Slightly smaller text for better fit */
-                font-weight: 500;
-                gap: 4px;
-                flex: 1; /* Distribute space evenly */
-                height: 100%;
+                color: #94a3b8; /* Slate-400 */
+                font-size: 10px;
+                font-weight: 600;
+                width: 60px;
+                height: 60px;
+                border-radius: 20px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                letter-spacing: 0.3px;
             }
 
             .nav-link-mobile i {
-                font-size: 1.4rem;
-                margin-bottom: -2px;
+                font-size: 24px;
+                margin-bottom: 4px;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
 
+            .nav-link-mobile span {
+                transition: all 0.2s ease;
+                transform-origin: center;
+            }
+
+            /* Active State */
             .nav-link-mobile.active {
                 color: var(--primary);
+                background: linear-gradient(135deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.1) 100%);
+            }
+
+            .nav-link-mobile.active i {
+                transform: translateY(-2px);
+                filter: drop-shadow(0 4px 8px rgba(106, 17, 203, 0.3));
+            }
+
+            .nav-link-mobile.active span {
+                font-weight: 700;
+            }
+
+            /* Active Indicator Dot */
+            .nav-link-mobile.active::after {
+                content: '';
+                position: absolute;
+                bottom: 8px;
+                width: 4px;
+                height: 4px;
+                border-radius: 50%;
+                background: var(--primary);
+                box-shadow: 0 0 10px var(--primary);
+            }
+
+            /* Hover Effect */
+            .nav-link-mobile:not(.active):active {
+                transform: scale(0.92);
+                background: rgba(0,0,0,0.03);
+            }
+
+             /* Cart Badge Sizing */
+            #mobile-cart-badge {
+                font-size: 0.65rem !important;
+                padding: 0.35em 0.55em !important;
+                border: 2px solid white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
         }
 
@@ -1700,29 +1760,36 @@
                 <span>Home</span>
             </a>
             <a href="javascript:void(0)" onclick="toggleCategoryDrawer()" class="nav-link-mobile">
+<<<<<<< HEAD
                 <i class="bi bi-grid"></i>
                 <span>Categories</span>
+=======
+                <i class="bi bi-grid-fill"></i>
+                <span>Category</span>
+>>>>>>> 3b00340d (order tracking)
             </a>
             <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
-                <i class="bi bi-cart3"></i>
-                <span id="mobile-cart-badge" class="position-absolute translate-middle badge rounded-pill bg-danger"
-                    style="top: 5px; right: 15px; font-size: 0.6rem; display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
-                    @auth
-                        {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
-                    @else
-                        0
-                    @endauth
-                </span>
+                <div class="position-relative">
+                    <i class="bi bi-bag-fill"></i>
+                    <span id="mobile-cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
+                        @auth
+                            {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
+                        @else
+                            0
+                        @endauth
+                    </span>
+                </div>
                 <span>Cart</span>
             </a>
             @auth
                 <a href="{{ route('profile.show') }}" class="nav-link-mobile">
-                    <i class="bi bi-person"></i>
-                    <span>{{ Auth::user()->name }}</span>
+                    <i class="bi bi-person-fill"></i>
+                    <span>Profile</span>
                 </a>
             @else
                 <a href="{{ route('login') }}" class="nav-link-mobile">
-                    <i class="bi bi-person"></i>
+                    <i class="bi bi-person-circle"></i>
                     <span>Login</span>
                 </a>
             @endauth

@@ -1,217 +1,362 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Orders - GrabBaskets</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #edf1f7; /* Swiggy-like light gray background */
+            font-family: 'ProximaNova', arial, 'Helvetica Neue', sans-serif;
+            color: #282c3f;
+        }
 
-@section('title', 'My Orders')
+        /* Navbar (Simple for context) */
+        .simple-header {
+            background: #fff;
+            padding: 15px 0;
+            box-shadow: 0 15px 40px -20px rgba(40,44,63,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-text {
+            font-weight: 800;
+            font-size: 24px;
+            color: #fc8019; /* Swiggy Orange */
+            text-decoration: none;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: #3d4152;
+            text-decoration: none;
+            margin-left: 30px;
+        }
 
-@section('content')
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-dark">My Orders</h2>
-                <a href="{{ route('index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Shop
+        /* Layout */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
+        }
+        
+        /* Sidebar (Optional context) */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background: #fff; /* In Swiggy this is often just part of the white bg */
+            display: none; /* Hiding for now to focus on main content */
+        }
+
+        /* Content Area */
+        .content-area {
+            flex-grow: 1;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #282c3f;
+            margin-bottom: 20px;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: #fff;
+            border: 1px solid #d4d5d9;
+            margin-bottom: 24px;
+            padding: 24px 24px 0; /* No bottom padding because actions bar is separate? No, typically inside. Reference shows padding. */
+            padding-bottom: 20px;
+        }
+
+        /* Card Top */
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .store-info {
+            display: flex;
+            gap: 15px;
+        }
+
+        .store-img {
+            width: 50px;
+            height: 50px;
+            background: #f2f6fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px; /* Slightly rounded */
+        }
+        .store-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .store-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #282c3f;
+            margin: 0 0 2px;
+        }
+        .store-details h3:hover { color: #fc8019; cursor: pointer; }
+
+        .store-location {
+            font-size: 13px;
+            color: #686b78;
+            margin-bottom: 4px;
+        }
+
+        .order-meta {
+            font-size: 12px;
+            color: #93959f; /* Lighter text for order # */
+        }
+
+        .view-details-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fc8019;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 8px;
+            border-bottom: 1px solid transparent;
+        }
+        .view-details-link:hover {
+            border-bottom-color: #fc8019;
+        }
+
+        .delivery-status {
+            text-align: right;
+            font-size: 13px;
+            color: #686b78;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .check-icon {
+            color: #fff;
+            background: #60b246; /* Swiggy Green */
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        /* Divider */
+        .dotted-divider {
+            border-top: 1px dashed #d4d5d9;
+            margin: 0 0 15px;
+        }
+
+        /* Items Row */
+        .items-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .items-list {
+            color: #282c3f;
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .total-paid {
+            font-weight: 600;
+            color: #282c3f;
+            white-space: nowrap;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-reorder {
+            background-color: #fc8019;
+            color: #fff;
+            border: 1px solid #fc8019;
+            padding: 11px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-reorder:hover {
+            background-color: #e37112;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-help {
+            background-color: #fff;
+            color: #fc8019;
+            border: 1px solid #fc8019;
+            padding: 11px 30px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-help:hover {
+            background-color: #fff9f2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 0;
+        }
+        .empty-img {
+            width: 250px;
+            opacity: 0.6;
+            margin-bottom: 20px;
+        }
+
+        @media(max-width: 768px) {
+            .card-top {
+                flex-direction: column;
+            }
+            .delivery-status {
+                margin-top: 15px;
+                justify-content: flex-start; /* Align left on mobile */
+                text-align: left;
+            }
+            .items-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Simple Header -->
+    <header class="simple-header">
+        <div class="container header-inner">
+            <a href="/" class="logo-text">
+                <i class="fa-solid fa-basket-shopping"></i> GrabBaskets
+            </a>
+            <div class="d-flex align-items-center">
+                <a href="{{ route('home') }}" class="nav-link">
+                    <i class="fa-solid fa-search"></i> Search
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-user"></i> {{ Auth::user()->name }}
                 </a>
             </div>
-            
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Main Content -->
+        <div class="content-area">
+            <h1 class="page-title">Past Orders</h1>
+
             @if($orders->count() > 0)
-                <div class="row">
-                    @foreach($orders as $order)
-                        <div class="col-12 mb-4">
-                            <div class="card shadow-sm border-0">
-                                <div class="card-header bg-white border-bottom">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <h5 class="mb-1">Order #{{ $order->id }}</h5>
-                                            <small class="text-muted">
-                                                Placed on {{ $order->created_at->format('M d, Y \a\t h:i A') }}
-                                            </small>
-                                        </div>
-                                        <div class="col-md-6 text-md-end">
-                                            <span class="badge badge-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'pending' ? 'warning' : 'info') }} p-2">
-                                                {{ ucfirst($order->status) }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="card-body">
-                                    @if($order->orderItems && $order->orderItems->count() > 0)
-                                        @foreach($order->orderItems as $item)
-                                            <div class="row align-items-center mb-3 {{ !$loop->last ? 'border-bottom pb-3' : '' }}">
-                                                <div class="col-md-2">
-                                                    @if($item->product && $item->product->image)
-                                                        <img src="{{ asset('storage/' . $item->product->image) }}" 
-                                                             alt="{{ $item->product->name }}" 
-                                                             class="img-fluid rounded" 
-                                                             style="max-height: 80px; object-fit: cover;">
-                                                    @else
-                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                                             style="height: 80px; width: 80px;">
-                                                            <i class="fas fa-image text-muted"></i>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h6 class="mb-1">{{ $item->product->name ?? 'Product Not Found' }}</h6>
-                                                    <p class="text-muted mb-1">Quantity: {{ $item->quantity }}</p>
-                                                    @if($item->product && $item->product->seller)
-                                                        <small class="text-muted">
-                                                            Sold by: {{ $item->product->seller->name }}
-                                                        </small>
-                                                    @endif
-                                                </div>
-                                                <div class="col-md-4 text-md-end">
-                                                    <h6 class="text-primary mb-0">
-                                                        ₹{{ number_format($item->price * $item->quantity, 2) }}
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        @endforeach
+                @foreach($orders as $order)
+                    <div class="order-card">
+                        <!-- Top Section -->
+                        <div class="card-top">
+                            <div class="store-info">
+                                <div class="store-img">
+                                    @if($order['type'] === 'Food Delivery')
+                                        <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_100,h_100,c_fill/e0vvulfbahjxjz6k4u77" alt="Food">
                                     @else
-                                        <p class="text-muted">No items found for this order.</p>
+                                        <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_100,h_100,c_fill/instamart-assets-images/instamart_logo_v2" alt="Express">
                                     @endif
-                                    
-                                    <div class="row mt-3 pt-3 border-top">
-                                        <div class="col-md-8">
-                                            @if($order->sellerUser)
-                                                <small class="text-muted">
-                                                    <strong>Seller:</strong> {{ $order->sellerUser->name }}<br>
-                                                    <strong>Email:</strong> {{ $order->sellerUser->email }}
-                                                </small>
-                                            @endif
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <h5 class="text-success mb-0">
-                                                Total: ₹{{ number_format($order->total_amount, 2) }}
-                                            </h5>
-                                        </div>
-                                    </div>
                                 </div>
-                                
-                                <div class="card-footer bg-light border-top-0">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            @if($order->delivery_address)
-                                                <small class="text-muted">
-                                                    <i class="fas fa-map-marker-alt"></i>
-                                                    <strong>Delivery Address:</strong> {{ $order->delivery_address }}
-                                                </small>
-                                            @endif
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            @if($order->status == 'pending')
-                                                <button class="btn btn-sm btn-outline-danger" 
-                                                        onclick="cancelOrder({{ $order->id }})">
-                                                    Cancel Order
-                                                </button>
-                                            @elseif($order->status == 'delivered')
-                                                <span class="text-success">
-                                                    <i class="fas fa-check-circle"></i> Delivered
-                                                </span>
-                                            @endif
-                                        </div>
+                                <div class="store-details">
+                                    <h3>{{ $order['seller_name'] ?? 'GrabBaskets Store' }}</h3>
+                                    <div class="store-location">{{ $order['type'] }}</div>
+                                    <div class="order-meta">
+                                        ORDER #{{ $order['order_number'] }} | {{ $order['date']->format('D, M d, Y, h:i A') }}
                                     </div>
+                                    <a href="{{ route('orders.show', ['type' => $order['type'] === 'Food Delivery' ? 'food' : 'express', 'id' => $order['id']]) }}" class="view-details-link">
+                                        VIEW DETAILS
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="delivery-status">
+                                Delivered on {{ $order['date']->format('D, M d, Y, h:i A') }}
+                                <div class="check-icon">
+                                    <i class="fas fa-check"></i>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
+
+                        <!-- Divider -->
+                        <div class="dotted-divider"></div>
+
+                        <!-- Items & Total -->
+                        <div class="items-row">
+                            <div class="items-list">
+                                @php
+                                    $itemTexts = [];
+                                    foreach($order['items'] as $item) {
+                                        $itemTexts[] = $item['product_name'] . ' x ' . $item['quantity'];
+                                    }
+                                    echo implode(', ', $itemTexts);
+                                @endphp
+                            </div>
+                            <div class="total-paid">
+                                Total Paid: ₹ {{ number_format($order['total_amount'], 0) }}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <!-- Helper function to reorder (dummy link for now) -->
+                            <a href="/ten-min-products" class="btn-reorder">REORDER</a>
+                            <a href="#" class="btn-help">HELP</a>
+                        </div>
+                    </div>
+                @endforeach
                 
                 <!-- Pagination -->
                 @if($orders->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
+                    <div class="d-flex justify-content-center mt-5">
                         {{ $orders->links() }}
                     </div>
                 @endif
-                
             @else
-                <!-- No Orders State -->
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-shopping-bag fa-5x text-muted"></i>
-                    </div>
-                    <h4 class="text-muted mb-3">No Orders Yet</h4>
-                    <p class="text-muted mb-4">You haven't placed any orders yet. Start shopping to see your orders here!</p>
-                    <a href="{{ route('index') }}" class="btn btn-primary">
-                        <i class="fas fa-shopping-cart"></i> Start Shopping
-                    </a>
+                <div class="empty-state">
+                    <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/2xempty_cart_ybi7ss" class="empty-img" alt="Empty">
+                    <h3>No orders found</h3>
+                    <p class="text-muted">You haven't placed any orders yet.</p>
+                    <a href="/" class="btn-reorder mt-3">GO TO HOME</a>
                 </div>
             @endif
         </div>
     </div>
-</div>
 
-<script>
-function cancelOrder(orderId) {
-    if (confirm('Are you sure you want to cancel this order?')) {
-        // Add AJAX call to cancel order
-        fetch(`/orders/${orderId}/cancel`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error cancelling order. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error cancelling order. Please try again.');
-        });
-    }
-}
-</script>
-
-<style>
-.badge {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem !important;
-}
-
-.badge-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.badge-warning {
-    background-color: #ffc107;
-    color: #000;
-}
-
-.badge-info {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.card {
-    transition: transform 0.2s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-    .card-header .row > div {
-        text-align: center !important;
-        margin-bottom: 0.5rem;
-    }
-    
-    .card-body .row > div {
-        margin-bottom: 1rem;
-        text-align: center !important;
-    }
-    
-    .card-footer .row > div {
-        margin-bottom: 0.5rem;
-        text-align: center !important;
-    }
-}
-</style>
-@endsection
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

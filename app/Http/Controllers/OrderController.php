@@ -13,49 +13,73 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    // Cancel an order (buyer)
-    public function cancel(Request $request, Order $order)
+    /**
+     * Cancel an order (buyer) - supports both Food and Express orders
+     */
+    public function cancel(Request $request, $type, $id)
     {
-        // Only the buyer can cancel their order
-        if ($order->buyer_id !== Auth::id()) {
-            abort(403);
+        $user = Auth::user();
+
+        if ($type === 'food') {
+            $order = Order::where('buyer_id', $user->id)->findOrFail($id);
+
+            // Only allow cancel if status is not shipped or delivered
+            $cancellableStatuses = ['pending', 'paid', 'confirmed'];
+            if (!in_array($order->status, $cancellableStatuses)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order cannot be cancelled at this stage.'
+                ], 400);
+            }
+
+            $order->status = 'cancelled';
+            $order->save();
+
+            // Send notification
+            if (class_exists('App\Services\NotificationService')) {
+                \App\Services\NotificationService::sendOrderStatusUpdate($user, $order, 'cancelled');
+            }
+
+            // Notify seller
+            $seller = $order->sellerUser;
+            if ($seller && $seller->email) {
+                $subject = 'Order Cancelled by Buyer';
+                $message = "Order #{$order->id} has been cancelled by the buyer.";
+                try {
+                    Mail::raw($message, function ($mail) use ($seller, $subject) {
+                        $mail->to($seller->email)->subject($subject);
+                    });
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send cancellation email to seller: ' . $e->getMessage());
+                }
+            }
+
+        } elseif ($type === 'express') {
+            $order = \App\Models\TenMinOrder::where('user_id', $user->id)->findOrFail($id);
+
+            // Only allow cancel if status is not shipped or delivered
+            $cancellableStatuses = ['pending', 'confirmed'];
+            if (!in_array($order->status, $cancellableStatuses)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order cannot be cancelled at this stage.'
+                ], 400);
+            }
+
+            $order->status = 'cancelled';
+            $order->save();
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid order type.'
+            ], 400);
         }
 
-        // Only allow cancel if status is not shipped or delivered
-        $cancellableStatuses = ['pending', 'paid', 'confirmed'];
-        if (!in_array($order->status, $cancellableStatuses)) {
-            return back()->with('error', 'Order cannot be cancelled at this stage.');
-        }
-
-        $order->status = 'cancelled';
-        $order->save();
-
-        // Send Amazon-like cancellation notification
-        NotificationService::sendOrderStatusUpdate(Auth::user(), $order, 'cancelled');
-
-        // Optionally, notify seller and admin
-        $seller = $order->sellerUser;
-        if ($seller && $seller->email) {
-            $subject = 'Order Cancelled by Buyer';
-            $message = "Order #{$order->id} has been cancelled by the buyer.";
-            Mail::raw($message, function ($mail) use ($seller, $subject) {
-                $mail->to($seller->email)
-                    ->subject($subject);
-            });
-        }
-
-        // Optionally, notify admin (if admin email is set in .env)
-        $adminEmail = config('mail.admin_email');
-        if ($adminEmail) {
-            $subject = 'Order Cancelled';
-            $message = "Order #{$order->id} has been cancelled by the buyer.";
-            Mail::raw($message, function ($mail) use ($adminEmail, $subject) {
-                $mail->to($adminEmail)
-                    ->subject($subject);
-            });
-        }
-
-        return back()->with('success', 'Order cancelled successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Order cancelled successfully.'
+        ]);
     }
     // Show all orders for the logged-in seller
     public function sellerOrders()
@@ -76,13 +100,76 @@ class OrderController extends Controller
 
         return view('orders.track', compact('orders'));
     }
-    public function show(Order $order)
+    /**
+     * Show individual order details (supports both Food and Express orders)
+     */
+    public function show($type, $id)
     {
-        if ($order->buyer_id !== Auth::id()) {
-            abort(403);
+        $user = Auth::user();
+
+        if ($type === 'food') {
+            $order = Order::where('buyer_id', $user->id)
+                ->with(['product', 'sellerUser', 'orderItems.product'])
+                ->findOrFail($id);
+
+            $orderData = [
+                'id' => $order->id,
+                'order_number' => 'ORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'type' => 'Food Delivery',
+                'type_badge' => 'primary',
+                'date' => $order->created_at,
+                'status' => $order->status,
+                'total_amount' => $order->amount,
+                'payment_method' => $order->payment_method,
+                'payment_reference' => $order->payment_reference,
+                'delivery_address' => $order->delivery_address,
+                'delivery_city' => $order->delivery_city,
+                'delivery_state' => $order->delivery_state,
+                'delivery_pincode' => $order->delivery_pincode,
+                'items' => $order->orderItems && $order->orderItems->count() > 0
+                    ? $order->orderItems
+                    : collect([
+                        (object) [
+                            'product' => $order->product,
+                            'quantity' => $order->quantity ?? 1,
+                            'price' => $order->amount,
+                        ]
+                    ]),
+                'seller' => $order->sellerUser,
+                'tracking_number' => $order->tracking_number,
+                'courier_name' => $order->courier_name,
+            ];
+        } elseif ($type === 'express') {
+            $order = \App\Models\TenMinOrder::where('user_id', $user->id)
+                ->with(['items.product', 'user'])
+                ->findOrFail($id);
+
+            $orderData = [
+                'id' => $order->id,
+                'order_number' => 'EXP-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'type' => '10-Mins Express',
+                'type_badge' => 'success',
+                'date' => $order->created_at,
+                'status' => $order->status,
+                'order_total' => $order->order_total,
+                'delivery_fee' => $order->delivery_fee,
+                'tax' => $order->tax ?? 0,
+                'wallet_discount' => $order->wallet_discount ?? 0,
+                'total_amount' => $order->total_amount,
+                'payment_method' => $order->payment_method,
+                'payment_reference' => $order->payment_reference,
+                'delivery_address' => $order->delivery_address,
+                'items' => $order->items,
+                'customer_name' => $order->customer_name,
+                'customer_phone' => $order->customer_phone,
+                'customer_email' => $order->customer_email,
+                'estimated_delivery_time' => $order->estimated_delivery_time,
+            ];
+        } else {
+            abort(404, 'Invalid order type');
         }
-        $order->load(['product', 'sellerUser']);
-        return view('orders.show', compact('order'));
+
+        return view('orders.show', compact('orderData', 'type'));
     }
     public function updateTracking(Request $request, Order $order)
     {
@@ -141,7 +228,7 @@ Thank you for shopping with us!
 Best regards,
 Grabbasket Team
                 ";
-                
+
                 Mail::raw($message, function ($mail) use ($buyer, $subject) {
                     $mail->to($buyer->email)
                         ->subject($subject);
@@ -169,26 +256,111 @@ Grabbasket Team
         return back()->with('success', 'Tracking information updated successfully.');
     }
 
-    // Show all orders for authenticated user
+    // Show all orders for authenticated user (Food + Express)
     public function index()
     {
         try {
             $user = Auth::user();
-            
+
             if (!$user) {
                 return redirect()->route('login')
                     ->with('error', 'Please login to view your orders.');
             }
 
-            $orders = Order::where('buyer_id', $user->id)
-                ->with(['orderItems.product', 'sellerUser'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+            // Fetch Food/Standard Orders
+            $foodOrders = Order::where('buyer_id', $user->id)
+                ->with(['product', 'sellerUser', 'orderItems.product'])
+                ->get()
+                ->map(function ($order) {
+                    return [
+                        'id' => $order->id,
+                        'order_number' => 'ORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                        'type' => 'Food Delivery',
+                        'type_badge' => 'primary',
+                        'date' => $order->created_at,
+                        'status' => $order->status,
+                        'total_amount' => $order->amount,
+                        'payment_method' => $order->payment_method ?? 'N/A',
+                        'delivery_address' => $order->delivery_address,
+                        'items' => $order->orderItems && $order->orderItems->count() > 0
+                            ? $order->orderItems->map(function ($item) {
+                                return [
+                                    'product_name' => $item->product->name ?? 'Product Not Found',
+                                    'product_image' => $item->product->image_url ?? null,
+                                    'quantity' => $item->quantity,
+                                    'price' => $item->price,
+                                    'total_price' => $item->total_price ?? ($item->price * $item->quantity),
+                                ];
+                            })
+                            : collect([
+                                [
+                                    'product_name' => $order->product->name ?? 'Product Not Found',
+                                    'product_image' => $order->product->image_url ?? null,
+                                    'quantity' => $order->quantity ?? 1,
+                                    'price' => $order->amount,
+                                    'total_price' => $order->amount,
+                                ]
+                            ]),
+                        'seller_name' => $order->sellerUser->name ?? 'N/A',
+                        'tracking_number' => $order->tracking_number,
+                        'courier_name' => $order->courier_name,
+                        'original_order' => $order
+                    ];
+                });
+
+            // Fetch Express/10-Min Orders
+            $expressOrders = \App\Models\TenMinOrder::where('user_id', $user->id)
+                ->with(['items.product', 'user'])
+                ->get()
+                ->map(function ($order) {
+                    return [
+                        'id' => $order->id,
+                        'order_number' => 'EXP-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                        'type' => '10-Mins Express',
+                        'type_badge' => 'success',
+                        'date' => $order->created_at,
+                        'status' => $order->status,
+                        'total_amount' => $order->total_amount,
+                        'payment_method' => $order->payment_method ?? 'N/A',
+                        'delivery_address' => $order->delivery_address,
+                        'items' => $order->items->map(function ($item) {
+                            return [
+                                'product_name' => $item->product_name,
+                                'product_image' => optional($item->product)->image_url ?? null,
+                                'quantity' => $item->quantity,
+                                'price' => $item->price,
+                                'total_price' => $item->price * $item->quantity,
+                            ];
+                        }),
+                        'seller_name' => 'Multiple Sellers',
+                        'delivery_fee' => $order->delivery_fee,
+                        'tax' => $order->tax ?? 0,
+                        'wallet_discount' => $order->wallet_discount ?? 0,
+                        'estimated_delivery_time' => $order->estimated_delivery_time,
+                        'original_order' => $order
+                    ];
+                });
+
+            // Merge and sort by date
+            $allOrders = $foodOrders->concat($expressOrders)
+                ->sortByDesc('date')
+                ->values();
+
+            // Manual pagination
+            $perPage = 10;
+            $currentPage = request()->get('page', 1);
+            $orders = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allOrders->forPage($currentPage, $perPage),
+                $allOrders->count(),
+                $perPage,
+                $currentPage,
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
 
             return view('orders.index', compact('orders'));
         } catch (\Exception $e) {
             Log::error('Orders Index Error: ' . $e->getMessage());
-            
+
             return view('orders.index', [
                 'orders' => new \Illuminate\Pagination\LengthAwarePaginator(
                     collect([]),
@@ -221,7 +393,7 @@ Grabbasket Team
 
         $oldStatus = $order->status;
         $newStatus = $request->status;
-        
+
         $order->status = $newStatus;
         $order->save();
 
@@ -362,7 +534,7 @@ Grabbasket Team
     public function apiTrackOrder(Order $order)
     {
         // In production, add proper authentication
-        
+
         return response()->json([
             'order_id' => $order->id,
             'status' => $order->status,

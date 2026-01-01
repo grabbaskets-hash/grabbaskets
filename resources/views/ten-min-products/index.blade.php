@@ -10,7 +10,13 @@
         href="https://fonts.googleapis.com/css2?family=Gilroy:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Bootstrap Override for compatibility */
+        a { text-decoration: none; }
+        ul { padding-left: 0; margin-bottom: 0; }
+        
+        /* ZEPTO-INSPIRED DESIGN SYSTEM */
         /* ZEPTO-INSPIRED DESIGN SYSTEM */
         :root {
             --primary: #0c0c0c;
@@ -617,23 +623,42 @@
 
             <div class="nav-right">
                 @auth
-                    <span style="font-size:14px;font-weight:600;">Hi, {{ auth()->user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
-                        @csrf
-                        <button type="submit" class="logout-btn" title="Logout">
-                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    <div class="dropdown">
+                        <button class="nav-btn border-0 bg-transparent dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-circle-user fa-lg text-secondary"></i>
+                            <span class="d-none d-md-inline ms-1">Hi, {{ auth()->user()->name }}</span>
                         </button>
-                    </form>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; overflow: hidden;">
+                            <li>
+                                <a class="dropdown-item py-2 px-3 fw-medium" href="{{ url('/profile') }}">
+                                    <i class="fa-solid fa-user me-2 text-muted"></i> Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 fw-medium" href="{{ route('orders.index') }}">
+                                    <i class="fa-solid fa-bag-shopping me-2 text-muted"></i> Orders
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2 px-3 text-danger fw-semibold">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 @else
-                    <a href="{{ route('login') }}" class="nav-btn">
+                    <a href="{{ route('login') }}" class="nav-btn text-decoration-none">
                         <i class="fa-regular fa-user"></i>&nbsp;Login
                     </a>
                 @endauth
 
-                <a href="{{ route('tenmin.cart.view') }}" class="nav-btn cart-btn">
+                <a href="{{ route('tenmin.cart.view') }}" class="nav-btn cart-btn text-decoration-none">
                     <i class="fa-solid fa-cart-shopping"></i>&nbsp;
-                    <span
-                        id="cartCountBadge">{{ \App\Models\TenMinGroceryCartItem::where('user_id', auth()->id())->sum('quantity') }}</span>
+                    <span id="cartCountBadge">{{ \App\Models\TenMinGroceryCartItem::where('user_id', auth()->id())->sum('quantity') }}</span>
                 </a>
             </div>
         </div>
@@ -886,6 +911,7 @@
         }
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

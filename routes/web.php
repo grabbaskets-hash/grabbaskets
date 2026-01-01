@@ -261,12 +261,15 @@ Route::middleware(['auth', 'verified', 'prevent.back'])->group(function () {
     Route::get('/seller/get-library-images', [SellerController::class, 'getLibraryImages'])->name('seller.getLibraryImages');
     Route::delete('/seller/delete-library-image', [SellerController::class, 'deleteLibraryImage'])->name('seller.deleteLibraryImage');
 
-    // Orders (user & seller)
+    // Orders (user & seller) - Unified for Food and Express orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/track', [OrderController::class, 'track'])->name('orders.track');
     Route::get('/orders/live-track', [OrderController::class, 'liveTrack'])->name('orders.liveTrack');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
+    // New unified order routes with type parameter
+    Route::get('/orders/{type}/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{type}/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
     Route::get('/seller/orders', [OrderController::class, 'sellerOrders'])->name('seller.orders');
     Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders/{order}/update-tracking', [OrderController::class, 'updateTracking'])->name('orders.updateTracking');
@@ -1081,7 +1084,7 @@ Route::get('/debug-bulk-system', function () {
 Route::get('/serve-image/{type}/{path}', function ($type, $path) {
     error_log("SERVE-IMAGE HIT: type=$type, path=$path");
     \Log::info("DEBUG: /serve-image hit", ['type' => $type, 'path' => $path]);
-    
+
     try {
         $allowedTypes = ['products', 'public', 'library', 'r2'];
         if (!in_array($type, $allowedTypes, true)) {
@@ -1091,7 +1094,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
 
         $leafPath = ltrim($path, '/');
         $storagePath = $leafPath;
-        
+
         if ($type === 'public') {
             $storagePath = preg_replace('/^public\//', '', $leafPath);
         } elseif ($type === 'library') {
@@ -1099,7 +1102,7 @@ Route::get('/serve-image/{type}/{path}', function ($type, $path) {
         } elseif ($type === 'products') {
             $storagePath = 'products/' . $leafPath;
         }
-        
+
         \Log::info("/serve-image: Resolved storage path", ['storagePath' => $storagePath, 'type' => $type]);
 
         // Try public disk first
