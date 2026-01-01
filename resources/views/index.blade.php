@@ -1004,6 +1004,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                color:red;
                 justify-content: center; /* Center aligned */
                 text-decoration: none;
                 color: var(--text-muted);
