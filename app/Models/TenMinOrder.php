@@ -10,7 +10,7 @@ class TenMinOrder extends Model
 
     protected $fillable = [
         'user_id',
-        'seller_id', // 👈 per-seller order
+        'seller_id',
         'customer_name',
         'customer_phone',
         'customer_email',
@@ -24,6 +24,7 @@ class TenMinOrder extends Model
         'payment_reference',
         'status',
         'estimated_delivery_time',
+        'delivery_partner_id'
     ];
 
     protected $casts = [
@@ -42,5 +43,10 @@ class TenMinOrder extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function getAmountAttribute()
+    {
+        return $this->total_amount;
     }
 }

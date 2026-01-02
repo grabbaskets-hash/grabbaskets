@@ -11,11 +11,11 @@ class FoodOrder extends Model
 
     protected $fillable = [
         'hotel_owner_id',
-        'shop_name',            // 👈 ADD
-        'shop_address',         // 👈 ADD (critical for delivery partner!)
+        'shop_name',
+        'shop_address',
         'customer_name',
         'customer_phone',
-        'customer_email',       // 👈 Optional but useful
+        'customer_email',
         'delivery_address',
         'food_total',
         'delivery_fee',
@@ -25,7 +25,7 @@ class FoodOrder extends Model
         'payment_reference',
         'wallet_discount',
         'estimated_delivery_time',
-        'delivery_partner_id'   // 👈 Optional: assign delivery person
+        'delivery_partner_id'
     ];
 
     protected $casts = [
@@ -41,24 +41,21 @@ class FoodOrder extends Model
 
     public function hotelOwner()
     {
-        return $this->belongsTo(HotelOwner::class, 'hotel_owner_id'); // ✅ Fixed
+        return $this->belongsTo(HotelOwner::class, 'hotel_owner_id');
     }
-
-    // Optional: if you add delivery_partner_id
-    // public function deliveryPartner()
-    // {
-    //     return $this->belongsTo(User::class, 'delivery_partner_id');
-    // }
 
     public function getSubtotalAttribute()
     {
         return $this->food_total;
     }
 
+    public function getAmountAttribute()
+    {
+        return $this->total_amount;
+    }
+
     public function getDiscountAmountAttribute()
     {
-        // If you add a discount column later, use it here.
-        // For now, return 0 or calculate if logic exists.
-        return 0.00; 
+        return 0.00;
     }
 }

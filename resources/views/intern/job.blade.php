@@ -167,12 +167,12 @@
                         <span class="highlight"><strong>Roles: Technical Associate</strong></span>
                     </p>
 
-                    <p class="subtext">Internship Period: <span class="highlight">3 Months</span></p>
-                    <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹30,000</span></p>
-                    <p class="subtext">Starting Monthly Package: <span class="highlight">₹17,000</span></p>
+                    <p class="subtext">Internship Period: <span class="highlight">6 Months</span></p>
+                    <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹50,000</span></p>
+                    <p class="subtext">Starting Monthly Package: <span class="highlight">₹24,000</span></p>
 
                     <button class="apply-btn mt-3"
-                        onclick="applyNow('Technical Associate', 30000, 12, 'IT Section')">
+                        onclick="applyNow('Technical Associate', 50000, 24, 'IT Section')">
                         Apply Now
                     </button>
                 </div>
@@ -212,6 +212,7 @@
             window.location.href = url;
         }
     </script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

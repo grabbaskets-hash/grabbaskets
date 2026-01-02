@@ -14,7 +14,7 @@ class DeliveryPartner extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'delivery_partners';
-    
+
     protected $guard = 'delivery_partner';
 
     /**
@@ -141,8 +141,8 @@ class DeliveryPartner extends Authenticatable
     public function scopeAvailable($query)
     {
         return $query->where('is_available', true)
-                    ->where('is_online', true)
-                    ->where('status', 'approved');
+            ->where('is_online', true)
+            ->where('status', 'approved');
     }
 
     /**
@@ -154,14 +154,33 @@ class DeliveryPartner extends Authenticatable
     }
 
     /**
-     * Check if partner is available for delivery.
+     * Check if partner is approved and verified to perform deliveries.
+     * This checks the fundamental eligibility, not the current real-time status.
+     */
+    public function canPerformDeliveries(): bool
+    {
+        return $this->status === 'approved' &&
+            $this->is_verified === true &&
+            $this->status !== 'suspended' &&
+            $this->status !== 'rejected';
+    }
+
+    /**
+     * Check if partner is available for delivery right now.
      */
     public function isAvailableForDelivery(): bool
     {
-        return $this->status === 'approved' && 
-               $this->is_verified && 
-               $this->is_online && 
-               $this->is_available;
+        return $this->canPerformDeliveries() &&
+            $this->is_online === true &&
+            $this->is_available === true;
+    }
+
+    /**
+     * Check if the partner is allowed to go online.
+     */
+    public function canGoOnline(): bool
+    {
+        return $this->canPerformDeliveries();
     }
 
     /**
@@ -214,8 +233,8 @@ class DeliveryPartner extends Authenticatable
         $lonDelta = $lonTo - $lonFrom;
 
         $a = sin($latDelta / 2) * sin($latDelta / 2) +
-             cos($latFrom) * cos($latTo) *
-             sin($lonDelta / 2) * sin($lonDelta / 2);
+            cos($latFrom) * cos($latTo) *
+            sin($lonDelta / 2) * sin($lonDelta / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return round($earthRadius * $c, 2);
@@ -412,8 +431,8 @@ class DeliveryPartner extends Authenticatable
     public function getPendingOrdersCountAttribute(): int
     {
         return $this->orders()
-                   ->whereIn('delivery_status', ['assigned', 'picked_up', 'in_transit'])
-                   ->count();
+            ->whereIn('delivery_status', ['assigned', 'picked_up', 'in_transit'])
+            ->count();
     }
 
     /**
@@ -422,8 +441,8 @@ class DeliveryPartner extends Authenticatable
     public function getTodayEarningsAttribute(): float
     {
         return $this->orders()
-                   ->where('delivery_status', 'delivered')
-                   ->whereDate('delivered_at', today())
-                   ->sum('delivery_fee') ?? 0;
+            ->where('delivery_status', 'delivered')
+            ->whereDate('delivered_at', today())
+            ->sum('delivery_fee') ?? 0;
     }
 }

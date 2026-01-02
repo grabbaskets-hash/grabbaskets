@@ -75,7 +75,7 @@ class AuthController extends Controller
             'vehicle_rc_number' => 'nullable|string|max:50',
             'insurance_number' => 'nullable|string|max:50',
             'insurance_expiry' => 'nullable|date|after:today',
-            
+
             // Documents - reduced size limit for faster upload
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'license_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
@@ -83,13 +83,13 @@ class AuthController extends Controller
             'aadhar_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'pan_number' => 'nullable|string|size:10',
             'pan_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
-            
+
             // Bank Details
             'bank_account_holder' => 'nullable|string|max:255',
             'bank_account_number' => 'nullable|string|max:20',
             'bank_ifsc_code' => 'nullable|string|max:11',
             'bank_name' => 'nullable|string|max:255',
-            
+
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|size:10',
             'emergency_contact_relation' => 'nullable|string|max:100',
@@ -101,7 +101,7 @@ class AuthController extends Controller
         if ($request->filled('email') && DeliveryPartner::where('email', $request->email)->exists()) {
             return back()->withErrors(['email' => 'Email already registered'])->withInput();
         }
-        
+
         if ($request->filled('phone') && DeliveryPartner::where('phone', $request->phone)->exists()) {
             return back()->withErrors(['phone' => 'Phone number already registered'])->withInput();
         }
@@ -128,7 +128,7 @@ class AuthController extends Controller
             $uploadedFiles = [];
             $fileFields = [
                 'profile_photo',
-                'license_photo', 
+                'license_photo',
                 'vehicle_photo',
                 'aadhar_photo',
                 'pan_photo'
@@ -138,12 +138,12 @@ class AuthController extends Controller
                 if ($request->hasFile($field)) {
                     $file = $request->file($field);
                     $filename = 'delivery-partner/' . $field . '/' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                    
+
                     // Store ONLY in public disk for immediate registration
                     $path = $file->storeAs('', $filename, 'public');
                     $data[$field] = $filename;
                     $uploadedFiles[] = $filename;
-                    
+
                     // Skip R2 upload during registration for speed - handle in background job later
                 }
             }
@@ -219,7 +219,7 @@ class AuthController extends Controller
             }
 
             logger('Delivery Partner Registration Error: ' . $e->getMessage());
-            
+
             return back()
                 ->with('error', 'Registration failed. Please try again.')
                 ->withInput();
@@ -252,7 +252,7 @@ class AuthController extends Controller
             // Create delivery partner with minimal required data
             $data = $validator->validated();
             unset($data['terms_accepted']);
-            
+
             $deliveryPartner = DeliveryPartner::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -320,7 +320,7 @@ class AuthController extends Controller
             logger('Quick Registration Error: ' . $e->getMessage());
             logger('Quick Registration Stack Trace: ' . $e->getTraceAsString());
             logger('Quick Registration Data: ' . json_encode($request->all()));
-            
+
             return back()
                 ->with('error', 'Registration failed: ' . $e->getMessage())
                 ->withInput();
@@ -334,7 +334,7 @@ class AuthController extends Controller
     {
         $phone = $request->input('phone');
         $exists = DeliveryPartner::where('phone', $phone)->exists();
-        
+
         return response()->json(['exists' => $exists]);
     }
 
@@ -345,7 +345,7 @@ class AuthController extends Controller
     {
         $email = $request->input('email');
         $exists = DeliveryPartner::where('email', $email)->exists();
-        
+
         return response()->json(['exists' => $exists]);
     }
 
@@ -355,7 +355,7 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $startTime = microtime(true);
-        
+
         $credentials = $request->validate([
             'login' => 'required|string',
             'password' => 'required|string',
@@ -363,7 +363,7 @@ class AuthController extends Controller
 
         // Determine if login is email or phone
         $loginField = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        
+
         $loginData = [
             $loginField => $credentials['login'],
             'password' => $credentials['password']
@@ -373,15 +373,15 @@ class AuthController extends Controller
         // Use efficient authentication with minimal queries
         if (Auth::guard('delivery_partner')->attempt($loginData, $request->boolean('remember'))) {
             $authTime = (microtime(true) - $authStartTime) * 1000;
-            
+
             $sessionStartTime = microtime(true);
             $request->session()->regenerate();
             $sessionTime = (microtime(true) - $sessionStartTime) * 1000;
-            
+
             $userStartTime = microtime(true);
             $partner = Auth::guard('delivery_partner')->user();
             $userTime = (microtime(true) - $userStartTime) * 1000;
-            
+
             // Update last active timestamp efficiently (only if more than 1 hour old)
             $updateStartTime = microtime(true);
             $updateTime = 0;
@@ -394,7 +394,7 @@ class AuthController extends Controller
                 // Silent fail - not critical
                 $updateTime = (microtime(true) - $updateStartTime) * 1000;
             }
-            
+
             // Check partner status
             if ($partner->status === 'pending') {
                 return redirect()
@@ -415,7 +415,7 @@ class AuthController extends Controller
             }
 
             $totalTime = (microtime(true) - $startTime) * 1000;
-            
+
             // Log performance metrics
             Log::info("DeliveryPartner Login Success", [
                 'partner_id' => $partner->id,
@@ -454,7 +454,7 @@ class AuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         $partner = Auth::guard('delivery_partner')->user();
-        
+
         if ($partner) {
             // Mark as offline when logging out
             $partner->update([
@@ -464,7 +464,7 @@ class AuthController extends Controller
         }
 
         Auth::guard('delivery_partner')->logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -535,10 +535,10 @@ class AuthController extends Controller
 
                 $file = $request->file('profile_photo');
                 $filename = 'delivery-partner/profile_photo/' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                
+
                 $file->storeAs('', $filename, 'public');
                 $data['profile_photo'] = $filename;
-                
+
                 // Try to sync to R2
                 try {
                     Storage::disk('r2')->put($filename, $file->get());
@@ -589,7 +589,7 @@ class AuthController extends Controller
     {
         $partner = Auth::guard('delivery_partner')->user();
 
-        if (!$partner->isAvailableForDelivery() && !$partner->is_online) {
+        if (!$partner->is_online && !$partner->canGoOnline()) {
             return response()->json([
                 'success' => false,
                 'message' => 'You cannot go online. Please ensure your account is approved and verified.'

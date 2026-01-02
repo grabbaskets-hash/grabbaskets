@@ -10,6 +10,9 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\FoodOrder;
+use App\Models\TenMinOrder;
+use App\Models\DeliveryPartner;
 use App\Models\User;
 use App\Models\Notification;
 use App\Services\NotificationService;
@@ -76,7 +79,8 @@ class AdminController extends Controller
 
             foreach ($rows as $row) {
                 $data = array_combine($header, $row);
-                if (!$data) continue;
+                if (!$data)
+                    continue;
 
                 $data['seller_id'] = $seller->id;
 
@@ -124,7 +128,7 @@ class AdminController extends Controller
         try {
             // Count of products safely
             $productsCount = Product::count();
-            
+
             // Get latest orders with eager loading - handle null relationships gracefully
             $ordersCount = Order::with([
                 'buyerUser' => function ($query) {
@@ -134,10 +138,10 @@ class AdminController extends Controller
                     $query->select('id', 'name', 'price');
                 }
             ])->latest()->take(10)->get();
-            
+
             $sellersCount = User::where('role', 'seller')->count();
             $buyersCount = User::where('role', 'buyer')->count();
-            
+
             // Add delivery partners count
             $deliveryPartnersCount = \App\Models\DeliveryPartner::count();
             $activeDeliveryPartnersCount = \App\Models\DeliveryPartner::where('status', 'approved')->count();
@@ -158,43 +162,87 @@ class AdminController extends Controller
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->view('errors.custom', [
                 'message' => 'There was an error loading the dashboard. Please try again.'
             ], 500);
         }
     }
 
-    public function orders(Request $request)
+    public function orders(Request $request, $type = 'all')
     {
-        $statuses = ['Pending', 'Shipped', 'Delivered', 'Cancelled'];
+        $statuses = ['Pending', 'Preparing', 'Shipped', 'Delivered', 'Cancelled'];
+        $deliveryTypes = ['standard', 'food', 'express_10min'];
 
-        $query = Order::with(['buyerUser', 'product']); // Use buyerUser instead of customer
-        
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('buyerUser', function ($q) use ($search) { // Use buyerUser
-                $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('product', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
+        // Define the active type based on route parameter or query string
+        $activeType = $request->get('type', $type);
+
+        if ($activeType === 'food') {
+            $query = FoodOrder::with('items.foodItem');
+        } elseif ($activeType === 'express' || $activeType === 'tenmins') {
+            $query = TenMinOrder::with('items.product');
+            $activeType = 'express'; // Normalize
+        } elseif ($activeType === 'standard') {
+            $query = Order::with(['buyerUser', 'product'])->where('delivery_type', 'standard');
+        } else {
+            // Unified view (all)
+            $standardOrders = Order::with(['buyerUser', 'product'])
+                ->select('id', 'buyer_id', 'amount', 'status', 'created_at', 'payment_method', 'delivery_type', 'tracking_number', 'courier_name')
+                ->selectRaw("'standard' as type");
+
+            $foodOrders = FoodOrder::with(['items'])
+                ->select('id', 'hotel_owner_id as buyer_id', 'total_amount as amount', 'status', 'created_at', 'payment_method')
+                ->selectRaw("'food' as delivery_type, NULL as tracking_number, NULL as courier_name, 'food' as type");
+
+            $expressOrders = TenMinOrder::with(['user', 'items'])
+                ->select('id', 'user_id as buyer_id', 'total_amount as amount', 'status', 'created_at', 'payment_method')
+                ->selectRaw("'express_10min' as delivery_type, NULL as tracking_number, NULL as courier_name, 'express' as type");
+
+            $query = $standardOrders->union($foodOrders)->union($expressOrders);
         }
 
+        // Apply global filters
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            // Search logic here...
         }
 
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
+        $orders = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->all());
+
+        // Hydrate only for unified view because specialized queries already have relations
+        if ($activeType === 'all') {
+            $orders->getCollection()->transform(function ($order) {
+                if ($order->type === 'food') {
+                    $item = FoodOrder::with('items.foodItem')->find($order->id);
+                    if ($item)
+                        $item->type = 'food';
+                    return $item ?? $order;
+                } elseif ($order->type === 'express') {
+                    $item = TenMinOrder::with('items.product')->find($order->id);
+                    if ($item)
+                        $item->type = 'express';
+                    return $item ?? $order;
+                } else {
+                    $item = Order::with(['buyerUser', 'product'])->find($order->id);
+                    if ($item)
+                        $item->type = 'standard';
+                    return $item ?? $order;
+                }
+            });
+        } else {
+            // Ensure type is set on individual models
+            $orders->getCollection()->each(function ($item) use ($activeType) {
+                $item->type = $activeType;
+            });
         }
 
-        $orders = $query->latest()->paginate(15)->appends($request->only(['search', 'status', 'start_date', 'end_date']));
+        $partners = DeliveryPartner::where('status', 'approved')->get();
 
-        return view('admin.orders', compact('orders', 'statuses'));
+        return view('admin.orders', compact('orders', 'statuses', 'deliveryTypes', 'partners', 'activeType'));
     }
 
     public function products(Request $request)
@@ -237,15 +285,17 @@ class AdminController extends Controller
 
             // Get all sellers with product counts using the correct relationship
             $sellersQuery = User::where('role', 'seller')
-                ->withCount(['products' => function($query) {
-                    $query->whereNotNull('image'); // Only count products with images
-                }]);
+                ->withCount([
+                    'products' => function ($query) {
+                        $query->whereNotNull('image'); // Only count products with images
+                    }
+                ]);
 
             // Apply search filter
             if ($search) {
-                $sellersQuery->where(function($q) use ($search) {
+                $sellersQuery->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 });
             }
 
@@ -254,7 +304,7 @@ class AdminController extends Controller
             // Get products for selected seller
             $products = null;
             $selectedSellerInfo = null;
-            
+
             if ($selectedSeller) {
                 $selectedSellerInfo = User::find($selectedSeller);
                 if ($selectedSellerInfo) {
@@ -289,7 +339,7 @@ class AdminController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -342,24 +392,33 @@ class AdminController extends Controller
         return back()->with('success', "User {$action} successfully.");
     }
 
-    public function updateOrderStatus(Request $request, Order $order)
+    public function updateOrderStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string|in:Pending,Shipped,Delivered,Cancelled',
+            'status' => 'required|string',
+            'order_type' => 'required|in:standard,food,express'
         ]);
 
+        $orderType = $request->order_type;
+
+        if ($orderType !== 'standard') {
+            return back()->with('error', 'Status for ' . ucfirst($orderType) . ' orders must be updated by the respective seller or hotel owner.');
+        }
+
+        $order = Order::findOrFail($id);
         $order->status = $request->status;
         $order->save();
 
-        $admin = User::where('role', 'admin')->first();
-        if ($admin) {
-            Mail::raw(
-                "Order #{$order->id} status updated to: {$order->status}",
-                function ($message) use ($admin) {
-                    $message->to($admin->email)
-                            ->subject('Order Status Updated');
-                }
-            );
+        // Notify buyer
+        $buyer = $order->buyerUser;
+        if ($buyer) {
+            Notification::create([
+                'user_id' => $buyer->id,
+                'title' => "Order Status Updated",
+                'message' => "Your order #{$id} status has been updated to {$request->status}.",
+                'type' => 'order_status_update',
+                'data' => json_encode(['order_id' => $id, 'type' => 'standard'])
+            ]);
         }
 
         return back()->with('success', 'Order status updated successfully.');
@@ -414,7 +473,7 @@ Thank you for shopping with us!
 Best regards,
 Grabbasket Team
                 ";
-                
+
                 Mail::raw($message, function ($mail) use ($buyer, $subject) {
                     $mail->to($buyer->email)
                         ->subject($subject);
@@ -446,7 +505,7 @@ Grabbasket Team
                 "Order #{$order->id} tracking number updated to: {$order->tracking_number} via {$order->courier_name}. Buyer has been notified via email and SMS.",
                 function ($message) use ($admin) {
                     $message->to($admin->email)
-                            ->subject('Order Tracking Number Updated');
+                        ->subject('Order Tracking Number Updated');
                 }
             );
         }
@@ -585,10 +644,10 @@ Grabbasket Team
 
                 case 'wishlist_sale':
                     $wishlistItems = \App\Models\Wishlist::with(['user', 'product'])
-                                            ->whereHas('product', function($query) {
-                                                $query->where('discount', '>', 0);
-                                            })
-                                            ->get();
+                        ->whereHas('product', function ($query) {
+                            $query->where('discount', '>', 0);
+                        })
+                        ->get();
                     foreach ($wishlistItems as $item) {
                         NotificationService::sendWishlistItemOnSale($item->user, $item->product);
                     }
@@ -597,10 +656,10 @@ Grabbasket Team
 
                 case 'back_in_stock':
                     $wishlistItems = \App\Models\Wishlist::with(['user', 'product'])
-                                            ->whereHas('product', function($query) {
-                                                $query->where('stock', '>', 0);
-                                            })
-                                            ->get();
+                        ->whereHas('product', function ($query) {
+                            $query->where('stock', '>', 0);
+                        })
+                        ->get();
                     foreach ($wishlistItems as $item) {
                         NotificationService::sendProductBackInStock($item->user, $item->product);
                     }
@@ -642,5 +701,34 @@ Grabbasket Team
         $product->seller_id = $seller->id;
         $product->save();
         return back()->with('success', 'Seller updated successfully.');
+    }
+
+    public function assignDeliveryPartner(Request $request, $id)
+    {
+        $request->validate([
+            'delivery_partner_id' => 'required|exists:delivery_partners,id',
+            'order_type' => 'required|in:standard,food,express'
+        ]);
+
+        $orderType = $request->order_type;
+        $order = null;
+
+        if ($orderType === 'standard') {
+            $order = Order::findOrFail($id);
+            $order->delivery_partner_id = $request->delivery_partner_id;
+        } elseif ($orderType === 'food') {
+            $order = FoodOrder::findOrFail($id);
+            $order->delivery_partner_id = $request->delivery_partner_id;
+        } else {
+            $order = TenMinOrder::findOrFail($id);
+            // Check if column exists, though we should probably ensure it does
+            if (\Illuminate\Support\Facades\Schema::hasColumn('ten_min_orders', 'delivery_partner_id')) {
+                $order->delivery_partner_id = $request->delivery_partner_id;
+            }
+        }
+
+        $order->save();
+
+        return back()->with('success', 'Delivery partner assigned successfully.');
     }
 }

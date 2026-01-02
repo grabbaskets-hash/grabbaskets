@@ -757,8 +757,22 @@ Route::get('/admin/orders', function () {
     if (!session('is_admin')) {
         return redirect()->route('admin.login');
     }
-    return app(AdminController::class)->orders(request());
+    return app(AdminController::class)->orders(request(), 'standard');
 })->name('admin.orders');
+
+Route::get('/admin/food', function () {
+    if (!session('is_admin')) {
+        return redirect()->route('admin.login');
+    }
+    return app(AdminController::class)->orders(request(), 'food');
+})->name('admin.orders.food');
+
+Route::get('/admin/tenmins', function () {
+    if (!session('is_admin')) {
+        return redirect()->route('admin.login');
+    }
+    return app(AdminController::class)->orders(request(), 'express');
+})->name('admin.orders.express');
 
 Route::get('/admin/products', function () {
     if (!session('is_admin')) {
@@ -803,19 +817,26 @@ Route::post('/admin/users/{user}/suspend', function (Request $request, $user) {
     return app(AdminController::class)->suspendUser(\App\Models\User::findOrFail($user));
 })->name('admin.users.suspend');
 
-Route::post('/admin/orders/{order}/update-status', function (Request $request, $order) {
+Route::post('/admin/orders/{id}/update-status', function (Request $request, $id) {
     if (!session('is_admin')) {
         return redirect()->route('admin.login');
     }
-    return app(AdminController::class)->updateOrderStatus($request, \App\Models\Order::findOrFail($order));
+    return app(AdminController::class)->updateOrderStatus($request, $id);
 })->name('admin.updateOrderStatus');
 
-Route::post('/admin/orders/{order}/update-tracking', function (Request $request, $order) {
+Route::post('/admin/orders/{id}/update-tracking', function (Request $request, $id) {
     if (!session('is_admin')) {
         return redirect()->route('admin.login');
     }
-    return app(AdminController::class)->updateTracking($request, \App\Models\Order::findOrFail($order));
+    return app(AdminController::class)->updateTracking($request, \App\Models\Order::findOrFail($id));
 })->name('admin.updateTracking');
+
+Route::post('/admin/orders/{id}/assign-partner', function (Request $request, $id) {
+    if (!session('is_admin')) {
+        return redirect()->route('admin.login');
+    }
+    return app(AdminController::class)->assignDeliveryPartner($request, $id);
+})->name('admin.assignDeliveryPartner');
 
 Route::delete('/admin/products/{product}', function ($product) {
     if (!session('is_admin')) {
