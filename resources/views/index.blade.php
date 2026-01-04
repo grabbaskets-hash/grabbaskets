@@ -2304,7 +2304,9 @@
             const overlay = document.getElementById('drawerOverlay');
             
             if (!drawer || !overlay) {
-                console.error('Category drawer elements not found');
+                @if(config('app.debug'))
+                    console.error('Category drawer elements not found');
+                @endif
                 return;
             }
             
@@ -2461,7 +2463,11 @@
                         refreshCartCount(); 
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    @if(config('app.debug'))
+                        console.error('Error:', error);
+                    @endif
+                });
             @else
                 window.location.href = '{{ route('login') }}';
             @endauth
