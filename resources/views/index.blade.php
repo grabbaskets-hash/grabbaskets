@@ -255,19 +255,24 @@
             top: 0;
             left: -100%;
             width: 80%;
+            max-width: 320px;
             height: 100%;
             background: white;
             z-index: 2000;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
             border-top-right-radius: 25px;
             border-bottom-right-radius: 25px;
+            opacity: 0;
+            transform: translateX(-20px);
         }
 
         .mobile-category-drawer.active {
             left: 0;
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .drawer-overlay {
@@ -331,13 +336,88 @@
             color: #333;
             border-radius: 15px;
             margin-bottom: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: #f8f9fa;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .mobile-category-drawer.active .drawer-item {
+            animation: slideInFade 0.4s ease forwards;
+        }
+
+        .drawer-item:nth-child(1) { animation-delay: 0.05s; }
+        .drawer-item:nth-child(2) { animation-delay: 0.1s; }
+        .drawer-item:nth-child(3) { animation-delay: 0.15s; }
+        .drawer-item:nth-child(4) { animation-delay: 0.2s; }
+        .drawer-item:nth-child(5) { animation-delay: 0.25s; }
+        .drawer-item:nth-child(6) { animation-delay: 0.3s; }
+        .drawer-item:nth-child(7) { animation-delay: 0.35s; }
+        .drawer-item:nth-child(8) { animation-delay: 0.4s; }
+        .drawer-item:nth-child(n+9) { animation-delay: 0.45s; }
+
+        @keyframes slideInFade {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .drawer-item:active {
             background: #e9ecef;
             transform: scale(0.98);
+        }
+
+        .drawer-subcategory {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px 12px 45px;
+            text-decoration: none;
+            color: #666;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #f0f0f0;
+            font-size: 0.9rem;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .drawer-subcategory.show {
+            opacity: 1;
+            max-height: 50px;
+            margin-bottom: 6px;
+        }
+
+        .drawer-subcategory:active {
+            background: #e0e0e0;
+            transform: scale(0.98);
+        }
+
+        .drawer-category-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .drawer-category-toggle i {
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .drawer-category-toggle.expanded i {
+            transform: rotate(90deg);
         }
 
         .drawer-item .item-emoji {
@@ -1014,12 +1094,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-<<<<<<< HEAD
-                color:red;
-                justify-content: center; /* Center aligned */
-=======
                 justify-content: center;
->>>>>>> 3b00340d (order tracking)
                 text-decoration: none;
                 color: #94a3b8; /* Slate-400 */
                 font-size: 10px;
@@ -1162,6 +1237,21 @@
                 top: 100px;
                 max-height: calc(100vh - 120px);
                 overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary-light) transparent;
+            }
+
+            .sidebar-menu::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar-menu::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .sidebar-menu::-webkit-scrollbar-thumb {
+                background: var(--primary-light);
+                border-radius: 3px;
             }
 
             .side-link {
@@ -1172,14 +1262,70 @@
                 color: var(--text-main);
                 text-decoration: none;
                 border-radius: 10px;
-                transition: all 0.2s;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 font-weight: 500;
+                opacity: 1;
+                transform: translateX(0);
             }
 
             .side-link:hover {
-                background: #f8f9fa;
+                background: linear-gradient(90deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.05) 100%);
                 color: var(--primary);
                 transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(106, 17, 203, 0.1);
+            }
+
+            .side-link.active {
+                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                color: white;
+                font-weight: 600;
+            }
+
+            /* Subcategory styles */
+            .subcategory-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 15px 8px 35px;
+                color: var(--text-muted);
+                text-decoration: none;
+                border-radius: 8px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-size: 0.85rem;
+                font-weight: 500;
+                opacity: 0;
+                max-height: 0;
+                overflow: hidden;
+            }
+
+            .subcategory-item.show {
+                opacity: 1;
+                max-height: 50px;
+                margin-bottom: 4px;
+            }
+
+            .subcategory-item:hover {
+                background: rgba(106, 17, 203, 0.08);
+                color: var(--primary);
+                transform: translateX(3px);
+            }
+
+            .category-group {
+                margin-bottom: 8px;
+            }
+
+            .category-toggle {
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .category-toggle i {
+                transition: transform 0.3s ease;
+                font-size: 0.8rem;
+            }
+
+            .category-toggle.expanded i {
+                transform: rotate(90deg);
             }
 
             .desktop-grid {
@@ -1562,9 +1708,12 @@
             </div>
             
             <div class="mobile-search-wrapper">
-                <form action="{{ route('products.index') }}" method="GET" class="search-bar-modern">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-modern" id="mobileSearchForm">
                     <i class="bi bi-search"></i>
-                    <input type="text" name="q" placeholder="Search for groceries, food & more..." autocomplete="off">
+                    <input type="text" name="q" id="mobileSearchInput" 
+                           placeholder="Search for groceries, food & more..." 
+                           autocomplete="off"
+                           value="{{ request('q') }}">
                 </form>
             </div>
         </div>
@@ -1760,13 +1909,8 @@
                 <span>Home</span>
             </a>
             <a href="javascript:void(0)" onclick="toggleCategoryDrawer()" class="nav-link-mobile">
-<<<<<<< HEAD
-                <i class="bi bi-grid"></i>
-                <span>Categories</span>
-=======
                 <i class="bi bi-grid-fill"></i>
-                <span>Category</span>
->>>>>>> 3b00340d (order tracking)
+                <span>Categories</span>
             </a>
             <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
                 <div class="position-relative">
@@ -1815,8 +1959,10 @@
                     </div>
 
                 </div>
-                <form action="{{ route('products.index') }}" method="GET" class="search-bar-container desktop-search">
-                    <input type="text" name="q" class="search-input" placeholder="Search for products, brands and more">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-container desktop-search" id="desktopSearchForm">
+                    <input type="text" name="q" id="desktopSearchInput" class="search-input" 
+                           placeholder="Search for products, brands and more"
+                           value="{{ request('q') }}">
                     <i class="bi bi-search search-icon"></i>
                 </form>
                 <div class="nav-actions">
@@ -1858,14 +2004,43 @@
             <aside>
                 <div class="sidebar-menu shadow-sm-custom">
                     <div class="text-muted fs-8 fw-bold mb-3 px-3 text-uppercase tracking-wider">Categories</div>
-                    @foreach(collect($categories ?? [])->take(10) as $cat)
-                        <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="side-link">
-                            <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span> {{ $cat->name ?? 'Category' }}
-                        </a>
+                    @php
+                        $allCategories = collect($categories ?? []);
+                        $categoriesWithSubs = $allCategories->map(function($cat) {
+                            $cat->subcategories_list = \App\Models\Subcategory::where('category_id', $cat->id)->get();
+                            return $cat;
+                        });
+                    @endphp
+                    @foreach($categoriesWithSubs as $cat)
+                        <div class="category-group">
+                            <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" 
+                               class="side-link category-link-main"
+                               data-category-id="{{ $cat->id ?? 0 }}">
+                                <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span>
+                                <span class="flex-grow-1">{{ $cat->name ?? 'Category' }}</span>
+                                @if(($cat->subcategories_list ?? collect())->count() > 0)
+                                    <i class="bi bi-chevron-right category-toggle-icon" style="font-size: 0.75rem; margin-left: auto;"></i>
+                                @endif
+                            </a>
+                            @if(($cat->subcategories_list ?? collect())->count() > 0)
+                                <div class="subcategories-container" data-category="{{ $cat->id ?? 0 }}" style="display: none;">
+                                    @foreach($cat->subcategories_list as $sub)
+                                        <a href="{{ route('products.index', ['category_id' => $cat->id, 'subcategory_id' => $sub->id]) }}" 
+                                           class="subcategory-item">
+                                            <span style="font-size: 1rem;">{{ $sub->emoji ?? '📦' }}</span>
+                                            <span>{{ $sub->name ?? 'Subcategory' }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
-                    <a href="{{ route('categories.index') }}" class="side-link text-primary mt-2">
-                        <i class="bi bi-grid fs-5"></i> View All
-                    </a>
+                    @if($allCategories->isEmpty())
+                        <div class="text-muted text-center py-3">
+                            <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                            <small>No categories available</small>
+                        </div>
+                    @endif
                 </div>
             </aside>
             <main>
@@ -2068,37 +2243,172 @@
             </button>
         </div>
         <div class="drawer-body">
-            @foreach(($categories ?? []) as $cat)
-                <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-item">
-                    <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
-                    <div class="item-text">{{ $cat->name ?? 'Category' }}</div>
-                </a>
-            @endforeach
-            @if(count($categories ?? []) == 0)
-                @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning', 'Home', 'Beauty', 'Pharma', 'Pet'] as $dummy)
-                    <a href="#" class="drawer-item">
-                        <div class="item-emoji">📦</div>
-                        <div class="item-text">{{ $dummy }}</div>
+            @php
+                $mobileCategories = collect($categories ?? []);
+                $mobileCategoriesWithSubs = $mobileCategories->map(function($cat) {
+                    try {
+                        $cat->subcategories_list = \App\Models\Subcategory::where('category_id', $cat->id)->get();
+                    } catch (\Exception $e) {
+                        $cat->subcategories_list = collect();
+                    }
+                    return $cat;
+                });
+            @endphp
+            @foreach($mobileCategoriesWithSubs as $cat)
+                @if(($cat->subcategories_list ?? collect())->count() > 0)
+                    <div class="drawer-category-wrapper">
+                        <div class="drawer-item" style="cursor: pointer;" onclick="toggleMobileSubcategories({{ $cat->id ?? 0 }})">
+                            <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
+                            <div class="item-text flex-grow-1">{{ $cat->name ?? 'Category' }}</div>
+                            <button class="drawer-category-toggle" type="button">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="drawer-subcategories" id="subcats-{{ $cat->id ?? 0 }}" style="display: none;">
+                            <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-subcategory" onclick="toggleCategoryDrawer()">
+                                <div class="item-emoji" style="width: 35px; height: 35px; font-size: 1rem;">{{ $cat->emoji ?? '🥬' }}</div>
+                                <div class="item-text">All {{ $cat->name ?? 'Category' }}</div>
+                            </a>
+                            @foreach($cat->subcategories_list as $sub)
+                                <a href="{{ route('products.index', ['category_id' => $cat->id, 'subcategory_id' => $sub->id]) }}" 
+                                   class="drawer-subcategory" onclick="toggleCategoryDrawer()">
+                                    <div class="item-emoji" style="width: 35px; height: 35px; font-size: 1rem;">{{ $sub->emoji ?? '📦' }}</div>
+                                    <div class="item-text">{{ $sub->name ?? 'Subcategory' }}</div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-item" onclick="toggleCategoryDrawer()">
+                        <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
+                        <div class="item-text">{{ $cat->name ?? 'Category' }}</div>
                     </a>
-                @endforeach
+                @endif
+            @endforeach
+            @if($mobileCategories->isEmpty())
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    <small>No categories available</small>
+                </div>
             @endif
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
+        /**
+         * Toggle mobile category drawer with smooth animations
+         */
         function toggleCategoryDrawer() {
             const drawer = document.getElementById('categoryDrawer');
             const overlay = document.getElementById('drawerOverlay');
-            drawer.classList.toggle('active');
-            overlay.classList.toggle('active');
             
-            if (drawer.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
+            if (!drawer || !overlay) {
+                console.error('Category drawer elements not found');
+                return;
+            }
+            
+            const isActive = drawer.classList.contains('active');
+            
+            if (isActive) {
+                // Close drawer
+                drawer.classList.remove('active');
+                overlay.classList.remove('active');
                 document.body.style.overflow = 'auto';
+            } else {
+                // Open drawer
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
         }
+
+        /**
+         * Toggle subcategories in mobile drawer
+         */
+        function toggleMobileSubcategories(categoryId) {
+            const subcatContainer = document.getElementById('subcats-' + categoryId);
+            const categoryItem = event?.currentTarget || document.querySelector(`[onclick="toggleMobileSubcategories(${categoryId})"]`);
+            const toggleIcon = categoryItem?.querySelector('.drawer-category-toggle i');
+            
+            if (!subcatContainer) return;
+            
+            const isExpanded = subcatContainer.style.display === 'block';
+            
+            if (isExpanded) {
+                // Collapse
+                subcatContainer.style.display = 'none';
+                if (categoryItem) {
+                    categoryItem.querySelector('.drawer-category-toggle')?.classList.remove('expanded');
+                }
+            } else {
+                // Expand
+                subcatContainer.style.display = 'block';
+                if (categoryItem) {
+                    categoryItem.querySelector('.drawer-category-toggle')?.classList.add('expanded');
+                }
+                // Animate subcategories
+                const subcats = subcatContainer.querySelectorAll('.drawer-subcategory');
+                subcats.forEach((sub, index) => {
+                    setTimeout(() => {
+                        sub.classList.add('show');
+                    }, index * 50);
+                });
+            }
+        }
+
+        /**
+         * Initialize desktop sidebar category toggles
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desktop sidebar category expansion
+            const categoryLinks = document.querySelectorAll('.category-link-main');
+            categoryLinks.forEach(link => {
+                const subcatContainer = link.nextElementSibling;
+                if (subcatContainer && subcatContainer.classList.contains('subcategories-container')) {
+                    link.addEventListener('click', function(e) {
+                        // If clicking the chevron icon, toggle subcategories
+                        const icon = this.querySelector('.category-toggle-icon');
+                        if (icon && e.target === icon || icon?.contains(e.target)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const isExpanded = subcatContainer.style.display === 'block';
+                            if (isExpanded) {
+                                subcatContainer.style.display = 'none';
+                                icon.style.transform = 'rotate(0deg)';
+                            } else {
+                                subcatContainer.style.display = 'block';
+                                icon.style.transform = 'rotate(90deg)';
+                                // Animate subcategories
+                                const subcats = subcatContainer.querySelectorAll('.subcategory-item');
+                                subcats.forEach((sub, index) => {
+                                    setTimeout(() => {
+                                        sub.classList.add('show');
+                                    }, index * 30);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Close drawer when clicking overlay
+            const overlay = document.getElementById('drawerOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', toggleCategoryDrawer);
+            }
+
+            // Close drawer on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const drawer = document.getElementById('categoryDrawer');
+                    if (drawer && drawer.classList.contains('active')) {
+                        toggleCategoryDrawer();
+                    }
+                }
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/location-delivery.js') }}"></script>
@@ -2195,6 +2505,41 @@
         function addToCart(productId) {
             updateCart(productId, 'add');
         }
+
+        /**
+         * Enhanced search functionality with error handling
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile search form handling
+            const mobileSearchForm = document.getElementById('mobileSearchForm');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+            
+            if (mobileSearchForm && mobileSearchInput) {
+                mobileSearchForm.addEventListener('submit', function(e) {
+                    const query = mobileSearchInput.value.trim();
+                    if (!query) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    // Form will submit normally to products.index route
+                });
+            }
+
+            // Desktop search form handling
+            const desktopSearchForm = document.getElementById('desktopSearchForm');
+            const desktopSearchInput = document.getElementById('desktopSearchInput');
+            
+            if (desktopSearchForm && desktopSearchInput) {
+                desktopSearchForm.addEventListener('submit', function(e) {
+                    const query = desktopSearchInput.value.trim();
+                    if (!query) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    // Form will submit normally to products.index route
+                });
+            }
+        });
     </script>
 
     <script>

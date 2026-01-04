@@ -182,18 +182,20 @@ public function dashboard()
 
 
 
-public function search(Request $request)
-{
-    try {
-        $searchQuery = $request->input('q', '');
-        $matchedStores = collect();
-        
-        $query = Product::with(['category', 'subcategory'])
-            ->whereNotNull('image')
-            ->where('image', '!=', '')
-            ->where('image', 'NOT LIKE', '%unsplash%')
-            ->where('image', 'NOT LIKE', '%placeholder%')
-            ->where('image', 'NOT LIKE', '%via.placeholder%');
+    public function search(Request $request)
+    {
+        try {
+            $searchQuery = $request->input('q', '');
+            $matchedStores = collect();
+            
+            // Query only from 'products' table - exclude ten_min_delivery_products
+            // Product model defaults to 'products' table, so we just use Product:: directly
+            $query = Product::with(['category', 'subcategory'])
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%');
 
         if ($request->filled('q')) {
             $search = trim($searchQuery);
@@ -255,6 +257,16 @@ public function search(Request $request)
             });
         }
 
+        // Apply category filter if provided
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->input('category_id'));
+        }
+
+        // Apply subcategory filter if provided
+        if ($request->filled('subcategory_id')) {
+            $query->where('subcategory_id', $request->input('subcategory_id'));
+        }
+
         // Add sorting
         $sort = $request->input('sort', 'relevance');
         switch ($sort) {
@@ -301,6 +313,22 @@ public function search(Request $request)
             'sort' => $request->input('sort', 'relevance')
         ];
         
+        // Get related products if search returns no results
+        $relatedProducts = collect();
+        if ($request->filled('q') && $totalResults == 0) {
+            // Try to find products from similar categories or popular products
+            // Query only from 'products' table - exclude ten_min_delivery_products
+            $relatedProducts = Product::with(['category', 'subcategory'])
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->where('image', 'NOT LIKE', '%unsplash%')
+                ->where('image', 'NOT LIKE', '%placeholder%')
+                ->where('image', 'NOT LIKE', '%via.placeholder%')
+                ->inRandomOrder()
+                ->take(6)
+                ->get();
+        }
+
         // Log search query for analytics
         if ($request->filled('q')) {
             \Illuminate\Support\Facades\Log::info('Search Query', [
@@ -311,7 +339,21 @@ public function search(Request $request)
             ]);
         }
 
-        return view('buyer.products', compact('products', 'searchQuery', 'totalResults', 'matchedStores', 'filters'));
+        // Get all categories for sidebar
+        $allCategories = Category::with(['subcategories' => function($query) {
+            $query->orderBy('name');
+        }])->orderBy('name')->get();
+
+        // Ensure we're passing 'categories' variable (not 'allCategories')
+        return view('products.index', [
+            'products' => $products,
+            'searchQuery' => $searchQuery,
+            'totalResults' => $totalResults,
+            'matchedStores' => $matchedStores,
+            'filters' => $filters,
+            'relatedProducts' => $relatedProducts,
+            'categories' => $allCategories
+        ]);
         
     } catch (\Exception $e) {
         \Illuminate\Support\Facades\Log::error('Search Error', [
@@ -329,12 +371,19 @@ public function search(Request $request)
             ['path' => request()->url(), 'query' => request()->query()]
         );
         
-        return view('buyer.products', [
+        // Get all categories for sidebar even on error
+        $allCategories = Category::with(['subcategories' => function($query) {
+            $query->orderBy('name');
+        }])->orderBy('name')->get();
+
+        return view('products.index', [
             'products' => $emptyProducts,
             'searchQuery' => $request->input('q', ''),
             'totalResults' => 0,
             'matchedStores' => collect([]),
             'filters' => [],
+            'relatedProducts' => collect([]),
+            'categories' => $allCategories,
             'error' => 'An error occurred while searching. Please try again.'
         ]);
     }
@@ -385,7 +434,9 @@ public function search(Request $request)
     {
         try {
             $category = Category::findOrFail($category_id);
-            $query = Product::with(['category', 'subcategory'])->where('category_id', $category_id)
+            // Query only from 'products' table - exclude ten_min_delivery_products
+            $query = Product::with(['category', 'subcategory'])
+                ->where('category_id', $category_id)
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
@@ -466,7 +517,9 @@ public function search(Request $request)
     {
         try {
             $subcategory = Subcategory::with('category')->findOrFail($subcategory_id);
-            $query = Product::with(['category', 'subcategory'])->where('subcategory_id', $subcategory_id)
+            // Query only from 'products' table - exclude ten_min_delivery_products
+            $query = Product::with(['category', 'subcategory'])
+                ->where('subcategory_id', $subcategory_id)
                 ->whereNotNull('image')
                 ->where('image', '!=', '')
                 ->where('image', 'NOT LIKE', '%unsplash%')
