@@ -39,4 +39,29 @@ class TenMinGroceryCartItem extends Model
     {
         return $this->belongsTo(User::class, 'seller_id'); // or Seller::class if separate
     }
+
+    // Get the image URL - Use Laravel Cloud URL
+    public function getImageUrlAttribute()
+    {
+        // Try to use product's image_url first
+        if ($this->product && $this->product->image_url) {
+            return $this->product->image_url;
+        }
+
+        // Fallback to constructing from stored image path
+        if (!$this->image) {
+            return null;
+        }
+
+        $imagePath = ltrim($this->image, '/');
+
+        // Static public images shipped with app (e.g., images/srm/...)
+        if (str_starts_with($imagePath, 'images/')) {
+            return asset($imagePath);
+        }
+
+        // Product images - use direct Laravel Cloud public URL
+        $r2PublicUrl = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+        return "{$r2PublicUrl}/{$imagePath}";
+    }
 }

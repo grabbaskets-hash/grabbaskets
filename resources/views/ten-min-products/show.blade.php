@@ -239,7 +239,7 @@ body{
 
     <!-- LEFT -->
     <div class="product-box">
-      <img id="productImage" class="product-img" src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/330?text=No+Image' }}" alt="{{ $product->name }}">
+      <img id="productImage" class="product-img" src="{{ $product->image_url ?? 'https://via.placeholder.com/330?text=No+Image' }}" alt="{{ $product->name }}">
 
       <div class="action-row">
         <div class="price-btn">₹{{ number_format($product->price, 2) }}</div>

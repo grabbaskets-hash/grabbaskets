@@ -492,7 +492,7 @@
 
                                     <!-- Image -->
                                     <div class="item-img-wrapper">
-                                        <img src="{{ $item->image ? asset('product_images/' . $item->image) : 'https://via.placeholder.com/80' }}"
+                                        <img src="{{ $item->image_url ?? 'https://via.placeholder.com/80' }}"
                                             alt="{{ $item->name }}">
                                     </div>
 

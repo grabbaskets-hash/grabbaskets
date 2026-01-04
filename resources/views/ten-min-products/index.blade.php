@@ -740,7 +740,7 @@
                             @endif
 
                             <div class="p-img-box">
-                                <img src="{{ $product->image ? asset('product_images/' . $product->image) : 'https://via.placeholder.com/300' }}"
+                                <img src="{{ $product->image_url ?? 'https://via.placeholder.com/300' }}"
                                     class="p-img" alt="{{ $product->name }}">
                             </div>
 
