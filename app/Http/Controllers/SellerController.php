@@ -1404,7 +1404,7 @@ class SellerController extends Controller
             return [
                 'id' => $cat->id,
                 'name' => $cat->name,
-                'icon' => $cat->icon ?? '🛒',
+                'icon' => $cat->emoji ?? '🛒',
                 'subcategories' => $cat->filteredSubcategories->map(fn($s) => [
                     'id' => $s->id,
                     'name' => $s->name,
@@ -1414,7 +1414,7 @@ class SellerController extends Controller
                         'id' => $p->id,
                         'name' => $p->name,
                         'subcategory' => $p->subcategory?->name ?? 'Other',
-                        'img' => asset('product_images/' . $p->image),
+                        'img' => $p->image_url,
                         'price' => $p->price,
                         'discount' => $p->discount ?? 0,
                     ];

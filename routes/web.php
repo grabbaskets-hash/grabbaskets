@@ -1974,6 +1974,12 @@ Route::prefix('food')->group(function () {
         // Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
         Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
             ->name('customer.food.order.success');
+
+             Route::get('/my-orders', [CustomerFoodController::class, 'myOrders'])
+        ->name('food.my-orders');
+          Route::get('/my-orders/{order}', [CustomerFoodController::class, 'orderDetails'])
+        ->name('food.order.details');
+  
     });
 });
 
