@@ -378,10 +378,6 @@
         <div class="action-icon icon-wish"><i class="bi bi-heart"></i></div>
         <span class="action-label">Wishlist</span>
       </a>
-      <a href="{{ route('withdrawals.index') }}" class="action-card">
-        <div class="action-icon icon-wish" style="background: #e6f7ff; color: #1890ff;"><i class="bi bi-bank"></i></div>
-        <span class="action-label">Withdrawals</span>
-      </a>
     </div>
 
     <!-- Personal Info -->

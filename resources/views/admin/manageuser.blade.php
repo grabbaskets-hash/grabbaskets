@@ -366,8 +366,6 @@
                         Warehouse Management</a></li>
                 <li><a class="nav-link" href="{{ route('admin.delivery-partners.dashboard') }}"><i
                             class="bi bi-bicycle"></i> Delivery Partners</a></li>
-                <li><a class="nav-link" href="{{ route('admin.user-withdrawals.index') }}"><i class="bi bi-bank"></i>
-                        User Withdrawals</a></li>
                 <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
                         <i class="bi bi-box-arrow-right"></i> Logout</a>
                 </li>
