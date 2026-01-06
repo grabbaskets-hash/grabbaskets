@@ -141,6 +141,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Get user's bank details
+     */
+    public function bankDetails()
+    {
+        return $this->hasOne(UserBankDetail::class);
+    }
+
+    /**
+     * Get user's withdrawal requests
+     */
+    public function withdrawals()
+    {
+        return $this->hasMany(UserWithdrawal::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Check if user is eligible for withdrawal (> 3 referrals)
+     */
+    public function canWithdraw(): bool
+    {
+        return $this->referrals()->count() > 3;
+    }
+
+    /**
      * Add points to user's wallet and create transaction record
      */
     public function addWalletPoints(int $amount, string $type, string $description, ?int $relatedUserId = null): void

@@ -51,7 +51,7 @@ if (app()->environment(['local', 'development'])) {
         }
         return view('test-upload');
     })->name('test.upload');
-    
+
     // Test direct upload to R2
     Route::match(['get', 'post'], '/test-upload-r2', function (Request $request) {
         if ($request->isMethod('post')) {
@@ -195,6 +195,11 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/wallet', [ProfileController::class, 'wallet'])->name('wallet.show');
     Route::post('/apply-referral', [App\Http\Controllers\ReferralController::class, 'apply'])->name('referral.apply');
+
+    // User Withdrawal Routes
+    Route::get('/withdrawals', [App\Http\Controllers\WithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::post('/withdrawals', [App\Http\Controllers\WithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::post('/withdrawals/bank-details', [App\Http\Controllers\WithdrawalController::class, 'saveBankDetails'])->name('withdrawals.bank-details.save');
 });
 
 // Test route without middleware
@@ -792,6 +797,11 @@ Route::get('/admin/bulk-product-upload', function () {
     }
     return app(AdminController::class)->showBulkProductUpload();
 })->name('admin.bulkProductUpload');
+
+// Admin User Withdrawal Routes
+Route::get('/admin/user-withdrawals', [App\Http\Controllers\Admin\UserWithdrawalController::class, 'index'])->name('admin.user-withdrawals.index');
+Route::post('/admin/user-withdrawals/{withdrawal}/approve', [App\Http\Controllers\Admin\UserWithdrawalController::class, 'approve'])->name('admin.user-withdrawals.approve');
+Route::post('/admin/user-withdrawals/{withdrawal}/reject', [App\Http\Controllers\Admin\UserWithdrawalController::class, 'reject'])->name('admin.user-withdrawals.reject');
 
 // Admin actions (POST/DELETE)
 Route::post('/admin/bulk-product-upload', function (Request $request) {
@@ -1975,11 +1985,11 @@ Route::prefix('food')->group(function () {
         Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
             ->name('customer.food.order.success');
 
-             Route::get('/my-orders', [CustomerFoodController::class, 'myOrders'])
-        ->name('food.my-orders');
-          Route::get('/my-orders/{order}', [CustomerFoodController::class, 'orderDetails'])
-        ->name('food.order.details');
-  
+        Route::get('/my-orders', [CustomerFoodController::class, 'myOrders'])
+            ->name('food.my-orders');
+        Route::get('/my-orders/{order}', [CustomerFoodController::class, 'orderDetails'])
+            ->name('food.order.details');
+
     });
 });
 

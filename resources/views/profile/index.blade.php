@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +16,14 @@
       --text-muted: #666;
       --bg-body: #f8f9fb;
       --white: #ffffff;
-      --shadow: 0 4px 20px rgba(0,0,0,0.06);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: 'Outfit', sans-serif;
@@ -164,7 +169,7 @@
 
     .action-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
       border-color: var(--primary-light);
     }
 
@@ -179,10 +184,25 @@
       margin-bottom: 5px;
     }
 
-    .icon-wallet { background: #fff5e6; color: #ff8c00; }
-    .icon-ref { background: #e6f7ff; color: #1890ff; }
-    .icon-orders { background: #f6ffed; color: #52c41a; }
-    .icon-wish { background: #fff1f0; color: #ff4d4f; }
+    .icon-wallet {
+      background: #fff5e6;
+      color: #ff8c00;
+    }
+
+    .icon-ref {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+
+    .icon-orders {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+
+    .icon-wish {
+      background: #fff1f0;
+      color: #ff4d4f;
+    }
 
     .action-label {
       font-weight: 600;
@@ -205,7 +225,9 @@
       border-bottom: 1px solid #f8f9fb;
     }
 
-    .info-item:last-child { border-bottom: none; }
+    .info-item:last-child {
+      border-bottom: none;
+    }
 
     .info-icon {
       width: 36px;
@@ -265,16 +287,32 @@
       font-size: 0.9rem;
     }
 
-    .alert-success { background: #d4edda; color: #155724; }
-    .alert-danger { background: #f8d7da; color: #721c24; }
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
 
     @media (max-width: 480px) {
-      .header { padding: 30px 15px 70px; }
-      .container { padding: 0 15px; }
-      .profile-main-card { padding: 20px; }
+      .header {
+        padding: 30px 15px 70px;
+      }
+
+      .container {
+        padding: 0 15px;
+      }
+
+      .profile-main-card {
+        padding: 20px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="header">
@@ -301,12 +339,14 @@
     <!-- Main Profile Card -->
     <div class="profile-main-card">
       <div class="avatar-wrapper">
-        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=fff5e6&color=ff8c00&size=200&bold=true" alt="User Avatar">
+        <img
+          src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=fff5e6&color=ff8c00&size=200&bold=true"
+          alt="User Avatar">
         <div class="edit-avatar-btn"><i class="bi bi-camera"></i></div>
       </div>
       <h3 class="user-name">{{ $user->name }}</h3>
       <p class="user-phone">{{ $user->phone ?? 'Add phone number' }}</p>
-      
+
       <div class="stats-grid">
         <div class="stat-item">
           <span class="stat-value">₹{{ number_format($user->wallet_point ?? 0, 0) }}</span>
@@ -337,6 +377,10 @@
       <a href="{{ route('wishlist.index') }}" class="action-card">
         <div class="action-icon icon-wish"><i class="bi bi-heart"></i></div>
         <span class="action-label">Wishlist</span>
+      </a>
+      <a href="{{ route('withdrawals.index') }}" class="action-card">
+        <div class="action-icon icon-wish" style="background: #e6f7ff; color: #1890ff;"><i class="bi bi-bank"></i></div>
+        <span class="action-label">Withdrawals</span>
       </a>
     </div>
 
@@ -388,7 +432,8 @@
     <div style="margin-top: 40px; text-align: center;">
       <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button type="submit" style="background: none; border: none; color: #ff4d4f; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+        <button type="submit"
+          style="background: none; border: none; color: #ff4d4f; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
           <i class="bi bi-box-arrow-right"></i> Logout Account
         </button>
       </form>
@@ -396,5 +441,5 @@
   </div>
 
 </body>
-</html>
 
+</html>
