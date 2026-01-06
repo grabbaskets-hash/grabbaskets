@@ -1,436 +1,509 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ $product->name }} | GrabBasket</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $product->name }} - GrabBasket</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-primary: #9333ea;     /* Vibrant Purple */
+            --brand-secondary: #0c831f;   /* Green for Actions */
+            --brand-yellow: #f8cb46;      
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --bg-body: #f9fafb;
+            --surface-white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+        }
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-body); color: var(--text-dark); font-family: 'Inter', sans-serif; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
 
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Poppins,system-ui;
-}
+        /* HEADER - Glassmorphism & Gradient */
+        header {
+            background: linear-gradient(135deg, rgba(109, 40, 217, 0.95), rgba(147, 51, 234, 0.95));
+            padding: 16px 24px;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(109, 40, 217, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo { 
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; color: #fff; 
+            letter-spacing: -0.5px; text-decoration: none; display: flex; align-items: center; gap: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .logo:hover { color: #f3e8ff; transform: scale(1.01); transition: 0.3s; }
 
-body{
-  background:linear-gradient(135deg,#f4f6ff,#fefefe);
-}
+        .search-container { flex: 1; margin: 0 2rem; max-width: 600px; position: relative; }
+        .search-box {
+            background: rgba(255, 255, 255, 0.95); border-radius: 99px; padding: 12px 24px;
+            display: flex; align-items: center; gap: 12px; color: var(--text-gray); 
+            border: 2px solid transparent; transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .search-box:focus-within { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 0 4px rgba(255,255,255,0.2); }
+        .search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; color: #333; }
 
-/* ================= NAVBAR ================= */
-.navbar{
-  background:linear-gradient(135deg,#6d28d9,#9333ea);
-  color:#fff;
-  padding:14px 20px;
-  display:flex;
-  align-items:center;
-  gap:18px;
-  box-shadow:0 8px 30px rgba(109,40,217,.4);
-  position:sticky;
-  top:0;
-  z-index:10;
-}
+        .nav-actions { display: flex; gap: 24px; align-items: center; }
+        .nav-link { 
+            color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; font-size: 0.95rem; 
+            transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-link:hover { color: #fff; }
+        .user-menu { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; color: #fff; font-weight: 600; font-size: 0.9rem; }
+        
+        .cart-icon { position: relative; font-size: 1.3rem; color: #fff; text-decoration: none; padding: 4px; transition: transform 0.2s; }
+        .cart-icon:hover { transform: scale(1.1); }
+        .cart-badge {
+            position: absolute; top: -2px; right: -6px; background: #ef4444; color: white;
+            font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 50%; 
+            display: none; border: 2px solid #9333ea;
+        }
 
-.logo{ font-size:22px; font-weight:800; }
-.location{ font-size:14px; white-space:nowrap; cursor:pointer; }
+        /* MAIN LAYOUT */
+        .main-wrapper {
+            max-width: 1280px; margin: 3rem auto; padding: 0 1.5rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;
+        }
+        /* LEFT: IMAGE */
+        .left-column { display: flex; flex-direction: column; gap: 1.25rem; }
+        .product-image-container {
+            background: var(--surface-white); border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-color);
+            height: 550px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .product-img { max-width: 85%; max-height: 85%; object-fit: contain; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .product-img:hover { transform: scale(1.08); }
 
-.search{
-  flex:1;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background:#fff;
-  padding:10px 16px;
-  border-radius:999px;
-  color:#6b7280;
-}
+        /* RIGHT: INFO */
+        .product-info { display: flex; flex-direction: column; gap: 0.85rem; }
+        
+        .breadcrumb { font-size: 0.85rem; color: var(--text-gray); margin-bottom: 0.25rem; }
+        .breadcrumb a { color: var(--brand-primary); text-decoration: none; font-weight: 500; }
+        
+        .product-title { 
+            font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; 
+            line-height: 1.2; letter-spacing: -0.02em; color: var(--text-dark); 
+        }
+        
+        .time-badge {
+            background: #ecfccb; border: 1px solid #d9f99d; border-radius: 8px; color: #4d7c0f;
+            padding: 8px 12px; display: inline-flex; align-items: center; gap: 8px; 
+            font-size: 0.8rem; font-weight: 700; width: fit-content; margin-top: 0.5rem;
+        }
+        .time-badge i { font-size: 1rem; color: #65a30d; }
 
-.search input{ border:none; outline:none; width:100%; }
+        .price-section { 
+            margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem; 
+        }
+        .unit-label { font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem; font-weight: 500; }
+        
+        .price-row { display: flex; align-items: center; justify-content: space-between; }
+        .price-display { display: flex; align-items: baseline; gap: 12px; }
+        .current-price { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--text-dark); }
+        .mrp-price { font-size: 1.1rem; color: var(--text-gray); text-decoration: line-through; }
+        .tax-text { font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 4px; }
 
-.nav-icons{ display:flex; gap:18px; }
+        /* ACTION BUTTONS */
+        .action-actions { display: flex; align-items: center; gap: 16px; min-width: 180px; justify-content: flex-end; }
+        
+        .add-btn {
+            background: var(--surface-white);
+            border: 2px solid var(--brand-secondary);
+            color: var(--brand-secondary);
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(12, 131, 31, 0.05);
+            letter-spacing: 0.5px;
+        }
+        .add-btn:hover { 
+            background: var(--brand-secondary); color: #fff; 
+            box-shadow: 0 8px 16px rgba(12, 131, 31, 0.25); transform: translateY(-2px);
+        }
+        .add-btn:disabled { border-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; background: #f3f4f6; transform: none; box-shadow: none; }
 
-.cart{ position:relative; cursor:pointer; }
+        /* QTY CONTROL */
+        .qty-control {
+            background: var(--brand-secondary);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            display: none; 
+            align-items: center; flex: 1;
+            gap: 16px;
+            box-shadow: 0 4px 12px rgba(12, 131, 31, 0.3);
+            justify-content: space-between;
+            min-height: 50px;
+        }
+        .qty-btn-action { background: rgba(255,255,255,0.1); border-radius: 6px; width: 32px; height: 32px; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .qty-btn-action:hover { background: rgba(255,255,255,0.3); }
+        .qty-text { font-weight: 700; font-size: 1.2rem; min-width: 24px; text-align: center; font-family: 'Outfit', sans-serif; }
 
-.cart-badge{
-  position:absolute;
-  top:-6px;
-  right:-8px;
-  background:#ef4444;
-  color:#fff;
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:999px;
-  display:none;
-}
+        /* SELLER & DETAILS */
+        .features-section { margin-top: 3rem; }
+        .features-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-dark); }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .feature-card { 
+            background: var(--surface-white); padding: 1.5rem; border-radius: 16px; 
+            border: 1px solid var(--border-color); text-align: center; 
+            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: rgba(147, 51, 234, 0.2); }
+        .feature-icon-box { 
+            width: 50px; height: 50px; background: #f3e8ff; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;
+            color: var(--brand-primary); font-size: 1.25rem;
+        }
+        .feature-text { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
 
-/* ================= MAIN ================= */
-.main{
-  max-width:1100px;
-  margin:30px auto;
-  padding:0 16px;
-}
+        .info-card { 
+            padding: 1.5rem; background: var(--surface-white); border-radius: 16px; 
+            border: 1px solid var(--border-color); margin-top: 1rem; 
+            box-shadow: var(--shadow-sm);
+        }
+        .info-card strong { color: var(--text-dark); display: block; margin-bottom: 6px; font-size: 1rem; font-family: 'Outfit', sans-serif; }
+        .info-text { font-size: 0.95rem; color: var(--text-gray); line-height: 1.6; }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:30px;
-}
+        /* MOBILE STICKY BAR */
+        .mobile-bar { display: none; }
 
-/* ================= PRODUCT ================= */
-.product-box{
-  background:#fff;
-  border-radius:22px;
-  padding:26px;
-  box-shadow:0 14px 40px rgba(0,0,0,.08);
-}
+        @media (max-width: 900px) {
+            .main-wrapper { grid-template-columns: 1fr; gap: 2rem; margin: 1.5rem auto; padding: 0 1rem; }
+            .product-image-container { height: 380px; }
+            .header-search { display: none; } 
+            .nav-actions { gap: 16px; }
+            .product-title { font-size: 1.75rem; }
+            
+            .mobile-bar {
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+                background: var(--surface-white); padding: 16px 20px; 
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                justify-content: space-between; align-items: center; z-index: 1000;
+                border-radius: 20px 20px 0 0;
+            }
+            .mobile-price { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--text-dark); }
+            
+            /* Mobile Buttons */
+             .add-btn, .qty-control { margin: 0; padding: 12px 28px; font-size: 1rem; width: auto; min-width: 140px; }
+             .action-actions { display: block; } /* Reset */
 
-.product-img{
-  width:100%;
-  max-width:330px;
-  margin:auto;
-  display:block;
-}
-
-/* action row */
-.action-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:24px;
-}
-
-/* price */
-.price-btn{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
-  color:#fff;
-  padding:14px 22px;
-  border-radius:16px;
-  font-weight:800;
-  font-size:16px;
-}
-
-/* add to cart */
-.add-btn{
-  background:linear-gradient(135deg,#ec4899,#f472b6);
-  border:none;
-  color:#fff;
-  padding:18px 42px;
-  border-radius:20px;
-  font-weight:800;
-  font-size:16px;
-  cursor:pointer;
-  transition:.3s;
-  box-shadow:0 10px 25px rgba(236,72,153,.45);
-}
-
-.action-row:hover .add-btn{
-  transform:scale(.9);
-}
-
-/* qty */
-.qty-box{
-  display:none;
-  align-items:center;
-  gap:14px;
-  background:#f9fafb;
-  padding:10px 16px;
-  border-radius:18px;
-}
-
-.qty-btn{
-  width:42px;
-  height:42px;
-  border:none;
-  border-radius:50%;
-  background:linear-gradient(135deg,#a78bfa,#7c3aed);
-  color:#fff;
-  font-size:20px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-#qty{
-  font-size:18px;
-  font-weight:700;
-  min-width:20px;
-  text-align:center;
-}
-
-/* ================= INFO ================= */
-.info-card{
-  background:#fff;
-  border-radius:22px;
-  padding:26px;
-  box-shadow:0 14px 40px rgba(0,0,0,.08);
-}
-
-.info-card h2{
-  font-size:22px;
-  margin-bottom:16px;
-}
-
-.info-row{
-  font-size:14.5px;
-  color:#374151;
-  margin-bottom:14px;
-  line-height:1.6;
-}
-
-/* feature icons */
-.feature-box{
-  display:flex;
-  gap:16px;
-  margin:18px 0;
-}
-
-.feature{
-  flex:1;
-  background:#f8fafc;
-  border-radius:16px;
-  padding:14px;
-  text-align:center;
-  font-size:13px;
-}
-
-.feature i{
-  font-size:22px;
-  margin-bottom:8px;
-  color:#7c3aed;
-}
-
-/* ================= MOBILE ================= */
-@media(max-width:768px){
-  .grid{ grid-template-columns:1fr; }
-}
-</style>
-
+            body { padding-bottom: 120px; }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-  <div class="logo">GrabBaskets</div>
-
-  <div class="location">
-    <i class="fa-solid fa-location-dot"></i> Location
-  </div>
-
-  <div class="search">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input placeholder="Search rice, oil, atta..." />
-  </div>
-
-  <div class="nav-icons">
-    <i class="fa-regular fa-user"></i>
-    <a href="{{ route('tenmin.cart.view') }}" class="cart" style="color:white;text-decoration:none;">
-      <i class="fa-solid fa-cart-shopping"></i>
-      <span class="cart-badge" id="badge">0</span>
-    </a>
-  </div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-  <div class="grid">
-
-    <!-- LEFT -->
-    <div class="product-box">
-      <img id="productImage" class="product-img" src="{{ $product->image_url ?? 'https://via.placeholder.com/330?text=No+Image' }}" alt="{{ $product->name }}">
-
-      <div class="action-row">
-        <div class="price-btn">₹{{ number_format($product->price, 2) }}</div>
-
-        <button 
-            class="add-btn" 
-            id="addBtn"
-            @if($product->stock <= 0) disabled @endif
-        >
-            {{ $product->stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
-        </button>
-
-        <div class="qty-box" id="qtyBox">
-          <button class="qty-btn" id="minus">−</button>
-          <span id="qty">1</span>
-          <button class="qty-btn" id="plus">+</button>
+    <!-- HEADER -->
+    <!-- HEADER -->
+    <header>
+        <a href="/" class="logo"><i class="fa-solid fa-bag-shopping" style="color: var(--brand-yellow);"></i> GrabBaskets</a>
+        
+        <div class="search-container header-search">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+                <input type="text" placeholder="Search for 'milk', 'chips', 'bread'..." />
+            </div>
         </div>
-      </div>
+
+        <div class="nav-actions">
+            <a href="/" class="nav-link d-none d-md-flex"><i class="fa-solid fa-house"></i> Home</a>
+            
+            <!-- Auth Logic -->
+            @auth
+                <div class="user-menu d-none d-md-flex align-items-center gap-2">
+                    <i class="fa-regular fa-user"></i> {{ auth()->user()->name }}
+                </div>
+                <!-- Mobile only icon for user if needed, or stick to desktop text -->
+            @else
+                <a href="{{ route('login') }}" class="nav-link d-none d-md-flex"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+            @endauth
+
+            <a href="{{ route('tenmin.cart.view') }}" class="cart-icon">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge" id="badge">0</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- LEFT -->
+        <!-- LEFT -->
+        <div class="left-column">
+            <div class="product-image-container">
+                <img id="productImage" src="{{ $product->image_url ?? 'https://via.placeholder.com/600' }}" class="product-img" alt="{{ $product->name }}">
+            </div>
+
+            @if($product->description)
+            <div class="info-card">
+                <strong>Product Details</strong>
+                <p class="info-text">{{ $product->description }}</p>
+            </div>
+            @endif
+        </div>
+
+        <!-- RIGHT -->
+        <div class="product-info">
+            <div class="breadcrumb">
+                <a href="/">Home</a> <span class="mx-1">/</span> 
+                {{ $product->subcategory ? $product->subcategory->name : 'Products' }} <span class="mx-1">/</span> 
+                <span style="color: var(--text-dark);">{{ $product->name }}</span>
+            </div>
+
+            <h1 class="product-title">{{ $product->name }}</h1>
+            
+            <div class="time-badge">
+                <i class="fa-solid fa-bolt"></i> 10 MINS SUPERFAST
+            </div>
+
+            <div class="price-section">
+                <div class="unit-label">1 unit</div> 
+                
+                <div class="price-row">
+                    <div>
+                        <div class="price-display">
+                            <span class="current-price price-btn">₹{{ number_format($product->price, 0) }}</span>
+                            @if($product->discount > 0)
+                                <span class="mrp-price">₹{{ number_format($product->price * 1.2, 0) }}</span>
+                            @endif
+                        </div>
+                        <span class="tax-text">(Inclusive of all taxes)</span>
+                    </div>
+
+                    <!-- DESKTOP ACTIONS -->
+                    <div class="action-actions d-none d-md-block">
+                        <button class="add-btn" id="addBtn" @if($product->stock <= 0) disabled @endif>
+                            {{ $product->stock > 0 ? 'ADD' : 'OUT OF STOCK' }}
+                        </button>
+                        
+                        <div class="qty-control" id="qtyBox">
+                            <button class="qty-btn-action" id="minus"><i class="fa-solid fa-minus"></i></button>
+                            <span class="qty-text" id="qty">1</span>
+                            <button class="qty-btn-action" id="plus"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <h3 class="features-title">Why shop from GrabBaskets?</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div class="feature-text">Superfast Delivery</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-tag"></i></div>
+                        <div class="feature-text">Best Prices & Offers</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-box"><i class="fa-solid fa-shield-cat"></i></div>
+                        <div class="feature-text">Genuine Products</div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="info-card">
+                <strong>Seller & Support</strong>
+                
+                <div style="margin-bottom:12px;">
+                     <span style="background:#fef2f2; color:#dc2626; border:1px solid #fee2e2; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:600; display:inline-block; margin-right:6px;"><i class="fa-solid fa-ban"></i> No Return</span>
+                     <span style="background:#f0fdf4; color:#16a34a; border:1px solid #dcfce7; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:600; display:inline-block;"><i class="fa-solid fa-gauge-high"></i> Fast Delivery</span>
+                </div>
+
+                <div style="background:#f9fafb; padding:10px; border-radius:8px; margin-bottom:12px;">
+                    <div style="font-weight:700; font-size:0.85rem; margin-bottom:2px;">Customer Care</div>
+                    <div style="font-size:0.8rem; color:#555;">In case of any issue, contact us</div>
+                    <div style="font-size:0.85rem; font-weight:600; margin-top:2px;">
+                        <i class="fa-solid fa-envelope" style="color:#9ca3af; margin-right:4px;"></i> grabbaskets@gmail.com
+                    </div>
+                </div>
+
+                <div class="info-text">
+                    <strong>Seller Information</strong>
+                    <div style="display:grid; grid-template-columns: 70px 1fr; gap:4px; font-size:0.85rem;">
+                        <span style="color:#6b7280;">Seller:</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->name ?? 'GrabBasket Partner' }}</span>
+                        
+                        <span style="color:#6b7280;">Email:</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->email ?? 'N/A' }}</span>
+                        
+                        <span style="color:#6b7280;">Address:</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->address ?? 'N/A' }}</span>
+                        
+                        <span style="color:#6b7280;">State:</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->state ?? 'N/A' }}</span>
+                        
+                        <span style="color:#6b7280;">Country:</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->country ?? 'India' }}</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="info-card">
-      <h2>{{ $product->name }}</h2>
-
-      <div class="action-row">
-        <div class="price-btn">₹{{ number_format($product->price, 2) }}</div>
-      </div>
-
-      <div class="feature-box">
-        <div class="feature">
-          <i class="fa-solid fa-ban"></i>
-          No Return<br>or Exchange
-        </div>
-        <div class="feature">
-          <i class="fa-solid fa-bolt"></i>
-          Fast<br>Delivery
-        </div>
-      </div>
-
-      <div class="info-row">
-        <b>Customer Care</b><br>
-        In case of any issue, contact us<br>
-        Email: <b>grabbaskets@gmail.com</b>
-      </div>
-
-      {{-- DYNAMIC SELLER INFO --}}
-      @php
-          $seller = $product->seller;
-      @endphp
-
-      @if($seller)
-          <div class="info-row"><b>Seller:</b> {{ $seller->name }}</div>
-          <div class="info-row"><b>Email:</b> {{ $seller->email }}</div>
-          @if($seller->address)
-              <div class="info-row"><b>Address:</b> {{ $seller->address }}</div>
-          @else
-              <div class="info-row"><b>Address:</b> {{ $seller->city ?? 'Chennai' }}, {{ $seller->state ?? 'Tamil Nadu' }}</div>
-          @endif
-          <div class="info-row"><b>State:</b> {{ $seller->state ?? 'Tamil Nadu' }}</div>
-          <div class="info-row"><b>Country:</b> {{ $seller->country ?? 'India' }}</div>
-      @else
-          <div class="info-row"><b>Seller:</b> <em>Information not available</em></div>
-      @endif
-
-      @if($product->description)
-        <div class="info-row"><b>Description:</b> {{ $product->description }}</div>
-      @endif
+    <!-- MOBILE STICKY BAR -->
+    <div class="mobile-bar d-md-none">
+          <div style="display: flex; flex-direction: column;">
+             <div class="mobile-price">₹{{ number_format($product->price, 0) }}</div>
+             <div style="font-size:0.75rem; color:#666; font-weight:500;">View Detail Bill</div>
+          </div>
+          <div>
+            <button class="add-btn" id="mobileAddBtn" style="background: var(--brand-secondary); color: white; border:none; box-shadow: 0 4px 15px rgba(12,131,31,0.4);" onclick="document.getElementById('addBtn').click()">ADD</button>
+          </div>
     </div>
 
-  </div>
-</div>
+    <!-- SCRIPT -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let qty = 1;
+        const addBtn = document.getElementById("addBtn");
+        const qtyBox = document.getElementById("qtyBox");
+        const badge = document.getElementById("badge");
+        const qtyText = document.getElementById("qty");
+        const csrfToken = '{{ csrf_token() }}';
+        const productId = {{ $product->id }};
+        const priceBtn = document.querySelector('.price-btn');
+        const mobileAddBtn = document.getElementById('mobileAddBtn'); // Mobile Trigger
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // ========== STATE ==========
-    let qty = 1;
-    const addBtn = document.getElementById("addBtn");
-    const qtyBox = document.getElementById("qtyBox");
-    const badge = document.getElementById("badge");
-    const qtyText = document.getElementById("qty");
-    const csrfToken = '{{ csrf_token() }}';
-    const productId = {{ $product->id }};
-    const priceBtn = document.querySelector('.price-btn');
+        function updateCartBadge() {
+            const cartCount = parseInt(badge.innerText) || 0;
+            badge.style.display = cartCount > 0 ? 'inline-flex' : 'none';
+        }
+        updateCartBadge();
 
-    // ========== CART BADGE ==========
-    function updateCartBadge() {
-        const cartCount = parseInt(badge.innerText) || 0;
-        badge.style.display = cartCount > 0 ? 'block' : 'none';
-    }
-    updateCartBadge();
-
-    // ========== REAL-TIME STOCK ==========
-    function fetchProductDetails() {
-        fetch(`/api/product/${productId}`)
-            .then(response => {
-                if (!response.ok) {
-                    if (priceBtn) priceBtn.textContent = 'Unavailable';
-                    if (addBtn) {
-                        addBtn.disabled = true;
-                        addBtn.textContent = 'Out of Stock';
+        function fetchProductDetails() {
+            fetch(`/api/product/${productId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        if (priceBtn) priceBtn.textContent = 'Unavailable';
+                        if (addBtn) {
+                            addBtn.disabled = true;
+                            addBtn.textContent = 'OUT OF STOCK';
+                        }
+                        if(mobileAddBtn) {
+                             mobileAddBtn.disabled = true;
+                             mobileAddBtn.textContent = 'OUT OF STOCK';
+                        }
+                        throw new Error('Unavailable');
                     }
-                    throw new Error('Unavailable');
+                    return response.json();
+                })
+                .then(data => {
+                    if (priceBtn) {
+                        priceBtn.textContent = `₹${parseFloat(data.price).toFixed(0)}`;
+                    }
+                    const inStock = data.stock > 0;
+                    if (addBtn) {
+                        addBtn.disabled = !inStock;
+                        if(addBtn.innerText !== 'ADDING...') {
+                             addBtn.textContent = inStock ? 'ADD' : 'OUT OF STOCK';
+                        }
+                    }
+                     if (mobileAddBtn) {
+                        mobileAddBtn.disabled = !inStock;
+                         if(mobileAddBtn.innerText !== 'ADDING...') {
+                             mobileAddBtn.textContent = inStock ? 'ADD' : 'OUT OF STOCK';
+                        }
+                    }
+                })
+                .catch(err => console.warn('Fetch failed:', err));
+        }
+
+        fetchProductDetails();
+        const interval = setInterval(fetchProductDetails, 15000);
+        window.addEventListener('beforeunload', () => clearInterval(interval));
+
+        addBtn.onclick = () => {
+            if (addBtn.disabled) return;
+
+            const originalText = addBtn.innerText;
+            addBtn.innerText = "ADDING...";
+            if(mobileAddBtn) mobileAddBtn.innerText = "ADDING...";
+            addBtn.disabled = true;
+
+            fetch("{{ route('tenmin.cart.add') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": csrfToken
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: qty
+                })
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+
+                if (!response.ok) {
+                    const errorMsg = (data && (data.error || data.message)) || 'Failed to add to cart';
+                    throw new Error(errorMsg);
                 }
-                return response.json();
+                return data;
             })
             .then(data => {
-                if (priceBtn) {
-                    priceBtn.textContent = `₹${parseFloat(data.price).toFixed(2)}`;
-                }
-                const inStock = data.stock > 0;
-                if (addBtn) {
-                    addBtn.disabled = !inStock;
-                    addBtn.textContent = inStock ? 'Add to Cart' : 'Out of Stock';
+                if (data && data.success) {
+                    badge.innerText = data.cart_count;
+                    updateCartBadge();
+                    
+                    addBtn.style.display = 'none';
+                    if(mobileAddBtn) mobileAddBtn.style.display = 'none'; 
+                    qtyBox.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                         window.location.href = "{{ route('tenmin.cart.view') }}";
+                    }, 800);
+                } else {
+                    throw new Error((data && data.error) || 'Failed to add');
                 }
             })
-            .catch(err => console.warn('Fetch failed:', err));
-    }
+            .catch(err => {
+                console.error('Error:', err);
+                alert(err.message);
+                addBtn.innerText = originalText;
+                if(mobileAddBtn) mobileAddBtn.innerText = originalText;
+                addBtn.disabled = false;
+            });
+        };
 
-    fetchProductDetails();
-    const interval = setInterval(fetchProductDetails, 15000);
-    window.addEventListener('beforeunload', () => clearInterval(interval));
-
-    // ========== ADD TO CART ==========
-    addBtn.onclick = () => {
-        if (addBtn.disabled) return;
-
-        // Visual feedback
-        const originalText = addBtn.innerText;
-        addBtn.innerText = "Adding...";
-        addBtn.disabled = true;
-
-        fetch("{{ route('tenmin.cart.add') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-CSRF-TOKEN": csrfToken
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                quantity: qty
-            })
-        })
-        .then(async response => {
-            const isJson = response.headers.get('content-type')?.includes('application/json');
-            const data = isJson ? await response.json() : null;
-
-            if (!response.ok) {
-                const errorMsg = (data && (data.error || data.message)) || 'Failed to add to cart';
-                throw new Error(errorMsg);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data && data.success) {
-                // Update badge immediately
-                badge.innerText = data.cart_count;
-                updateCartBadge();
-                
-                addBtn.innerText = "Added!";
-                
-                // Redirect to cart page after short delay
-                setTimeout(() => {
-                    window.location.href = "{{ route('tenmin.cart.view') }}";
-                }, 500);
-            } else {
-                throw new Error((data && data.error) || 'Failed to add');
-            }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alert(err.message);
-            addBtn.innerText = originalText;
-            addBtn.disabled = false;
-        });
-    };
-
-    // ========== QUANTITY CONTROLS ==========
-    document.getElementById("plus").onclick = () => {
-        qty++;
-        qtyText.innerText = qty;
-    };
-
-    document.getElementById("minus").onclick = () => {
-        if (qty > 1) {
-            qty--;
+        document.getElementById("plus").onclick = () => {
+            qty++;
             qtyText.innerText = qty;
-        }
-    };
-});
-</script>
+        };
 
+        document.getElementById("minus").onclick = () => {
+            if (qty > 1) {
+                qty--;
+                qtyText.innerText = qty;
+            }
+        };
+    });
+    </script>
 </body>
 </html>
