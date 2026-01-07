@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,9 +28,9 @@
       --bg-white: #FFFFFF;
       --bg-light: #F1F3F6;
       --border-color: #E0E0E0;
-      --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.1);
-      --shadow-md: 0 2px 4px 0 rgba(0,0,0,0.1);
-      --shadow-lg: 0 4px 8px 0 rgba(0,0,0,0.12);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 4px 8px 0 rgba(0, 0, 0, 0.12);
     }
 
     body {
@@ -301,6 +302,7 @@
       border-radius: 2px;
       font-size: 11px;
       font-weight: 600;
+      z-index: 10;
     }
 
     .product-info {
@@ -513,11 +515,10 @@
           <i class="bi bi-bag-check-fill" style="font-size: 24px;"></i>
           <h4>GrabBaskets</h4>
         </a>
-        
+
         <form action="{{ route('products.index') }}" method="GET" class="search-container">
-          <input type="text" name="q" class="search-box" 
-                 placeholder="Search for products, brands and more"
-                 value="{{ request('q') }}">
+          <input type="text" name="q" class="search-box" placeholder="Search for products, brands and more"
+            value="{{ request('q') }}">
           <i class="bi bi-search search-icon"></i>
         </form>
 
@@ -542,7 +543,7 @@
     <!-- Left Sidebar - Filters -->
     <aside class="filter-sidebar d-none d-md-block">
       <div class="filter-title">Filters</div>
-      
+
       <div class="filter-section">
         <div class="filter-section-title">
           <i class="bi bi-grid"></i> Categories
@@ -550,8 +551,8 @@
         <div class="category-list">
           @foreach($categories ?? [] as $cat)
             <div>
-              <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id])) }}" 
-                 class="category-item {{ request()->input('category_id') == $cat->id ? 'active' : '' }}">
+              <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id])) }}"
+                class="category-item {{ request()->input('category_id') == $cat->id ? 'active' : '' }}">
                 <span class="category-emoji">{!! $cat->emoji ?? '📦' !!}</span>
                 <span>{{ $cat->name }}</span>
                 @if(($cat->subcategories ?? collect())->count() > 0)
@@ -560,16 +561,16 @@
                   </span>
                 @endif
               </a>
-              
+
               @if(request()->input('category_id') == $cat->id && ($cat->subcategories ?? collect())->count() > 0)
                 <div style="margin-left: 20px; margin-top: 4px;">
-                  <a href="{{ route('products.index', request()->except(['category_id', 'subcategory_id'])) }}" 
-                     class="subcategory-item {{ !request()->input('subcategory_id') ? 'active' : '' }}">
+                  <a href="{{ route('products.index', request()->except(['category_id', 'subcategory_id'])) }}"
+                    class="subcategory-item {{ !request()->input('subcategory_id') ? 'active' : '' }}">
                     All {{ $cat->name }}
                   </a>
                   @foreach($cat->subcategories as $sub)
-                    <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id, 'subcategory_id' => $sub->id])) }}" 
-                       class="subcategory-item {{ request()->input('subcategory_id') == $sub->id ? 'active' : '' }}">
+                    <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id, 'subcategory_id' => $sub->id])) }}"
+                      class="subcategory-item {{ request()->input('subcategory_id') == $sub->id ? 'active' : '' }}">
                       {!! $sub->emoji ?? '📦' !!} {{ $sub->name }}
                     </a>
                   @endforeach
@@ -586,8 +587,8 @@
       <!-- Mobile Categories -->
       <div class="mobile-categories d-md-none">
         @foreach($categories ?? [] as $cat)
-          <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id])) }}" 
-             class="mobile-category-btn {{ request()->input('category_id') == $cat->id ? 'active' : '' }}">
+          <a href="{{ route('products.index', array_merge(request()->except('subcategory_id'), ['category_id' => $cat->id])) }}"
+            class="mobile-category-btn {{ request()->input('category_id') == $cat->id ? 'active' : '' }}">
             {!! $cat->emoji ?? '📦' !!} {{ Str::limit($cat->name, 12) }}
           </a>
         @endforeach
@@ -624,14 +625,12 @@
               @if($discount > 0)
                 <span class="discount-badge">{{ $discount }}% OFF</span>
               @endif
-              <img src="{{ $image }}" 
-                   onerror="this.src='/images/placeholder.png'" 
-                   class="product-image"
-                   alt="{{ $product->name }}">
+              <img src="{{ $image }}" onerror="this.src='/images/placeholder.png'" class="product-image"
+                alt="{{ $product->name }}">
             </div>
             <div class="product-info">
               <div class="product-title">{{ $product->name }}</div>
-              
+
               <div class="product-price">
                 <div class="price-row">
                   <span class="current-price">₹{{ number_format($product->price, 0) }}</span>
@@ -643,15 +642,12 @@
               </div>
 
               @if(auth()->check())
-                <button class="add-to-cart-btn" 
-                        data-product-id="{{ $product->id }}"
-                        onclick="event.stopPropagation(); addToCart({{ $product->id }});">
+                <button class="add-to-cart-btn" data-product-id="{{ $product->id }}"
+                  onclick="event.stopPropagation(); addToCart({{ $product->id }});">
                   <i class="bi bi-cart-plus"></i> Add to Cart
                 </button>
               @else
-                <a href="{{ route('login') }}" 
-                   class="add-to-cart-btn"
-                   onclick="event.stopPropagation();">
+                <a href="{{ route('login') }}" class="add-to-cart-btn" onclick="event.stopPropagation();">
                   <i class="bi bi-box-arrow-in-right"></i> Login to Buy
                 </a>
               @endif
@@ -672,10 +668,8 @@
                     @foreach($relatedProducts as $related)
                       <div class="product-card" onclick="window.location.href='{{ route('product.details', $related->id) }}'">
                         <div class="product-image-wrapper">
-                          <img src="{{ $related->image_url ?? '/images/placeholder.png' }}" 
-                               onerror="this.src='/images/placeholder.png'" 
-                               class="product-image"
-                               alt="{{ $related->name }}">
+                          <img src="{{ $related->image_url ?? '/images/placeholder.png' }}"
+                            onerror="this.src='/images/placeholder.png'" class="product-image" alt="{{ $related->name }}">
                         </div>
                         <div class="product-info">
                           <div class="product-title">{{ Str::limit($related->name, 50) }}</div>
@@ -713,13 +707,13 @@
       try {
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const button = document.querySelector(`[data-product-id="${productId}"]`);
-        
+
         if (!button) return;
-        
+
         const originalHTML = button.innerHTML;
         button.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
         button.disabled = true;
-        
+
         const res = await fetch('/cart/add', {
           method: 'POST',
           headers: {
@@ -727,20 +721,20 @@
             'X-CSRF-TOKEN': token,
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ 
-            product_id: productId, 
+          body: JSON.stringify({
+            product_id: productId,
             quantity: 1,
             delivery_type: 'standard'
           })
         });
-        
+
         const data = await res.json();
-        
+
         if (res.ok) {
           button.innerHTML = '<i class="bi bi-check-circle"></i> Added!';
           button.style.background = '#388E3C';
           showMessage('✅ Added to cart successfully!', 'success');
-          
+
           setTimeout(() => {
             button.innerHTML = originalHTML;
             button.style.background = '';
@@ -767,7 +761,7 @@
       if (existingAlert) {
         existingAlert.remove();
       }
-      
+
       const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
       const alertDiv = document.createElement('div');
       alertDiv.className = `alert ${alertClass} alert-dismissible fade show alert-custom position-fixed`;
@@ -776,9 +770,9 @@
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       `;
-      
+
       document.body.appendChild(alertDiv);
-      
+
       setTimeout(() => {
         if (alertDiv) {
           alertDiv.remove();
@@ -787,4 +781,5 @@
     }
   </script>
 </body>
+
 </html>

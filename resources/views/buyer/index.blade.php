@@ -114,6 +114,7 @@
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 0.8rem;
+            z-index: 10;
         }
 
         .gift-badge {

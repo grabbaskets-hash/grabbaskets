@@ -95,11 +95,11 @@
         .product-image-container {
             background: var(--surface-white); border-radius: var(--radius-lg); 
             border: 1px solid var(--border-color);
-            height: 550px; display: flex; align-items: center; justify-content: center;
+            height: 420px; display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
             box-shadow: var(--shadow-lg);
         }
-        .product-img { max-width: 85%; max-height: 85%; object-fit: contain; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .product-img { max-width: 90%; max-height: 90%; object-fit: contain; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .product-img:hover { transform: scale(1.08); }
 
         /* RIGHT: INFO */
@@ -109,7 +109,9 @@
         .breadcrumb a { color: var(--brand-primary); text-decoration: none; font-weight: 500; }
         
         .product-title { 
-            font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; 
+            font-family: 'Outfit', sans-serif; 
+            font-size: clamp(1.5rem, 4vw, 2.25rem); /* Fluid Typography */
+            font-weight: 700; 
             line-height: 1.2; letter-spacing: -0.02em; color: var(--text-dark); 
         }
         
@@ -174,7 +176,10 @@
         /* SELLER & DETAILS */
         .features-section { margin-top: 3rem; }
         .features-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-dark); }
-        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .feature-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Flexible Grid */
+            gap: 1rem; margin-bottom: 2rem; 
+        }
         .feature-card { 
             background: var(--surface-white); padding: 1.5rem; border-radius: 16px; 
             border: 1px solid var(--border-color); text-align: center; 
@@ -200,8 +205,8 @@
         .mobile-bar { display: none; }
 
         @media (max-width: 900px) {
-            .main-wrapper { grid-template-columns: 1fr; gap: 2rem; margin: 1.5rem auto; padding: 0 1rem; }
-            .product-image-container { height: auto; aspect-ratio: 1/1; max-height: 45vh; } /* Responsive Square */
+            .main-wrapper { grid-template-columns: 1fr; gap: 1.5rem; margin: 1rem auto; padding: 0 12px; } /* Tighter mobile layout */
+            .product-image-container { height: auto; aspect-ratio: 1/1; max-height: 35vh; } /* Increased height slightly for visibility */
             .header-search { display: none; } 
             
             /* Mobile Navbar - Reveal Strategy */
@@ -249,20 +254,59 @@
         }
 
         /* Small Mobile Devices */
+        /* Small Mobile Devices (iPhone SE, etc) */
         @media (max-width: 400px) {
-            header { padding: 12px 16px; }
-            .logo { font-size: 1.3rem; }
-            .nav-actions { gap: 10px; }
+            header { padding: 12px 12px; }
+            .logo { font-size: 1.25rem; }
+            .nav-actions { gap: 6px; }
             
-            .product-title { font-size: 1.5rem; }
-            /* Small mobile adjustments */
+            /* Navbar icon tweaks for tight spaces */
+            .user-menu, .nav-link, .cart-icon { width: 32px; height: 32px; }
+            .user-menu:hover, .nav-link:hover, .cart-icon:hover { padding: 0 8px; }
+            .nav-link:hover .nav-text, 
+            .user-menu:hover .nav-text,
+            .cart-icon:hover .nav-text {
+                font-size: 0.75rem; max-width: 80px;
+            }
+
+            .product-title { font-size: 1.4rem; line-height: 1.3; }
             .product-image-container { max-height: 40vh; } 
             .feature-grid { grid-template-columns: 1fr; gap: 1rem; }
             
-            .add-btn, .qty-control { padding: 10px 16px; font-size: 0.95rem; min-width: 110px; }
-            .mobile-price { font-size: 1.2rem; }
+            .add-btn, .qty-control { padding: 10px 16px; font-size: 0.95rem; min-width: 100px; }
+            .mobile-price { font-size: 1.25rem; }
             .mobile-bar { padding: 12px 16px; }
         }
+
+        /* Very Small Screens (Galaxy Fold, Old Devices) */
+        @media (max-width: 350px) {
+            .logo { font-size: 1.1rem; gap: 5px; }
+            .nav-actions { gap: 2px; }
+            
+            .product-title { font-size: 1.25rem; }
+            .current-price { font-size: 2rem; }
+            
+            .mobile-bar { padding: 10px 12px; }
+            .mobile-bar .add-btn { padding: 8px 20px; min-width: auto; font-size: 0.9rem; }
+            .mobile-bar .add-btn { padding: 8px 20px; min-width: auto; font-size: 0.9rem; }
+            .mobile-price { font-size: 1.1rem; }
+        }
+
+        /* Ultra Small (Active refinement for 300px) */
+        @media (max-width: 320px) {
+            .logo { font-size: 1rem; } 
+            .logo i { font-size: 1.1rem; } 
+            .nav-actions { gap: 0; }
+            
+            /* Crucial overflow fix */
+            .main-wrapper, .product-info { padding-left: 8px; padding-right: 8px; overflow-x: hidden; }
+            .add-btn, .qty-control { width: 100%; min-width: 0; }
+        }
+    </style>
+    <style>
+        /* Global safe-guard against horizontal scroll */
+        html, body { max-width: 100%; overflow-x: hidden; }
+    </style>
     </style>
 </head>
 <body>
@@ -398,12 +442,12 @@
 
                 <div class="info-text">
                     <strong>Seller Information</strong>
-                    <div style="display:grid; grid-template-columns: 70px 1fr; gap:4px; font-size:0.85rem;">
+                    <div class="seller-grid" style="display:grid; grid-template-columns: 70px 1fr; gap:6px; font-size:0.85rem;">
                         <span style="color:#6b7280;">Seller:</span>
                         <span style="font-weight:600; color:#111827;">{{ $product->seller->name ?? 'GrabBasket Partner' }}</span>
                         
                         <span style="color:#6b7280;">Email:</span>
-                        <span style="font-weight:600; color:#111827;">{{ $product->seller->email ?? 'N/A' }}</span>
+                        <span style="font-weight:600; color:#111827; word-break: break-all;">{{ $product->seller->email ?? 'N/A' }}</span>
                         
                         <span style="color:#6b7280;">Address:</span>
                         <span style="font-weight:600; color:#111827;">{{ $product->seller->billing_address ?? $product->seller->default_address ?? 'N/A' }}</span>

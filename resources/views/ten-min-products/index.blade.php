@@ -358,6 +358,7 @@
             font-weight: 800;
             padding: 4px 8px;
             border-radius: 6px;
+            z-index: 10;
         }
 
         .p-title {
@@ -876,7 +877,7 @@
                 } else {
                     noResults.style.display = 'none';
                     productGrid.innerHTML = matches.map(p => `
-                        <div class="product-card" onclick="window.location.href='/ten-min-products/details/${p.id}'">
+                        <div class="product-card" onclick="window.location.href='/product/${p.id}'">
                             ${p.discount > 0 ? `<div class="discount-badge">${p.discount}% OFF</div>` : ''}
                             <div class="p-img-box">
                                 <img src="${p.img || 'https://via.placeholder.com/300'}" class="p-img" alt="${p.name}">
