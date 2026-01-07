@@ -1377,11 +1377,20 @@ class SellerController extends Controller
             ->filter(fn($cat) => $cat->tenMinProducts->isNotEmpty())
             ->values();
 
-        // Determine active category: from query param or fallback to first
+        // Determine active category: from query param
+        $selectedCategoryId = $request->query('category');
         $activeCategory = null;
-        if ($categories->isNotEmpty()) {
-            $selectedCategoryId = $request->query('category');
-            $activeCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
+        $commonProducts = collect();
+
+        if ($selectedCategoryId) {
+            $activeCategory = $categories->firstWhere('id', $selectedCategoryId);
+        }
+
+        // If no categories or no selected category, prepare "Top Picks" (2 from each category)
+        if (!$activeCategory && $categories->isNotEmpty()) {
+            foreach ($categories as $cat) {
+                $commonProducts = $commonProducts->merge($cat->tenMinProducts->take(2));
+            }
         }
 
         // Safely attach filteredSubcategories to every category (including active one)
@@ -1409,11 +1418,12 @@ class SellerController extends Controller
                     'id' => $s->id,
                     'name' => $s->name,
                 ])->toArray(),
-                'products' => $cat->tenMinProducts->map(function ($p) {
+                'products' => $cat->tenMinProducts->map(function ($p) use ($cat) {
                     return [
                         'id' => $p->id,
                         'name' => $p->name,
                         'subcategory' => $p->subcategory?->name ?? 'Other',
+                        'categoryName' => $cat->name,
                         'img' => $p->image_url,
                         'price' => $p->price,
                         'discount' => $p->discount ?? 0,
@@ -1422,7 +1432,7 @@ class SellerController extends Controller
             ];
         })->toArray();
 
-        return view('ten-min-products.index', compact('categories', 'jsCategories', 'activeCategory'));
+        return view('ten-min-products.index', compact('categories', 'jsCategories', 'activeCategory', 'commonProducts'));
     }
 
     public function show($id)

@@ -724,31 +724,44 @@
 
         <!-- Content -->
         <main>
-            @if(isset($activeCategory))
-                <div class="content-header">
-                    <div>
-                        <h1 class="content-title">{{ $activeCategory->name }}</h1>
-                        <div style="color:#6b7280; margin-top:4px;">{{ $activeCategory->tenMinProducts->count() }} items
-                            available</div>
+            @php
+                $displayActive = $activeCategory ?? null;
+                $displayProducts = $displayActive ? $displayActive->tenMinProducts : ($commonProducts ?? collect());
+                $title = $displayActive ? $displayActive->name : 'Top Picks for You';
+                $count = $displayActive ? $displayActive->tenMinProducts->count() : null;
+            @endphp
+
+            <div class="content-header">
+                <div>
+                    <h1 class="content-title">{{ $title }}</h1>
+                    <div style="color:#6b7280; margin-top:4px;">
+                        @if($count !== null)
+                            {{ $count }} items available
+                        @else
+                            Curated selection from all categories
+                        @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Subcategories -->
+            <!-- Subcategories -->
+            @if($displayActive && $displayActive->filteredSubcategories->isNotEmpty())
                 <div class="subcategories" id="subCats">
                     <div class="sub-pill active" data-sub="All">All</div>
-                    @foreach($activeCategory->filteredSubcategories as $sub)
+                    @foreach($displayActive->filteredSubcategories as $sub)
                         <div class="sub-pill" data-sub="{{ $sub->name }}">{{ $sub->name }}</div>
                     @endforeach
                 </div>
+            @endif
 
                 <!-- Products -->
                 <div class="product-grid" id="productGrid">
-                    @foreach($activeCategory->tenMinProducts as $product)
+                    @foreach($displayProducts as $product)
                         <div class="product-card" data-subcat="{{ $product->subcategory?->name ?? 'Other' }}"
-                            onclick="window.location.href='{{ route('tenmin.product.details', $product->id) }}'">
+                            onclick="window.location.href='/product/{{ $product->id }}'">
 
                             @if($product->discount > 0)
-                                <div class="discount-badge">{{ $product->discount }}% OFF</div>
+                                <div class="discount-badge" style="z-index: 10;">{{ $product->discount }}% OFF</div>
                             @endif
 
                             <div class="p-img-box">
@@ -758,7 +771,12 @@
 
                             <div>
                                 <div class="p-title">{{ $product->name }}</div>
-                                <div class="p-weight">{{ $product->subcategory?->name ?? 'Standard' }}</div>
+                                <div class="p-weight">
+                                    @if(!$displayActive)
+                                        {{ $product->category?->name ?? 'Category' }} •
+                                    @endif
+                                    {{ $product->subcategory?->name ?? 'Standard' }}
+                                </div>
                             </div>
 
                             <div class="p-footer">
@@ -766,7 +784,7 @@
                                     <span class="current-price">₹{{ $product->price }}</span>
                                     @if($product->discount > 0)
                                         <span
-                                            class="old-price">₹{{ $product->price + ($product->price * $product->discount / 100) }}</span>
+                                            class="old-price">₹{{ number_format($product->price / (1 - $product->discount / 100), 2) }}</span>
                                     @endif
                                 </div>
                                 <button class="add-btn-sm"
@@ -781,14 +799,8 @@
                 <div id="noResults" class="empty-state" style="display:none;">
                     <i class="fa-regular fa-face-frown" style="font-size:48px;margin-bottom:16px;"></i>
                     <h3>No products found</h3>
-                    <p>Try selecting a different subcategory.</p>
+                    <p>Try searching for something else.</p>
                 </div>
-
-            @else
-                <div class="empty-state">
-                    <h3>Please select a category to start shopping</h3>
-                </div>
-            @endif
         </main>
 
     </div>
@@ -830,8 +842,9 @@
         const contentTitle = document.querySelector('.content-title');
         const contentHeaderInfo = document.querySelector('.content-header div div');
         const subCatsContainer = document.getElementById('subCats');
-        const defaultCategoryName = "{{ $activeCategory->name ?? '' }}";
-        const defaultCategoryItemsCount = "{{ $activeCategory->tenMinProducts->count() ?? 0 }}";
+        const defaultCategoryName = "{{ $activeCategory->name ?? 'Top Picks for You' }}";
+        const defaultCategoryItemsCount = "{{ $activeCategory ? $activeCategory->tenMinProducts->count() : ($commonProducts->count() ?? 0) }}";
+        const isCommonView = @json(!isset($activeCategory));
 
         // Store original view products to restore later
         const originalGridHTML = productGrid.innerHTML;
@@ -851,7 +864,9 @@
                         attachSubcategoryListeners(); // Re-attach listeners to restored pills
                     }
                     if (contentTitle) contentTitle.innerText = defaultCategoryName;
-                    if (contentHeaderInfo) contentHeaderInfo.innerText = `${defaultCategoryItemsCount} items available`;
+                    if (contentHeaderInfo) {
+                        contentHeaderInfo.innerText = isCommonView ? "Curated selection from all categories" : `${defaultCategoryItemsCount} items available`;
+                    }
                     noResults.style.display = 'none';
                     return;
                 }
