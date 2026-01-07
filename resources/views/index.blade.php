@@ -1756,7 +1756,7 @@
                             <div class="firework fw-4"></div>
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                             <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
@@ -1771,7 +1771,7 @@
                             <div class="firework fw-4"></div>
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                             <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
@@ -1787,7 +1787,7 @@
                             <div class="firework fw-4"></div>
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                             <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
@@ -2062,7 +2062,7 @@
                                         <div class="firework fw-4"></div>
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                                         <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
@@ -2077,7 +2077,7 @@
                                         <div class="firework fw-4"></div>
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                                         <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
@@ -2093,7 +2093,7 @@
                                         <div class="firework fw-4"></div>
                                         <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
                                         <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>

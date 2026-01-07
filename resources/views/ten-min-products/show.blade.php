@@ -59,18 +59,31 @@
         .nav-actions { display: flex; gap: 24px; align-items: center; }
         .nav-link { 
             color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; font-size: 0.95rem; 
-            transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px; border-radius: 20px;
         }
-        .nav-link:hover { color: #fff; }
-        .user-menu { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; color: #fff; font-weight: 600; font-size: 0.9rem; }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
         
-        .cart-icon { position: relative; font-size: 1.3rem; color: #fff; text-decoration: none; padding: 4px; transition: transform 0.2s; }
-        .cart-icon:hover { transform: scale(1.1); }
+        .user-menu { 
+            background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 20px; 
+            color: #fff; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; 
+            cursor: default; transition: all 0.3s ease; gap: 6px;
+        }
+        .user-menu:hover { background: rgba(255,255,255,0.3); }
+        
+        .cart-icon { 
+            position: relative; font-size: 1.3rem; color: #fff; text-decoration: none; 
+            padding: 6px 10px; transition: all 0.3s ease; display: flex; align-items: center; border-radius: 20px; gap: 4px;
+        }
+        .cart-icon:hover { background: rgba(255,255,255,0.1); }
         .cart-badge {
-            position: absolute; top: -2px; right: -6px; background: #ef4444; color: white;
+            position: absolute; top: -2px; right: 0px; background: #ef4444; color: white;
             font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 50%; 
             display: none; border: 2px solid #9333ea;
         }
+        
+        .nav-text { display: inline-block; } /* Visible by default on desktop for Home/User */
+        .cart-icon .nav-text { display: none; } /* Hide 'Cart' text on Desktop */
 
         /* MAIN LAYOUT */
         .main-wrapper {
@@ -188,9 +201,35 @@
 
         @media (max-width: 900px) {
             .main-wrapper { grid-template-columns: 1fr; gap: 2rem; margin: 1.5rem auto; padding: 0 1rem; }
-            .product-image-container { height: 380px; }
+            .product-image-container { height: auto; aspect-ratio: 1/1; max-height: 45vh; } /* Responsive Square */
             .header-search { display: none; } 
-            .nav-actions { gap: 16px; }
+            
+            /* Mobile Navbar - Reveal Strategy */
+            .nav-actions { gap: 8px; }
+            .nav-text { 
+                max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; transition: all 0.3s ease; font-size: 0.8rem;
+            }
+            /* Restore Cart text display for mobile trigger */
+            .cart-icon .nav-text { display: inline-block; }
+            
+            .nav-link:hover .nav-text, 
+            .user-menu:hover .nav-text,
+            .cart-icon:hover .nav-text {
+                max-width: 100px; opacity: 1; margin-left: 4px;
+            }
+             /* Ensure circular and centered icons on mobile default */
+             .user-menu, .nav-link, .cart-icon { 
+                 padding: 0; 
+                 width: 36px; height: 36px; 
+                 display: flex; align-items: center; justify-content: center; 
+                 border-radius: 50%;
+             }
+             /* On hover these will expand width naturally if needed or keeps circle if text is separate? 
+                Actually flex container with width fixed might clip text. Use min-width or auto.
+             */
+             .user-menu:hover, .nav-link:hover, .cart-icon:hover {
+                 width: auto; padding: 0 12px; border-radius: 20px;
+             } 
             .product-title { font-size: 1.75rem; }
             
             .mobile-bar {
@@ -207,6 +246,22 @@
              .action-actions { display: block; } /* Reset */
 
             body { padding-bottom: 120px; }
+        }
+
+        /* Small Mobile Devices */
+        @media (max-width: 400px) {
+            header { padding: 12px 16px; }
+            .logo { font-size: 1.3rem; }
+            .nav-actions { gap: 10px; }
+            
+            .product-title { font-size: 1.5rem; }
+            /* Small mobile adjustments */
+            .product-image-container { max-height: 40vh; } 
+            .feature-grid { grid-template-columns: 1fr; gap: 1rem; }
+            
+            .add-btn, .qty-control { padding: 10px 16px; font-size: 0.95rem; min-width: 110px; }
+            .mobile-price { font-size: 1.2rem; }
+            .mobile-bar { padding: 12px 16px; }
         }
     </style>
 </head>
@@ -225,20 +280,20 @@
         </div>
 
         <div class="nav-actions">
-            <a href="/" class="nav-link d-none d-md-flex"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></a>
             
             <!-- Auth Logic -->
             @auth
-                <div class="user-menu d-none d-md-flex align-items-center gap-2">
-                    <i class="fa-regular fa-user"></i> {{ auth()->user()->name }}
+                <div class="user-menu">
+                    <i class="fa-regular fa-user"></i> <span class="nav-text">{{ auth()->user()->name }}</span>
                 </div>
-                <!-- Mobile only icon for user if needed, or stick to desktop text -->
             @else
-                <a href="{{ route('login') }}" class="nav-link d-none d-md-flex"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                <a href="{{ route('login') }}" class="nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="nav-text">Login</span></a>
             @endauth
 
             <a href="{{ route('tenmin.cart.view') }}" class="cart-icon">
                 <i class="fa-solid fa-cart-shopping"></i>
+                <span class="nav-text">Cart</span>
                 <span class="cart-badge" id="badge">0</span>
             </a>
         </div>
@@ -351,7 +406,7 @@
                         <span style="font-weight:600; color:#111827;">{{ $product->seller->email ?? 'N/A' }}</span>
                         
                         <span style="color:#6b7280;">Address:</span>
-                        <span style="font-weight:600; color:#111827;">{{ $product->seller->address ?? 'N/A' }}</span>
+                        <span style="font-weight:600; color:#111827;">{{ $product->seller->billing_address ?? $product->seller->default_address ?? 'N/A' }}</span>
                         
                         <span style="color:#6b7280;">State:</span>
                         <span style="font-weight:600; color:#111827;">{{ $product->seller->state ?? 'N/A' }}</span>
@@ -505,5 +560,5 @@
         };
     });
     </script>
-  </body>
+</body>
 </html>

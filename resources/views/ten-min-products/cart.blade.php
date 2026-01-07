@@ -12,31 +12,133 @@
 
     <style>
         :root {
-            --brand-primary: #9333ea;
-            --brand-secondary: #0c831f; 
+            --brand-primary: #9333ea;     /* Vibrant Purple */
+            --brand-secondary: #0c831f;   /* Green for Actions */
+            --brand-yellow: #f8cb46;      
             --text-dark: #111827;
             --text-gray: #6b7280;
-            --bg-body: #f8fafc;
+            --bg-body: #f9fafb;
             --surface-white: #ffffff;
-            --border-color: #e2e8f0;
-            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --radius-default: 16px;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-default: 16px; /* kept from cart */
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* kept from cart */
         }
 
         body { background: var(--bg-body); font-family: 'Inter', sans-serif; color: var(--text-dark); padding-bottom: 120px; }
         
-        /* NAVBAR - Matches Product Page V2 */
-        .navbar-custom {
-            background: linear-gradient(120deg, #7e22ce, #a855f7);
-            padding: 16px 0;
+        /* HEADER - Glassmorphism & Gradient */
+        header {
+            background: linear-gradient(135deg, rgba(109, 40, 217, 0.95), rgba(147, 51, 234, 0.95));
+            padding: 16px 24px;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(109, 40, 217, 0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: sticky; top:0; z-index: 100;
-            box-shadow: 0 4px 20px rgba(109, 40, 217, 0.25);
-            backdrop-filter: blur(10px);
-            color: white;
         }
-        .nav-logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.7rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .nav-logo:hover { transform: scale(1.02); transition: 0.3s; color: #fff; }
+        .logo { 
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; color: #fff; 
+            letter-spacing: -0.5px; text-decoration: none; display: flex; align-items: center; gap: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .logo:hover { color: #f3e8ff; transform: scale(1.01); transition: 0.3s; }
+
+        .search-container { flex: 1; margin: 0 2rem; max-width: 600px; position: relative; }
+        .search-box {
+            background: rgba(255, 255, 255, 0.95); border-radius: 99px; padding: 12px 24px;
+            display: flex; align-items: center; gap: 12px; color: var(--text-gray); 
+            border: 2px solid transparent; transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .search-box:focus-within { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 0 4px rgba(255,255,255,0.2); }
+        .search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; color: #333; }
+
+        .nav-actions { display: flex; gap: 24px; align-items: center; }
+        .nav-link { 
+            color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; font-size: 0.95rem; 
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px; border-radius: 20px;
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        
+        .user-menu { 
+            background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 20px; 
+            color: #fff; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; 
+            cursor: default; transition: all 0.3s ease; gap: 6px;
+        }
+        .user-menu:hover { background: rgba(255,255,255,0.3); }
+        
+        .cart-icon { 
+            position: relative; font-size: 1.3rem; color: #fff; text-decoration: none; 
+            padding: 6px 10px; transition: all 0.3s ease; display: flex; align-items: center; border-radius: 20px; gap: 4px;
+        }
+        .cart-icon:hover { background: rgba(255,255,255,0.1); }
+        .cart-badge {
+            position: absolute; top: -2px; right: 0px; background: #ef4444; color: white;
+            font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 50%; 
+            display: none; border: 2px solid #9333ea;
+        }
+        
+        .nav-text { display: inline-block; } /* Visible desktop */
+        .cart-icon .nav-text { display: none; } /* Hide 'Cart' text on Desktop */
+
+        @media (max-width: 900px) {
+            .header-search { display: none; }
+            header { padding: 12px 16px; }
+            .logo { font-size: 1.4rem; }
+            
+            /* Mobile Navbar - Reveal Strategy */
+            .nav-actions { gap: 8px; }
+            .nav-text { 
+                max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; transition: all 0.3s ease; font-size: 0.8rem;
+            }
+            .cart-icon .nav-text { display: inline-block; } /* Restore for mobile reveal */
+            
+            .nav-link:hover .nav-text, 
+            .user-menu:hover .nav-text,
+            .cart-icon:hover .nav-text {
+                max-width: 100px; opacity: 1; margin-left: 4px;
+            }
+             /* Ensure circular and centered icons on mobile default */
+             .user-menu, .nav-link, .cart-icon { 
+                 padding: 0; 
+                 width: 36px; height: 36px; 
+                 display: flex; align-items: center; justify-content: center; 
+                 border-radius: 50%;
+             }
+             .user-menu:hover, .nav-link:hover, .cart-icon:hover {
+                 width: auto; padding: 0 12px; border-radius: 20px;
+             }
+            
+            /* Cart specific mobile tweaks */
+            .page-title { font-size: 1.5rem; margin-bottom: 1rem; }
+            .delivery-ticket { padding: 16px; gap: 12px; }
+            .delivery-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+             .cart-wrapper { margin: 1.5rem auto; }
+        }
+
+        @media (max-width: 576px) {
+            .cart-item-row { gap: 12px; padding: 16px 0; }
+            .item-thumb { width: 60px; height: 60px; }
+            .qty-picker { width: 90px; padding: 4px; font-size: 0.9rem; }
+            .qty-action { width: 28px; height: 28px; }
+            .item-name { font-size: 1rem; }
+            .item-price { font-size: 1rem; }
+            
+            .checkout-bar { padding: 12px 16px; }
+            .checkout-btn { padding: 12px 20px; font-size: 1rem; }
+        }
+
+        @media (max-width: 375px) {
+            .checkout-btn { flex-direction: row; gap: 10px; font-size: 0.9rem; padding: 12px; }
+            .checkout-btn div:first-child { flex: 1; }
+            .empty-icon { font-size: 4rem; }
+        }
 
         /* CONTAINERS */
         .cart-wrapper { max-width: 1100px; margin: 3rem auto; padding: 0 1rem; }
@@ -149,15 +251,36 @@
 </head>
 <body>
 
-    <nav class="navbar-custom">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a href="{{ route('ten.min.products') }}" class="nav-logo"><i class="fa-solid fa-bag-shopping" style="color:#fbbf24;"></i> GrabBaskets</a>
-            <div class="d-none d-md-flex gap-3 text-white-50 small align-items-center">
-                <span class="text-white"><i class="fa-solid fa-shield-halved"></i> 100% Secure Payments</span>
-                @auth <span class="badge bg-white text-dark rounded-pill px-3 py-2"><i class="fa-solid fa-user me-1"></i> {{ auth()->user()->name }}</span> @endauth
+    <!-- HEADER -->
+    <header>
+        <a href="/" class="logo"><i class="fa-solid fa-bag-shopping" style="color: var(--brand-yellow);"></i> GrabBaskets</a>
+        
+        <div class="search-container header-search">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+                <input type="text" placeholder="Search for 'milk', 'chips', 'bread'..." />
             </div>
         </div>
-    </nav>
+
+        <div class="nav-actions">
+            <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></a>
+            
+            <!-- Auth Logic -->
+            @auth
+                <div class="user-menu">
+                    <i class="fa-regular fa-user"></i> <span class="nav-text">{{ auth()->user()->name }}</span>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="nav-text">Login</span></a>
+            @endauth
+
+            <a href="{{ route('tenmin.cart.view') }}" class="cart-icon">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="nav-text">Cart</span>
+                <span class="cart-badge" id="headerCartBadge">0</span>
+            </a>
+        </div>
+    </header>
 
     <div class="container cart-wrapper">
         
