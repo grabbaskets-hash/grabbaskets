@@ -13,6 +13,9 @@
             color: #282c3f;
         }
 
+
+
+        
         /* Navbar (Simple for context) */
         .simple-header {
             background: #fff;
