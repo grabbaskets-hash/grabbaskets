@@ -24,14 +24,14 @@ class DashboardController extends Controller
     {
         try {
             $partner = Auth::guard('delivery_partner')->user();
-            
+
             if (!$partner) {
                 \Illuminate\Support\Facades\Log::warning('Dashboard accessed without authentication', [
                     'session_id' => session()->getId(),
                     'guard_check' => Auth::guard('delivery_partner')->check(),
                     'user_agent' => request()->userAgent()
                 ]);
-                
+
                 return redirect()->route('delivery-partner.login')
                     ->with('error', 'Please login to access the dashboard.');
             }
@@ -65,7 +65,7 @@ class DashboardController extends Controller
                 'recentOrders' => $recentOrders,
                 'activeOrder' => $activeOrder,
             ]);
-            
+
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Dashboard loading failed completely', [
                 'error' => $e->getMessage(),
@@ -73,7 +73,7 @@ class DashboardController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->view('errors.500', [
                 'message' => 'Unable to load dashboard. Please try again later.'
             ], 500);
@@ -91,34 +91,34 @@ class DashboardController extends Controller
 
         // Get wallet information
         $wallet = $partner->wallet;
-        
+
         // --- Standard Delivery Requests Stats ---
         $reqQuery = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id);
         $totalRequests = (clone $reqQuery)->count();
         $completedRequests = (clone $reqQuery)->completed()->count();
-        
+
         $todayRequests = (clone $reqQuery)
             ->completed()
             ->whereDate('delivered_at', $today)
             ->count();
-            
+
         $monthRequests = (clone $reqQuery)
             ->completed()
             ->where('delivered_at', '>=', $thisMonth)
             ->count();
-            
+
         $weekRequests = (clone $reqQuery)
             ->completed()
             ->where('delivered_at', '>=', $thisWeek)
             ->count();
-            
+
         $pendingRequests = (clone $reqQuery)->active()->count();
 
         // --- Food Orders Stats ---
         $foodQuery = $partner->foodOrders();
         $foodTotal = (clone $foodQuery)->count();
         $foodCompleted = (clone $foodQuery)->where('status', 'delivered')->count(); // Assuming 'delivered'
-        
+
         // --- 10-Min Orders Stats ---
         $tenMinQuery = $partner->tenMinOrders();
         $tenMinTotal = (clone $tenMinQuery)->count();
@@ -127,16 +127,16 @@ class DashboardController extends Controller
         // --- Aggregated Stats ---
         $totalOrdersAll = $totalRequests + $foodTotal + $tenMinTotal;
         $completedOrdersAll = $completedRequests + $foodCompleted + $tenMinCompleted;
-        
+
         // Note: For advanced stats like 'today_deliveries' spanning all types, 
         // we would need more queries. For now, let's just sum the completion counts if possible,
         // or just rely on the main delivery requests if that's the primary tracking mechanism.
         // If FoodOrder/TenMinOrder are handled directly without DeliveryRequest, we should count them.
-        
+
         // Let's approximate 'today' and 'month' for other types if they have timestamps
         $foodToday = (clone $foodQuery)->where('status', 'delivered')->whereDate('updated_at', $today)->count();
         $tenMinToday = (clone $tenMinQuery)->where('status', 'delivered')->whereDate('updated_at', $today)->count();
-        
+
         $allToday = $todayRequests + $foodToday + $tenMinToday;
 
         $foodPending = (clone $foodQuery)->whereIn('status', ['assigned', 'picked_up', 'out_for_delivery'])->count();
@@ -174,7 +174,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get()
-             ->map(function ($req) {
+            ->map(function ($req) {
                 // DeliveryRequest wraps an Order.
                 // We mock the structure to look like a direct order for uniformity or extract the order.
                 // The current view expects 'order' object logic. 
@@ -182,7 +182,7 @@ class DashboardController extends Controller
                 // OR wrap this whole thing.
                 // ACTUALLY, the view uses $order directly in the loop.
                 // `foreach($recentOrders->take(3) as $order)`
-                
+    
                 // Let's check getRecentOrders implementation. 
                 // Original returned `DeliveryRequest` collection.
                 // But wait, the view iterates it and accesses `$order->order_number` etc.
@@ -198,9 +198,9 @@ class DashboardController extends Controller
                 // `{{ $order->order_number ?? ... }}`.
                 // If `recentOrders` returns `DeliveryRequest`, this would fail unless `DeliveryRequest` has those attributes.
                 // The original code returned `DeliveryRequest`.
-                
+    
                 // Let's stick to returning Order objects (or normalized objects) to be safe and consistent with Available Orders.
-                
+    
                 if ($req->order) {
                     $o = $req->order;
                     $o->type = 'standard';
@@ -277,11 +277,11 @@ class DashboardController extends Controller
                 $order->customer_name_display = $order->user->name ?? 'Customer';
                 $order->delivery_address_display = $order->delivery_address;
                 $order->total_amount_display = $order->total_amount;
-                
+
                 // Pickup info
                 $order->pickup_name_display = $order->sellerUser->name ?? 'Seller';
                 $order->pickup_address_display = $order->sellerUser->billing_address ?? 'Contact support';
-                
+
                 return $order;
             });
 
@@ -298,11 +298,11 @@ class DashboardController extends Controller
                 $order->customer_name_display = $order->customer_name;
                 $order->delivery_address_display = $order->delivery_address;
                 $order->total_amount_display = $order->total_amount;
-                
+
                 // Pickup info
                 $order->pickup_name_display = $order->shop_name ?? ($order->hotelOwner->restaurant_name ?? 'Restaurant');
                 $order->pickup_address_display = $order->shop_address ?? ($order->hotelOwner->restaurant_address ?? 'Address not found');
-                
+
                 return $order;
             });
 
@@ -319,20 +319,20 @@ class DashboardController extends Controller
                 $order->customer_name_display = $order->customer_name;
                 $order->delivery_address_display = $order->delivery_address;
                 $order->total_amount_display = $order->total_amount;
-                
+
                 // Pickup info - Lookup Seller profile by user email
                 $pickupName = 'Shop';
                 $pickupAddress = 'Address not found';
-                
+
                 if ($order->seller) {
                     $sellerProfile = \App\Models\Seller::where('email', $order->seller->email)->first();
                     $pickupName = $sellerProfile->store_name ?? ($order->seller->name ?? 'Shop');
                     $pickupAddress = $sellerProfile->store_address ?? ($order->seller->billing_address ?? 'Address not found');
                 }
-                
+
                 $order->pickup_name_display = $pickupName;
                 $order->pickup_address_display = $pickupAddress;
-                
+
                 return $order;
             });
 
@@ -349,10 +349,10 @@ class DashboardController extends Controller
             // Standard Order has delivery_latitude/longitude.
             // FoodOrder/TenMinOrder might strictly rely on address string or we need to verify schema.
             // Based on file read, they have delivery_address.
-            
+
             if (isset($order->delivery_latitude) && isset($order->delivery_longitude) && $order->delivery_latitude && $order->delivery_longitude) {
-                 return $partner->canDeliverTo(
-                    $order->delivery_latitude, 
+                return $partner->canDeliverTo(
+                    $order->delivery_latitude,
                     $order->delivery_longitude
                 );
             }
@@ -365,10 +365,7 @@ class DashboardController extends Controller
      */
     private function getTodayEarnings($partner): float
     {
-        return $partner->orders()
-            ->where('delivery_status', 'delivered')
-            ->whereDate('delivered_at', today())
-            ->sum('delivery_fee') ?? 0;
+        return $partner->today_earnings;
     }
 
     /**
@@ -508,11 +505,11 @@ class DashboardController extends Controller
             ->with(['user', 'orderItems.product'])
             ->where(function ($q) use ($query) {
                 $q->where('order_number', 'like', "%{$query}%")
-                  ->orWhere('delivery_address', 'like', "%{$query}%")
-                  ->orWhereHas('user', function ($userQuery) use ($query) {
-                      $userQuery->where('name', 'like', "%{$query}%")
-                               ->orWhere('phone', 'like', "%{$query}%");
-                  });
+                    ->orWhere('delivery_address', 'like', "%{$query}%")
+                    ->orWhereHas('user', function ($userQuery) use ($query) {
+                        $userQuery->where('name', 'like', "%{$query}%")
+                            ->orWhere('phone', 'like', "%{$query}%");
+                    });
             })
             ->limit(10)
             ->get();
@@ -616,7 +613,7 @@ class DashboardController extends Controller
     private function getActiveOrder($partner)
     {
         $order = $partner->currentOrder;
-        
+
         if (!$order) {
             return null;
         }
@@ -634,7 +631,7 @@ class DashboardController extends Controller
             $order->normalized_order_number = 'TM-' . $order->id;
             $order->customer_name_display = $order->customer_name;
             $order->delivery_address_display = $order->delivery_address;
-            
+
             $pickupName = 'Shop';
             $pickupAddress = 'Address not found';
             if ($order->seller) {
@@ -662,18 +659,18 @@ class DashboardController extends Controller
     public function refreshAvailableOrders(Request $request)
     {
         $partner = Auth::guard('delivery_partner')->user();
-        
+
         if (!$partner) {
             return response()->json(['html' => '']);
         }
 
         // Limit to 5 for the dashboard widget
         $availableOrders = $this->getAvailableOrders($partner, 5);
-        
+
         $html = view('delivery-partner.dashboard.partials.available-orders', compact('availableOrders', 'partner'))->render();
-        
+
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'html' => $html,
             'count' => $availableOrders->count()
         ]);

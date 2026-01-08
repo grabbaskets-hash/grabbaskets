@@ -160,6 +160,19 @@ class DeliveryPartner extends Authenticatable
         return $this->hasMany(Order::class, 'delivery_partner_id');
     }
 
+    public function deliveryRequests(): HasMany
+    {
+        return $this->hasMany(DeliveryRequest::class, 'delivery_partner_id');
+    }
+
+    /**
+     * Get the wallet associated with the delivery partner.
+     */
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DeliveryPartnerWallet::class, 'delivery_partner_id');
+    }
+
     /**
      * Get the food orders assigned to this delivery partner.
      */
@@ -490,9 +503,23 @@ class DeliveryPartner extends Authenticatable
      */
     public function getTodayEarningsAttribute(): float
     {
-        return $this->orders()
-            ->where('delivery_status', 'delivered')
-            ->whereDate('delivered_at', today())
-            ->sum('delivery_fee') ?? 0;
+        $today = Carbon::today();
+
+        $standardEarnings = $this->deliveryRequests()
+            ->where('status', 'completed')
+            ->whereDate('delivered_at', $today)
+            ->sum('delivery_fee');
+
+        $foodEarnings = $this->foodOrders()
+            ->where('status', 'delivered')
+            ->whereDate('updated_at', $today)
+            ->sum('delivery_fee');
+
+        $tenMinEarnings = $this->tenMinOrders()
+            ->where('status', 'delivered')
+            ->whereDate('updated_at', $today)
+            ->sum('delivery_fee');
+
+        return (float) ($standardEarnings + $foodEarnings + $tenMinEarnings);
     }
 }

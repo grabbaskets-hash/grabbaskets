@@ -133,7 +133,7 @@ class DeliveryPartnerWallet extends Model
     public function updateDeliveryStats($successful = true)
     {
         $this->increment('total_deliveries');
-        
+
         if ($successful) {
             $this->increment('successful_deliveries');
         }
@@ -147,7 +147,7 @@ class DeliveryPartnerWallet extends Model
         if ($this->total_deliveries == 0) {
             return 0;
         }
-        
+
         return round(($this->successful_deliveries / $this->total_deliveries) * 100, 2);
     }
 
@@ -165,5 +165,29 @@ class DeliveryPartnerWallet extends Model
     public function getFormattedTotalEarnedAttribute()
     {
         return '₹' . number_format($this->total_earned, 2);
+    }
+
+    /**
+     * Get today's earnings from the related partner
+     */
+    public function getTodayEarningsAttribute()
+    {
+        return $this->deliveryPartner ? $this->deliveryPartner->today_earnings : 0;
+    }
+
+    /**
+     * Get this month's earnings from the related partner
+     */
+    public function getThisMonthEarningsAttribute()
+    {
+        return $this->deliveryPartner ? $this->deliveryPartner->this_month_earnings : 0;
+    }
+
+    /**
+     * Get available earnings (balance)
+     */
+    public function getAvailableEarningsAttribute()
+    {
+        return $this->balance;
     }
 }
