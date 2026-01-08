@@ -65,7 +65,7 @@ class AdminDeliveryPartnerController extends Controller
         } catch (\Exception $e) {
             Log::error('Admin Delivery Partner Dashboard Error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return back()->with('error', 'Error loading dashboard: ' . $e->getMessage());
         }
     }
@@ -97,8 +97,8 @@ class AdminDeliveryPartnerController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -142,22 +142,15 @@ class AdminDeliveryPartnerController extends Controller
         ];
 
         try {
-            $stats['total_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)->count();
-            $stats['completed_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->count();
-            $stats['pending_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->whereIn('status', ['accepted', 'picked_up'])
-                ->count();
-            $stats['today_deliveries'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->whereDate('completed_at', today())
-                ->count();
-            $stats['today_earnings'] = DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->where('status', 'completed')
-                ->whereDate('completed_at', today())
-                ->sum('delivery_fee') ?? 0;
-            $stats['completion_rate'] = $this->getCompletionRate($partner->id);
+            $stats['total_deliveries'] = $partner->total_deliveries_count;
+            $stats['completed_deliveries'] = $partner->completed_deliveries_count;
+            $stats['pending_deliveries'] = $partner->pending_deliveries_count_all;
+            $stats['today_deliveries'] = $partner->today_deliveries_count;
+            $stats['today_earnings'] = $partner->today_earnings;
+            $stats['total_earnings'] = $partner->total_earnings_all;
+            $stats['completion_rate'] = $partner->total_deliveries_count > 0
+                ? round(($partner->completed_deliveries_count / $partner->total_deliveries_count) * 100, 2)
+                : 0;
         } catch (\Exception $e) {
             Log::warning('Could not load delivery statistics: ' . $e->getMessage());
         }
@@ -445,16 +438,18 @@ class AdminDeliveryPartnerController extends Controller
             'total_completed' => $query->count(),
             'total_earnings' => $query->sum('delivery_fee') ?? 0,
             'avg_delivery_time' => $query->avg(DB::raw('TIMESTAMPDIFF(MINUTE, created_at, completed_at)')) ?? 0,
-            'top_partners' => DeliveryPartner::withCount(['deliveryRequests' => function ($q) use ($period) {
-                $q->where('status', 'completed');
-                if ($period === 'today') {
-                    $q->whereDate('completed_at', today());
-                } elseif ($period === 'week') {
-                    $q->where('completed_at', '>=', now()->startOfWeek());
-                } elseif ($period === 'month') {
-                    $q->where('completed_at', '>=', now()->startOfMonth());
+            'top_partners' => DeliveryPartner::withCount([
+                'deliveryRequests' => function ($q) use ($period) {
+                    $q->where('status', 'completed');
+                    if ($period === 'today') {
+                        $q->whereDate('completed_at', today());
+                    } elseif ($period === 'week') {
+                        $q->where('completed_at', '>=', now()->startOfWeek());
+                    } elseif ($period === 'month') {
+                        $q->where('completed_at', '>=', now()->startOfMonth());
+                    }
                 }
-            }])
+            ])
                 ->orderByDesc('delivery_requests_count')
                 ->limit(5)
                 ->get(['id', 'name', 'phone', 'delivery_requests_count']),
@@ -474,9 +469,11 @@ class AdminDeliveryPartnerController extends Controller
         return DeliveryPartner::where('is_online', true)
             ->where('is_available', true)
             ->where('status', 'approved')  // Only approved partners can receive orders
-            ->withCount(['deliveryRequests' => function ($q) {
-                $q->whereIn('status', ['accepted', 'picked_up']);
-            }])
+            ->withCount([
+                'deliveryRequests' => function ($q) {
+                    $q->whereIn('status', ['accepted', 'picked_up']);
+                }
+            ])
             ->orderBy('delivery_requests_count', 'asc')
             ->orderByDesc('rating')
             ->first();

@@ -522,4 +522,71 @@ class DeliveryPartner extends Authenticatable
 
         return (float) ($standardEarnings + $foodEarnings + $tenMinEarnings);
     }
+
+    /**
+     * Get total earnings.
+     */
+    public function getTotalEarningsAllAttribute(): float
+    {
+        $standardEarnings = $this->deliveryRequests()
+            ->where('status', 'completed')
+            ->sum('delivery_fee');
+
+        $foodEarnings = $this->foodOrders()
+            ->where('status', 'delivered')
+            ->sum('delivery_fee');
+
+        $tenMinEarnings = $this->tenMinOrders()
+            ->where('status', 'delivered')
+            ->sum('delivery_fee');
+
+        return (float) ($standardEarnings + $foodEarnings + $tenMinEarnings);
+    }
+
+    /**
+     * Get total deliveries count across all types.
+     */
+    public function getTotalDeliveriesCountAttribute(): int
+    {
+        return $this->deliveryRequests()->count() +
+            $this->foodOrders()->count() +
+            $this->tenMinOrders()->count();
+    }
+
+    /**
+     * Get completed deliveries count across all types.
+     */
+    public function getCompletedDeliveriesCountAttribute(): int
+    {
+        $standard = $this->deliveryRequests()->where('status', 'completed')->count();
+        $food = $this->foodOrders()->where('status', 'delivered')->count();
+        $tenMin = $this->tenMinOrders()->where('status', 'delivered')->count();
+
+        return $standard + $food + $tenMin;
+    }
+
+    /**
+     * Get pending deliveries count across all types.
+     */
+    public function getPendingDeliveriesCountAllAttribute(): int
+    {
+        $standard = $this->deliveryRequests()->whereIn('status', ['accepted', 'picked_up'])->count();
+        $food = $this->foodOrders()->whereIn('status', ['assigned', 'picked_up', 'out_for_delivery'])->count();
+        $tenMin = $this->tenMinOrders()->whereIn('status', ['assigned', 'picked_up', 'out_for_delivery'])->count();
+
+        return $standard + $food + $tenMin;
+    }
+
+    /**
+     * Get today's deliveries count across all types.
+     */
+    public function getTodayDeliveriesCountAttribute(): int
+    {
+        $today = Carbon::today();
+        $standard = $this->deliveryRequests()->where('status', 'completed')->whereDate('delivered_at', $today)->count();
+        $food = $this->foodOrders()->where('status', 'delivered')->whereDate('updated_at', $today)->count();
+        $tenMin = $this->tenMinOrders()->where('status', 'delivered')->whereDate('updated_at', $today)->count();
+
+        return $standard + $food + $tenMin;
+    }
 }
