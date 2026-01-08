@@ -51,7 +51,7 @@ if (app()->environment(['local', 'development'])) {
         }
         return view('test-upload');
     })->name('test.upload');
-    
+
     // Test direct upload to R2
     Route::match(['get', 'post'], '/test-upload-r2', function (Request $request) {
         if ($request->isMethod('post')) {
@@ -195,6 +195,7 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/wallet', [ProfileController::class, 'wallet'])->name('wallet.show');
     Route::post('/apply-referral', [App\Http\Controllers\ReferralController::class, 'apply'])->name('referral.apply');
+
 });
 
 // Test route without middleware
@@ -792,6 +793,7 @@ Route::get('/admin/bulk-product-upload', function () {
     }
     return app(AdminController::class)->showBulkProductUpload();
 })->name('admin.bulkProductUpload');
+
 
 // Admin actions (POST/DELETE)
 Route::post('/admin/bulk-product-upload', function (Request $request) {
@@ -1978,6 +1980,12 @@ Route::prefix('food')->group(function () {
         // Route::get('/order/success/{orderId}', [CustomerFoodController::class, 'orderSuccess'])->name('customer.food.order.success');
         Route::get('/order/success', [CustomerFoodController::class, 'orderSuccess'])
             ->name('customer.food.order.success');
+
+        Route::get('/my-orders', [CustomerFoodController::class, 'myOrders'])
+            ->name('food.my-orders');
+        Route::get('/my-orders/{order}', [CustomerFoodController::class, 'orderDetails'])
+            ->name('food.order.details');
+
     });
 });
 

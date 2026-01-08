@@ -38,32 +38,46 @@ class CategoryEmojiSeeder extends Seeder
 
         foreach ($categories as $category) {
             $categoryName = strtoupper(trim($category->name));
-            
+
             // Direct mapping
             if (isset($emojiMappings[$categoryName])) {
                 $category->emoji = $emojiMappings[$categoryName];
             } else {
                 // Partial matching for similar categories
                 $emoji = '🛍️'; // Default
-                
-                if (str_contains($categoryName, 'ELECTRONIC')) $emoji = '⚡';
-                elseif (str_contains($categoryName, 'FASHION') || str_contains($categoryName, 'CLOTH')) $emoji = '👗';
-                elseif (str_contains($categoryName, 'BEAUTY') || str_contains($categoryName, 'CARE')) $emoji = '💅';
-                elseif (str_contains($categoryName, 'SPORT') || str_contains($categoryName, 'FITNESS')) $emoji = '⚽';
-                elseif (str_contains($categoryName, 'BOOK') || str_contains($categoryName, 'EDUCATION')) $emoji = '📚';
-                elseif (str_contains($categoryName, 'KID') || str_contains($categoryName, 'TOY')) $emoji = '🎮';
-                elseif (str_contains($categoryName, 'AUTO') || str_contains($categoryName, 'CAR')) $emoji = '🚘';
-                elseif (str_contains($categoryName, 'HEALTH') || str_contains($categoryName, 'WELLNESS')) $emoji = '💊';
-                elseif (str_contains($categoryName, 'JEWELRY') || str_contains($categoryName, 'ACCESS')) $emoji = '💎';
-                elseif (str_contains($categoryName, 'GROCERY') || str_contains($categoryName, 'FOOD')) $emoji = '🍎';
-                elseif (str_contains($categoryName, 'FURNITURE') || str_contains($categoryName, 'HOME')) $emoji = '🏠';
-                elseif (str_contains($categoryName, 'GARDEN') || str_contains($categoryName, 'OUTDOOR')) $emoji = '🌸';
-                elseif (str_contains($categoryName, 'PET')) $emoji = '🐾';
-                elseif (str_contains($categoryName, 'BABY')) $emoji = '🍼';
-                
+
+                if (str_contains($categoryName, 'ELECTRONIC'))
+                    $emoji = '⚡';
+                elseif (str_contains($categoryName, 'FASHION') || str_contains($categoryName, 'CLOTH'))
+                    $emoji = '👗';
+                elseif (str_contains($categoryName, 'BEAUTY') || str_contains($categoryName, 'CARE'))
+                    $emoji = '💅';
+                elseif (str_contains($categoryName, 'SPORT') || str_contains($categoryName, 'FITNESS'))
+                    $emoji = '⚽';
+                elseif (str_contains($categoryName, 'BOOK') || str_contains($categoryName, 'EDUCATION'))
+                    $emoji = '📚';
+                elseif (str_contains($categoryName, 'KID') || str_contains($categoryName, 'TOY'))
+                    $emoji = '🎮';
+                elseif (str_contains($categoryName, 'AUTO') || str_contains($categoryName, 'CAR'))
+                    $emoji = '🚘';
+                elseif (str_contains($categoryName, 'HEALTH') || str_contains($categoryName, 'WELLNESS'))
+                    $emoji = '💊';
+                elseif (str_contains($categoryName, 'JEWELRY') || str_contains($categoryName, 'ACCESS'))
+                    $emoji = '💎';
+                elseif (str_contains($categoryName, 'GROCERY') || str_contains($categoryName, 'FOOD'))
+                    $emoji = '🍎';
+                elseif (str_contains($categoryName, 'FURNITURE') || str_contains($categoryName, 'HOME'))
+                    $emoji = '🏠';
+                elseif (str_contains($categoryName, 'GARDEN') || str_contains($categoryName, 'OUTDOOR'))
+                    $emoji = '🌸';
+                elseif (str_contains($categoryName, 'PET'))
+                    $emoji = '🐾';
+                elseif (str_contains($categoryName, 'BABY'))
+                    $emoji = '🍼';
+
                 $category->emoji = $emoji;
             }
-            
+
             $category->save();
         }
     }

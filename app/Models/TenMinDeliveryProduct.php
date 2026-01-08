@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class TenMinDeliveryProduct extends Model
 {
     protected $fillable = [
+        'product_id',
+        'unique_id',
         'name',
         'category_id',
         'subcategory_id',
@@ -38,10 +40,10 @@ class TenMinDeliveryProduct extends Model
         return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
 
-   public function seller()
-{
-    return $this->belongsTo(\App\Models\User::class, 'seller_id');
-}
+    public function seller()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'seller_id');
+    }
 
     // Get the image URL - Use Laravel Cloud URL
     public function getImageUrlAttribute()

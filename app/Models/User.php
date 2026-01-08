@@ -140,6 +140,7 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'referrer_id');
     }
 
+
     /**
      * Add points to user's wallet and create transaction record
      */

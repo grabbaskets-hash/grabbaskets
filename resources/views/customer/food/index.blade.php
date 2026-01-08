@@ -683,7 +683,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                             <li><a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="fa-solid fa-user-circle me-2"></i> Profile</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('orders.index') }}"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
+                            <li><a class="dropdown-item py-2" href="/food/my-orders"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">

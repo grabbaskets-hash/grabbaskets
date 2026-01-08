@@ -13,9 +13,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Bootstrap Override for compatibility */
-        a { text-decoration: none; }
-        ul { padding-left: 0; margin-bottom: 0; }
-        
+        a {
+            text-decoration: none;
+        }
+
+        ul {
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+
         /* ZEPTO-INSPIRED DESIGN SYSTEM */
         /* ZEPTO-INSPIRED DESIGN SYSTEM */
         :root {
@@ -352,6 +358,7 @@
             font-weight: 800;
             padding: 4px 8px;
             border-radius: 6px;
+            z-index: 10;
         }
 
         .p-title {
@@ -624,11 +631,13 @@
             <div class="nav-right">
                 @auth
                     <div class="dropdown">
-                        <button class="nav-btn border-0 bg-transparent dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="nav-btn border-0 bg-transparent dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-circle-user fa-lg text-secondary"></i>
                             <span class="d-none d-md-inline ms-1">Hi, {{ auth()->user()->name }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; overflow: hidden;">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2"
+                            style="border-radius: 12px; overflow: hidden;">
                             <li>
                                 <a class="dropdown-item py-2 px-3 fw-medium" href="{{ url('/profile') }}">
                                     <i class="fa-solid fa-user me-2 text-muted"></i> Profile
@@ -639,7 +648,9 @@
                                     <i class="fa-solid fa-bag-shopping me-2 text-muted"></i> Orders
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -658,7 +669,8 @@
 
                 <a href="{{ route('tenmin.cart.view') }}" class="nav-btn cart-btn text-decoration-none">
                     <i class="fa-solid fa-cart-shopping"></i>&nbsp;
-                    <span id="cartCountBadge">{{ \App\Models\TenMinGroceryCartItem::where('user_id', auth()->id())->sum('quantity') }}</span>
+                    <span
+                        id="cartCountBadge">{{ \App\Models\TenMinGroceryCartItem::where('user_id', auth()->id())->sum('quantity') }}</span>
                 </a>
             </div>
         </div>
@@ -712,41 +724,59 @@
 
         <!-- Content -->
         <main>
-            @if(isset($activeCategory))
-                <div class="content-header">
-                    <div>
-                        <h1 class="content-title">{{ $activeCategory->name }}</h1>
-                        <div style="color:#6b7280; margin-top:4px;">{{ $activeCategory->tenMinProducts->count() }} items
-                            available</div>
+            @php
+                $displayActive = $activeCategory ?? null;
+                $displayProducts = $displayActive ? $displayActive->tenMinProducts : ($commonProducts ?? collect());
+                $title = $displayActive ? $displayActive->name : 'Top Picks for You';
+                $count = $displayActive ? $displayActive->tenMinProducts->count() : null;
+            @endphp
+
+            <div class="content-header">
+                <div>
+                    <h1 class="content-title">{{ $title }}</h1>
+                    <div style="color:#6b7280; margin-top:4px;">
+                        @if($count !== null)
+                            {{ $count }} items available
+                        @else
+                            Curated selection from all categories
+                        @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Subcategories -->
+            <!-- Subcategories -->
+            @if($displayActive && $displayActive->filteredSubcategories->isNotEmpty())
                 <div class="subcategories" id="subCats">
                     <div class="sub-pill active" data-sub="All">All</div>
-                    @foreach($activeCategory->filteredSubcategories as $sub)
+                    @foreach($displayActive->filteredSubcategories as $sub)
                         <div class="sub-pill" data-sub="{{ $sub->name }}">{{ $sub->name }}</div>
                     @endforeach
                 </div>
+            @endif
 
                 <!-- Products -->
                 <div class="product-grid" id="productGrid">
-                    @foreach($activeCategory->tenMinProducts as $product)
+                    @foreach($displayProducts as $product)
                         <div class="product-card" data-subcat="{{ $product->subcategory?->name ?? 'Other' }}"
-                            onclick="window.location.href='{{ route('tenmin.product.details', $product->id) }}'">
+                            onclick="window.location.href='/product/{{ $product->id }}'">
 
                             @if($product->discount > 0)
-                                <div class="discount-badge">{{ $product->discount }}% OFF</div>
+                                <div class="discount-badge" style="z-index: 10;">{{ $product->discount }}% OFF</div>
                             @endif
 
                             <div class="p-img-box">
-                                <img src="{{ $product->image_url ?? 'https://via.placeholder.com/300' }}"
-                                    class="p-img" alt="{{ $product->name }}">
+                                <img src="{{ $product->image_url ?? 'https://via.placeholder.com/300' }}" class="p-img"
+                                    alt="{{ $product->name }}">
                             </div>
 
                             <div>
                                 <div class="p-title">{{ $product->name }}</div>
-                                <div class="p-weight">{{ $product->subcategory?->name ?? 'Standard' }}</div>
+                                <div class="p-weight">
+                                    @if(!$displayActive)
+                                        {{ $product->category?->name ?? 'Category' }} •
+                                    @endif
+                                    {{ $product->subcategory?->name ?? 'Standard' }}
+                                </div>
                             </div>
 
                             <div class="p-footer">
@@ -754,7 +784,7 @@
                                     <span class="current-price">₹{{ $product->price }}</span>
                                     @if($product->discount > 0)
                                         <span
-                                            class="old-price">₹{{ $product->price + ($product->price * $product->discount / 100) }}</span>
+                                            class="old-price">₹{{ number_format($product->price / (1 - $product->discount / 100), 2) }}</span>
                                     @endif
                                 </div>
                                 <button class="add-btn-sm"
@@ -769,14 +799,8 @@
                 <div id="noResults" class="empty-state" style="display:none;">
                     <i class="fa-regular fa-face-frown" style="font-size:48px;margin-bottom:16px;"></i>
                     <h3>No products found</h3>
-                    <p>Try selecting a different subcategory.</p>
+                    <p>Try searching for something else.</p>
                 </div>
-
-            @else
-                <div class="empty-state">
-                    <h3>Please select a category to start shopping</h3>
-                </div>
-            @endif
         </main>
 
     </div>
@@ -811,56 +835,118 @@
     </nav>
 
     <script>
-        // ========== SUBCATEGORY FILTERING ==========
-        const subPills = document.querySelectorAll('.sub-pill');
-        const cards = document.querySelectorAll('.product-card');
-        const noResults = document.getElementById('noResults');
-
-        subPills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                subPills.forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-
-                const selectedSub = pill.dataset.sub;
-                let visibleCount = 0;
-
-                cards.forEach(card => {
-                    if (selectedSub === 'All' || card.dataset.subcat === selectedSub) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-            });
-        });
-
         // ========== SEARCH ==========
         const searchInputs = [document.getElementById('globalSearch'), document.getElementById('mobileSearchInput')];
+        const jsCategories = @json($jsCategories);
+        const productGrid = document.getElementById('productGrid');
+        const contentTitle = document.querySelector('.content-title');
+        const contentHeaderInfo = document.querySelector('.content-header div div');
+        const subCatsContainer = document.getElementById('subCats');
+        const defaultCategoryName = "{{ $activeCategory->name ?? 'Top Picks for You' }}";
+        const defaultCategoryItemsCount = "{{ $activeCategory ? $activeCategory->tenMinProducts->count() : ($commonProducts->count() ?? 0) }}";
+        const isCommonView = @json(!isset($activeCategory));
+
+        // Store original view products to restore later
+        const originalGridHTML = productGrid.innerHTML;
+        const originalSubCatsHTML = subCatsContainer ? subCatsContainer.innerHTML : '';
 
         searchInputs.forEach(input => {
             if (!input) return;
             input.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                let visibleCount = 0;
+                const term = e.target.value.toLowerCase().trim();
 
-                cards.forEach(card => {
-                    const title = card.querySelector('.p-title').innerText.toLowerCase();
-                    const sub = card.querySelector('.p-weight').innerText.toLowerCase();
-
-                    if (title.includes(term) || sub.includes(term)) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
+                if (term.length === 0) {
+                    // Restore original view
+                    productGrid.innerHTML = originalGridHTML;
+                    if (subCatsContainer) {
+                        subCatsContainer.style.display = 'flex';
+                        subCatsContainer.innerHTML = originalSubCatsHTML;
+                        attachSubcategoryListeners(); // Re-attach listeners to restored pills
                     }
+                    if (contentTitle) contentTitle.innerText = defaultCategoryName;
+                    if (contentHeaderInfo) {
+                        contentHeaderInfo.innerText = isCommonView ? "Curated selection from all categories" : `${defaultCategoryItemsCount} items available`;
+                    }
+                    noResults.style.display = 'none';
+                    return;
+                }
+
+                // Global Search across all categories
+                let matches = [];
+                jsCategories.forEach(cat => {
+                    cat.products.forEach(p => {
+                        if (p.name.toLowerCase().includes(term) || p.subcategory.toLowerCase().includes(term)) {
+                            matches.push({ ...p, categoryName: cat.name });
+                        }
+                    });
                 });
 
-                noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+                // Update UI for Search Results
+                if (contentTitle) contentTitle.innerText = `Search Results for "${term}"`;
+                if (contentHeaderInfo) contentHeaderInfo.innerText = `${matches.length} items found across all categories`;
+                if (subCatsContainer) subCatsContainer.style.display = 'none';
+
+                if (matches.length === 0) {
+                    productGrid.innerHTML = '';
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                    productGrid.innerHTML = matches.map(p => `
+                        <div class="product-card" onclick="window.location.href='/product/${p.id}'">
+                            ${p.discount > 0 ? `<div class="discount-badge">${p.discount}% OFF</div>` : ''}
+                            <div class="p-img-box">
+                                <img src="${p.img || 'https://via.placeholder.com/300'}" class="p-img" alt="${p.name}">
+                            </div>
+                            <div>
+                                <div class="p-title">${p.name}</div>
+                                <div class="p-weight">${p.categoryName} • ${p.subcategory}</div>
+                            </div>
+                            <div class="p-footer">
+                                <div class="p-price">
+                                    <span class="current-price">₹${p.price}</span>
+                                    ${p.discount > 0 ? `<span class="old-price">₹${(p.price / (1 - p.discount / 100)).toFixed(2)}</span>` : ''}
+                                </div>
+                                <button class="add-btn-sm" onclick="event.stopPropagation(); addToCart(${p.id}, this)">
+                                    ADD
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
             });
         });
+
+        function attachSubcategoryListeners() {
+            const subPills = document.querySelectorAll('.sub-pill');
+            subPills.forEach(pill => {
+                pill.replaceWith(pill.cloneNode(true)); // Clear existing listeners to avoid duplicates
+            });
+
+            document.querySelectorAll('.sub-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('.sub-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+
+                    const selectedSub = pill.dataset.sub;
+                    let visibleCount = 0;
+                    const currentCards = document.querySelectorAll('.product-card');
+
+                    currentCards.forEach(card => {
+                        if (selectedSub === 'All' || card.dataset.subcat === selectedSub) {
+                            card.style.display = 'flex';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Initialize listeners
+        attachSubcategoryListeners();
 
         // ========== ADD TO CART ==========
         async function addToCart(productId, btn) {

@@ -1055,4 +1055,47 @@ class CustomerFoodController extends Controller
 
         return view('customer.food.order-success', compact('orders')); // plural
     }
+    public function myOrders(Request $request)
+{
+    $user = Auth::user();
+
+    // Fetch orders where customer_email OR customer_phone matches (adjust as per your data consistency)
+    // Preferably, if you store user_id or customer_id, use that instead.
+    $query = FoodOrder::with('items')
+        ->where(function ($q) use ($user) {
+            $q->where('customer_email', $user->email)
+              ->orWhere('customer_phone', $user->phone);
+        });
+
+    // Optional: Filter by status (e.g., ?status=Delivered)
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Optional: Search by order ID or food name (basic)
+    if ($search = $request->input('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('id', 'LIKE', "%{$search}%")
+              ->orWhereHas('items', function ($q2) use ($search) {
+                  $q2->where('food_name', 'LIKE', "%{$search}%");
+              });
+        });
+    }
+
+    $orders = $query->orderBy('created_at', 'desc')->get();
+
+    return view('customer.food.my-orders', compact('orders'));
+}
+
+public function orderDetails(FoodOrder $order)
+{
+    $user = Auth::user();
+
+    // 🔐 Security: Ensure the order belongs to the logged-in user
+    if ($order->customer_email !== $user->email && $order->customer_phone !== $user->phone) {
+        abort(403, 'Unauthorized access to this order.');
+    }
+
+    return view('customer.food.order-details', compact('order'));
+}
 }
