@@ -32,6 +32,7 @@ class OrderController extends Controller
                 ], 400);
             }
 
+        
             $order->status = 'cancelled';
             $order->save();
 
