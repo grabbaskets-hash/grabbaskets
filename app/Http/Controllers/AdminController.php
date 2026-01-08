@@ -409,6 +409,14 @@ class AdminController extends Controller
         $order->status = $request->status;
         $order->save();
 
+        // Release delivery partner if order completed or cancelled
+        if (in_array($request->status, ['delivered', 'cancelled'])) {
+            if ($order->delivery_partner_id) {
+                // Eager load if needed, but it should be fine
+                $order->deliveryPartner->clearOrder();
+            }
+        }
+
         // Notify buyer
         $buyer = $order->buyerUser;
         if ($buyer) {
@@ -710,24 +718,41 @@ Grabbasket Team
             'order_type' => 'required|in:standard,food,express'
         ]);
 
+        $partner = DeliveryPartner::findOrFail($request->delivery_partner_id);
+
+        // Validation: Must be online and available
+        if (!$partner->is_online) {
+            return back()->with('error', 'Cannot assign order: Partner is offline.');
+        }
+
+        if (!$partner->is_available || $partner->current_order_id) {
+            return back()->with('error', 'Cannot assign order: Partner is currently busy with another order.');
+        }
+
         $orderType = $request->order_type;
         $order = null;
 
         if ($orderType === 'standard') {
             $order = Order::findOrFail($id);
-            $order->delivery_partner_id = $request->delivery_partner_id;
         } elseif ($orderType === 'food') {
             $order = FoodOrder::findOrFail($id);
-            $order->delivery_partner_id = $request->delivery_partner_id;
         } else {
             $order = TenMinOrder::findOrFail($id);
-            // Check if column exists, though we should probably ensure it does
-            if (\Illuminate\Support\Facades\Schema::hasColumn('ten_min_orders', 'delivery_partner_id')) {
-                $order->delivery_partner_id = $request->delivery_partner_id;
-            }
         }
 
-        $order->save();
+        if (!$order) {
+            return back()->with('error', 'Order not found.');
+        }
+
+        // Assign the order and update partner status
+        $partner->assignOrder($order);
+
+        // Update order status based on type
+        if ($orderType === 'standard') {
+            $order->update(['delivery_status' => 'assigned']);
+        } else {
+            $order->update(['status' => 'assigned']);
+        }
 
         return back()->with('success', 'Delivery partner assigned successfully.');
     }

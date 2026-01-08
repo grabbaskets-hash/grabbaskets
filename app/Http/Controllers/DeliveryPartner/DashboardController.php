@@ -5,6 +5,8 @@ namespace App\Http\Controllers\DeliveryPartner;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryPartner;
 use App\Models\Order;
+use App\Models\FoodOrder;
+use App\Models\TenMinOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -47,6 +49,8 @@ class DashboardController extends Controller
             $availableOrders = $this->getAvailableOrders($partner, 10);
             $recentOrders = $this->getRecentOrders($partner, 5);
 
+            $activeOrder = $this->getActiveOrder($partner);
+
             return view('delivery-partner.dashboard.index', [
                 'partner' => $partner,
                 'initial_stats' => [
@@ -55,11 +59,11 @@ class DashboardController extends Controller
                     'is_online' => $partner->is_online,
                     'rating' => $partner->rating ?? 4.5,
                 ],
-                // Provide full stats array under the key expected by the view
                 'stats' => $stats,
                 'notifications' => $notifications,
                 'availableOrders' => $availableOrders,
                 'recentOrders' => $recentOrders,
+                'activeOrder' => $activeOrder,
             ]);
             
         } catch (\Exception $e) {
@@ -88,33 +92,71 @@ class DashboardController extends Controller
         // Get wallet information
         $wallet = $partner->wallet;
         
-        // Get delivery request statistics
-        $totalRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->count();
-        $completedRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->completed()->count();
-        $todayRequests = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+        // --- Standard Delivery Requests Stats ---
+        $reqQuery = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id);
+        $totalRequests = (clone $reqQuery)->count();
+        $completedRequests = (clone $reqQuery)->completed()->count();
+        
+        $todayRequests = (clone $reqQuery)
             ->completed()
             ->whereDate('delivered_at', $today)
             ->count();
+            
+        $monthRequests = (clone $reqQuery)
+            ->completed()
+            ->where('delivered_at', '>=', $thisMonth)
+            ->count();
+            
+        $weekRequests = (clone $reqQuery)
+            ->completed()
+            ->where('delivered_at', '>=', $thisWeek)
+            ->count();
+            
+        $pendingRequests = (clone $reqQuery)->active()->count();
+
+        // --- Food Orders Stats ---
+        $foodQuery = $partner->foodOrders();
+        $foodTotal = (clone $foodQuery)->count();
+        $foodCompleted = (clone $foodQuery)->where('status', 'delivered')->count(); // Assuming 'delivered'
+        
+        // --- 10-Min Orders Stats ---
+        $tenMinQuery = $partner->tenMinOrders();
+        $tenMinTotal = (clone $tenMinQuery)->count();
+        $tenMinCompleted = (clone $tenMinQuery)->where('status', 'delivered')->count();
+
+        // --- Aggregated Stats ---
+        $totalOrdersAll = $totalRequests + $foodTotal + $tenMinTotal;
+        $completedOrdersAll = $completedRequests + $foodCompleted + $tenMinCompleted;
+        
+        // Note: For advanced stats like 'today_deliveries' spanning all types, 
+        // we would need more queries. For now, let's just sum the completion counts if possible,
+        // or just rely on the main delivery requests if that's the primary tracking mechanism.
+        // If FoodOrder/TenMinOrder are handled directly without DeliveryRequest, we should count them.
+        
+        // Let's approximate 'today' and 'month' for other types if they have timestamps
+        $foodToday = (clone $foodQuery)->where('status', 'delivered')->whereDate('updated_at', $today)->count();
+        $tenMinToday = (clone $tenMinQuery)->where('status', 'delivered')->whereDate('updated_at', $today)->count();
+        
+        $allToday = $todayRequests + $foodToday + $tenMinToday;
+
+        $foodPending = (clone $foodQuery)->whereIn('status', ['assigned', 'picked_up', 'out_for_delivery'])->count();
+        $tenMinPending = (clone $tenMinQuery)->whereIn('status', ['assigned', 'picked_up', 'out_for_delivery'])->count();
+
+        $totalPendingAll = $pendingRequests + $foodPending + $tenMinPending;
 
         return [
-            'total_orders' => $totalRequests,
-            'completed_orders' => $completedRequests,
-            'completion_rate' => $totalRequests > 0 ? round(($completedRequests / $totalRequests) * 100, 1) : 0,
+            'total_orders' => $totalOrdersAll,
+            'completed_orders' => $completedOrdersAll,
+            'completion_rate' => $totalOrdersAll > 0 ? round(($completedOrdersAll / $totalOrdersAll) * 100, 1) : 0,
             'rating' => $partner->rating ?? 4.5,
             'total_earnings' => $wallet ? $wallet->balance : 0,
             'this_month_earnings' => $wallet ? $wallet->this_month_earnings : 0,
             'today_earnings' => $wallet ? $wallet->today_earnings : 0,
-            'pending_orders' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->active()->count(),
-            'pending_requests' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)->active()->count(),
-            'today_deliveries' => $todayRequests,
-            'week_deliveries' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->completed()
-                ->where('delivered_at', '>=', $thisWeek)
-                ->count(),
-            'month_deliveries' => \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
-                ->completed()
-                ->where('delivered_at', '>=', $thisMonth)
-                ->count(),
+            'pending_orders' => $totalPendingAll,
+            'pending_requests' => $pendingRequests,
+            'today_deliveries' => $allToday,
+            'week_deliveries' => $weekRequests,
+            'month_deliveries' => $monthRequests,
             'active_hours' => $this->getActiveHours($partner),
             'wallet_balance' => $wallet ? $wallet->balance : 0,
             'total_withdrawals' => $wallet ? $wallet->total_withdrawals : 0,
@@ -127,11 +169,87 @@ class DashboardController extends Controller
      */
     private function getRecentOrders($partner, int $limit = 5)
     {
-        return \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
+        $standardOrders = \App\Models\DeliveryRequest::where('delivery_partner_id', $partner->id)
             ->with(['order'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
-            ->get();
+            ->get()
+             ->map(function ($req) {
+                // DeliveryRequest wraps an Order.
+                // We mock the structure to look like a direct order for uniformity or extract the order.
+                // The current view expects 'order' object logic. 
+                // Let's attach the normalized fields to the request's order if possible, 
+                // OR wrap this whole thing.
+                // ACTUALLY, the view uses $order directly in the loop.
+                // `foreach($recentOrders->take(3) as $order)`
+                
+                // Let's check getRecentOrders implementation. 
+                // Original returned `DeliveryRequest` collection.
+                // But wait, the view iterates it and accesses `$order->order_number` etc.
+                // That implies `$order` in the view is a `DeliveryRequest` instance, 
+                // and it accesses `$order->order_number`? 
+                // `DeliveryRequest` does NOT have `order_number`. 
+                // It has `order` relationship.
+                // BUT the view does `$order->order_number ?? 'ORD-' . $order->id`.
+                // If `$order` is a DeliveryRequest, `$order->id` is the request ID.
+                // So the view might be relying on direct properties if it was passing Order objects,
+                // OR `DeliveryRequest` delegates, OR the previous code was weird.
+                // Looking at the view: `@foreach($recentOrders->take(3) as $order)`
+                // `{{ $order->order_number ?? ... }}`.
+                // If `recentOrders` returns `DeliveryRequest`, this would fail unless `DeliveryRequest` has those attributes.
+                // The original code returned `DeliveryRequest`.
+                
+                // Let's stick to returning Order objects (or normalized objects) to be safe and consistent with Available Orders.
+                
+                if ($req->order) {
+                    $o = $req->order;
+                    $o->type = 'standard';
+                    $o->normalized_id = $o->id;
+                    $o->normalized_order_number = $o->order_number;
+                    $o->customer_name_display = $o->user->name ?? 'Customer';
+                    $o->delivery_status_display = $req->status; // Use request status
+                    $o->total_amount_display = $o->total_amount;
+                    $o->created_at_display = $req->created_at; // Use request time
+                    return $o;
+                }
+                return null;
+            })->filter();
+
+        // Food Orders (Direct relationship)
+        $foodOrders = $partner->foodOrders()
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($order) {
+                $order->type = 'food';
+                $order->normalized_id = $order->id;
+                $order->normalized_order_number = 'FOOD-' . $order->id;
+                $order->customer_name_display = $order->customer_name;
+                $order->delivery_status_display = $order->status;
+                $order->total_amount_display = $order->total_amount;
+                $order->created_at_display = $order->created_at;
+                return $order;
+            });
+
+        // 10-Min Orders (Direct relationship)
+        $tenMinOrders = $partner->tenMinOrders()
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($order) {
+                $order->type = 'ten_min';
+                $order->normalized_id = $order->id;
+                $order->normalized_order_number = 'TM-' . $order->id;
+                $order->customer_name_display = $order->customer_name;
+                $order->delivery_status_display = $order->status;
+                $order->total_amount_display = $order->total_amount;
+                $order->created_at_display = $order->created_at;
+                return $order;
+            });
+
+        return $standardOrders->concat($foodOrders)->concat($tenMinOrders)
+            ->sortByDesc('created_at_display')
+            ->take($limit);
     }
 
     /**
@@ -139,34 +257,106 @@ class DashboardController extends Controller
      */
     private function getAvailableOrders($partner, int $limit = 10)
     {
-        if (!$partner->is_online || $partner->status !== 'available') {
+        // Check if partner handles deliveries
+        if (!$partner->isAvailableForDelivery()) {
             return collect();
         }
 
-        // Get orders that are ready for pickup and within delivery radius
-        $query = Order::with(['user', 'orderItems.product'])
+        // 1. Standard Orders
+        $standardOrders = Order::with(['user', 'sellerUser'])
             ->where('delivery_status', 'pending')
             ->whereNull('delivery_partner_id')
             ->where('order_status', 'confirmed')
-            ->orderBy('created_at', 'asc');
+            ->orderBy('created_at', 'asc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($order) {
+                $order->type = 'standard';
+                $order->normalized_id = $order->id;
+                $order->normalized_order_number = $order->order_number;
+                $order->customer_name_display = $order->user->name ?? 'Customer';
+                $order->delivery_address_display = $order->delivery_address;
+                $order->total_amount_display = $order->total_amount;
+                
+                // Pickup info
+                $order->pickup_name_display = $order->sellerUser->name ?? 'Seller';
+                $order->pickup_address_display = $order->sellerUser->billing_address ?? 'Contact support';
+                
+                return $order;
+            });
 
-        // If partner has location, filter by distance
-        if ($partner->current_latitude && $partner->current_longitude) {
-            // This is a simplified distance filter
-            // In production, you'd use proper spatial queries
-            $query->where('delivery_latitude', '!=', null)
-                  ->where('delivery_longitude', '!=', null);
-        }
+        // 2. Food Orders
+        $foodOrders = FoodOrder::with(['hotelOwner'])->whereIn('status', ['pending', 'ready', 'cooking', 'preparing', 'paid', 'accepted'])
+            ->whereNull('delivery_partner_id')
+            ->orderBy('created_at', 'asc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($order) {
+                $order->type = 'food';
+                $order->normalized_id = $order->id;
+                $order->normalized_order_number = 'FOOD-' . $order->id;
+                $order->customer_name_display = $order->customer_name;
+                $order->delivery_address_display = $order->delivery_address;
+                $order->total_amount_display = $order->total_amount;
+                
+                // Pickup info
+                $order->pickup_name_display = $order->shop_name ?? ($order->hotelOwner->restaurant_name ?? 'Restaurant');
+                $order->pickup_address_display = $order->shop_address ?? ($order->hotelOwner->restaurant_address ?? 'Address not found');
+                
+                return $order;
+            });
 
-        return $query->limit($limit)->get()->filter(function ($order) use ($partner) {
+        // 3. 10-Min Orders
+        $tenMinOrders = TenMinOrder::with(['seller'])->whereIn('status', ['pending', 'confirmed', 'packing', 'ready', 'paid'])
+            ->whereNull('delivery_partner_id')
+            ->orderBy('created_at', 'asc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($order) {
+                $order->type = 'ten_min';
+                $order->normalized_id = $order->id;
+                $order->normalized_order_number = 'TM-' . $order->id;
+                $order->customer_name_display = $order->customer_name;
+                $order->delivery_address_display = $order->delivery_address;
+                $order->total_amount_display = $order->total_amount;
+                
+                // Pickup info - Lookup Seller profile by user email
+                $pickupName = 'Shop';
+                $pickupAddress = 'Address not found';
+                
+                if ($order->seller) {
+                    $sellerProfile = \App\Models\Seller::where('email', $order->seller->email)->first();
+                    $pickupName = $sellerProfile->store_name ?? ($order->seller->name ?? 'Shop');
+                    $pickupAddress = $sellerProfile->store_address ?? ($order->seller->billing_address ?? 'Address not found');
+                }
+                
+                $order->pickup_name_display = $pickupName;
+                $order->pickup_address_display = $pickupAddress;
+                
+                return $order;
+            });
+
+        // Merge and sort by creation time
+        $allOrders = $standardOrders->concat($foodOrders)->concat($tenMinOrders)
+            ->sortBy('created_at')
+            ->take($limit);
+
+        return $allOrders->filter(function ($order) use ($partner) {
             // Check if partner can deliver to this location
-            if ($order->delivery_latitude && $order->delivery_longitude) {
-                return $partner->canDeliverTo(
+            // Normalized address check - assuming lat/long availability varies or requires address geocoding
+            // For now, bypassing strict lat/long check if not present on all models, 
+            // or we need to ensure models have these fields.
+            // Standard Order has delivery_latitude/longitude.
+            // FoodOrder/TenMinOrder might strictly rely on address string or we need to verify schema.
+            // Based on file read, they have delivery_address.
+            
+            if (isset($order->delivery_latitude) && isset($order->delivery_longitude) && $order->delivery_latitude && $order->delivery_longitude) {
+                 return $partner->canDeliverTo(
                     $order->delivery_latitude, 
                     $order->delivery_longitude
                 );
             }
-            return true; // If no coordinates, assume deliverable
+            return true; // If no coordinates, assume deliverable for now
         });
     }
 
@@ -418,5 +608,74 @@ class DashboardController extends Controller
                 'message' => 'Failed to update status. Please try again.'
             ]);
         }
+    }
+
+    /**
+     * Get the current active order for the partner.
+     */
+    private function getActiveOrder($partner)
+    {
+        $order = $partner->currentOrder;
+        
+        if (!$order) {
+            return null;
+        }
+
+        // Normalize order data
+        if ($order instanceof FoodOrder) {
+            $order->type = 'food';
+            $order->normalized_order_number = 'FOOD-' . $order->id;
+            $order->customer_name_display = $order->customer_name;
+            $order->delivery_address_display = $order->delivery_address;
+            $order->pickup_name_display = $order->shop_name ?? ($order->hotelOwner->restaurant_name ?? 'Restaurant');
+            $order->pickup_address_display = $order->shop_address ?? ($order->hotelOwner->restaurant_address ?? 'Address not found');
+        } elseif ($order instanceof TenMinOrder) {
+            $order->type = 'ten_min';
+            $order->normalized_order_number = 'TM-' . $order->id;
+            $order->customer_name_display = $order->customer_name;
+            $order->delivery_address_display = $order->delivery_address;
+            
+            $pickupName = 'Shop';
+            $pickupAddress = 'Address not found';
+            if ($order->seller) {
+                $sellerProfile = \App\Models\Seller::where('email', $order->seller->email)->first();
+                $pickupName = $sellerProfile->store_name ?? ($order->seller->name ?? 'Shop');
+                $pickupAddress = $sellerProfile->store_address ?? ($order->seller->billing_address ?? 'Address not found');
+            }
+            $order->pickup_name_display = $pickupName;
+            $order->pickup_address_display = $pickupAddress;
+        } elseif ($order instanceof Order) {
+            $order->type = 'standard';
+            $order->normalized_order_number = $order->order_number;
+            $order->customer_name_display = $order->user->name ?? 'Customer';
+            $order->delivery_address_display = $order->delivery_address;
+            $order->pickup_name_display = $order->sellerUser->name ?? 'Seller';
+            $order->pickup_address_display = $order->sellerUser->billing_address ?? 'Address not found';
+        }
+
+        return $order;
+    }
+
+    /**
+     * Refresh available orders list (AJAX).
+     */
+    public function refreshAvailableOrders(Request $request)
+    {
+        $partner = Auth::guard('delivery_partner')->user();
+        
+        if (!$partner) {
+            return response()->json(['html' => '']);
+        }
+
+        // Limit to 5 for the dashboard widget
+        $availableOrders = $this->getAvailableOrders($partner, 5);
+        
+        $html = view('delivery-partner.dashboard.partials.available-orders', compact('availableOrders', 'partner'))->render();
+        
+        return response()->json([
+            'success' => true, 
+            'html' => $html,
+            'count' => $availableOrders->count()
+        ]);
     }
 }

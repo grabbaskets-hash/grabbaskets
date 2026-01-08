@@ -15,6 +15,7 @@ class Order extends Model
         'buyer_id',
         'amount',
         'status',
+        'delivery_partner_id',
         'paid_at',
         'payment_reference',
         'delivery_address',
@@ -47,5 +48,10 @@ class Order extends Model
     public function buyerUser()
     {
         return $this->belongsTo(User::class, 'buyer_id');
+    }
+
+    public function deliveryPartner()
+    {
+        return $this->belongsTo(DeliveryPartner::class, 'delivery_partner_id');
     }
 }

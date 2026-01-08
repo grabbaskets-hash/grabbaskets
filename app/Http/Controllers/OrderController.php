@@ -269,7 +269,7 @@ Grabbasket Team
 
             // Fetch Food/Standard Orders
             $foodOrders = Order::where('buyer_id', $user->id)
-                ->with(['product', 'sellerUser', 'orderItems.product'])
+                ->with(['product', 'sellerUser', 'orderItems.product', 'deliveryPartner'])
                 ->get()
                 ->map(function ($order) {
                     return [
@@ -304,13 +304,15 @@ Grabbasket Team
                         'seller_name' => $order->sellerUser->name ?? 'N/A',
                         'tracking_number' => $order->tracking_number,
                         'courier_name' => $order->courier_name,
+                        'delivery_partner_name' => $order->deliveryPartner->name ?? null,
+                        'delivery_partner_phone' => $order->deliveryPartner->phone ?? null,
                         'original_order' => $order
                     ];
                 });
 
             // Fetch Express/10-Min Orders
             $expressOrders = \App\Models\TenMinOrder::where('user_id', $user->id)
-                ->with(['items.product', 'user'])
+                ->with(['items.product', 'user', 'deliveryPartner'])
                 ->get()
                 ->map(function ($order) {
                     return [
@@ -337,6 +339,8 @@ Grabbasket Team
                         'tax' => $order->tax ?? 0,
                         'wallet_discount' => $order->wallet_discount ?? 0,
                         'estimated_delivery_time' => $order->estimated_delivery_time,
+                        'delivery_partner_name' => $order->deliveryPartner->name ?? null,
+                        'delivery_partner_phone' => $order->deliveryPartner->phone ?? null,
                         'original_order' => $order
                     ];
                 });

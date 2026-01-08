@@ -45,6 +45,16 @@ class TenMinOrder extends Model
         return $this->belongsTo(\App\Models\User::class);
     }
 
+    public function seller()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'seller_id');
+    }
+
+    public function deliveryPartner()
+    {
+        return $this->belongsTo(DeliveryPartner::class, 'delivery_partner_id');
+    }
+
     public function getAmountAttribute()
     {
         return $this->total_amount;

@@ -304,9 +304,20 @@
                             </div>
 
                             <div class="delivery-status">
-                                Delivered on {{ $order['date']->format('D, M d, Y, h:i A') }}
-                                <div class="check-icon">
-                                    <i class="fas fa-check"></i>
+                                @if($order['delivery_partner_name'])
+                                    <div>
+                                        <i class="fas fa-motorcycle"></i> 
+                                        <strong>{{ $order['delivery_partner_name'] }}</strong><br>
+                                        <small>{{ $order['delivery_partner_phone'] }}</small>
+                                    </div>
+                                @else
+                                    <span class="text-info">Delivery partner will be assigned soon</span>
+                                @endif
+                                <div class="ms-3">
+                                    {{ ucfirst($order['status']) }}
+                                    <div class="check-icon d-inline-flex ms-1">
+                                        <i class="fas fa-check"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>

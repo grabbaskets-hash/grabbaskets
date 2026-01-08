@@ -1589,6 +1589,10 @@ Route::prefix('delivery-partner')->name('delivery-partner.')->middleware(['auth:
     Route::get('/dashboard', [App\Http\Controllers\DeliveryPartner\DashboardController::class, 'index'])
         ->name('dashboard');
 
+    // AJAX Refresh
+    Route::get('/dashboard/orders/refresh', [App\Http\Controllers\DeliveryPartner\DashboardController::class, 'refreshAvailableOrders'])
+        ->name('orders.refresh');
+
     // Profile Management
     Route::get('/profile', [App\Http\Controllers\DeliveryPartner\AuthController::class, 'profile'])
         ->name('profile');

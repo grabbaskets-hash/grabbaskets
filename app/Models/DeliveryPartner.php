@@ -56,6 +56,8 @@ class DeliveryPartner extends Authenticatable
         'is_verified',
         'is_online',
         'is_available',
+        'current_order_id',
+        'current_order_type',
         'current_latitude',
         'current_longitude',
         'location_updated_at',
@@ -122,9 +124,56 @@ class DeliveryPartner extends Authenticatable
     /**
      * Get the orders assigned to this delivery partner.
      */
+    public function currentOrder(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Assign an order to the partner
+     */
+    public function assignOrder($order): void
+    {
+        $this->update([
+            'current_order_id' => $order->id,
+            'current_order_type' => get_class($order),
+            'is_available' => false
+        ]);
+
+        $order->update(['delivery_partner_id' => $this->id]);
+    }
+
+    /**
+     * Clear the current order and make partner available
+     */
+    public function clearOrder(): void
+    {
+        $this->update([
+            'current_order_id' => null,
+            'current_order_type' => null,
+            'is_available' => true
+        ]);
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'delivery_partner_id');
+    }
+
+    /**
+     * Get the food orders assigned to this delivery partner.
+     */
+    public function foodOrders(): HasMany
+    {
+        return $this->hasMany(FoodOrder::class, 'delivery_partner_id');
+    }
+
+    /**
+     * Get the 10-min grocery orders assigned to this delivery partner.
+     */
+    public function tenMinOrders(): HasMany
+    {
+        return $this->hasMany(TenMinOrder::class, 'delivery_partner_id');
     }
 
     /**
@@ -298,6 +347,7 @@ class DeliveryPartner extends Authenticatable
     {
         return $this->update([
             'is_online' => true,
+            'is_available' => $this->current_order_id ? false : true,
             'last_active_at' => now()
         ]);
     }

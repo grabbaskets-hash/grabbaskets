@@ -538,9 +538,17 @@
                                                 <select name="delivery_partner_id" class="form-select form-select-sm">
                                                     <option value="">Assign Partner</option>
                                                     @foreach($partners as $partner)
-                                                        <option value="{{ $partner->id }}" {{ $order->delivery_partner_id == $partner->id ? 'selected' : '' }}>
+                                                        <option value="{{ $partner->id }}" 
+                                                            {{ $order->delivery_partner_id == $partner->id ? 'selected' : '' }}
+                                                            {{ (!$partner->is_online || !$partner->is_available || $partner->current_order_id) && $order->delivery_partner_id != $partner->id ? 'disabled' : '' }}>
                                                             {{ $partner->name }}
-                                                            ({{ $partner->is_available ? 'Available' : 'Busy' }})
+                                                            @if(!$partner->is_online)
+                                                                (Offline)
+                                                            @elseif(!$partner->is_available || $partner->current_order_id)
+                                                                (Busy)
+                                                            @else
+                                                                (Available)
+                                                            @endif
                                                         </option>
                                                     @endforeach
                                                 </select>

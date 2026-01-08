@@ -44,6 +44,11 @@ class FoodOrder extends Model
         return $this->belongsTo(HotelOwner::class, 'hotel_owner_id');
     }
 
+    public function deliveryPartner()
+    {
+        return $this->belongsTo(DeliveryPartner::class, 'delivery_partner_id');
+    }
+
     public function getSubtotalAttribute()
     {
         return $this->food_total;
