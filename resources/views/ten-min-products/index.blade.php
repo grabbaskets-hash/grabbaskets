@@ -577,8 +577,8 @@
             }
 
             .product-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
             }
 
             .product-card {
@@ -754,53 +754,53 @@
                 </div>
             @endif
 
-                <!-- Products -->
-                <div class="product-grid" id="productGrid">
-                    @foreach($displayProducts as $product)
-                        <div class="product-card" data-subcat="{{ $product->subcategory?->name ?? 'Other' }}"
-                            onclick="window.location.href='/product/{{ $product->id }}'">
+            <!-- Products -->
+            <div class="product-grid" id="productGrid">
+                @foreach($displayProducts as $product)
+                    <div class="product-card" data-subcat="{{ $product->subcategory?->name ?? 'Other' }}"
+                        onclick="window.location.href='/product/{{ $product->id }}'">
 
-                            @if($product->discount > 0)
-                                <div class="discount-badge" style="z-index: 10;">{{ $product->discount }}% OFF</div>
-                            @endif
+                        @if($product->discount > 0)
+                            <div class="discount-badge" style="z-index: 10;">{{ $product->discount }}% OFF</div>
+                        @endif
 
-                            <div class="p-img-box">
-                                <img src="{{ $product->image_url ?? 'https://via.placeholder.com/300' }}" class="p-img"
-                                    alt="{{ $product->name }}">
-                            </div>
+                        <div class="p-img-box">
+                            <img src="{{ $product->image_url ?? 'https://via.placeholder.com/300' }}" class="p-img"
+                                alt="{{ $product->name }}">
+                        </div>
 
-                            <div>
-                                <div class="p-title">{{ $product->name }}</div>
-                                <div class="p-weight">
-                                    @if(!$displayActive)
-                                        {{ $product->category?->name ?? 'Category' }} •
-                                    @endif
-                                    {{ $product->subcategory?->name ?? 'Standard' }}
-                                </div>
-                            </div>
-
-                            <div class="p-footer">
-                                <div class="p-price">
-                                    <span class="current-price">₹{{ $product->price }}</span>
-                                    @if($product->discount > 0)
-                                        <span
-                                            class="old-price">₹{{ number_format($product->price / (1 - $product->discount / 100), 2) }}</span>
-                                    @endif
-                                </div>
-                                <button class="add-btn-sm"
-                                    onclick="event.stopPropagation(); addToCart({{ $product->id }}, this)">
-                                    ADD
-                                </button>
+                        <div>
+                            <div class="p-title">{{ $product->name }}</div>
+                            <div class="p-weight">
+                                @if(!$displayActive)
+                                    {{ $product->category?->name ?? 'Category' }} •
+                                @endif
+                                {{ $product->subcategory?->name ?? 'Standard' }}
                             </div>
                         </div>
-                    @endforeach
-                </div>
 
-                <div id="noResults" class="empty-state" style="display:none;">
-                    <i class="fa-regular fa-face-frown" style="font-size:48px;margin-bottom:16px;"></i>
-                    <h3>No products found</h3>
-                    <p>Try searching for something else.</p>
-                </div>
+                        <div class="p-footer">
+                            <div class="p-price">
+                                <span class="current-price">₹{{ $product->price }}</span>
+                                @if($product->discount > 0)
+                                    <span
+                                        class="old-price">₹{{ number_format($product->price / (1 - $product->discount / 100), 2) }}</span>
+                                @endif
+                            </div>
+                            <button class="add-btn-sm"
+                                onclick="event.stopPropagation(); addToCart({{ $product->id }}, this)">
+                                ADD
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div id="noResults" class="empty-state" style="display:none;">
+                <i class="fa-regular fa-face-frown" style="font-size:48px;margin-bottom:16px;"></i>
+                <h3>No products found</h3>
+                <p>Try searching for something else.</p>
+            </div>
         </main>
 
     </div>

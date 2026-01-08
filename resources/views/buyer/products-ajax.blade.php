@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,14 +25,14 @@
             background: white;
             border-radius: 50px;
             padding: 1rem 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: none;
             font-size: 1.1rem;
         }
 
         .search-box:focus {
             outline: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .search-btn {
@@ -55,7 +56,7 @@
             background: white;
             border-radius: 15px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             margin-bottom: 2rem;
         }
 
@@ -71,7 +72,8 @@
             transition: all 0.3s ease;
         }
 
-        .category-btn:hover, .category-btn.active {
+        .category-btn:hover,
+        .category-btn.active {
             background: linear-gradient(45deg, #667eea, #764ba2);
             border-color: #667eea;
             color: white;
@@ -86,12 +88,12 @@
             overflow: hidden;
             transition: all 0.3s ease;
             border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
         .product-image {
@@ -132,8 +134,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* No Results */
@@ -142,7 +149,7 @@
             padding: 4rem 2rem;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         .no-results i {
@@ -156,11 +163,11 @@
             .search-container {
                 padding: 2rem 0;
             }
-            
+
             .search-box {
                 margin-bottom: 1rem;
             }
-            
+
             .category-btn {
                 font-size: 0.9rem;
                 padding: 0.4rem 0.8rem;
@@ -175,9 +182,9 @@
         }
 
         .nav-icon-btn {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white !important;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 0.5rem 1rem;
             margin: 0 0.25rem;
@@ -186,15 +193,17 @@
         }
 
         .nav-icon-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
             color: white !important;
         }
     </style>
 </head>
+
 <body>
     <!-- Modern Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <nav class="navbar navbar-expand-lg navbar-dark"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container">
             <a class="navbar-brand-modern" href="{{ url('/') }}">
                 <i class="bi bi-bag-check-fill"></i>
@@ -242,13 +251,10 @@
                         <h1 class="text-white fw-bold mb-3">Find Your Perfect Products</h1>
                         <p class="text-white-50">Search through thousands of products from trusted sellers</p>
                     </div>
-                    
+
                     <div class="d-flex gap-2">
-                        <input type="text" 
-                               id="searchInput" 
-                               class="form-control search-box flex-grow-1" 
-                               placeholder="Search for products, brands, categories..."
-                               value="{{ request('q') }}">
+                        <input type="text" id="searchInput" class="form-control search-box flex-grow-1"
+                            placeholder="Search for products, brands, categories..." value="{{ request('q') }}">
                         <button type="button" id="searchBtn" class="btn search-btn">
                             <i class="bi bi-search"></i>
                             <span class="d-none d-md-inline ms-2">Search</span>
@@ -320,7 +326,7 @@
                 this.currentPage = 1;
                 this.isLoading = false;
                 this.hasMoreResults = true;
-                
+
                 this.initializeElements();
                 this.bindEvents();
                 this.loadInitialResults();
@@ -393,7 +399,7 @@
                 if (this.isLoading) return;
 
                 this.currentQuery = this.searchInput.value.trim();
-                
+
                 if (!append) {
                     this.currentPage = 1;
                     this.hasMoreResults = true;
@@ -412,14 +418,14 @@
                     });
 
                     const data = await response.json();
-                    
+
                     if (!append) {
                         this.productsGrid.innerHTML = '';
                     }
 
                     if (data.products && data.products.length > 0) {
                         this.renderProducts(data.products, append);
-                        
+
                         // Update pagination info
                         if (data.pagination) {
                             this.showLoadMoreButton(data.pagination.has_more);
@@ -446,7 +452,7 @@
 
             renderProducts(products, append = false) {
                 const productHTML = products.map(product => `
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-lg-3 col-md-4 col-6 mb-4">
                         <div class="card product-card h-100">
                             <div class="position-relative">
                                 <img src="${product.image || '/images/no-image.png'}" 
@@ -582,7 +588,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     // Show success message
                     const toast = document.createElement('div');
@@ -595,7 +601,7 @@
                         </div>
                     `;
                     document.body.appendChild(toast);
-                    
+
                     // Auto remove after 3 seconds
                     setTimeout(() => {
                         toast.remove();
@@ -610,4 +616,5 @@
         }
     </script>
 </body>
+
 </html>
