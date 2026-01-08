@@ -21,7 +21,7 @@
             padding: 15px 0;
             box-shadow: 0 15px 40px -20px rgba(40,44,63,0.15);
             margin-bottom: 30px;
-        }
+        }   
         .header-inner {
             display: flex;
             align-items: center;

@@ -20,6 +20,7 @@
                             <th>Tracking #</th>
                             <th>Placed At</th>
                         </tr>
+             
                     </thead>
                     <tbody>
                         @foreach($orders as $order)

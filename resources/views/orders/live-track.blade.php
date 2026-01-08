@@ -12,7 +12,6 @@
     
     <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places,geometry" async defer></script>
-    
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

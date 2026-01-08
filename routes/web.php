@@ -1965,6 +1965,7 @@ Route::prefix('food')->group(function () {
     Route::get('/customer', [CustomerFoodController::class, 'index'])->name('customer.food.index');
 
 
+
     Route::get('/customer/details/{id}', [CustomerFoodController::class, 'details'])
         ->name('customer.food.details');
     // Protected cart routes
