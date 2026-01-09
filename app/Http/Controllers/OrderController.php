@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\TenMinOrder;
 use App\Models\Notification;
 use App\Services\NotificationService;
 use App\Services\InfobipSmsService;
@@ -32,7 +33,7 @@ class OrderController extends Controller
                 ], 400);
             }
 
-        
+
             $order->status = 'cancelled';
             $order->save();
 
@@ -94,10 +95,52 @@ class OrderController extends Controller
     }
     public function track()
     {
-        $orders = Order::with(['product', 'sellerUser'])
-            ->where('buyer_id', Auth::id())
+        $user = Auth::user();
+
+        // Standard Orders (Food/Grocery)
+        $standardOrders = Order::with(['product', 'sellerUser', 'deliveryPartner'])
+            ->where('buyer_id', $user->id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'type' => 'Food Delivery',
+                    'order_number' => 'ORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                    'date' => $order->created_at,
+                    'status' => $order->delivery_status ?? $order->order_status ?? $order->status ?? 'pending',
+                    'total_amount' => $order->amount,
+                    'product_name' => $order->product->name ?? 'Standard Order',
+                    'product_image' => $order->product ? $order->product->image_url : null,
+                    'seller_name' => $order->sellerUser->name ?? 'GrabBaskets',
+                    'delivery_partner' => $order->deliveryPartner,
+                    'tracking_number' => $order->tracking_number
+                ];
+            });
+
+        // 10-Min Orders
+        $tenMinOrders = TenMinOrder::with(['items.product', 'seller', 'deliveryPartner'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($order) {
+                $firstItem = $order->items->first();
+                return [
+                    'id' => $order->id,
+                    'type' => 'Express Delivery',
+                    'order_number' => 'EXP-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                    'date' => $order->created_at,
+                    'status' => $order->status,
+                    'total_amount' => $order->total_amount,
+                    'product_name' => $firstItem && $firstItem->product ? $firstItem->product->product_name : '10-Min Order',
+                    'product_image' => $firstItem && $firstItem->product ? $firstItem->product->first_image_url : null,
+                    'seller_name' => $order->seller->name ?? 'Partner Store',
+                    'delivery_partner' => $order->deliveryPartner,
+                    'tracking_number' => null
+                ];
+            });
+
+        $orders = $standardOrders->concat($tenMinOrders)->sortByDesc('date');
 
         return view('orders.track', compact('orders'));
     }
