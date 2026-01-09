@@ -119,28 +119,28 @@ class OrderController extends Controller
             });
 
         // 10-Min Orders
-        $tenMinOrders = TenMinOrder::with(['items.product', 'seller', 'deliveryPartner'])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($order) {
-                $firstItem = $order->items->first();
-                return [
-                    'id' => $order->id,
-                    'type' => 'Express Delivery',
-                    'order_number' => 'EXP-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
-                    'date' => $order->created_at,
-                    'status' => $order->status,
-                    'total_amount' => $order->total_amount,
-                    'product_name' => $firstItem && $firstItem->product ? $firstItem->product->product_name : '10-Min Order',
-                    'product_image' => $firstItem && $firstItem->product ? $firstItem->product->first_image_url : null,
-                    'seller_name' => $order->seller->name ?? 'Partner Store',
-                    'delivery_partner' => $order->deliveryPartner,
-                    'tracking_number' => null
-                ];
-            });
+        // $tenMinOrders = TenMinOrder::with(['items.product', 'seller', 'deliveryPartner'])
+        //     ->where('user_id', $user->id)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get()
+        //     ->map(function ($order) {
+        //         $firstItem = $order->items->first();
+        //         return [
+        //             'id' => $order->id,
+        //             'type' => 'Express Delivery',
+        //             'order_number' => 'EXP-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+        //             'date' => $order->created_at,
+        //             'status' => $order->status,
+        //             'total_amount' => $order->total_amount,
+        //             'product_name' => $firstItem && $firstItem->product ? $firstItem->product->product_name : '10-Min Order',
+        //             'product_image' => $firstItem && $firstItem->product ? $firstItem->product->first_image_url : null,
+        //             'seller_name' => $order->seller->name ?? 'Partner Store',
+        //             'delivery_partner' => $order->deliveryPartner,
+        //             'tracking_number' => null
+        //         ];
+        //     });
 
-        $orders = $standardOrders->concat($tenMinOrders)->sortByDesc('date');
+        $orders = $standardOrders->sortByDesc('date');
 
         return view('orders.track', compact('orders'));
     }
