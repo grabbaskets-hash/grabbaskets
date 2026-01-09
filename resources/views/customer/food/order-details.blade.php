@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,11 @@
 
     <!-- Bootstrap 5.3.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -50,7 +52,7 @@
 
         /* Navbar */
         .navbar {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             background: white;
             z-index: 1030;
             position: fixed;
@@ -61,7 +63,7 @@
 
         [data-bs-theme="dark"] .navbar {
             background: #0f172a;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .navbar-brand {
@@ -99,13 +101,28 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .badge-delivered { background-color: #d4edda; color: #155724; }
-        .badge-cancelled { background-color: #f8d7da; color: #721c24; }
-        .badge-onway { background-color: #fff3cd; color: #856404; }
-        .badge-pending { background-color: #e2e3e5; color: #383d41; }
+        .badge-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-onway {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-pending {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
 
         /* Cards */
         .card {
@@ -126,7 +143,7 @@
 
         .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -157,7 +174,7 @@
             background-color: #fafafa;
             border-radius: 8px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
             transition: background 0.2s;
         }
 
@@ -280,17 +297,21 @@
             body {
                 padding-top: 64px;
             }
+
             .order-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .order-id {
                 font-size: 1.5rem;
             }
+
             .food-item {
                 flex-direction: column !important;
                 align-items: flex-start;
             }
+
             .food-price-group {
                 width: 100%;
                 margin-top: 10px;
@@ -316,7 +337,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="mainNav">
-            
+
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
@@ -387,7 +408,8 @@
                                 <div>
                                     {{ ucfirst($order->payment_method) }}
                                     @if($order->payment_reference)
-                                        <span class="badge bg-light text-dark ms-2">Ref: {{ substr($order->payment_reference, -6) }}</span>
+                                        <span class="badge bg-light text-dark ms-2">Ref:
+                                            {{ substr($order->payment_reference, -6) }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -416,15 +438,44 @@
                     <div class="card-body">
                         <div><strong>{{ $order->customer_name }}</strong></div>
                         <div class="mt-1">
-                            <i class="bi bi-telephone text-muted me-1"></i> 
+                            <i class="bi bi-telephone text-muted me-1"></i>
                             {{ $order->customer_phone }}
                         </div>
                         <div class="mt-2">
-                            <i class="bi bi-geo-alt text-muted me-1"></i> 
+                            <i class="bi bi-geo-alt text-muted me-1"></i>
                             {{ $order->delivery_address ?? '—' }}
                         </div>
                     </div>
                 </div>
+
+                <!-- Delivery Partner Card -->
+                @if($order->deliveryPartner)
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <i class="bi bi-person-badge"></i> Delivery Partner
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="bi bi-person fs-3 text-secondary"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1 fw-bold">{{ $order->deliveryPartner->name }}</h5>
+                                    <div class="text-muted d-flex align-items-center mb-1">
+                                        <i class="bi bi-telephone me-2"></i> {{ $order->deliveryPartner->phone }}
+                                    </div>
+                                    <div class="text-muted d-flex align-items-center">
+                                        <i class="bi bi-bicycle me-2"></i>
+                                        {{ $order->deliveryPartner->vehicle_number ?? 'Vehicle Not Listed' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Items Card -->
                 <div class="card">
@@ -475,10 +526,10 @@
                             <span>₹{{ number_format($order->delivery_fee, 2) }}</span>
                         </div>
                         @if($order->wallet_discount > 0)
-                        <div class="summary-row discount-row">
-                            <span><i class="bi bi-wallet me-1"></i> Wallet Discount</span>
-                            <span>-₹{{ number_format($order->wallet_discount, 2) }}</span>
-                        </div>
+                            <div class="summary-row discount-row">
+                                <span><i class="bi bi-wallet me-1"></i> Wallet Discount</span>
+                                <span>-₹{{ number_format($order->wallet_discount, 2) }}</span>
+                            </div>
                         @endif
                         <div class="summary-row total">
                             <span>Total Paid</span>
@@ -514,13 +565,13 @@
             // Theme Toggle
             const toggle = document.getElementById('themeToggle');
             const savedTheme = localStorage.getItem('theme') || 'light';
-            
+
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
                 toggle.classList.add('active');
             }
 
-            toggle?.addEventListener('click', function() {
+            toggle?.addEventListener('click', function () {
                 const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
                 document.documentElement.setAttribute('data-bs-theme', isDark ? 'light' : 'dark');
                 localStorage.setItem('theme', isDark ? 'light' : 'dark');
@@ -529,4 +580,5 @@
         });
     </script>
 </body>
+
 </html>

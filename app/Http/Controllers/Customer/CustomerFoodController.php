@@ -415,39 +415,39 @@ class CustomerFoodController extends Controller
     private $razorpayKeyId = 'rzp_live_RZLX30zmmnhHum';
     private $razorpayKeySecret = 'XKmsdH5PbR49EiT74CgehYYi';
 
-   
+
     public function index(Request $request)
     {
         $now = now();
-        
+
         $currentTime = $now->format('H:i:s');
         $today = strtolower($now->format('l'));
 
         $categoryMap = [
-            'appetizer'    => ['name' => 'Appetizer',    'icon' => 'appetizer.png'],
-            'main_course'  => ['name' => 'Main Course',  'icon' => 'main-course.png'],
-            'dessert'      => ['name' => 'Dessert',      'icon' => 'dessert.png'],
-            'beverages'    => ['name' => 'Beverage',     'icon' => 'beverage.png'],
-            'snack'        => ['name' => 'Snack',        'icon' => 'snack.png'],
-            'salad'        => ['name' => 'Salad',        'icon' => 'salad.png'],
-            'soup'         => ['name' => 'Soup',         'icon' => 'soup.png'],
-            'staters'      => ['name' => 'Starters',     'icon' => 'starters.png'],
-            'rice'         => ['name' => 'Rice',         'icon' => 'rice.png'],
-            'chicken'      => ['name' => 'Chicken',      'icon' => 'chicken.png'],
-            'seefood'      => ['name' => 'Seafood',      'icon' => 'seafood.png'],
-            'burger'       => ['name' => 'Burger',       'icon' => 'burger.png'],
-            'pizza'        => ['name' => 'Pizza',        'icon' => 'pizza.png'],
-            'mutton'       => ['name' => 'Mutton',       'icon' => 'mutton.png'],
-            'briyani'      => ['name' => 'Briyani',      'icon' => 'biryani.png'],
+            'appetizer' => ['name' => 'Appetizer', 'icon' => 'appetizer.png'],
+            'main_course' => ['name' => 'Main Course', 'icon' => 'main-course.png'],
+            'dessert' => ['name' => 'Dessert', 'icon' => 'dessert.png'],
+            'beverages' => ['name' => 'Beverage', 'icon' => 'beverage.png'],
+            'snack' => ['name' => 'Snack', 'icon' => 'snack.png'],
+            'salad' => ['name' => 'Salad', 'icon' => 'salad.png'],
+            'soup' => ['name' => 'Soup', 'icon' => 'soup.png'],
+            'staters' => ['name' => 'Starters', 'icon' => 'starters.png'],
+            'rice' => ['name' => 'Rice', 'icon' => 'rice.png'],
+            'chicken' => ['name' => 'Chicken', 'icon' => 'chicken.png'],
+            'seefood' => ['name' => 'Seafood', 'icon' => 'seafood.png'],
+            'burger' => ['name' => 'Burger', 'icon' => 'burger.png'],
+            'pizza' => ['name' => 'Pizza', 'icon' => 'pizza.png'],
+            'mutton' => ['name' => 'Mutton', 'icon' => 'mutton.png'],
+            'briyani' => ['name' => 'Briyani', 'icon' => 'biryani.png'],
         ];
 
         $availableCategoryKeys = FoodItem::where('is_available', 1)
             ->distinct()
             ->pluck('category')
-            ->filter(fn ($key) => isset($categoryMap[$key]))
+            ->filter(fn($key) => isset($categoryMap[$key]))
             ->values();
 
-        $foodCategories = $availableCategoryKeys->map(fn ($key) => [
+        $foodCategories = $availableCategoryKeys->map(fn($key) => [
             'id' => $key,
             'name' => $categoryMap[$key]['name'],
             'icon_image' => $categoryMap[$key]['icon'],
@@ -455,9 +455,9 @@ class CustomerFoodController extends Controller
 
         $query = FoodItem::with('hotelOwner')
             ->where('is_available', 1);
-            // ->whereHas('hotelOwner', function ($q) {
-            //     $q->where('is_active', true);
-            // });
+        // ->whereHas('hotelOwner', function ($q) {
+        //     $q->where('is_active', true);
+        // });
 
         $search = $request->search;
         $category = $request->category;
@@ -467,22 +467,25 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category) $query->where('category', $category);
-            if ($veg === '1') $query->where('food_type', 'veg');
-            if ($veg === '0') $query->where('food_type', 'non-veg');
+            if ($category)
+                $query->where('category', $category);
+            if ($veg === '1')
+                $query->where('food_type', 'veg');
+            if ($veg === '0')
+                $query->where('food_type', 'non-veg');
         }
 
         match ($sort) {
-            'costLow'   => $query->orderBy('price', 'asc'),
-            'costHigh'  => $query->orderBy('price', 'desc'),
-            'ratingHigh'=> $query->orderBy('rating', 'desc'),
-            default     => $query->latest()
+            'costLow' => $query->orderBy('price', 'asc'),
+            'costHigh' => $query->orderBy('price', 'desc'),
+            'ratingHigh' => $query->orderBy('rating', 'desc'),
+            default => $query->latest()
         };
 
         $foods = $query->get();
 
         $activeCategoryKey = $category ?: ($foodCategories->first()['id'] ?? null);
-        
+
         // Use empty string placeholder if null
         $safeName = 'All';
         if ($activeCategoryKey && isset($categoryMap[$activeCategoryKey])) {
@@ -503,7 +506,7 @@ class CustomerFoodController extends Controller
                 ->filter()
                 ->unique()
                 ->values()
-                ->map(fn ($name) => (object)['id' => $name, 'name' => $name]),
+                ->map(fn($name) => (object) ['id' => $name, 'name' => $name]),
         ];
 
         return view('customer.food.index', compact(
@@ -521,9 +524,9 @@ class CustomerFoodController extends Controller
 
         $query = FoodItem::with('hotelOwner')
             ->where('is_available', 1);
-            // ->whereHas('hotelOwner', function ($q) {
-            //     $q->where('is_active', true);
-            // });
+        // ->whereHas('hotelOwner', function ($q) {
+        //     $q->where('is_active', true);
+        // });
 
         $search = $request->input('search');
         $category = $request->input('category');
@@ -533,15 +536,22 @@ class CustomerFoodController extends Controller
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         } else {
-            if ($category) $query->where('category', $category);
-            if ($vegFilter === '1') $query->where('food_type', 'veg');
-            elseif ($vegFilter === '0') $query->where('food_type', 'non-veg');
+            if ($category)
+                $query->where('category', $category);
+            if ($vegFilter === '1')
+                $query->where('food_type', 'veg');
+            elseif ($vegFilter === '0')
+                $query->where('food_type', 'non-veg');
         }
 
-        if ($sort === 'costLow') $query->orderBy('price', 'asc');
-        elseif ($sort === 'costHigh') $query->orderBy('price', 'desc');
-        elseif ($sort === 'ratingHigh') $query->orderBy('rating', 'desc');
-        else $query->latest();
+        if ($sort === 'costLow')
+            $query->orderBy('price', 'asc');
+        elseif ($sort === 'costHigh')
+            $query->orderBy('price', 'desc');
+        elseif ($sort === 'ratingHigh')
+            $query->orderBy('rating', 'desc');
+        else
+            $query->latest();
 
         $foods = $query->get();
 
@@ -1056,46 +1066,47 @@ class CustomerFoodController extends Controller
         return view('customer.food.order-success', compact('orders')); // plural
     }
     public function myOrders(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Fetch orders where customer_email OR customer_phone matches (adjust as per your data consistency)
-    // Preferably, if you store user_id or customer_id, use that instead.
-    $query = FoodOrder::with('items')
-        ->where(function ($q) use ($user) {
-            $q->where('customer_email', $user->email)
-              ->orWhere('customer_phone', $user->phone);
-        });
+        // Fetch orders where customer_email OR customer_phone matches (adjust as per your data consistency)
+        // Preferably, if you store user_id or customer_id, use that instead.
+        $query = FoodOrder::with(['items', 'deliveryPartner'])
+            ->where(function ($q) use ($user) {
+                $q->where('customer_email', $user->email)
+                    ->orWhere('customer_phone', $user->phone);
+            });
 
-    // Optional: Filter by status (e.g., ?status=Delivered)
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
+        // Optional: Filter by status (e.g., ?status=Delivered)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Optional: Search by order ID or food name (basic)
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'LIKE', "%{$search}%")
+                    ->orWhereHas('items', function ($q2) use ($search) {
+                        $q2->where('food_name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->get();
+
+        return view('customer.food.my-orders', compact('orders'));
     }
 
-    // Optional: Search by order ID or food name (basic)
-    if ($search = $request->input('search')) {
-        $query->where(function ($q) use ($search) {
-            $q->where('id', 'LIKE', "%{$search}%")
-              ->orWhereHas('items', function ($q2) use ($search) {
-                  $q2->where('food_name', 'LIKE', "%{$search}%");
-              });
-        });
+    public function orderDetails($id)
+    {
+        $order = FoodOrder::with(['items', 'deliveryPartner'])->findOrFail($id);
+        $user = Auth::user();
+
+        // 🔐 Security: Ensure the order belongs to the logged-in user
+        if ($order->customer_email !== $user->email && $order->customer_phone !== $user->phone) {
+            abort(403, 'Unauthorized access to this order.');
+        }
+
+        return view('customer.food.order-details', compact('order'));
     }
-
-    $orders = $query->orderBy('created_at', 'desc')->get();
-
-    return view('customer.food.my-orders', compact('orders'));
-}
-
-public function orderDetails(FoodOrder $order)
-{
-    $user = Auth::user();
-
-    // 🔐 Security: Ensure the order belongs to the logged-in user
-    if ($order->customer_email !== $user->email && $order->customer_phone !== $user->phone) {
-        abort(403, 'Unauthorized access to this order.');
-    }
-
-    return view('customer.food.order-details', compact('order'));
-}
 }

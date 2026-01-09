@@ -255,24 +255,19 @@
             top: 0;
             left: -100%;
             width: 80%;
-            max-width: 320px;
             height: 100%;
             background: white;
             z-index: 2000;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             border-top-right-radius: 25px;
             border-bottom-right-radius: 25px;
-            opacity: 0;
-            transform: translateX(-20px);
         }
 
         .mobile-category-drawer.active {
             left: 0;
-            opacity: 1;
-            transform: translateX(0);
         }
 
         .drawer-overlay {
@@ -281,7 +276,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px);
             z-index: 1999;
             display: none;
@@ -311,7 +306,7 @@
         }
 
         .close-drawer {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
             width: 35px;
@@ -336,115 +331,13 @@
             color: #333;
             border-radius: 15px;
             margin-bottom: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             background: #f8f9fa;
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-
-        .mobile-category-drawer.active .drawer-item {
-            animation: slideInFade 0.4s ease forwards;
-        }
-
-        .drawer-item:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .drawer-item:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .drawer-item:nth-child(3) {
-            animation-delay: 0.15s;
-        }
-
-        .drawer-item:nth-child(4) {
-            animation-delay: 0.2s;
-        }
-
-        .drawer-item:nth-child(5) {
-            animation-delay: 0.25s;
-        }
-
-        .drawer-item:nth-child(6) {
-            animation-delay: 0.3s;
-        }
-
-        .drawer-item:nth-child(7) {
-            animation-delay: 0.35s;
-        }
-
-        .drawer-item:nth-child(8) {
-            animation-delay: 0.4s;
-        }
-
-        .drawer-item:nth-child(n+9) {
-            animation-delay: 0.45s;
-        }
-
-        @keyframes slideInFade {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .drawer-item:active {
             background: #e9ecef;
             transform: scale(0.98);
-        }
-
-        .drawer-subcategory {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px 12px 45px;
-            text-decoration: none;
-            color: #666;
-            border-radius: 12px;
-            margin-bottom: 6px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #f0f0f0;
-            font-size: 0.9rem;
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-        }
-
-        .drawer-subcategory.show {
-            opacity: 1;
-            max-height: 50px;
-            margin-bottom: 6px;
-        }
-
-        .drawer-subcategory:active {
-            background: #e0e0e0;
-            transform: scale(0.98);
-        }
-
-        .drawer-category-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        .drawer-category-toggle i {
-            transition: transform 0.3s ease;
-            font-size: 0.9rem;
-            color: var(--primary);
-        }
-
-        .drawer-category-toggle.expanded i {
-            transform: rotate(90deg);
         }
 
         .drawer-item .item-emoji {
@@ -457,7 +350,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .drawer-item .item-text {
@@ -478,25 +371,10 @@
             color: #444;
         }
 
-        .grocery-tile {
-            border: 1px solid #e1f5fe;
-            background: #f1faff;
-        }
-
-        .food-tile {
-            border: 1px solid #fff3e0;
-            background: #fff8eb;
-        }
-
-        .meat-tile {
-            border: 1px solid #ffebee;
-            background: #fff5f6;
-        }
-
-        .library-tile {
-            border: 1px solid #f3e5f5;
-            background: #f9f2fa;
-        }
+        .grocery-tile { border: 1px solid #e1f5fe; background: #f1faff; }
+        .food-tile { border: 1px solid #fff3e0; background: #fff8eb; }
+        .meat-tile { border: 1px solid #ffebee; background: #fff5f6; }
+        .library-tile { border: 1px solid #f3e5f5; background: #f9f2fa; }
 
         .mobile-main-content {
             padding-bottom: 80px;
@@ -526,13 +404,13 @@
             justify-content: center;
             font-size: 1.8rem;
             margin-bottom: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
             transition: all 0.2s ease;
         }
-
-        .auth-name {
-            color: white
-        }
+.auth-name{
+    color:white
+    
+}
 
         .auth-name i {
             color: var(--primary);
@@ -644,17 +522,8 @@
 
         /* Firework Animation (Global) */
         @keyframes explode {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-                box-shadow: 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58;
-            }
-
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
-                box-shadow: -20px -30px 0 #fdcf58, 20px -30px 0 #ff00ea, -30px 10px 0 #00ffea, 30px 10px 0 #ff004c, -10px -50px 0 #ffac38, 10px -50px 0 #ffac38, -40px 0px 0 #ffac38, 40px 0px 0 #ffac38;
-            }
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58, 0 0 0 #fdcf58; }
+            100% { transform: scale(1.5); opacity: 0; box-shadow: -20px -30px 0 #fdcf58, 20px -30px 0 #ff00ea, -30px 10px 0 #00ffea, 30px 10px 0 #ff004c, -10px -50px 0 #ffac38, 10px -50px 0 #ffac38, -40px 0px 0 #ffac38, 40px 0px 0 #ffac38; }
         }
 
         .firework {
@@ -665,59 +534,23 @@
             animation: explode 1.5s infinite ease-out;
             opacity: 0;
             z-index: 1;
-            pointer-events: none;
-            /* Prevent clicking interaction issues */
+            pointer-events: none; /* Prevent clicking interaction issues */
         }
-
-        .fw-1 {
-            top: 20%;
-            left: 20%;
-            animation-delay: 0s;
-        }
-
-        .fw-2 {
-            top: 30%;
-            right: 20%;
-            animation-delay: 0.5s;
-        }
-
-        .fw-3 {
-            bottom: 30%;
-            left: 40%;
-            animation-delay: 1s;
-        }
-
-        .fw-4 {
-            top: 15%;
-            right: 40%;
-            animation-delay: 0.8s;
-        }
+        .fw-1 { top: 20%; left: 20%; animation-delay: 0s; }
+        .fw-2 { top: 30%; right: 20%; animation-delay: 0.5s; }
+        .fw-3 { bottom: 30%; left: 40%; animation-delay: 1s; }
+        .fw-4 { top: 15%; right: 40%; animation-delay: 0.8s; }
 
         /* ===== GLOBAL ANIMATIONS & STYLES ===== */
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
+        
         @keyframes floatBanner {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .fast-delivery-badge {
@@ -730,16 +563,16 @@
             display: inline-block;
             width: fit-content;
             margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             animation: pulse 2s infinite;
         }
 
         /* Third Hiring Slide - Elegant Theme */
         .hero-banner-hiring-3 {
-            /* New Business/Future Theme - Cache Busting Applied */
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1932&q=80&v=2') !important;
-            background-size: cover !important;
-            background-position: center !important;
+             /* New Business/Future Theme - Cache Busting Applied */
+             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1932&q=80&v=2') !important;
+             background-size: cover !important;
+             background-position: center !important;
         }
 
         /* ===== MOBILE VIEW ===== */
@@ -855,14 +688,11 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                align-items: center;
-                /* Center Content */
-                text-align: center;
-                /* Center Text */
+                align-items: center; /* Center Content */
+                text-align: center; /* Center Text */
                 padding: 35px 25px;
                 color: white;
-                margin: 0;
-                /* Margin handled by carousel */
+                margin: 0; /* Margin handled by carousel */
                 position: relative;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
                 overflow: hidden;
@@ -872,7 +702,7 @@
             /* Second Hiring Slide - Dark Team Theme + Fireworks */
             .hero-banner-hiring-2 {
                 /* Dark overlay to make fireworks pop on office image */
-                background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
+                background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
                 background-size: cover;
                 background-position: center;
             }
@@ -887,15 +717,8 @@
 
 
             @keyframes kenBurns {
-                0% {
-                    background-size: 100%;
-                    transform: scale(1);
-                }
-
-                100% {
-                    background-size: 120%;
-                    transform: scale(1.05);
-                }
+                0% { background-size: 100%; transform: scale(1); }
+                100% { background-size: 120%; transform: scale(1.05); }
             }
 
 
@@ -911,30 +734,27 @@
                 margin-bottom: 12px;
                 line-height: 1.2;
                 color: #fff;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-                /* Stronger shadow for night mode */
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.9); /* Stronger shadow for night mode */
                 z-index: 2;
                 position: relative;
             }
 
             .hero-banner p {
-                font-size: 1rem;
-                opacity: 1;
-                /* Full opacity */
-                margin-bottom: 24px;
-                font-weight: 500;
-                line-height: 1.5;
-                color: #f1f1f1;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
-                z-index: 2;
-                position: relative;
+                 font-size: 1rem;
+                 opacity: 1; /* Full opacity */
+                 margin-bottom: 24px;
+                 font-weight: 500;
+                 line-height: 1.5;
+                 color: #f1f1f1;
+                 text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+                 z-index: 2;
+                 position: relative;
             }
-
+            
             .style-join-btn {
                 position: relative;
                 z-index: 2;
-                display: inline-block;
-                /* Ensure centering works */
+                display: inline-block; /* Ensure centering works */
             }
 
             .join-btn-banner {
@@ -943,12 +763,11 @@
                 border: none;
                 padding: 12px 30px;
                 font-weight: 700;
-                border-radius: 50px;
-                /* Pillow shape */
+                border-radius: 50px; /* Pillow shape */
                 text-align: center;
                 text-decoration: none;
                 width: fit-content;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
                 transition: transform 0.2s, box-shadow 0.2s;
                 font-size: 1rem;
                 z-index: 2;
@@ -956,13 +775,13 @@
             }
 
             .join-btn-banner:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-                background: #f8f9fa;
+                 transform: translateY(-2px);
+                 box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                 background: #f8f9fa;
             }
 
             .munchies-banner {
-                background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+                background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
                 background-size: cover;
                 background-position: center;
                 height: 250px;
@@ -972,8 +791,8 @@
                 flex-direction: column;
                 justify-content: center;
                 margin: 20px 15px;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.2);
                 animation: floatBanner 4s ease-in-out infinite;
             }
 
@@ -982,7 +801,7 @@
                 margin-bottom: 5px;
                 color: #ffffff;
                 font-weight: 800;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             }
 
             .munchies-banner p {
@@ -990,9 +809,9 @@
                 margin-bottom: 20px;
                 font-weight: 500;
                 font-size: 1.1rem;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             }
-
+            
 
 
             .browse-btn {
@@ -1017,13 +836,11 @@
 
             .category-grid {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                /* 3 items per row */
+                grid-template-columns: repeat(3, 1fr); /* 3 items per row */
                 gap: 15px 10px;
                 padding: 20px 15px;
                 background: #fff;
-                border-radius: 0 0 20px 20px;
-                /* Only bottom rounded */
+                border-radius: 0 0 20px 20px; /* Only bottom rounded */
                 margin-bottom: 10px;
             }
 
@@ -1061,10 +878,11 @@
             }
 
             .rail-scroll {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                display: flex;
+                overflow-x: auto;
+                gap: 15px;
                 padding: 0 15px;
+                scrollbar-width: none;
             }
 
             .rail-scroll::-webkit-scrollbar {
@@ -1072,7 +890,8 @@
             }
 
             .product-card-mobile {
-                width: 100%;
+                min-width: 140px;
+                width: 140px;
                 flex-shrink: 0;
             }
 
@@ -1105,8 +924,7 @@
                 font-weight: 600;
                 font-size: 0.9rem;
                 margin-top: 5px;
-                border-radius: 8px;
-                /* Rounded */
+                border-radius: 8px; /* Rounded */
                 transition: all 0.2s;
             }
 
@@ -1160,7 +978,7 @@
                 margin-bottom: 20px;
                 box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
             }
-
+            
             main {
                 padding-left: 5px;
                 padding-right: 5px;
@@ -1186,7 +1004,7 @@
                 display: flex;
                 justify-content: space-evenly;
                 align-items: center;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.5);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255,255,255,0.5);
                 z-index: 1000;
                 border-radius: 25px;
                 padding: 0 5px;
@@ -1198,8 +1016,7 @@
                 align-items: center;
                 justify-content: center;
                 text-decoration: none;
-                color: #94a3b8;
-                /* Slate-400 */
+                color: #94a3b8; /* Slate-400 */
                 font-size: 10px;
                 font-weight: 600;
                 width: 60px;
@@ -1251,15 +1068,15 @@
             /* Hover Effect */
             .nav-link-mobile:not(.active):active {
                 transform: scale(0.92);
-                background: rgba(0, 0, 0, 0.03);
+                background: rgba(0,0,0,0.03);
             }
 
-            /* Cart Badge Sizing */
+             /* Cart Badge Sizing */
             #mobile-cart-badge {
                 font-size: 0.65rem !important;
                 padding: 0.35em 0.55em !important;
                 border: 2px solid white;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
         }
 
@@ -1340,21 +1157,6 @@
                 top: 100px;
                 max-height: calc(100vh - 120px);
                 overflow-y: auto;
-                scrollbar-width: thin;
-                scrollbar-color: var(--primary-light) transparent;
-            }
-
-            .sidebar-menu::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            .sidebar-menu::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .sidebar-menu::-webkit-scrollbar-thumb {
-                background: var(--primary-light);
-                border-radius: 3px;
             }
 
             .side-link {
@@ -1365,70 +1167,14 @@
                 color: var(--text-main);
                 text-decoration: none;
                 border-radius: 10px;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.2s;
                 font-weight: 500;
-                opacity: 1;
-                transform: translateX(0);
             }
 
             .side-link:hover {
-                background: linear-gradient(90deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.05) 100%);
+                background: #f8f9fa;
                 color: var(--primary);
                 transform: translateX(5px);
-                box-shadow: 0 2px 8px rgba(106, 17, 203, 0.1);
-            }
-
-            .side-link.active {
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-                color: white;
-                font-weight: 600;
-            }
-
-            /* Subcategory styles */
-            .subcategory-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 8px 15px 8px 35px;
-                color: var(--text-muted);
-                text-decoration: none;
-                border-radius: 8px;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                font-size: 0.85rem;
-                font-weight: 500;
-                opacity: 0;
-                max-height: 0;
-                overflow: hidden;
-            }
-
-            .subcategory-item.show {
-                opacity: 1;
-                max-height: 50px;
-                margin-bottom: 4px;
-            }
-
-            .subcategory-item:hover {
-                background: rgba(106, 17, 203, 0.08);
-                color: var(--primary);
-                transform: translateX(3px);
-            }
-
-            .category-group {
-                margin-bottom: 8px;
-            }
-
-            .category-toggle {
-                cursor: pointer;
-                user-select: none;
-            }
-
-            .category-toggle i {
-                transition: transform 0.3s ease;
-                font-size: 0.8rem;
-            }
-
-            .category-toggle.expanded i {
-                transform: rotate(90deg);
             }
 
             .desktop-grid {
@@ -1500,10 +1246,8 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                align-items: center;
-                /* Center Content */
-                text-align: center;
-                /* Center Text */
+                align-items: center; /* Center Content */
+                text-align: center; /* Center Text */
                 padding: 35px 25px;
                 color: white;
                 margin-bottom: 30px;
@@ -1515,7 +1259,7 @@
 
             /* Second Hiring Slide */
             .hero-banner-hiring-2 {
-                background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
+                background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80');
                 background-size: cover;
                 background-position: center;
             }
@@ -1544,13 +1288,13 @@
             }
 
             .hero-banner p {
-                font-size: 1.1rem;
-                opacity: 0.95;
-                margin-bottom: 24px;
-                font-weight: 400;
-                line-height: 1.5;
-                color: rgba(255, 255, 255, 0.9);
-                z-index: 2;
+                 font-size: 1.1rem;
+                 opacity: 0.95;
+                 margin-bottom: 24px;
+                 font-weight: 400;
+                 line-height: 1.5;
+                 color: rgba(255, 255, 255, 0.9);
+                 z-index: 2;
             }
 
             .join-btn-banner {
@@ -1563,7 +1307,7 @@
                 text-align: center;
                 text-decoration: none;
                 width: fit-content;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
                 transition: transform 0.2s, box-shadow 0.2s;
                 font-size: 1rem;
                 z-index: 2;
@@ -1571,13 +1315,13 @@
             }
 
             .join-btn-banner:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-                background: #f8f9fa;
+                 transform: translateY(-2px);
+                 box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                 background: #f8f9fa;
             }
 
             .munchies-banner {
-                background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+                background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
                 background-size: cover;
                 background-position: center;
                 height: 250px;
@@ -1588,8 +1332,8 @@
                 flex-direction: column;
                 justify-content: center;
                 margin-top: 10px;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.2);
                 animation: floatBanner 4s ease-in-out infinite;
             }
 
@@ -1598,7 +1342,7 @@
                 margin-bottom: 5px;
                 color: #ffffff;
                 font-weight: 800;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             }
 
             .munchies-banner p {
@@ -1606,7 +1350,7 @@
                 margin-bottom: 20px;
                 font-weight: 500;
                 font-size: 1.1rem;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             }
 
             .browse-btn {
@@ -1746,37 +1490,296 @@
             .food-promo-section {
                 margin: 40px 15px;
             }
-
             .food-promo-card {
                 flex-direction: column;
                 padding: 30px;
                 text-align: center;
             }
-
             .food-promo-content {
                 margin-bottom: 30px;
                 text-align: center;
             }
-
             .promo-title {
                 font-size: 1.8rem;
             }
-
             .promo-text {
                 margin: 0 auto 20px;
                 font-size: 1rem;
             }
-
             .food-promo-image {
                 flex: 0 0 220px;
                 height: 220px;
                 width: 220px;
             }
-
             .food-promo-image img {
                 transform: rotate(0deg);
             }
         }
+
+        
+/* ===== FOOTER STYLES ===== */
+.site-footer {
+    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 60px 0 0;
+    margin-top: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--secondary), var(--accent));
+}
+
+.footer-brand {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-brand i {
+    color: var(--accent);
+}
+
+.footer-tagline {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.footer-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary));
+    border-radius: 2px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-links a:hover {
+    color: var(--accent);
+    transform: translateX(5px);
+}
+
+.footer-links a i {
+    font-size: 0.85rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.social-link:hover {
+    background: var(--accent);
+    color: var(--primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+}
+
+.social-link i {
+    font-size: 1.2rem;
+}
+
+.download-badges {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.app-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-badge:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.app-badge i {
+    font-size: 1.8rem;
+}
+
+.app-badge-text small {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.app-badge-text strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.footer-bottom {
+    margin-top: 50px;
+    padding: 25px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.copyright {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.footer-legal-links {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.footer-legal-links a:hover {
+    color: var(--accent);
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+}
+
+.contact-item i {
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.contact-item a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-item a:hover {
+    color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 40px 0 0;
+        margin-top: 50px;
+    }
+
+    .footer-brand {
+        font-size: 1.5rem;
+    }
+
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-legal-links {
+        justify-content: center;
+    }
+
+    .download-badges {
+        flex-direction: column;
+    }
+
+    .app-badge {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
     </style>
 </head>
 
@@ -1787,7 +1790,7 @@
         <div class="mobile-header navbar-gradient">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="d-flex align-items-center">
-                    <button class="mobile-menu-trigger me-2">
+                    <button class="mobile-menu-trigger me-2" onclick="toggleNavDrawer()">
                         <i class="bi bi-list"></i>
                     </button>
                     <a href="{{ route('home') }}" class="brand-mobile">
@@ -1800,33 +1803,68 @@
                         @auth
                             @php $cartCount = \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity'); @endphp
                             @if($cartCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                    style="font-size: 0.6rem;">
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
                                     {{ $cartCount }}
                                 </span>
                             @endif
                         @endauth
                     </a>
                     @auth
-                        <a href="{{ route('profile.show') }}" class="mobile-profile-link">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=fff&color=6a11cb"
-                                alt="User">
-                        </a>
+                        <div class="dropdown">
+                            <a href="#" class="mobile-profile-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; display: block;">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=fff&color=6a11cb" alt="User">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" style="border-radius: 12px; min-width: 200px; padding: 10px 0;">
+                                <li class="px-3 py-2 border-bottom mb-2">
+                                    <div class="fw-bold text-primary">{{ Auth::user()->name }}</div>
+                                    <div class="fs-8 text-muted truncate-1">{{ Auth::user()->email }}</div>
+                                </li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('profile.show') }}">
+                                    <i class="bi bi-person me-2 text-primary"></i> Profile
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/wishlist">
+                                    <i class="bi bi-heart me-2 text-danger"></i> Wishlist
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/orders/track">
+                                    <i class="bi bi-truck me-2 text-primary"></i> Orders
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/buyer/dashboard">
+                                    <i class="bi bi-speedometer2 me-2 text-success"></i> Buyer
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST" class="px-2">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 text-danger fw-bold d-flex align-items-center" style="border-radius: 8px;">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     @else
-                        <a href="{{ route('login') }}" class="mobile-icon-btn">
-                            <i class="bi bi-person-circle"></i>
+                        <a href="{{ route('login') }}" class="cart-btn py-2 px-3 fs-7" style="border-radius: 12px !important;">
+                             Login
                         </a>
                     @endauth
                 </div>
             </div>
 
+            <!-- Mobile Location Detection -->
+            <div class="location-tracker mb-3 text-white px-1" onclick="getUserLocation()" style="cursor: pointer;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt-fill text-warning"></i>
+                    <div style="line-height: 1.2;">
+                        <div class="fw-bold fs-7 location-text-display">Detect your location</div>
+                        <div class="small opacity-75 location-subtext-display" style="font-size: 0.7rem;">Click to find your location</div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="mobile-search-wrapper">
-                <form action="{{ route('products.index') }}" method="GET" class="search-bar-modern"
-                    id="mobileSearchForm">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-modern">
                     <i class="bi bi-search"></i>
-                    <input type="text" name="q" id="mobileSearchInput"
-                        placeholder="Search for groceries, food & more..." autocomplete="off"
-                        value="{{ request('q') }}">
+                    <input type="text" name="q" placeholder="Search for groceries, food & more..." autocomplete="off">
                 </form>
             </div>
         </div>
@@ -1835,7 +1873,7 @@
             <!-- Quick Services Section -->
             <section class="quick-services-section">
                 <div class="services-grid">
-                    <a href="#" class="service-tile grocery-tile">
+                    <a href="/tenmins" class="service-tile grocery-tile">
                         <div class="tile-icon">🛒</div>
                         <div class="tile-label">10 Mins<br>Delivery</div>
                     </a>
@@ -1853,15 +1891,11 @@
                     </a>
                 </div>
             </section>
-            <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000"
-                data-bs-pause="hover" style="margin: 20px 15px 20px;">
+            <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
                 <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="0" class="active"
-                        aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="1"
-                        aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="2"
-                        aria-label="Slide 3"></button>
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                 </div>
                 <div class="carousel-inner" style="border-radius: 24px; overflow: hidden;">
                     <!-- Slide 1: Hiring / Night City / Fireworks -->
@@ -1871,31 +1905,25 @@
                             <div class="firework fw-2"></div>
                             <div class="firework fw-3"></div>
                             <div class="firework fw-4"></div>
-                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀
-                                Career Opportunity</span>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per
-                                month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn"
-                                onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
                     </div>
                     <!-- Slide 2: Hiring / Dark Team / Fireworks (Duplicate Content) -->
                     <div class="carousel-item">
-                        <div class="hero-banner hero-banner-hiring-2">
+                         <div class="hero-banner hero-banner-hiring-2">
                             <div class="firework fw-1"></div>
                             <div class="firework fw-2"></div>
                             <div class="firework fw-3"></div>
                             <div class="firework fw-4"></div>
-                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀
-                                Career Opportunity</span>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per
-                                month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn"
-                                onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
@@ -1908,13 +1936,10 @@
                             <div class="firework fw-2"></div>
                             <div class="firework fw-3"></div>
                             <div class="firework fw-4"></div>
-                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀
-                                Career Opportunity</span>
+                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per
-                                month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn"
-                                onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
+                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
@@ -1948,8 +1973,8 @@
                                 @auth
                                     @php
                                         $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
-                                            ->where('product_id', $prod->id)
-                                            ->first();
+                                                    ->where('product_id', $prod->id)
+                                                    ->first();
                                         $qty = $cartItem ? $cartItem->quantity : 0;
                                     @endphp
                                     @if($qty > 0)
@@ -1959,14 +1984,12 @@
                                             <button class="qty-btn" onclick="updateCart({{ $prod->id }}, 'increase')">+</button>
                                         </div>
                                     @else
-                                        <button class="add-btn"
-                                            onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">
+                                        <button class="add-btn" onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">
                                             ADD
                                         </button>
                                     @endif
                                 @else
-                                    <a href="{{ route('login') }}" class="add-btn"
-                                        style="text-align:center; text-decoration:none;">
+                                    <a href="{{ route('login') }}" class="add-btn" style="text-align:center; text-decoration:none;">
                                         Login
                                     </a>
                                 @endauth
@@ -1975,12 +1998,34 @@
                     @endforeach
                 </div>
             </div>
+            <!-- Food Order Promotion (Mobile) -->
+            <div class="food-promo-section">
+                <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                    <div class="food-promo-card">
+                        <div class="food-promo-content">
+                            <div class="food-badge">
+                                <i class="bi bi-fire"></i> Hot & Fresh
+                            </div>
+                            <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
+                            <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
+                            <span class="cta-food-btn">
+                                Order Now <i class="bi bi-arrow-right"></i>
+                            </span>
+                        </div>
+                        <div class="food-promo-image">
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
+                        </div>
+                    </div>
+                </a>
+            </div>
+
             <div class="munchies-banner">
                 <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
                 <h3>⚡ Instant Munchies</h3>
                 <p>Quick snacks and drinks delivered in minutes!</p>
                 <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
             </div>
+
             <div class="product-rail">
                 <div class="rail-header">
                     <h5 class="fw-bold mb-0">🥬 Fresh Vegetables</h5>
@@ -2003,8 +2048,8 @@
                                 @auth
                                     @php
                                         $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
-                                            ->where('product_id', $prod->id)
-                                            ->first();
+                                                    ->where('product_id', $prod->id)
+                                                    ->first();
                                         $qty = $cartItem ? $cartItem->quantity : 0;
                                     @endphp
                                     @if($qty > 0)
@@ -2018,8 +2063,7 @@
                                             onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
                                     @endif
                                 @else
-                                    <a href="{{ route('login') }}" class="add-btn"
-                                        style="text-align:center; text-decoration:none; display:block;">Login</a>
+                                    <a href="{{ route('login') }}" class="add-btn" style="text-align:center; text-decoration:none; display:block;">Login</a>
                                 @endauth
                             </div>
                         </div>
@@ -2044,8 +2088,7 @@
             <a href="{{ route('cart.index') }}" class="nav-link-mobile position-relative">
                 <div class="position-relative">
                     <i class="bi bi-bag-fill"></i>
-                    <span id="mobile-cart-badge"
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    <span id="mobile-cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                         style="display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
                         @auth
                             {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
@@ -2081,18 +2124,16 @@
                     <div class="delivery-info location-tracker" onclick="getUserLocation()">
                         <div class="fw-bold fs-7">
                             <i class="bi bi-geo-alt-fill"></i>
-                            <span id="location-text">Detect your location</span>
+                            <span class="location-text-display">Detect your location</span>
                         </div>
-                        <div class="text-muted fs-8 truncate-1" id="location-subtext">
+                        <div class="text-muted fs-8 truncate-1 location-subtext-display">
                             Click to find your location
                         </div>
                     </div>
 
                 </div>
-                <form action="{{ route('products.index') }}" method="GET" class="search-bar-container desktop-search"
-                    id="desktopSearchForm">
-                    <input type="text" name="q" id="desktopSearchInput" class="search-input"
-                        placeholder="Search for products, brands and more" value="{{ request('q') }}">
+                <form action="{{ route('products.index') }}" method="GET" class="search-bar-container desktop-search">
+                    <input type="text" name="q" class="search-input" placeholder="Search for products, brands and more">
                     <i class="bi bi-search search-icon"></i>
                 </form>
                 <div class="nav-actions">
@@ -2102,9 +2143,8 @@
 
                     <a href="{{ route('cart.index') }}" class="cart-btn position-relative">
                         <i class="bi bi-cart3"></i> Cart
-                        <span id="desktop-cart-badge"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem; display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
+                        <span id="desktop-cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                             style="font-size: 0.6rem; display: {{ (\App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0) > 0 ? 'inline-block' : 'none' }};">
                             @auth
                                 {{ \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity') ?? 0 }}
                             @else
@@ -2113,17 +2153,41 @@
                         </span>
                     </a>
                     @auth
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('profile.show') }}" class="auth-name">{{ Auth::user()->name }}</a>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="logout-btn">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
-                                </button>
-                            </form>
+                        <div class="dropdown">
+                            <a href="#" class="auth-name dropdown-toggle d-flex align-items-center gap-2 py-2 px-3 text-white text-decoration-none" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: rgba(255, 255, 255, 0.15); border-radius: 10px;">
+                                <i class="bi bi-person-circle"></i>
+                                <span>{{ Auth::user()->name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" style="border-radius: 12px; min-width: 200px; padding: 10px 0;">
+                                <li class="px-3 py-2 border-bottom mb-2">
+                                    <div class="fw-bold text-primary">{{ Auth::user()->name }}</div>
+                                    <div class="fs-8 text-muted truncate-1">{{ Auth::user()->email }}</div>
+                                </li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('profile.show') }}">
+                                    <i class="bi bi-person me-2 text-primary"></i> Profile
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/wishlist">
+                                    <i class="bi bi-heart me-2 text-danger"></i> Wishlist
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/orders/track">
+                                    <i class="bi bi-truck me-2 text-primary"></i> Orders
+                                </a></li>
+                                <li><a class="dropdown-item py-2 d-flex align-items-center" href="/buyer/dashboard">
+                                    <i class="bi bi-speedometer2 me-2 text-success"></i> Buyer
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST" class="px-2">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 text-danger fw-bold d-flex align-items-center" style="border-radius: 8px;">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="auth-name">
+                        <a href="{{ route('login') }}" class="cart-btn">
                             <i class="bi bi-person"></i> Login
                         </a>
                     @endauth
@@ -2135,57 +2199,24 @@
             <aside>
                 <div class="sidebar-menu shadow-sm-custom">
                     <div class="text-muted fs-8 fw-bold mb-3 px-3 text-uppercase tracking-wider">Categories</div>
-                    @php
-                        $allCategories = collect($categories ?? []);
-                        $categoriesWithSubs = $allCategories->map(function ($cat) {
-                            $cat->subcategories_list = \App\Models\Subcategory::where('category_id', $cat->id)->get();
-                            return $cat;
-                        });
-                    @endphp
-                    @foreach($categoriesWithSubs as $cat)
-                        <div class="category-group">
-                            <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}"
-                                class="side-link category-link-main" data-category-id="{{ $cat->id ?? 0 }}">
-                                <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span>
-                                <span class="flex-grow-1">{{ $cat->name ?? 'Category' }}</span>
-                                @if(($cat->subcategories_list ?? collect())->count() > 0)
-                                    <i class="bi bi-chevron-right category-toggle-icon"
-                                        style="font-size: 0.75rem; margin-left: auto;"></i>
-                                @endif
-                            </a>
-                            @if(($cat->subcategories_list ?? collect())->count() > 0)
-                                <div class="subcategories-container" data-category="{{ $cat->id ?? 0 }}" style="display: none;">
-                                    @foreach($cat->subcategories_list as $sub)
-                                        <a href="{{ route('products.index', ['category_id' => $cat->id, 'subcategory_id' => $sub->id]) }}"
-                                            class="subcategory-item">
-                                            <span style="font-size: 1rem;">{{ $sub->emoji ?? '📦' }}</span>
-                                            <span>{{ $sub->name ?? 'Subcategory' }}</span>
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+                    @foreach(collect($categories ?? [])->take(10) as $cat)
+                        <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="side-link">
+                            <span class="fs-5">{{ $cat->emoji ?? '📦' }}</span> {{ $cat->name ?? 'Category' }}
+                        </a>
                     @endforeach
-                    @if($allCategories->isEmpty())
-                        <div class="text-muted text-center py-3">
-                            <i class="bi bi-inbox fs-4 d-block mb-2"></i>
-                            <small>No categories available</small>
-                        </div>
-                    @endif
+                    <a href="{{ route('categories.index') }}" class="side-link text-primary mt-2">
+                        <i class="bi bi-grid fs-5"></i> View All
+                    </a>
                 </div>
             </aside>
             <main>
                 <div class="row mb-5">
                     <div class="col-8">
-                        <div id="desktopBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel"
-                            data-bs-interval="5000" data-bs-pause="hover">
-                            <div class="carousel-indicators">
-                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="0"
-                                    class="active" aria-current="true" aria-label="Slide 1"></button>
-                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="1"
-                                    aria-label="Slide 2"></button>
-                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="2"
-                                    aria-label="Slide 3"></button>
+                        <div id="desktopBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
+                             <div class="carousel-indicators">
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                <button type="button" data-bs-target="#desktopBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                             </div>
                             <div class="carousel-inner" style="border-radius: 24px; overflow: hidden;">
                                 <!-- Slide 1: Hiring / Night City -->
@@ -2195,13 +2226,10 @@
                                         <div class="firework fw-2"></div>
                                         <div class="firework fw-3"></div>
                                         <div class="firework fw-4"></div>
-                                        <span class="badge bg-warning text-dark mb-2"
-                                            style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed
-                                            ₹24,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn"
-                                            onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
@@ -2213,13 +2241,10 @@
                                         <div class="firework fw-2"></div>
                                         <div class="firework fw-3"></div>
                                         <div class="firework fw-4"></div>
-                                        <span class="badge bg-warning text-dark mb-2"
-                                            style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed
-                                            ₹24,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn"
-                                            onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
@@ -2232,13 +2257,10 @@
                                         <div class="firework fw-2"></div>
                                         <div class="firework fw-3"></div>
                                         <div class="firework fw-4"></div>
-                                        <span class="badge bg-warning text-dark mb-2"
-                                            style="position:relative; z-index:2;">🚀 Career Opportunity</span>
+                                        <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                                         <h2>We Are Hiring: Secure Your Future</h2>
-                                        <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed
-                                            ₹24,000 per month.</p>
-                                        <button class="join-btn-banner mt-2 style-join-btn"
-                                            onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
+                                        <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
+                                        <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                             Join Now
                                         </button>
                                     </div>
@@ -2248,14 +2270,35 @@
                     </div>
                     <div class="col-4">
                         <div class="munchies-banner">
-                            <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery
-                            </div>
+                            <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
                             <h3>⚡ Instant Munchies</h3>
                             <p>Quick snacks and drinks delivered in minutes!</p>
                             <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
+                <!-- Food Order Promotion -->
+                <div class="food-promo-section mb-5">
+                    <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                        <div class="food-promo-card">
+                            <div class="food-promo-content">
+                                <div class="food-badge">
+                                    <i class="bi bi-fire"></i> Hot & Fresh
+                                </div>
+                                <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
+                                <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
+                                <span class="cta-food-btn">
+                                    Order Now <i class="bi bi-arrow-right"></i>
+                                </span>
+                            </div>
+                            <div class="food-promo-image">
+                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Daily Staples Section -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="fw-bold m-0" id="daily">Daily Staples</h3>
                     <a href="#" class="text-primary text-decoration-none fw-bold">see all</a>
@@ -2280,8 +2323,8 @@
                                     @auth
                                         @php
                                             $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
-                                                ->where('product_id', $prod->id)
-                                                ->first();
+                                                        ->where('product_id', $prod->id)
+                                                        ->first();
                                             $qty = $cartItem ? $cartItem->quantity : 0;
                                         @endphp
                                         @if($qty > 0)
@@ -2295,8 +2338,7 @@
                                                 onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
                                         @endif
                                     @else
-                                        <a href="{{ route('login') }}"
-                                            class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
+                                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
                                             Login
                                         </a>
                                     @endauth
@@ -2310,6 +2352,8 @@
                         </div>
                     @endforelse
                 </div>
+
+                <!-- Snacks & Drinks Section Moved Here -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="fw-bold m-0">Snacks & Drinks</h3>
                     <a href="#" class="text-primary text-decoration-none fw-bold">see all</a>
@@ -2330,8 +2374,8 @@
                                     @auth
                                         @php
                                             $cartItem = \App\Models\CartItem::where('user_id', auth()->id())
-                                                ->where('product_id', $prod->id)
-                                                ->first();
+                                                        ->where('product_id', $prod->id)
+                                                        ->first();
                                             $qty = $cartItem ? $cartItem->quantity : 0;
                                         @endphp
                                         @if($qty > 0)
@@ -2345,8 +2389,7 @@
                                                 onclick="event.stopPropagation(); updateCart({{ $prod->id }}, 'add')">ADD</button>
                                         @endif
                                     @else
-                                        <a href="{{ route('login') }}"
-                                            class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
+                                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-3 px-3 fw-bold w-100">
                                             Login
                                         </a>
                                     @endauth
@@ -2355,35 +2398,10 @@
                         </div>
                     @endforeach
                 </div>
-
-                <!-- Food Order Promotion -->
-                <div class="food-promo-section">
-                    <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
-                        <div class="food-promo-card">
-                            <div class="food-promo-content">
-                                <div class="food-badge">
-                                    <i class="bi bi-fire"></i> Hot & Fresh
-                                </div>
-                                <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
-                                <p class="promo-text">Order from top restaurants and get it delivered in minutes.
-                                    Experience the taste of your city with GrabBaskets.</p>
-                                <span class="cta-food-btn">
-                                    Order Now <i class="bi bi-arrow-right"></i>
-                                </span>
-                            </div>
-                            <div class="food-promo-image">
-                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80"
-                                    alt="Delicious Food">
-                            </div>
-                        </div>
-                    </a>
-                </div>
             </main>
         </div>
     </div>
 
-    <!-- Mobile Category Drawer -->
-    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleCategoryDrawer()"></div>
     <div class="mobile-category-drawer" id="categoryDrawer">
         <div class="drawer-header">
             <h5><i class="bi bi-grid-fill me-2"></i> Categories</h5>
@@ -2392,179 +2410,231 @@
             </button>
         </div>
         <div class="drawer-body">
-            @php
-                $mobileCategories = collect($categories ?? []);
-                $mobileCategoriesWithSubs = $mobileCategories->map(function ($cat) {
-                    try {
-                        $cat->subcategories_list = \App\Models\Subcategory::where('category_id', $cat->id)->get();
-                    } catch (\Exception $e) {
-                        $cat->subcategories_list = collect();
-                    }
-                    return $cat;
-                });
-            @endphp
-            @foreach($mobileCategoriesWithSubs as $cat)
-                @if(($cat->subcategories_list ?? collect())->count() > 0)
-                    <div class="drawer-category-wrapper">
-                        <div class="drawer-item" style="cursor: pointer;"
-                            onclick="toggleMobileSubcategories({{ $cat->id ?? 0 }})">
-                            <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
-                            <div class="item-text flex-grow-1">{{ $cat->name ?? 'Category' }}</div>
-                            <button class="drawer-category-toggle" type="button">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                        </div>
-                        <div class="drawer-subcategories" id="subcats-{{ $cat->id ?? 0 }}" style="display: none;">
-                            <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-subcategory"
-                                onclick="toggleCategoryDrawer()">
-                                <div class="item-emoji" style="width: 35px; height: 35px; font-size: 1rem;">
-                                    {{ $cat->emoji ?? '🥬' }}</div>
-                                <div class="item-text">All {{ $cat->name ?? 'Category' }}</div>
-                            </a>
-                            @foreach($cat->subcategories_list as $sub)
-                                <a href="{{ route('products.index', ['category_id' => $cat->id, 'subcategory_id' => $sub->id]) }}"
-                                    class="drawer-subcategory" onclick="toggleCategoryDrawer()">
-                                    <div class="item-emoji" style="width: 35px; height: 35px; font-size: 1rem;">
-                                        {{ $sub->emoji ?? '📦' }}</div>
-                                    <div class="item-text">{{ $sub->name ?? 'Subcategory' }}</div>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @else
-                    <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-item"
-                        onclick="toggleCategoryDrawer()">
-                        <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
-                        <div class="item-text">{{ $cat->name ?? 'Category' }}</div>
-                    </a>
-                @endif
+            @foreach(($categories ?? []) as $cat)
+                <a href="{{ route('buyer.productsByCategory', $cat->id ?? 1) }}" class="drawer-item">
+                    <div class="item-emoji">{{ $cat->emoji ?? '🥬' }}</div>
+                    <div class="item-text">{{ $cat->name ?? 'Category' }}</div>
+                </a>
             @endforeach
-            @if($mobileCategories->isEmpty())
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    <small>No categories available</small>
-                </div>
+            @if(count($categories ?? []) == 0)
+                @foreach(['Fruits', 'Veggies', 'Dairy', 'Bakery', 'Munchies', 'Cold Drinks', 'Instant', 'Cleaning', 'Home', 'Beauty', 'Pharma', 'Pet'] as $dummy)
+                    <a href="#" class="drawer-item">
+                        <div class="item-emoji">📦</div>
+                        <div class="item-text">{{ $dummy }}</div>
+                    </a>
+                @endforeach
             @endif
         </div>
     </div>
 
+    <!-- Mobile Nav Drawer (Hamburger Menu) -->
+    <div class="mobile-category-drawer" id="navDrawer">
+        <div class="drawer-header">
+            <h5><i class="bi bi-list me-2"></i> Menu</h5>
+            <button class="close-drawer" onclick="toggleNavDrawer()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="drawer-body">
+            <a href="/joinus" class="drawer-item">
+                <div class="item-emoji">🤝</div>
+                <div class="item-text">Join With Us</div>
+            </a>
+            <a href="{{ route('cart.index') }}" class="drawer-item">
+                <div class="item-emoji">🛒</div>
+                <div class="item-text">Cart</div>
+            </a>
+            @auth
+                <form action="{{ route('logout') }}" method="POST" id="mobile-logout-form" style="display:none;">
+                    @csrf
+                </form>
+                <a href="javascript:void(0)" onclick="document.getElementById('mobile-logout-form').submit();" class="drawer-item">
+                    <div class="item-emoji">🚪</div>
+                    <div class="item-text">Logout</div>
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="drawer-item" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white;">
+                    <div class="item-emoji">👤</div>
+                    <div class="item-text">Login</div>
+                </a>
+            @endauth
+        </div>
+    </div>
+<!-- ===== FOOTER SECTION ===== -->
+<!-- Add this CSS to your existing <style> tag -->
+
+
+<!-- Add this HTML before closing </body> tag, after all your content -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Brand Section -->
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-brand">
+                    <i class="bi bi-bag-check-fill"></i>
+                    GrabBaskets
+                </div>
+                <p class="footer-tagline">
+                    Your trusted partner for lightning-fast grocery delivery. 
+                    Fresh products delivered to your doorstep in just 10 minutes!
+                </p>
+         <div class="social-links">
+
+    <a href="https://wa.me/918300504230" class="social-link" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <a href="https://www.facebook.com/p/Swivel-Education-61573324123476/" class="social-link" aria-label="Facebook" target="_blank"rel="noopener noreferrer">
+        <i class="bi bi-facebook"></i>
+    </a>
+
+    <a href="https://www.instagram.com/grab_baskets/"class="social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-instagram"></i>
+    </a>
+
+    <a href="https://youtube.com/@swivel-training?si=6AhKUo6pd7lpBNCw" class="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-youtube"></i>
+    </a>
+
+    <a href="https://www.linkedin.com/in/jey-groups-2557933a3/"class="social-link" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-linkedin"></i>
+    </a>
+
+</div>
+
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-section-title">Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ route('home') }}"><i class="bi bi-chevron-right"></i> Home</a></li>
+                    <li><a href="/tenmins"><i class="bi bi-chevron-right"></i> Ten-Mins-Delivery</a></li>
+                    <li><a href="{{ route('categories.index') }}"><i class="bi bi-chevron-right"></i> Card</a></li>
+                    <li><a href="{{ route('customer.food.index') }}"><i class="bi bi-chevron-right"></i> Food Delivery</a></li>
+                    <li><a href="/joinus"><i class="bi bi-chevron-right"></i> Join With Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Customer Service -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-section-title">Customer Service</h5>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Help Center</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Track Order</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Returns & Refunds</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> Shipping Info</a></li>
+                    <li><a href="#"><i class="bi bi-chevron-right"></i> FAQs</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact & Download -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-section-title">Get In Touch</h5>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>DLF IT Park,<br>Mount Poonamallee Road, Porur,<br>
+                    Chennai, Tamil Nadu, 600116.</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <a href="tel:+911234567890">+91-830 050 4230</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <a href="mailto:admin@swivel.co.in">admin@swivel.co.in</a>
+                    </div>
+                </div>
+                <div class="download-badges mt-4">
+                    <a href="#" class="app-badge">
+                        <i class="bi bi-google-play"></i>
+                        <div class="app-badge-text">
+                            <small>GET IT ON</small>
+                            <strong>Google Play</strong>
+                        </div>
+                    </a>
+                    <a href="#" class="app-badge">
+                        <i class="bi bi-apple"></i>
+                        <div class="app-badge-text">
+                            <small>Download on the</small>
+                            <strong>App Store</strong>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="copyright">
+                    © 2025 GrabBaskets. All rights reserved.
+                </div>
+                <div class="footer-legal-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
     <!-- Scripts -->
     <script>
-        /**
-         * Toggle mobile category drawer with smooth animations
-         */
         function toggleCategoryDrawer() {
             const drawer = document.getElementById('categoryDrawer');
             const overlay = document.getElementById('drawerOverlay');
-
-            if (!drawer || !overlay) {
-                @if(config('app.debug'))
-                    console.error('Category drawer elements not found');
-                @endif
-                return;
+            
+            // Close nav drawer if open
+            const navDrawer = document.getElementById('navDrawer');
+            if (navDrawer.classList.contains('active')) {
+                navDrawer.classList.remove('active');
             }
 
-            const isActive = drawer.classList.contains('active');
-
-            if (isActive) {
-                // Close drawer
-                drawer.classList.remove('active');
-                overlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                // Open drawer
-                drawer.classList.add('active');
-                overlay.classList.add('active');
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (drawer.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
-            }
-        }
-
-        /**
-         * Toggle subcategories in mobile drawer
-         */
-        function toggleMobileSubcategories(categoryId) {
-            const subcatContainer = document.getElementById('subcats-' + categoryId);
-            const categoryItem = event?.currentTarget || document.querySelector(`[onclick="toggleMobileSubcategories(${categoryId})"]`);
-            const toggleIcon = categoryItem?.querySelector('.drawer-category-toggle i');
-
-            if (!subcatContainer) return;
-
-            const isExpanded = subcatContainer.style.display === 'block';
-
-            if (isExpanded) {
-                // Collapse
-                subcatContainer.style.display = 'none';
-                if (categoryItem) {
-                    categoryItem.querySelector('.drawer-category-toggle')?.classList.remove('expanded');
-                }
             } else {
-                // Expand
-                subcatContainer.style.display = 'block';
-                if (categoryItem) {
-                    categoryItem.querySelector('.drawer-category-toggle')?.classList.add('expanded');
-                }
-                // Animate subcategories
-                const subcats = subcatContainer.querySelectorAll('.drawer-subcategory');
-                subcats.forEach((sub, index) => {
-                    setTimeout(() => {
-                        sub.classList.add('show');
-                    }, index * 50);
-                });
+                document.body.style.overflow = 'auto';
             }
         }
 
-        /**
-         * Initialize desktop sidebar category toggles
-         */
-        document.addEventListener('DOMContentLoaded', function () {
-            // Desktop sidebar category expansion
-            const categoryLinks = document.querySelectorAll('.category-link-main');
-            categoryLinks.forEach(link => {
-                const subcatContainer = link.nextElementSibling;
-                if (subcatContainer && subcatContainer.classList.contains('subcategories-container')) {
-                    link.addEventListener('click', function (e) {
-                        // If clicking the chevron icon, toggle subcategories
-                        const icon = this.querySelector('.category-toggle-icon');
-                        if (icon && e.target === icon || icon?.contains(e.target)) {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            const isExpanded = subcatContainer.style.display === 'block';
-                            if (isExpanded) {
-                                subcatContainer.style.display = 'none';
-                                icon.style.transform = 'rotate(0deg)';
-                            } else {
-                                subcatContainer.style.display = 'block';
-                                icon.style.transform = 'rotate(90deg)';
-                                // Animate subcategories
-                                const subcats = subcatContainer.querySelectorAll('.subcategory-item');
-                                subcats.forEach((sub, index) => {
-                                    setTimeout(() => {
-                                        sub.classList.add('show');
-                                    }, index * 30);
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-
-            // Close drawer when clicking overlay
+        function toggleNavDrawer() {
+            const drawer = document.getElementById('navDrawer');
             const overlay = document.getElementById('drawerOverlay');
-            if (overlay) {
-                overlay.addEventListener('click', toggleCategoryDrawer);
+            
+            // Close category drawer if open
+            const catDrawer = document.getElementById('categoryDrawer');
+            if (catDrawer.classList.contains('active')) {
+                catDrawer.classList.remove('active');
             }
 
-            // Close drawer on escape key
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    const drawer = document.getElementById('categoryDrawer');
-                    if (drawer && drawer.classList.contains('active')) {
-                        toggleCategoryDrawer();
-                    }
-                }
-            });
-        });
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (drawer.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+                overlay.classList.remove('active'); // Extra safety
+            }
+        }
+
+        // Close all drawers when clicking overlay
+        document.getElementById('drawerOverlay').onclick = function() {
+            const navDrawer = document.getElementById('navDrawer');
+            const catDrawer = document.getElementById('categoryDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            
+            navDrawer.classList.remove('active');
+            catDrawer.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/location-delivery.js') }}"></script>
@@ -2588,14 +2658,14 @@
 
                 // Optimistic UI Update
                 renderProductButton(productId, currentQty);
-
+                
                 // Optimistic Badge Update
-                const mobileBadge = document.getElementById('mobile-cart-badge');
-                if (mobileBadge) {
-                    let currentCount = parseInt(mobileBadge.innerText || 0);
-                    let newCount = currentCount + quantityChange;
-                    updateCartBadge(newCount);
-                }
+                 const mobileBadge = document.getElementById('mobile-cart-badge');
+                 if (mobileBadge) {
+                     let currentCount = parseInt(mobileBadge.innerText || 0);
+                     let newCount = currentCount + quantityChange;
+                     updateCartBadge(newCount);
+                 }
 
                 // Server Request
                 fetch('{{ route('cart.add') }}', {
@@ -2609,19 +2679,15 @@
                         quantity: quantityChange // delta
                     })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.cart_count !== undefined) {
-                            updateCartBadge(data.cart_count);
-                        } else {
-                            refreshCartCount();
-                        }
-                    })
-                    .catch(error => {
-                        @if(config('app.debug'))
-                            console.error('Error:', error);
-                        @endif
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cart_count !== undefined) {
+                        updateCartBadge(data.cart_count);
+                    } else {
+                        refreshCartCount(); 
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             @else
                 window.location.href = '{{ route('login') }}';
             @endauth
@@ -2650,56 +2716,21 @@
         }
 
         function updateCartBadge(count) {
-            const mobileBadge = document.getElementById('mobile-cart-badge');
-            if (mobileBadge) {
-                mobileBadge.innerText = count;
-                mobileBadge.style.display = count > 0 ? 'inline-block' : 'none';
-            }
+             const mobileBadge = document.getElementById('mobile-cart-badge');
+             if (mobileBadge) {
+                 mobileBadge.innerText = count;
+                 mobileBadge.style.display = count > 0 ? 'inline-block' : 'none';
+             }
         }
 
         function refreshCartCount() {
-            fetch('{{ route('cart.index') }}');
+             fetch('{{ route('cart.index') }}');
         }
 
         // Desktop Backwards Compatibility
         function addToCart(productId) {
             updateCart(productId, 'add');
         }
-
-        /**
-         * Enhanced search functionality with error handling
-         */
-        document.addEventListener('DOMContentLoaded', function () {
-            // Mobile search form handling
-            const mobileSearchForm = document.getElementById('mobileSearchForm');
-            const mobileSearchInput = document.getElementById('mobileSearchInput');
-
-            if (mobileSearchForm && mobileSearchInput) {
-                mobileSearchForm.addEventListener('submit', function (e) {
-                    const query = mobileSearchInput.value.trim();
-                    if (!query) {
-                        e.preventDefault();
-                        return false;
-                    }
-                    // Form will submit normally to products.index route
-                });
-            }
-
-            // Desktop search form handling
-            const desktopSearchForm = document.getElementById('desktopSearchForm');
-            const desktopSearchInput = document.getElementById('desktopSearchInput');
-
-            if (desktopSearchForm && desktopSearchInput) {
-                desktopSearchForm.addEventListener('submit', function (e) {
-                    const query = desktopSearchInput.value.trim();
-                    if (!query) {
-                        e.preventDefault();
-                        return false;
-                    }
-                    // Form will submit normally to products.index route
-                });
-            }
-        });
     </script>
 
     <script>
@@ -2709,26 +2740,23 @@
                 return;
             }
 
-            document.getElementById("location-text").innerText = "Detecting...";
-            document.getElementById("location-subtext").innerText = "Please allow location access";
+            const textDisplays = document.querySelectorAll(".location-text-display");
+            const subtextDisplays = document.querySelectorAll(".location-subtext-display");
+
+            textDisplays.forEach(el => el.innerText = "Detecting...");
+            subtextDisplays.forEach(el => el.innerText = "Please allow location access");
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
 
-                    // Show coordinates (fast & safe)
-                    document.getElementById("location-text").innerText = "Your Location";
-                    document.getElementById("location-subtext").innerText =
-                        `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-
-                    // OPTIONAL: Open Google Maps
-                    // window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
+                    textDisplays.forEach(el => el.innerText = "Your Location");
+                    subtextDisplays.forEach(el => el.innerText = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`);
                 },
                 () => {
-                    document.getElementById("location-text").innerText = "Location denied";
-                    document.getElementById("location-subtext").innerText =
-                        "Please enable location access";
+                    textDisplays.forEach(el => el.innerText = "Location denied");
+                    subtextDisplays.forEach(el => el.innerText = "Please enable location access");
                 }
             );
         }

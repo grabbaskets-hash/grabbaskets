@@ -270,6 +270,9 @@ class OrderController extends Controller
                 $order->update(['status' => 'confirmed']); 
             }
 
+            // Send notification
+            \App\Services\NotificationService::sendOrderAssignedToPartner($partner, $order);
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Order accepted successfully!']);
             }

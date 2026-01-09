@@ -16,7 +16,8 @@ class NotificationService
     public static function sendOrderPlaced($user, $order)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'order_placed',
             'title' => 'Order Confirmed! 🎉',
             'message' => "Your order #{$order->id} has been placed successfully. We'll keep you updated on its progress.",
@@ -42,7 +43,8 @@ class NotificationService
         ];
 
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'order_status_update',
             'title' => 'Order Update',
             'message' => $messages[$status] ?? "Your order #{$order->id} status has been updated to: {$status}",
@@ -60,7 +62,8 @@ class NotificationService
     public static function sendNewOrderToSeller($seller, $order)
     {
         Notification::create([
-            'user_id' => $seller->id,
+            'notifiable_id' => $seller->id,
+            'notifiable_type' => get_class($seller),
             'type' => 'order_received',
             'title' => 'New Order Received! 💰',
             'message' => "You have a new order for {$order->product->name}. Order #{$order->id} worth ₹{$order->amount}",
@@ -79,7 +82,8 @@ class NotificationService
     public static function sendPaymentConfirmed($user, $order)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'payment_confirmed',
             'title' => 'Payment Successful! 💳',
             'message' => "Your payment of ₹{$order->amount} for order #{$order->id} has been processed successfully.",
@@ -97,7 +101,8 @@ class NotificationService
     public static function sendProductBackInStock($user, $product)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'product_back_in_stock',
             'title' => 'Back in Stock! 📦',
             'message' => "Good news! {$product->name} is back in stock. Order now before it runs out again!",
@@ -115,9 +120,10 @@ class NotificationService
     public static function sendPriceDrop($user, $product, $oldPrice, $newPrice)
     {
         $discount = round((($oldPrice - $newPrice) / $oldPrice) * 100);
-        
+
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'price_drop',
             'title' => 'Price Drop Alert! 🏷️',
             'message' => "{$product->name} is now ₹{$newPrice} (was ₹{$oldPrice}). Save {$discount}%!",
@@ -137,7 +143,8 @@ class NotificationService
     public static function sendWishlistItemOnSale($user, $product)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'wishlist_item_sale',
             'title' => 'Wishlist Item on Sale! ❤️',
             'message' => "Great news! {$product->name} from your wishlist is now on sale with {$product->discount}% off!",
@@ -156,7 +163,8 @@ class NotificationService
     public static function sendDeliveryReminder($user, $order)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'delivery_reminder',
             'title' => 'Delivery Reminder 🚚',
             'message' => "Don't forget! Your order #{$order->id} will be delivered today between 10 AM - 8 PM.",
@@ -173,7 +181,8 @@ class NotificationService
     public static function sendReviewRequest($user, $order)
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'review_request',
             'title' => 'How was your experience? ⭐',
             'message' => "We'd love to hear your feedback on {$order->product->name}. Share your review to help other customers!",
@@ -195,7 +204,8 @@ class NotificationService
 
         foreach ($userIds as $userId) {
             $notifications[] = [
-                'user_id' => $userId,
+                'notifiable_id' => $userId,
+                'notifiable_type' => User::class,
                 'type' => $type,
                 'title' => $title,
                 'message' => $message,
@@ -232,7 +242,8 @@ class NotificationService
             try {
                 // Send in-app notification
                 Notification::create([
-                    'user_id' => $buyer->id,
+                    'notifiable_id' => $buyer->id,
+                    'notifiable_type' => get_class($buyer),
                     'type' => 'promotion',
                     'title' => $title,
                     'message' => $message,
@@ -301,7 +312,8 @@ class NotificationService
             try {
                 // Send in-app notification
                 Notification::create([
-                    'user_id' => $user->id,
+                    'notifiable_id' => $user->id,
+                    'notifiable_type' => get_class($user),
                     'type' => 'promotion',
                     'title' => $title,
                     'message' => $message,
@@ -325,11 +337,31 @@ class NotificationService
     public static function sendPromotion($user, $title, $message, $data = [])
     {
         Notification::create([
-            'user_id' => $user->id,
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user),
             'type' => 'promotion',
             'title' => $title,
             'message' => $message,
             'data' => $data
+        ]);
+    }
+
+    /**
+     * Send new order assignment notification to partner
+     */
+    public static function sendOrderAssignedToPartner($partner, $order)
+    {
+        Notification::create([
+            'notifiable_id' => $partner->id,
+            'notifiable_type' => get_class($partner),
+            'type' => 'order_assigned',
+            'title' => 'New Order Assigned! 🔔',
+            'message' => "You have been assigned a new order #{$order->id}. Please pick it up as soon as possible.",
+            'data' => [
+                'order_id' => $order->id,
+                'type' => isset($order->order_number) ? 'standard' : (isset($order->hotel_owner_id) ? 'food' : 'ten_min'),
+                'amount' => $order->amount ?? $order->total_amount
+            ]
         ]);
     }
 }

@@ -276,6 +276,14 @@ class DeliveryPartner extends Authenticatable
     }
 
     /**
+     * Update last active timestamp.
+     */
+    public function touchActivity(): bool
+    {
+        return $this->update(['last_active_at' => now()]);
+    }
+
+    /**
      * Calculate distance from a given location.
      */
     public function distanceFrom(float $latitude, float $longitude): ?float
@@ -499,48 +507,48 @@ class DeliveryPartner extends Authenticatable
     }
 
     /**
-     * Get today's earnings.
+     * Get today's earnings (₹30 per delivery).
      */
     public function getTodayEarningsAttribute(): float
     {
         $today = Carbon::today();
 
-        $standardEarnings = $this->deliveryRequests()
+        $standardCount = $this->deliveryRequests()
             ->where('status', 'completed')
             ->whereDate('delivered_at', $today)
-            ->sum('delivery_fee');
+            ->count();
 
-        $foodEarnings = $this->foodOrders()
+        $foodCount = $this->foodOrders()
             ->where('status', 'delivered')
             ->whereDate('updated_at', $today)
-            ->sum('delivery_fee');
+            ->count();
 
-        $tenMinEarnings = $this->tenMinOrders()
+        $tenMinCount = $this->tenMinOrders()
             ->where('status', 'delivered')
             ->whereDate('updated_at', $today)
-            ->sum('delivery_fee');
+            ->count();
 
-        return (float) ($standardEarnings + $foodEarnings + $tenMinEarnings);
+        return (float) (($standardCount + $foodCount + $tenMinCount) * 30);
     }
 
     /**
-     * Get total earnings.
+     * Get total earnings (₹30 per delivery).
      */
     public function getTotalEarningsAllAttribute(): float
     {
-        $standardEarnings = $this->deliveryRequests()
+        $standardCount = $this->deliveryRequests()
             ->where('status', 'completed')
-            ->sum('delivery_fee');
+            ->count();
 
-        $foodEarnings = $this->foodOrders()
+        $foodCount = $this->foodOrders()
             ->where('status', 'delivered')
-            ->sum('delivery_fee');
+            ->count();
 
-        $tenMinEarnings = $this->tenMinOrders()
+        $tenMinCount = $this->tenMinOrders()
             ->where('status', 'delivered')
-            ->sum('delivery_fee');
+            ->count();
 
-        return (float) ($standardEarnings + $foodEarnings + $tenMinEarnings);
+        return (float) (($standardCount + $foodCount + $tenMinCount) * 30);
     }
 
     /**

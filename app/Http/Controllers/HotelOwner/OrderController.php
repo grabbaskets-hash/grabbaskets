@@ -15,7 +15,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = FoodOrder::where('hotel_owner_id', Auth::guard('hotel_owner')->id())
-                          ->with(['items.foodItem']); // Eager load items and foodItem for performance
+            ->with(['items.foodItem']); // Eager load items and foodItem for performance
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
@@ -36,7 +36,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $order->load(['items.foodItem']);
+        $order->load(['items.foodItem', 'deliveryPartner']);
 
         return view('hotel-owner.orders.show', compact('order'));
     }
@@ -52,7 +52,7 @@ class OrderController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:pending,accepted,preparing,ready,delivered,cancelled',
+            'status' => 'required|in:pending,accepted,assigned,preparing,ready,delivered,cancelled',
         ]);
 
         $order->update(['status' => $request->status]);

@@ -464,6 +464,24 @@
                                 </div>
                             </div>
 
+                            <!-- Delivery Partner Info -->
+                            @if($order->deliveryPartner)
+                            <div class="shop-box mb-3 mx-4 mt-3 border-left-success" style="border-left-color: #28a745; background-color: #f0fff4;">
+                                <div class="fw-bold text-dark d-flex align-items-center">
+                                    <i class="bi bi-person-badge me-2"></i>
+                                    Delivery Partner: {{ $order->deliveryPartner->name }}
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-telephone me-2"></i> {{ $order->deliveryPartner->phone }}
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-bicycle me-2"></i> {{ $order->deliveryPartner->vehicle_number ?? 'Vehicle Not Listed' }}
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <!-- Items Preview -->
                             <div class="px-4 pb-3">
                                 @foreach($order->items->take(2) as $item)

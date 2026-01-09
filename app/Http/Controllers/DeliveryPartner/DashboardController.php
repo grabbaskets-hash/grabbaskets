@@ -41,15 +41,17 @@ class DashboardController extends Controller
                 'partner_name' => $partner->name
             ]);
 
-            // Quick load with minimal data + ensure view variables expected by the blade are present
-            // Compute full stats and collections used by the dashboard view. This may be slightly
-            // heavier than the minimal load but avoids undefined variable errors during rendering.
             $stats = $this->getDashboardStats($partner);
             $notifications = $this->getNotifications($partner, 10);
             $availableOrders = $this->getAvailableOrders($partner, 10);
             $recentOrders = $this->getRecentOrders($partner, 5);
 
             $activeOrder = $this->getActiveOrder($partner);
+
+            // Update pulse
+            if ($partner->is_online) {
+                $partner->touchActivity();
+            }
 
             return view('delivery-partner.dashboard.index', [
                 'partner' => $partner,
@@ -103,12 +105,12 @@ class DashboardController extends Controller
             'completed_orders' => $completedOrdersAll,
             'completion_rate' => $totalOrdersAll > 0 ? round(($completedOrdersAll / $totalOrdersAll) * 100, 1) : 0,
             'rating' => $partner->rating ?? 4.5,
-            'total_earnings' => $wallet ? $wallet->balance : 0,
-            'this_month_earnings' => $wallet ? $wallet->this_month_earnings : 0,
-            'today_earnings' => $wallet ? $wallet->today_earnings : 0,
+            'total_earnings' => $partner->total_earnings_all,
+            'this_month_earnings' => $partner->this_month_earnings, // Still using model field for now
+            'today_earnings' => $partner->today_earnings,
             'pending_orders' => $totalPendingAll,
             'today_deliveries' => $allToday,
-            'week_deliveries' => 0, // Need to implement week/month accessors if needed
+            'week_deliveries' => 0,
             'month_deliveries' => 0,
             'active_hours' => $this->getActiveHours($partner),
             'wallet_balance' => $wallet ? $wallet->balance : 0,
@@ -379,19 +381,25 @@ class DashboardController extends Controller
             ];
         }
 
-        // New order alerts (simulated)
-        if ($partner->isAvailableForDelivery()) {
-            $availableCount = $this->getAvailableOrders($partner)->count();
-            if ($availableCount > 0) {
-                $notifications[] = [
-                    'type' => 'success',
-                    'title' => 'New Orders Available',
-                    'message' => "{$availableCount} orders are available for pickup in your area.",
-                    'icon' => 'fas fa-shopping-bag',
-                    'time' => 'Now',
+        // Real database notifications
+        $dbNotifications = \App\Models\Notification::where('notifiable_type', get_class($partner))
+            ->where('notifiable_id', $partner->id)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($n) {
+                return [
+                    'id' => $n->id,
+                    'type' => $n->type === 'order_assigned' ? 'success' : 'info',
+                    'title' => $n->title,
+                    'message' => $n->message,
+                    'icon' => $n->type === 'order_assigned' ? 'fas fa-bell' : 'fas fa-info-circle',
+                    'time' => $n->created_at->diffForHumans(),
                 ];
-            }
-        }
+            })
+            ->toArray();
+
+        $notifications = array_merge($dbNotifications, $notifications);
 
         return array_slice($notifications, 0, $limit);
     }
@@ -522,6 +530,7 @@ class DashboardController extends Controller
                         ]);
                     }
                     $partner->goOnline();
+                    $partner->touchActivity();
                     break;
 
                 case 'offline':
