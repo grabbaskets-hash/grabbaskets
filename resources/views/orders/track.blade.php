@@ -512,7 +512,20 @@
                                 <div class="timeline-container">
                                     @php
                                         $status = strtolower($order['status']);
-                                        $steps = ['pending' => 1, 'confirmed' => 2, 'paid' => 2, 'shipped' => 3, 'delivered' => 4];
+                                        $steps = [
+                                            'pending' => 1,
+                                            'confirmed' => 2,
+                                            'paid' => 2,
+                                            'accepted' => 2,
+                                            'packing' => 2,
+                                            'ready' => 2,
+                                            'assigned' => 2,
+                                            'shipped' => 3,
+                                            'picked_up' => 3,
+                                            'out_for_delivery' => 3,
+                                            'on_the_way' => 3,
+                                            'delivered' => 4
+                                        ];
                                         $currentStep = $steps[$status] ?? 1;
                                         $progress = (($currentStep - 1) / 3) * 100;
                                         if ($status === 'cancelled')
@@ -537,7 +550,7 @@
                                         <div
                                             class="timeline-step {{ $currentStep >= 3 ? 'completed' : '' }} {{ $currentStep == 3 ? 'active' : '' }}">
                                             <div class="step-icon-box"><i class="bi bi-box-seam"></i></div>
-                                            <div class="step-label">Shipped</div>
+                                            <div class="step-label">On the Way</div>
                                         </div>
                                         <div
                                             class="timeline-step {{ $currentStep >= 4 ? 'completed' : '' }} {{ $currentStep == 4 ? 'active' : '' }}">
