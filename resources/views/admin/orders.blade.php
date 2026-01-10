@@ -13,8 +13,6 @@
             background-color: #f4f6f9;
         }
 
-
-
         .content {
             margin-left: 230px;
             padding: 20px;
@@ -37,11 +35,6 @@
             z-index: 1200;
         }
 
-        .img {
-            position: relative;
-            margin-top: -40px;
-        }
-
         .filter-controls {
             background: #fff;
             border-radius: 8px;
@@ -50,7 +43,7 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
-        /* Fix pagination styling to match your design */
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -58,15 +51,12 @@
             gap: 5px;
         }
 
-        .pagination .page-item {
-            margin: 0;
-        }
-
         .pagination .page-link {
             color: #2c3e50;
             border: 1px solid #ddd;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
+            font-size: 0.875rem;
             transition: all 0.3s ease;
         }
 
@@ -82,7 +72,7 @@
             border-color: #3498db;
         }
 
-        /* Table styling to match your design */
+        /* Table */
         .table thead th {
             background-color: #2c3e50;
             color: white;
@@ -94,71 +84,18 @@
             background-color: #f8f9fa;
         }
 
-        .btn-update {
-            padding: 5px 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-update:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-save {
-            padding: 5px 10px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-save:hover {
-            background-color: #27ae60;
-        }
-
         .payment-badge {
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
 
-        .payment-badge.paypal {
-            background-color: #003087;
-            color: white;
-        }
+        .payment-badge.paypal { background-color: #003087; color: white; }
+        .payment-badge.credit-card { background-color: #2c3e50; color: white; }
+        .payment-badge.cod { background-color: #e67e22; color: white; }
 
-        .payment-badge.credit-card {
-            background-color: #2c3e50;
-            color: white;
-        }
-
-        .payment-badge.cod {
-            background-color: #e67e22;
-            color: white;
-        }
-
-        /* Header styling */
-        .card-header {
-            background-color: #2c3e50;
-            color: white;
-            font-weight: 600;
-        }
-
-        /* Status dropdown styling */
-        .form-select {
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-
-
-        /* ===== OLD-STYLE SIDEBAR (FLAT DARK) ===== */
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -171,19 +108,36 @@
             z-index: 1000;
             box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100vh;
         }
 
         .sidebar .logo {
-            margin-top: -40px
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            margin-top: -20px;
         }
 
+        .sidebar .logo img {
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+        }
 
-
+        .sidebar-content {
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 15px 20px;
+            height: calc(10;100vh - 140px);
+            margin-top: 30px;
+        }
 
         .sidebar .nav-link {
             color: #bdc3c7;
-            margin: 8px 15px;
-            padding: 12px 20px;
+            margin: 6px 0;
+            padding: 10px 15px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -201,7 +155,6 @@
 
         .sidebar .nav-link.active {
             background-color: #007bff;
-            color: white;
             border-left: 4px solid #0056b3;
         }
 
@@ -220,47 +173,12 @@
             background-color: #2d2d40;
         }
 
-        /* ===== MOBILE SIDEBAR TOGGLE ===== */
         @media (max-width: 768px) {
-            .sidebar {
-                left: -250px;
-            }
-
-            .sidebar.show {
-                left: 0;
-            }
+            .sidebar { left: -250px; }
+            .sidebar.show { left: 0; }
         }
 
-        .sidebar .logo img {
-            margin-top: 60px;
-            position: relative;
-            left: 30px;
-            transition: transform 0.2s;
-        }
-
-        /* === SCROLLABLE SIDEBAR CONTENT === */
-        .sidebar {
-            /* Ensure the sidebar itself doesn't scroll, only its content */
-            overflow: hidden;
-            /* Keep your existing height */
-            height: 100vh;
-        }
-
-        .sidebar-content {
-            /* This is the key: make only this part scrollable */
-            overflow-y: auto;
-            overflow-x: hidden;
-            /* Add some padding at the bottom so the logout button isn't stuck to the edge */
-            padding-bottom: 20px;
-            /* This ensures the scrollbar appears inside the sidebar */
-            height: calc(100vh - 180px);
-            /* Adjust '180px' if your logo/header height changes */
-            padding-left: 15px;
-            margin-top: 50px;
-            padding-right: 15px;
-        }
-
-        /* Optional: Style the scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+        /* Scrollbar */
         .sidebar-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -279,24 +197,10 @@
             background: #777;
         }
 
-        /* === SIDEBAR LOGO BOX === */
-        .sidebar .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
-            height: 100px;
-        }
-
-        .sidebar .logo img {
-            width: 150px;
-            height: 200px;
-            object-fit: cover;
-            /* Pull up slightly to counter height increase */
-            /* margin-bottom: -50px; */
+        /* Small button tweak */
+        .filter-controls .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -308,41 +212,27 @@
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-header">
             <div class="logo">
-                <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo" width="150px">
+                <img src="{{ asset('asset/images/grabbasket.png') }}" alt="Logo">
             </div>
         </div>
         <div class="sidebar-content">
             <ul class="nav nav-pills flex-column">
-                <li><a class="nav-link " href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i>
-                        Dashboard</a></li>
-                <li><a class="nav-link " href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i>
-                        Products</a></li>
+                <li><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a class="nav-link" href="{{ route('admin.products') }}"><i class="bi bi-box-seam"></i> Products</a></li>
                 <li><a class="nav-link {{ $activeType === 'standard' ? 'active' : '' }}" href="{{ route('admin.orders') }}"><i class="bi bi-cart-check"></i> Standard Orders</a></li>
                 <li><a class="nav-link {{ $activeType === 'food' ? 'active' : '' }}" href="{{ route('admin.orders.food') }}"><i class="bi bi-egg-fried"></i> Food Orders</a></li>
                 <li><a class="nav-link {{ $activeType === 'express' ? 'active' : '' }}" href="{{ route('admin.orders.express') }}"><i class="bi bi-lightning-charge"></i> Express Orders</a></li>
-                <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track
-                        Package</a></li>
-                <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a>
-                </li>
-                <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner
-                        Management</a></li>
-                <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i
-                            class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
-                <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i
-                            class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
-                <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i>
-                        Promotional Notifications</a></li>
-                <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS
-                        Management</a></li>
-                <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk
-                        Product Upload</a></li>
-                <li><a class="nav-link" href="{{ route('admin.warehouse.dashboard') }}"><i class="bi bi-shop"></i>
-                        Warehouse Management</a></li>
-                <li><a class="nav-link" href="{{ route('admin.delivery-partners.dashboard') }}"><i
-                            class="bi bi-bicycle"></i> Delivery Partners</a></li>
-                <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}">
-                        <i class="bi bi-box-arrow-right"></i> Logout</a>
-                </li>
+                <li><a class="nav-link" href="{{ route('tracking.form') }}"><i class="bi bi-truck"></i> Track Package</a></li>
+                <li><a class="nav-link" href="{{ route('admin.manageuser') }}"><i class="bi bi-people"></i> Users</a></li>
+                <li><a class="nav-link" href="{{ route('admin.banners.index') }}"><i class="bi bi-images"></i> Banner Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.index-editor.index') }}"><i class="bi bi-house-gear-fill"></i> Index Page Editor</a></li>
+                <li><a class="nav-link" href="{{ route('admin.category-emojis.index') }}"><i class="bi bi-emoji-smile-fill"></i> Category Emojis</a></li>
+                <li><a class="nav-link" href="{{ route('admin.promotional.form') }}"><i class="bi bi-bell-fill"></i> Promotional Notifications</a></li>
+                <li><a class="nav-link" href="{{ route('admin.sms.dashboard') }}"><i class="bi bi-chat-dots"></i> SMS Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.bulkProductUpload') }}"><i class="bi bi-upload"></i> Bulk Product Upload</a></li>
+                <li><a class="nav-link" href="{{ route('admin.warehouse.dashboard') }}"><i class="bi bi-shop"></i> Warehouse Management</a></li>
+                <li><a class="nav-link" href="{{ route('admin.delivery-partners.dashboard') }}"><i class="bi bi-bicycle"></i> Delivery Partners</a></li>
+                <li><a class="nav-link text-danger" href="{{ route('admin.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
         </div>
     </div>
@@ -358,16 +248,16 @@
 
             {{-- 🔍 Filter Controls --}}
             <div class="filter-controls">
-                <form method="GET" class="row g-3 align-items-end">
+                <form method="GET" class="row g-2 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label">Search</label>
-                        <input type="text" name="search" class="form-control" value="{{ request('search') }}"
+                        <label class="form-label small">Search</label>
+                        <input type="text" name="search" class="form-control form-control-sm" value="{{ request('search') }}"
                             placeholder="Customer or Product...">
                     </div>
                     @if($activeType === 'all')
                     <div class="col-md-2">
-                        <label class="form-label">Order Type</label>
-                        <select name="type" class="form-select">
+                        <label class="form-label small">Order Type</label>
+                        <select name="type" class="form-select form-select-sm">
                             <option value="all">All Types</option>
                             <option value="standard" {{ request('type') == 'standard' ? 'selected' : '' }}>Standard</option>
                             <option value="food" {{ request('type') == 'food' ? 'selected' : '' }}>Food</option>
@@ -376,9 +266,9 @@
                     </div>
                     @endif
                     <div class="col-md-1">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select">
-                            <option value="all">All Statuses</option>
+                        <label class="form-label small">Status</label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="all">All</option>
                             @foreach($statuses as $status)
                                 <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
                                     {{ $status }}
@@ -387,15 +277,15 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">From</label>
-                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                        <label class="form-label small">From</label>
+                        <input type="date" name="start_date" class="form-control form-control-sm" value="{{ request('start_date') }}">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">To</label>
-                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                        <label class="form-label small">To</label>
+                        <input type="date" name="end_date" class="form-control form-control-sm" value="{{ request('end_date') }}">
                     </div>
-                    <div class="col-md-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary w-100">
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
                             <i class="bi bi-funnel"></i> Filter
                         </button>
                         @php
@@ -405,7 +295,7 @@
                                 default => 'admin.orders'
                             };
                         @endphp
-                        <a href="{{ route($resetRoute) }}" class="btn btn-outline-secondary">
+                        <a href="{{ route($resetRoute) }}" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1">
                             <i class="bi bi-arrow-repeat"></i> Reset
                         </a>
                     </div>
@@ -447,7 +337,7 @@
                                                 default => 'bg-primary'
                                             };
                                         @endphp
-                                        <span class="badge {{ $badgeClass }}">{{ ucfirst($typeLabel) }}</span>
+                                        <span class="badge {{ $badgeClass }} py-1 px-2">{{ ucfirst($typeLabel) }}</span>
                                     </td>
                                     <td>
                                         <i class="bi bi-person-circle text-primary"></i>
@@ -476,22 +366,22 @@
                                     <td class="fw-semibold text-success">₹{{ number_format($order->amount ?? $order->total_amount ?? $order->order_total ?? 0, 2) }}</td>
                                     <td>
                                         @if($typeLabel === 'standard')
-                                            <!-- ✅ Standard Order: Editable Status -->
                                             <form action="{{ route('admin.updateOrderStatus', $order->id) }}" method="POST"
                                                 class="d-flex align-items-center justify-content-center gap-2">
                                                 @csrf
                                                 <input type="hidden" name="order_type" value="{{ $typeLabel }}">
                                                 <select name="status" class="form-select form-select-sm w-auto">
                                                     <option value="Pending" {{ strtolower($order->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                    <option value="Preparing" {{ strtolower($order->status) == 'preparing' || strtolower($order->status) == 'confirmed' ? 'selected' : '' }}>Preparing</option>
-                                                    <option value="Shipped" {{ strtolower($order->status) == 'shipped' || strtolower($order->status) == 'out for delivery' ? 'selected' : '' }}>Shipped</option>
+                                                    <option value="Preparing" {{ in_array(strtolower($order->status), ['preparing', 'confirmed']) ? 'selected' : '' }}>Preparing</option>
+                                                    <option value="Shipped" {{ in_array(strtolower($order->status), ['shipped', 'out for delivery']) ? 'selected' : '' }}>Shipped</option>
                                                     <option value="Delivered" {{ strtolower($order->status) == 'delivered' ? 'selected' : '' }}>Delivered</option>
                                                     <option value="Cancelled" {{ strtolower($order->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                                 </select>
-                                                <button type="submit" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bi bi-check2"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-outline-primary shadow-sm">
+                                                    <i class="bi bi-check2"></i>
+                                                </button>
                                             </form>
                                         @else
-                                            <!-- ✅ Food & Express: Read-only Dashboard Status -->
                                             @php
                                                 $status = strtolower($order->status ?? 'pending');
                                                 $variant = match($status) {
@@ -503,7 +393,7 @@
                                                     default => 'secondary'
                                                 };
                                             @endphp
-                                            <span class="badge rounded-pill bg-{{ $variant }} px-3 py-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                            <span class="badge rounded-pill bg-{{ $variant }} px-2 py-1 text-uppercase" style="font-size: 0.7rem;">
                                                 {{ $order->status }}
                                             </span>
                                             <div class="mt-1 small text-muted">Managed by Seller</div>
@@ -511,28 +401,24 @@
                                     </td>
                                     <td>
                                         @if($typeLabel === 'standard')
-                                            <!-- Tracking for standard -->
                                             <form action="{{ route('admin.updateTracking', $order->id) }}" method="POST"
-                                                class="d-flex flex-column gap-2">
+                                                class="d-flex flex-column gap-1">
                                                 @csrf
-                                                <div class="d-flex gap-2">
+                                                <div class="d-flex gap-1">
                                                     <input type="text" name="tracking_number"
                                                         value="{{ $order->tracking_number }}"
-                                                        class="form-control form-control-sm" placeholder="Tracking Number">
+                                                        class="form-control form-control-sm" placeholder="Tracking #">
                                                     <select name="courier_name" class="form-select form-select-sm">
                                                         <option value="">Courier</option>
                                                         <option value="Delhivery" {{ $order->courier_name == 'Delhivery' ? 'selected' : '' }}>Delhivery</option>
                                                         <option value="Blue Dart" {{ $order->courier_name == 'Blue Dart' ? 'selected' : '' }}>Blue Dart</option>
-                                                        <!-- ... other couriers ... -->
                                                     </select>
                                                 </div>
-                                                <button type="submit" class="btn btn-sm btn-outline-success">Update
-                                                    Tracking</button>
+                                                <button type="submit" class="btn btn-sm btn-outline-success">Update</button>
                                             </form>
                                         @else
-                                            <!-- Partner Assignment for Food/Express -->
                                             <form action="{{ route('admin.assignDeliveryPartner', $order->id) }}" method="POST"
-                                                class="d-flex flex-column gap-2">
+                                                class="d-flex flex-column gap-1">
                                                 @csrf
                                                 <input type="hidden" name="order_type" value="{{ $typeLabel }}">
                                                 <select name="delivery_partner_id" class="form-select form-select-sm">
@@ -542,13 +428,9 @@
                                                             {{ $order->delivery_partner_id == $partner->id ? 'selected' : '' }}
                                                             {{ (!$partner->is_online || !$partner->is_available || $partner->current_order_id) && $order->delivery_partner_id != $partner->id ? 'disabled' : '' }}>
                                                             {{ $partner->name }}
-                                                            @if(!$partner->is_online)
-                                                                (Offline)
-                                                            @elseif(!$partner->is_available || $partner->current_order_id)
-                                                                (Busy)
-                                                            @else
-                                                                (Available)
-                                                            @endif
+                                                            @if(!$partner->is_online) (Offline)
+                                                            @elseif(!$partner->is_available || $partner->current_order_id) (Busy)
+                                                            @else (Available) @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -565,8 +447,7 @@
                                             <span class="badge payment-badge credit-card">{{ $order->payment_method }}</span>
                                         @endif
                                     </td>
-                                    <td><i class="bi bi-calendar-event"></i>
-                                        {{ $order->created_at->format('d M Y, h:i A') }}</td>
+                                    <td><i class="bi bi-calendar-event"></i> {{ $order->created_at->format('d M Y, h:i A') }}</td>
                                 </tr>
                             @empty
                                 <tr>
