@@ -152,6 +152,41 @@
             border-bottom-right-radius: 20px;
         }
 
+        .mobile-delivery-announcement {
+            display: none;
+        }
+
+        @media (max-width: 991px) {
+            .mobile-delivery-announcement {
+                display: block;
+                background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+                color: white !important;
+                text-align: center;
+                padding: 18px 20px;
+                font-size: 1rem;
+                font-weight: 800;
+                text-decoration: none;
+                border-radius: 20px;
+                margin: 0 15px 25px;
+                box-shadow: 0 10px 25px rgba(255, 107, 0, 0.25);
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .mobile-delivery-announcement:active {
+                transform: scale(0.97);
+                box-shadow: 0 5px 15px rgba(255, 107, 0, 0.2);
+            }
+
+            .mobile-delivery-announcement i {
+                font-size: 1.4rem;
+                vertical-align: middle;
+                margin-left: 5px;
+            }
+        }
+
         .mobile-menu-trigger {
             background: rgba(255, 255, 255, 0.2);
             border: none;
@@ -784,7 +819,7 @@
                 background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
                 background-size: cover;
                 background-position: center;
-                height: 250px;
+                height: 280px;
                 border-radius: 20px;
                 padding: 30px;
                 display: flex;
@@ -793,7 +828,16 @@
                 margin: 20px 15px;
                 box-shadow: 0 10px 20px rgba(0,0,0,0.2);
                 border: 1px solid rgba(255,255,255,0.2);
-                animation: floatBanner 4s ease-in-out infinite;
+            }
+
+            /* Unify mobile carousel items height and animation */
+            #mobileBannerCarousel .hero-banner,
+            #mobileBannerCarousel .munchies-banner,
+            #mobileBannerCarousel .food-promo-card {
+                height: 280px !important;
+                min-height: 280px !important;
+                animation: floatBanner 4s ease-in-out infinite !important;
+                margin: 0 !important;
             }
 
             .munchies-banner h3 {
@@ -1494,6 +1538,7 @@
                 flex-direction: column;
                 padding: 30px;
                 text-align: center;
+                height: auto;
             }
             .food-promo-content {
                 margin-bottom: 30px;
@@ -1824,7 +1869,7 @@
                                 </a></li>
                                 <li><a class="dropdown-item py-2 d-flex align-items-center" href="/wishlist">
                                     <i class="bi bi-heart me-2 text-danger"></i> Wishlist
-                                </a></li>
+                                </a></li> 
                                 <li><a class="dropdown-item py-2 d-flex align-items-center" href="/orders/track">
                                     <i class="bi bi-truck me-2 text-primary"></i> Orders
                                 </a></li>
@@ -1870,27 +1915,9 @@
         </div>
 
         <main class="mobile-main-content">
-            <!-- Quick Services Section -->
-            <section class="quick-services-section">
-                <div class="services-grid">
-                    <a href="/tenmins" class="service-tile grocery-tile">
-                        <div class="tile-icon">🛒</div>
-                        <div class="tile-label">10 Mins<br>Delivery</div>
-                    </a>
-                    <a href="{{ route('customer.food.index') }}" class="service-tile food-tile">
-                        <div class="tile-icon">🥘</div>
-                        <div class="tile-label">Delicious<br>Food</div>
-                    </a>
-                    <a href="#" class="service-tile meat-tile">
-                        <div class="tile-icon">🥩</div>
-                        <div class="tile-label">Fish &<br>Meat</div>
-                    </a>
-                    <a href="#" class="service-tile library-tile">
-                        <div class="tile-icon">📚</div>
-                        <div class="tile-label">Library &<br>Books</div>
-                    </a>
-                </div>
-            </section>
+            <a href="/tenmins" class="mobile-delivery-announcement">
+                ⚡ 10-Minute Delivery – Groceries & Food <i class="bi bi-arrow-right-short"></i>
+            </a>
             <div id="mobileBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" style="margin: 20px 15px 20px;">
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -1898,39 +1925,8 @@
                     <button type="button" data-bs-target="#mobileBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                 </div>
                 <div class="carousel-inner" style="border-radius: 24px; overflow: hidden;">
-                    <!-- Slide 1: Hiring / Night City / Fireworks -->
+                    <!-- Slide 1: Hiring (Theme 3 content) -->
                     <div class="carousel-item active">
-                        <div class="hero-banner">
-                            <div class="firework fw-1"></div>
-                            <div class="firework fw-2"></div>
-                            <div class="firework fw-3"></div>
-                            <div class="firework fw-4"></div>
-                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
-                            <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
-                                Join Now
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Slide 2: Hiring / Dark Team / Fireworks (Duplicate Content) -->
-                    <div class="carousel-item">
-                         <div class="hero-banner hero-banner-hiring-2">
-                            <div class="firework fw-1"></div>
-                            <div class="firework fw-2"></div>
-                            <div class="firework fw-3"></div>
-                            <div class="firework fw-4"></div>
-                            <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
-                            <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
-                            <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
-                                Join Now
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Slide 3: Partnership -->
-                    <!-- Slide 3: Hiring / Delivery Theme -->
-                    <div class="carousel-item">
                         <div class="hero-banner hero-banner-hiring-3">
                             <div class="firework fw-1"></div>
                             <div class="firework fw-2"></div>
@@ -1938,11 +1934,41 @@
                             <div class="firework fw-4"></div>
                             <span class="badge bg-warning text-dark mb-2" style="position:relative; z-index:2;">🚀 Career Opportunity</span>
                             <h2>We Are Hiring: Secure Your Future</h2>
-                            <p>Join our elite program! Pay a one-time fee of ₹50,000 and earn a guaranteed ₹24,000 per month.</p>
+                            <p>Join our elite program! Pay a one-time fee of ₹30,000 and earn a guaranteed ₹15,000 per month.</p>
                             <button class="join-btn-banner mt-2 style-join-btn" onclick="window.location.href='https://forms.gle/zsTCTdKv1dxcA7QL7'">
                                 Join Now
                             </button>
                         </div>
+                    </div>
+                    <!-- Slide 2: Munchies Banner -->
+                    <div class="carousel-item">
+                        <div class="munchies-banner" style="border-radius: 24px;">
+                            <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
+                            <h3>⚡ Instant Munchies</h3>
+                            <p>Quick snacks and drinks delivered in minutes!</p>
+                            <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Slide 3: Delicious Food Banner -->
+                    <div class="carousel-item">
+                        <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
+                            <div class="food-promo-card" style="border-radius: 24px; padding: 25px; position: relative; overflow: hidden;">
+                                <div class="firework fw-1"></div>
+                                <div class="firework fw-2"></div>
+                                <div class="firework fw-3"></div>
+                                <div class="firework fw-4"></div>
+                                <div class="food-promo-content">
+                                    <div class="food-badge">
+                                        <i class="bi bi-fire"></i> Hot & Fresh
+                                    </div>
+                                    <h2 class="promo-title" style="font-size: 1.5rem;">Delicious Food <br> Delivered to Your Door</h2>
+                                    <p class="promo-text" style="font-size: 0.9rem; margin-bottom: 15px;">Order from top restaurants and get it delivered in minutes.</p>
+                                    <span class="cta-food-btn" style="padding: 10px 20px;">
+                                        Order Now <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1998,33 +2024,9 @@
                     @endforeach
                 </div>
             </div>
-            <!-- Food Order Promotion (Mobile) -->
-            <div class="food-promo-section">
-                <a href="{{ route('customer.food.index') }}" class="text-decoration-none">
-                    <div class="food-promo-card">
-                        <div class="food-promo-content">
-                            <div class="food-badge">
-                                <i class="bi bi-fire"></i> Hot & Fresh
-                            </div>
-                            <h2 class="promo-title">Delicious Food <br> Delivered to Your Door</h2>
-                            <p class="promo-text">Order from top restaurants and get it delivered in minutes. Experience the taste of your city with GrabBaskets.</p>
-                            <span class="cta-food-btn">
-                                Order Now <i class="bi bi-arrow-right"></i>
-                            </span>
-                        </div>
-                        <div class="food-promo-image">
-                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1160&q=80" alt="Delicious Food">
-                        </div>
-                    </div>
-                </a>
-            </div>
 
-            <div class="munchies-banner">
-                <div class="fast-delivery-badge"><i class="bi bi-stopwatch-fill"></i> 10 Mins Fast Delivery</div>
-                <h3>⚡ Instant Munchies</h3>
-                <p>Quick snacks and drinks delivered in minutes!</p>
-                <a href="/tenmins" class="browse-btn">Browse <i class="bi bi-arrow-right"></i></a>
-            </div>
+
+
 
             <div class="product-rail">
                 <div class="rail-header">
