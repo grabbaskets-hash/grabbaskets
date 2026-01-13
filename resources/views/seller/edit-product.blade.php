@@ -292,8 +292,8 @@ label {
         <div class="col-md-6">          
 <label>10 Minutes Delivery?</label>
 <select name="ten_min_delivery" class="form-control" required>
-<option value="no">No</option>
-<option value="yes">Yes</option>
+    <option value="no" {{ old('ten_min_delivery', isset($isTenMin) && $isTenMin ? 'yes' : 'no') == 'no' ? 'selected' : '' }}>No</option>
+    <option value="yes" {{ old('ten_min_delivery', isset($isTenMin) && $isTenMin ? 'yes' : 'no') == 'yes' ? 'selected' : '' }}>Yes</option>
 </select>
 </div>
                 <div class="col-md-6">

@@ -1182,11 +1182,16 @@ class SellerController extends Controller
 
             $categories = Category::all();
             $subcategories = Subcategory::all();
+
+            // Check if product is in 10-min delivery
+            $isTenMin = \App\Models\TenMinDeliveryProduct::where('product_id', $product->id)->exists();
+
             Log::info('editProduct: categories/subcategories loaded', [
                 'categories_count' => $categories->count(),
-                'subcategories_count' => $subcategories->count()
+                'subcategories_count' => $subcategories->count(),
+                'is_ten_min' => $isTenMin
             ]);
-            return view('seller.edit-product', compact('product', 'categories', 'subcategories'));
+            return view('seller.edit-product', compact('product', 'categories', 'subcategories', 'isTenMin'));
         } catch (\Throwable $e) {
             Log::error('editProduct: Exception', [
                 'error' => $e->getMessage(),
@@ -1877,11 +1882,96 @@ class SellerController extends Controller
             'delivery_charge'
         ]);
 
-        /*  
-    ---------------------------------------
-    YOUR IMAGE LOGIC (UNCHANGED)  
-    ---------------------------------------
-    */
+        // Handle Image Upload
+        if ($request->hasFile('image')) {
+            try {
+                $image = $request->file('image');
+                $sellerId = Auth::id();
+                $folder = "products/seller-{$sellerId}";
+                $originalName = $image->getClientOriginalName();
+                $originalNameSlug = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+                $ext = $image->getClientOriginalExtension();
+                $filename = $originalNameSlug . '-' . time() . '-' . Str::random(4) . '.' . $ext;
+
+                // DUAL STORAGE: Save to both AWS R2 and Git storage for redundancy
+                $r2Path = null;
+                $publicPath = null;
+                $r2Success = false;
+                $publicSuccess = false;
+                $finalPath = null;
+
+                // Try AWS R2 first
+                try {
+                    $r2Path = $image->storeAs($folder, $filename, 'r2');
+                    $r2Success = !empty($r2Path);
+                } catch (\Throwable $r2Ex) {
+                    Log::warning('AWS R2 upload failed during product update', [
+                        'error' => $r2Ex->getMessage(),
+                        'product_id' => $product->id
+                    ]);
+                }
+
+                // Then save to Git storage (public disk)
+                try {
+                    $publicPath = $image->storeAs($folder, $filename, 'public');
+                    $publicSuccess = !empty($publicPath);
+                } catch (\Throwable $publicEx) {
+                    Log::warning('Git storage upload failed during product update', [
+                        'error' => $publicEx->getMessage(),
+                        'product_id' => $product->id
+                    ]);
+                }
+
+                // Use whichever path was successful (prefer R2)
+                $finalPath = $r2Success ? $r2Path : $publicPath;
+
+                if ($finalPath) {
+                    // Delete old image if exists
+                    if ($product->image) {
+                        try {
+                            Storage::disk('r2')->delete($product->image);
+                        } catch (\Throwable $e) {
+                        }
+                        try {
+                            Storage::disk('public')->delete($product->image);
+                        } catch (\Throwable $e) {
+                        }
+                    }
+
+                    $data['image'] = $finalPath;
+
+                    Log::info('Product image updated with dual storage', [
+                        'product_id' => $product->id,
+                        'path' => $finalPath,
+                        'r2_success' => $r2Success,
+                        'public_success' => $publicSuccess
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Product image update failed', ['error' => $e->getMessage()]);
+                // Continue with update even if image fails, or flash error? 
+                // Better to just log for now to avoid breaking the text update.
+            }
+        } elseif ($request->filled('library_image_url')) {
+            // Handle Library Image Selection
+            $url = $request->input('library_image_url');
+            // Try to extract relative path if it matches our storage domain
+            // This is a basic implementation - assuming the URL structure matches our storage
+            $r2Domain = 'https://fls-a00f1665-d58e-4a6d-a69d-0dc4be26102f.laravel.cloud';
+            if (str_starts_with($url, $r2Domain)) {
+                $data['image'] = str_replace($r2Domain . '/', '', $url);
+            } elseif (str_contains($url, '/storage/')) {
+                // If it's a local public URL
+                $parts = explode('/storage/', $url);
+                if (count($parts) > 1) {
+                    $data['image'] = $parts[1];
+                }
+            } else {
+                // Determine if we should store the full URL or handle it differently
+                // For now, if it's external or unknown, we might not update it to avoid breaking 'image' path expectation
+                // or just store it if the model supports full URLs.
+            }
+        }
 
         // After image logic ends → IMPORTANT
         $product->update($data);
