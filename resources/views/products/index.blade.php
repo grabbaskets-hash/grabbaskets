@@ -523,6 +523,9 @@
         </form>
 
         <div class="header-actions">
+          <a href="{{ route('food.shops.index') }}" class="header-btn">
+            <i class="bi bi-shop"></i> Restaurants
+          </a>
           @auth
             <a href="{{ route('cart.index') }}" class="header-btn">
               <i class="bi bi-cart3"></i> Cart

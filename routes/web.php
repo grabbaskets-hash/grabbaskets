@@ -585,6 +585,11 @@ Route::get('/products/food-delivery', [App\Http\Controllers\SimpleSearchControll
 // Food delivery main page route (alias for convenience)
 Route::get('/food', [App\Http\Controllers\SimpleSearchController::class, 'foodDelivery'])->name('food.index');
 
+// Food Shops Routes
+Route::get('/food/shops', [App\Http\Controllers\FoodShopController::class, 'index'])->name('food.shops.index');
+Route::get('/food/shop/{id}', [App\Http\Controllers\FoodShopController::class, 'show'])->name('food.shops.show');
+Route::post('/food/cart/add/{id}', [App\Http\Controllers\FoodShopController::class, 'addToCart'])->name('food.cart.add');
+
 // AJAX search routes disabled per user request
 // Route::get('/api/search/instant', [App\Http\Controllers\SimpleSearchController::class, 'instantSearch'])->name('search.instant');
 // Route::get('/api/search/suggestions', [App\Http\Controllers\SimpleSearchController::class, 'suggestions'])->name('search.suggestions');

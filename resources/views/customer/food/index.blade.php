@@ -664,6 +664,7 @@
                 </div>
             </div>
 
+             
             <div class="right-nav">
                 <a href="{{ route('customer.food.cart') }}" class="nav-link-item position-relative">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -674,7 +675,10 @@
                         </span>
                     @endif
                 </a>
-
+                <a href="{{ route('food.shops.index') }}" class="nav-link-item">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Restaurants</span>
+                </a>
                 @auth
                     <div class="dropdown">
                         <a href="#" class="nav-link-item dropdown-toggle" data-bs-toggle="dropdown">
