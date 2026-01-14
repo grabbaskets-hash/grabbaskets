@@ -1946,6 +1946,37 @@ class SellerController extends Controller
                         'r2_success' => $r2Success,
                         'public_success' => $publicSuccess
                     ]);
+
+                    // ✅ SYNC WITH PRODUCT GALLERY (ProductImage)
+                    // Find the primary or first image to update
+                    $galleryImage = \App\Models\ProductImage::where('product_id', $product->id)
+                        ->where('is_primary', true)
+                        ->first();
+
+                    if (!$galleryImage) {
+                        $galleryImage = \App\Models\ProductImage::where('product_id', $product->id)->first();
+                    }
+
+                    if ($galleryImage) {
+                        // Update existing gallery record
+                        $galleryImage->update([
+                            'image_path' => $finalPath,
+                            'original_name' => $originalName,
+                            'mime_type' => $image->getMimeType(),
+                            'file_size' => $image->getSize(),
+                        ]);
+                    } else {
+                        // Create new gallery record if none existed
+                        \App\Models\ProductImage::create([
+                            'product_id' => $product->id,
+                            'image_path' => $finalPath,
+                            'original_name' => $originalName,
+                            'mime_type' => $image->getMimeType(),
+                            'file_size' => $image->getSize(),
+                            'sort_order' => 1,
+                            'is_primary' => true,
+                        ]);
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error('Product image update failed', ['error' => $e->getMessage()]);
