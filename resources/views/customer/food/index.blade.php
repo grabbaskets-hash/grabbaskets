@@ -459,7 +459,6 @@
 
         .footer-spacer { height: 80px; }
     </style>
-    @include('partials.footer-styles')
 </head>
 
 <body>
@@ -743,7 +742,6 @@
         </a>
     </div>
 
-    @include('partials.footer')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
