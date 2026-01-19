@@ -589,9 +589,10 @@
 
             .items-grid { 
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                gap: 16px 12px; /* Increased row gap */
                 padding: 0;
                 margin: 0;
+                align-items: stretch; /* Force same height in row */
             }
             
             .premium-food-card {
@@ -599,68 +600,100 @@
                 width: 100%;
                 border-radius: 12px;
                 background: #fff;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
             }
             
             .card-img-container { 
+                width: 100%;
                 height: auto;
                 aspect-ratio: 4 / 3;
                 border-radius: 12px;
                 margin-bottom: 6px;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+                position: relative;
+                overflow: hidden;
             }
             
             .food-info {
-                padding: 0 4px 8px;
+                padding: 0 2px 4px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
             }
             
             .food-name-h { 
                 font-size: 0.95rem;
                 margin-bottom: 2px;
                 font-weight: 600;
+                height: 2.4em; /* Fixed height for 2 lines */
+                line-height: 1.2;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                white-space: normal;
+                text-overflow: ellipsis;
             }
             
             .discount-tag { 
-                font-size: 0.7rem;
-                bottom: 6px;
-                left: 6px;
+                font-size: 0.65rem;
+                bottom: 8px;
+                left: 8px;
                 font-weight: 700;
+                width: calc(100% - 16px);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .meta-row { 
-                gap: 6px;
-                font-size: 0.8rem;
-                margin-bottom: 2px;
+                gap: 4px;
+                font-size: 0.75rem;
+                margin-bottom: 4px;
+                align-items: center;
             }
             
             .rating-box { 
-                font-size: 0.75rem; 
-                padding: 1px 5px;
+                font-size: 0.7rem; 
+                padding: 1px 4px;
+                min-width: 32px;
+                justify-content: center;
             }
             
             .food-details-text {
-                font-size: 0.8rem;
-                margin-bottom: 2px;
+                font-size: 0.75rem;
+                margin-bottom: 4px;
                 color: var(--text-light);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .price-tag {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
                 font-weight: 600;
+                margin-top: auto; /* Push to bottom */
             }
             
             .veg-nonveg-indicator {
                 top: 6px;
                 right: 6px;
                 padding: 1px 4px;
-                font-size: 0.55rem;
+                font-size: 0.5rem;
+                z-index: 2;
             }
             
-            /* Section Title Adjustment */
+            .delivery-time {
+                white-space: nowrap;
+            }
+
             .section-title {
-                font-size: 1.25rem;
-                margin-bottom: 15px;
-                padding-left: 5px;
+                font-size: 1.2rem;
+                margin-bottom: 12px;
+                padding-left: 0;
             }
         }
 
