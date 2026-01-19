@@ -3,10 +3,12 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>GrabBaskets — Food Delivery</title>
     <!-- Google Fonts: Inter & Outfit -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -17,16 +19,12 @@
             --text-main: #3D4152;
             --text-light: #686B78;
             --bg-gray: #F1F4F6;
-            --rating-bg: #48C479;
+            --rating: #48C479;
             --white: #FFFFFF;
             --border-light: #E9E9EB;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --container-padding: 1rem;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --sticky-offset: 70px;
         }
 
         body {
@@ -36,40 +34,25 @@
             margin: 0;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            line-height: 1.5;
-        }
-
-        /* --- UTILITIES --- */
-        .premium-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--container-padding);
-        }
-
-        .section-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: clamp(1.1rem, 4vw, 1.5rem);
-            margin-bottom: 1.5rem;
-            color: var(--secondary);
-            letter-spacing: -0.02em;
         }
 
         /* --- NAVBAR --- */
         .swiggy-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--white);
             position: sticky;
             top: 0;
             z-index: 1100;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            height: 64px;
+            box-shadow: 0 15px 40px -20px rgba(40, 44, 63, 0.15);
+            padding: 0 20px;
+            height: 80px;
             display: flex;
             align-items: center;
         }
 
         .nav-content {
+            max-width: 1200px;
             width: 100%;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -78,386 +61,724 @@
         .left-nav {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 30px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 10px;
             text-decoration: none;
-            color: var(--primary);
+            transition: transform 0.2s;
         }
 
-        .logo-box i { font-size: 1.5rem; }
+        .logo-box:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-box i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
 
         .logo-text {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
+            color: var(--primary);
             letter-spacing: -0.5px;
         }
 
         .location-box {
-            display: none;
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
             font-size: 0.85rem;
-            padding-left: 1rem;
-            border-left: 1px solid var(--border-light);
+            color: var(--text-main);
+            border-left: 2px solid var(--text-main);
+            padding-left: 30px;
             cursor: pointer;
+        }
+
+        .location-bold {
+            font-weight: 700;
+            border-bottom: 2px solid var(--text-main);
+            margin-right: 5px;
+        }
+
+        .location-box:hover {
+            color: var(--primary);
+        }
+
+        .location-box:hover .location-bold {
+            border-bottom-color: var(--primary);
         }
 
         .right-nav {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: 40px;
         }
 
         .nav-link-item {
             text-decoration: none;
             color: var(--text-main);
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 10px;
+            transition: color 0.2s;
         }
 
-        .nav-link-item span { display: none; }
-
-        @media (min-width: 768px) {
-            .swiggy-nav { height: 80px; }
-            .location-box { display: flex; }
-            .nav-link-item span { display: inline; }
-            .right-nav { gap: 2.5rem; }
+        .nav-link-item:hover {
+            color: var(--primary);
         }
 
-        /* --- SEARCH --- */
+        .nav-link-item i {
+            font-size: 1.2rem;
+        }
+
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .swiggy-nav {
+                height: 60px;
+                padding: 0 15px;
+            }
+
+            .location-box {
+                display: none;
+            }
+
+            .right-nav {
+                display: none;
+            }
+
+            /* Hide desktop top-right nav on mobile */
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* --- MOBILE BOTTOM NAV --- */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            padding: 10px 0;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav-item {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            gap: 4px;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.4rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cart-badge-mobile {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #D12939;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-bottom-nav {
+                display: flex;
+            }
+
+            body {
+                padding-bottom: 70px;
+            }
+
+            /* Add padding for bottom nav */
+        }
+
+        /* --- SEARCH BOX --- */
         .search-section {
-            padding: 1rem 0;
+            padding: 30px 0;
             background: var(--white);
             position: sticky;
-            top: 64px;
+            top: 80px;
             z-index: 1050;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .swiggy-search-input {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
+            padding: 14px 20px 14px 50px;
             border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-main);
             box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
         }
 
         .swiggy-search-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.15);
         }
 
         .search-icon-inside {
             position: absolute;
-            left: 2rem;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
+            font-size: 1.1rem;
         }
 
-        @media (min-width: 768px) {
-            .search-section { top: 80px; padding: 1.5rem 0; }
+        @media (max-width: 768px) {
+            .search-section {
+                top: 60px;
+                padding: 15px 15px;
+            }
+
+            .swiggy-search-input {
+                padding: 10px 15px 10px 45px;
+                font-size: 0.9rem;
+            }
         }
 
         /* --- CATEGORIES --- */
-        .categories-carousel {
-            display: flex;
-            gap: 1.25rem;
-            overflow-x: auto;
-            padding: 0.5rem 0 1.5rem;
-            scrollbar-width: none;
-            scroll-snap-type: x mandatory;
+        .section-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
 
-        .categories-carousel::-webkit-scrollbar { display: none; }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--secondary);
+        }
+
+        .categories-carousel {
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .categories-carousel::-webkit-scrollbar {
+            display: none;
+        }
 
         .cat-item {
-            min-width: 75px;
+            min-width: 140px;
             text-align: center;
             text-decoration: none;
-            scroll-snap-align: start;
+            transition: transform 0.3s;
+        }
+
+        .cat-item:hover {
+            transform: translateY(-5px);
         }
 
         .cat-image-wrapper {
-            width: 75px;
-            height: 75px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             overflow: hidden;
-            margin-bottom: 0.5rem;
             background: var(--bg-gray);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s;
         }
 
-        .cat-item.active .cat-image-wrapper { border-color: var(--primary); transform: scale(1.05); }
+        .cat-item.active .cat-image-wrapper {
+            border-color: var(--primary);
+        }
 
-        .cat-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        .cat-name { font-size: 0.7rem; font-weight: 600; color: var(--text-main); }
+        .cat-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-        @media (min-width: 768px) {
-            .cat-item { min-width: 110px; }
-            .cat-image-wrapper { width: 110px; height: 110px; }
-            .cat-name { font-size: 0.85rem; }
-            .categories-carousel { gap: 2rem; }
+        @media (max-width: 768px) {
+            .section-container {
+                padding: 0 15px;
+                margin: 15px auto;
+            }
+
+            .categories-carousel {
+                gap: 15px;
+                padding: 0 0 15px;
+                margin: 0 -5px;
+            }
+
+            .cat-item {
+                min-width: 80px;
+                flex-shrink: 0;
+            }
+
+            .cat-image-wrapper {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 8px;
+            }
+
+            .cat-name {
+                font-size: 0.75rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+                padding: 0;
+            }
         }
 
         /* --- FILTER BAR --- */
         .filter-bar {
             display: flex;
-            gap: 0.75rem;
-            padding: 1rem 0;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: none;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
             position: sticky;
-            top: 128px;
+            top: 170px;
             background: var(--white);
+            padding: 10px 0;
             z-index: 1040;
             border-bottom: 1px solid var(--border-light);
         }
 
-        .filter-bar::-webkit-scrollbar { display: none; }
-
         .filter-pill {
-            padding: 0.4rem 0.9rem;
+            padding: 8px 18px;
             border: 1px solid var(--border-light);
-            border-radius: 2rem;
-            font-size: 0.8rem;
+            border-radius: 20px;
+            background: var(--white);
+            font-size: 0.9rem;
             font-weight: 500;
             color: var(--text-main);
-            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            background: var(--white);
+            gap: 8px;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: var(--bg-gray);
+            border-color: var(--text-main);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-pill select {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-weight: 600;
             cursor: pointer;
         }
 
-        .filter-pill.active { background: var(--bg-gray); border-color: var(--secondary); font-weight: 600; }
+        @media (max-width: 768px) {
+            .filter-bar {
+                top: 120px;
+                padding: 10px 15px;
+                margin: 0 -15px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
 
-        .filter-pill select { border: none; background: transparent; font-weight: inherit; font-size: inherit; outline: none; }
+            .filter-bar::-webkit-scrollbar {
+                display: none;
+            }
 
-        @media (min-width: 768px) {
-            .filter-bar { top: 160px; gap: 1rem; }
-            .filter-pill { padding: 0.6rem 1.25rem; font-size: 0.9rem; }
+            .filter-pill {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
         }
 
         /* --- FOOD CARDS --- */
         .items-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            padding-bottom: 2rem;
-        }
-
-        @media (min-width: 992px) {
-            .items-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-        }
-
-        @media (min-width: 1200px) {
-            .items-grid { grid-template-columns: repeat(4, 1fr); }
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
         }
 
         .premium-food-card {
             text-decoration: none;
             color: inherit;
+            transition: transform 0.3s;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .premium-food-card:hover { transform: translateY(-4px); }
+        .premium-food-card:hover {
+            transform: scale(0.96);
+        }
 
         .card-img-container {
             position: relative;
-            aspect-ratio: 4/3;
-            border-radius: var(--radius-md);
+            width: 100%;
+            height: 180px;
+            border-radius: 16px;
             overflow: hidden;
-            margin-bottom: 0.75rem;
-            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
         }
 
-        .card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .premium-food-card:hover .card-img-container img { transform: scale(1.05); }
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .img-overlay-gradient {
             position: absolute;
-            bottom: 0; left: 0; right: 0; height: 50%;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
         }
 
         .discount-tag {
             position: absolute;
-            bottom: 0.5rem; left: 0.5rem;
+            bottom: 12px;
+            left: 12px;
             color: var(--white);
+            font-family: 'Outfit', sans-serif;
             font-weight: 800;
-            font-size: 0.7rem;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
             text-transform: uppercase;
         }
 
-        .veg-nonveg-indicator {
-            position: absolute;
-            top: 0.5rem; right: 0.5rem;
-            background: rgba(255,255,255,0.9);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.55rem;
-            font-weight: 700;
-            display: flex; align-items: center; gap: 3px;
+        .food-info {
+            padding: 0 4px;
         }
-
-        .veg-indicator { color: var(--rating-bg); border: 1px solid var(--rating-bg); }
-        .nonveg-indicator { color: #D12939; border: 1px solid #D12939; }
-
-        .food-info { padding: 0 0.25rem; }
 
         .food-name-h {
             font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 0.2rem;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: var(--secondary);
+            color: var(--text-main);
         }
 
         .meta-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            margin-bottom: 0.25rem;
-            font-weight: 600;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
         }
 
         .rating-box {
-            background: var(--rating-bg);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--rating);
             color: var(--white);
-            padding: 0px 4px;
-            border-radius: 4px;
-            display: flex; align-items: center; gap: 2px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.85rem;
         }
 
-        .dot-sep { width: 3px; height: 3px; background: var(--text-light); border-radius: 50%; opacity: 0.5; }
+        .delivery-time {
+            color: var(--text-main);
+        }
+
+        .dot-sep {
+            width: 4px;
+            height: 4px;
+            background: var(--text-light);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
 
         .food-details-text {
+            font-size: 0.9rem;
             color: var(--text-light);
-            font-size: 0.75rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 0.25rem;
+            margin-bottom: 4px;
         }
 
-        .price-tag { font-weight: 600; font-size: 0.8rem; color: var(--text-main); }
+        .price-tag {
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-        @media (min-width: 768px) {
-            .card-img-container { border-radius: var(--radius-lg); }
-            .food-name-h { font-size: 1.1rem; }
-            .meta-row { font-size: 0.9rem; }
-            .discount-tag { font-size: 0.9rem; left: 0.75rem; bottom: 0.75rem; }
-            .price-tag { font-size: 1rem; }
-            .food-details-text { font-size: 0.85rem; }
+        .veg-nonveg-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid #ddd;
+        }
+
+        .veg-indicator {
+            color: var(--rating);
+            border-color: var(--rating);
+        }
+
+        .nonveg-indicator {
+            color: #D12939;
+            border-color: #D12939;
+        }
+
+        @media (max-width: 576px) {
+            .items-grid {
+                grid-template-columns: 1fr; /* Single column for better view */
+                gap: 25px; /* Increased gap */
+                padding: 0 5px;
+                margin: 0;
+            }
+
+            .premium-food-card {
+                margin-bottom: 5px;
+                width: 100%;
+                background: white;
+                border-radius: 16px;
+            }
+
+            .card-img-container {
+                height: 220px; /* Larger images */
+                border-radius: 16px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Subtle shadow */
+            }
+
+            .food-info {
+                padding: 0 4px;
+            }
+
+            .food-name-h {
+                font-size: 1.2rem; /* Larger font */
+                margin-bottom: 6px;
+            }
+
+            .discount-tag {
+                font-size: 0.9rem;
+                bottom: 12px;
+                left: 12px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Better readability */
+            }
+
+            .meta-row {
+                gap: 8px;
+                font-size: 0.95rem; /* Standard readable size */
+                margin-bottom: 6px;
+            }
+
+            .rating-box {
+                font-size: 0.8rem;
+                padding: 2px 6px;
+            }
+
+            .food-details-text {
+                font-size: 0.9rem;
+                margin-bottom: 6px;
+            }
+
+            .price-tag {
+                font-size: 1rem;
+            }
+
+            .veg-nonveg-indicator {
+                top: 12px;
+                right: 12px;
+                padding: 2px 8px;
+                font-size: 0.7rem;
+            }
+            
+            /* Section Title Adjustment */
+            .section-title {
+                font-size: 1.25rem;
+                margin-bottom: 15px;
+                padding-left: 5px;
+            }
         }
 
         /* --- BOTTOM CATEGORIES GRID --- */
         .categories-bottom-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-
-        @media (min-width: 768px) {
-            .categories-bottom-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        }
-
-        @media (min-width: 1024px) {
-            .categories-bottom-grid { grid-template-columns: repeat(4, 1fr); }
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .category-card {
             text-decoration: none;
-            border-radius: var(--radius-md);
+            border-radius: 16px;
             overflow: hidden;
             background: var(--white);
             box-shadow: var(--shadow-md);
             transition: all 0.3s ease;
-            height: 180px;
             position: relative;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .category-card:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
 
-        .category-card-image { width: 100%; height: 100%; }
-        .category-card-image img { width: 100%; height: 100%; object-fit: cover; }
+        .category-card.active {
+            border: 3px solid var(--primary);
+        }
+
+        .category-card-image {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .category-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover .category-card-image img {
+            transform: scale(1.1);
+        }
 
         .category-overlay {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .category-card:hover .category-overlay {
+            opacity: 0.9;
         }
 
         .category-card-content {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 1rem;
-            color: var(--white);
-        }
-
-        .category-card-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; margin: 0; }
-        .category-card-subtitle { font-size: 0.7rem; opacity: 0.8; margin: 0; }
-
-        @media (min-width: 768px) {
-            .category-card { height: 260px; border-radius: var(--radius-lg); }
-            .category-card-title { font-size: 1.25rem; }
-            .category-card-subtitle { font-size: 0.85rem; }
-        }
-
-        /* --- MOBILE BOTTOM NAV --- */
-        .mobile-bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 0.75rem 0.5rem;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            z-index: 1200;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .bottom-nav-item {
+            padding: 20px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-decoration: none;
+            justify-content: center;
+            background: var(--white);
+        }
+
+        .category-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin: 0 0 8px 0;
+            transition: color 0.2s;
+        }
+
+        .category-card:hover .category-card-title {
+            color: var(--primary);
+        }
+
+        .category-card-subtitle {
+            font-size: 0.9rem;
             color: var(--text-light);
-            gap: 2px;
+            margin: 0;
         }
 
-        .bottom-nav-item.active { color: var(--primary); }
-        .bottom-nav-item i { font-size: 1.2rem; }
-        .bottom-nav-item span { font-size: 0.6rem; font-weight: 600; }
+        @media (max-width: 768px) {
+            .categories-bottom-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0;
+            }
 
-        @media (min-width: 768px) {
-            .mobile-bottom-nav { display: none; }
+            .category-card {
+                height: 200px;
+            }
+
+            .category-card-image {
+                height: 120px;
+            }
+
+            .category-card-content {
+                padding: 10px;
+            }
+
+            .category-card-title {
+                font-size: 0.95rem;
+                margin-bottom: 4px;
+            }
+
+            .category-card-subtitle {
+                font-size: 0.75rem;
+            }
         }
 
-        .footer-spacer { height: 80px; }
+        /* --- FOOTER SPACING --- */
+        .footer-spacer {
+            height: 100px;
+        }
     </style>
 </head>
 
@@ -465,7 +786,7 @@
 
     <!-- STICKY NAVBAR -->
     <nav class="swiggy-nav">
-        <div class="premium-container nav-content">
+        <div class="nav-content">
             <div class="left-nav">
                 <a href="{{ url('/') }}" class="logo-box">
                     <i class="fa-solid fa-basket-shopping"></i>
@@ -478,31 +799,40 @@
                 </div>
             </div>
 
+
             <div class="right-nav">
                 <a href="{{ route('customer.food.cart') }}" class="nav-link-item position-relative">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span>Cart</span>
                     @if(session('cart_count', 0) > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.5rem; padding: 0.25em 0.5em;">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem;">
                             {{ session('cart_count') }}
                         </span>
                     @endif
                 </a>
-
+                <a href="{{ route('food.shops.index') }}" class="nav-link-item">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Restaurants</span>
+                </a>
                 @auth
                     <div class="dropdown">
                         <a href="#" class="nav-link-item dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="fa-solid fa-user"></i>
                             <span>{{ Auth::user()->name }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: var(--radius-md);">
-                            <li><a class="dropdown-item rounded py-2" href="{{ url('/profile') }}"><i class="fa-solid fa-user-circle me-2"></i> Profile</a></li>
-                            <li><a class="dropdown-item rounded py-2" href="/food/my-orders"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item py-2" href="{{ url('/profile') }}"><i
+                                        class="fa-solid fa-user-circle me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item py-2" href="/food/my-orders"><i
+                                        class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger rounded py-2">
+                                    <button type="submit" class="dropdown-item text-danger py-2">
                                         <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                                     </button>
                                 </form>
@@ -521,20 +851,19 @@
 
     <!-- STICKY SEARCH BAR -->
     <div class="search-section">
-        <div class="premium-container">
-            <div class="position-relative">
-                <form method="GET" action="{{ route('customer.food.index') }}">
-                    <i class="fa-solid fa-magnifying-glass search-icon-inside"></i>
-                    <input name="search" class="swiggy-search-input" placeholder="Search for restaurant, cuisine or a dish" value="{{ request('search') }}" autocomplete="off" />
-                    <input type="hidden" name="category" value="{{ request('category') }}">
-                    <input type="hidden" name="veg" value="{{ request('veg') }}">
-                    <input type="hidden" name="sort" value="{{ request('sort') }}">
-                </form>
-            </div>
+        <div class="search-container px-3">
+            <form method="GET" action="{{ route('customer.food.index') }}">
+                <i class="fa-solid fa-magnifying-glass search-icon-inside"></i>
+                <input name="search" class="swiggy-search-input" placeholder="Search for restaurant, cuisine or a dish"
+                    value="{{ request('search') }}" autocomplete="off" />
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                <input type="hidden" name="veg" value="{{ request('veg') }}">
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            </form>
         </div>
     </div>
 
-    <main class="premium-container">
+    <div class="section-container">
         <!-- WHAT'S ON YOUR MIND (CATEGORIES) -->
         <h2 class="section-title">What's on your mind?</h2>
         <div class="categories-carousel">
@@ -573,43 +902,47 @@
             @endforeach
         </div>
 
-        <hr class="my-4 opacity-10">
+        <hr class="my-5 opacity-10">
 
         <!-- FILTER BAR -->
         <div class="filter-bar">
-            <a href="{{ route('customer.food.index') }}" class="filter-pill {{ !request('category') && !request('search') ? 'active' : '' }}">
+            <a href="{{ route('customer.food.index') }}"
+                class="filter-pill {{ !request('category') && !request('search') ? 'active' : '' }}">
                 <i class="fa-solid fa-list"></i> All
             </a>
 
-            <div class="filter-pill {{ request('veg') !== null ? 'active' : '' }}">
-                <form method="GET" style="display:inline-flex; align-items:center; gap:5px;">
+            <form method="GET" style="display:inline;">
+                <input type="hidden" name="search" value="{{ request('search') }}" />
+                <input type="hidden" name="category" value="{{ request('category') }}" />
+                <input type="hidden" name="sort" value="{{ request('sort') }}" />
+                <label class="filter-pill {{ request('veg') === '1' ? 'active' : '' }}">
                     <i class="fa-solid fa-leaf text-success"></i>
-                    <input type="hidden" name="search" value="{{ request('search') }}" />
-                    <input type="hidden" name="category" value="{{ request('category') }}" />
-                    <input type="hidden" name="sort" value="{{ request('sort') }}" />
-                    <select name="veg" onchange="this.form.submit()">
+                    <select name="veg" onchange="this.form.submit()" style="font-size: inherit; color: inherit;">
                         <option value="">Dietary</option>
                         <option value="1" {{ request('veg') === '1' ? 'selected' : '' }}>Veg Only</option>
                         <option value="0" {{ request('veg') === '0' ? 'selected' : '' }}>Non-Veg</option>
                     </select>
-                </form>
-            </div>
+                </label>
+            </form>
 
-            <div class="filter-pill {{ request('sort') ? 'active' : '' }}">
-                <form method="GET" style="display:inline-flex; align-items:center; gap:5px;">
+            <form method="GET" style="display:inline;">
+                <input type="hidden" name="search" value="{{ request('search') }}" />
+                <input type="hidden" name="category" value="{{ request('category') }}" />
+                <input type="hidden" name="veg" value="{{ request('veg') }}" />
+                <label class="filter-pill {{ request('sort') ? 'active' : '' }}">
                     <i class="fa-solid fa-sort"></i>
-                    <input type="hidden" name="search" value="{{ request('search') }}" />
-                    <input type="hidden" name="category" value="{{ request('category') }}" />
-                    <input type="hidden" name="veg" value="{{ request('veg') }}" />
-                    <select name="sort" onchange="this.form.submit()">
+                    <select name="sort" onchange="this.form.submit()" style="font-size: inherit; color: inherit;">
                         <option value="">Sort By</option>
-                        <option value="costLow" {{ request('sort') === 'costLow' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="costHigh" {{ request('sort') === 'costHigh' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="ratingHigh" {{ request('sort') === 'ratingHigh' ? 'selected' : '' }}>Ratings: High to Low</option>
+                        <option value="costLow" {{ request('sort') === 'costLow' ? 'selected' : '' }}>Price: Low to High
+                        </option>
+                        <option value="costHigh" {{ request('sort') === 'costHigh' ? 'selected' : '' }}>Price: High to Low
+                        </option>
+                        <option value="ratingHigh" {{ request('sort') === 'ratingHigh' ? 'selected' : '' }}>Ratings: High
+                            to Low</option>
                     </select>
-                </form>
-            </div>
-            
+                </label>
+            </form>
+
             @if(request('category'))
                 <div class="filter-pill active">
                     <i class="fa-solid fa-tag"></i> {{ ucwords(request('category')) }}
@@ -618,7 +951,7 @@
         </div>
 
         <!-- ITEMS SECTION -->
-        <h2 class="section-title mt-4">
+        <h2 class="section-title">
             @if(request('search'))
                 Results for "{{ request('search') }}"
             @elseif(request('category'))
@@ -632,18 +965,19 @@
             @forelse($foods as $food)
                 <a href="{{ route('customer.food.details', $food->id) }}" class="premium-food-card">
                     <div class="card-img-container">
-                        <img src="{{ $food->first_image_url ?: 'https://via.placeholder.com/480x300?text=' . urlencode($food->name) }}" 
-                             alt="{{ $food->name }}"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/480x300?text=No+Image';">
-                        
+                        <img src="{{ $food->first_image_url ?: 'https://via.placeholder.com/480x300?text=' . urlencode($food->name) }}"
+                            alt="{{ $food->name }}"
+                            onerror="this.onerror=null;this.src='https://via.placeholder.com/480x300?text=No+Image';">
+
                         <div class="img-overlay-gradient"></div>
-                        
+
                         @php $discount = rand(10, 60); @endphp
                         <div class="discount-tag">{{ $discount }}% OFF UPTO ₹120</div>
-                        
-                        <div class="veg-nonveg-indicator {{ $food->food_type === 'veg' ? 'veg-indicator' : 'nonveg-indicator' }}">
-                            <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> 
-                            {{ strtoupper($food->food_type) }}
+
+                        <div
+                            class="veg-nonveg-indicator {{ $food->food_type === 'veg' ? 'veg-indicator' : 'nonveg-indicator' }}">
+                            <i class="fa-solid fa-circle" style="font-size: 0.6rem;"></i>
+                            {{ $food->food_type }}
                         </div>
                     </div>
 
@@ -651,7 +985,7 @@
                         <div class="food-name-h">{{ $food->name }}</div>
                         <div class="meta-row">
                             <div class="rating-box">
-                                <i class="fa-solid fa-star" style="font-size: 0.7rem;"></i>
+                                <i class="fa-solid fa-star"></i>
                                 {{ number_format($food->rating ?? 4.0, 1) }}
                             </div>
                             <div class="dot-sep"></div>
@@ -667,18 +1001,18 @@
                 </a>
             @empty
                 <div class="col-12 text-center py-5">
-                    <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/2x_empty_cart_ybi7ss" alt="Empty" style="width: 150px; opacity: 0.5;">
+                    <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/2x_empty_cart_ybi7ss"
+                        alt="Empty" style="width: 200px; opacity: 0.5;">
                     <h5 class="mt-4 text-muted">No items found matching your criteria</h5>
-                    <a href="{{ route('customer.food.index') }}" class="btn btn-primary mt-2" style="background: var(--primary); border: none;">Explore All Food</a>
                 </div>
             @endforelse
         </div>
 
         <!-- Food Categories Section at Bottom -->
         <hr class="my-5 opacity-10">
-        
+
         <h2 class="section-title">Browse All Food Categories</h2>
-        
+
         <div class="categories-bottom-grid">
             @foreach($foodCategories as $cat)
                 @php
@@ -713,36 +1047,45 @@
                     </div>
                     <div class="category-card-content">
                         <h3 class="category-card-title">{{ ucwords($cat['name']) }}</h3>
-                        <p class="category-card-subtitle">Explore {{ strtolower($cat['name']) }}</p>
+                        <p class="category-card-subtitle">Explore delicious {{ strtolower($cat['name']) }}</p>
                     </div>
                 </a>
             @endforeach
         </div>
 
         <div class="footer-spacer"></div>
-    </main>
-
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <div class="mobile-bottom-nav">
-        <a href="{{ url('/') }}" class="bottom-nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="{{ route('customer.food.index') }}" class="bottom-nav-item">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Search</span>
-        </a>
-        <a href="/food/my-orders" class="bottom-nav-item">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <span>Orders</span>
-        </a>
-        <a href="{{ url('/profile') }}" class="bottom-nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>Account</span>
-        </a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <div class="mobile-bottom-nav">
+        <a href="{{ route('customer.food.index') }}" class="mobile-nav-item {{ Route::is('customer.food.index') ? 'active' : '' }}">
+            <i class="fa-solid fa-bowl-food"></i>
+            <span>Food</span>
+        </a>
+        <a href="{{ route('food.shops.index') }}" class="mobile-nav-item {{ Route::is('food.shops.index') ? 'active' : '' }}">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Dining</span>
+        </a>
+        <a href="{{ route('customer.food.cart') }}" class="mobile-nav-item {{ Route::is('customer.food.cart') ? 'active' : '' }}">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Cart</span>
+            @if(session('cart_count', 0) > 0)
+                <span class="cart-badge-mobile">{{ session('cart_count') }}</span>
+            @endif
+        </a>
+        @auth
+            <a href="{{ url('/profile') }}" class="mobile-nav-item {{ Request::is('profile*') ? 'active' : '' }}">
+                <i class="fa-solid fa-user"></i>
+                <span>Profile</span>
+            </a>
+        @else
+            <a href="{{ route('login') }}" class="mobile-nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Login</span>
+            </a>
+        @endauth
+    </div>
 
+</body>
 </html>
