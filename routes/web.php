@@ -1995,6 +1995,7 @@ Route::prefix('food')->group(function () {
     });
 });
 
+Route::get('/location',[CartController::class,'location']);
 Route::get('/tenmins', [SellerController::class, 'tenmins']);
 Route::get('/joinus', [SellerController::class, 'joinus']);
 Route::get('/internship/details', [InternshipController::class, 'details'])

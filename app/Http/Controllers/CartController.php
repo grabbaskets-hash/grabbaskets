@@ -317,4 +317,8 @@ class CartController extends Controller
         
         return view('cart.checkout', compact('items', 'totals', 'addresses', 'user'));
     }
+
+    public function location(){
+        return view ('location');
+    }
 }

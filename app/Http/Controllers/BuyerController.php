@@ -586,4 +586,5 @@ public function dashboard()
             ], 500);
         }
     }}
+    
 
