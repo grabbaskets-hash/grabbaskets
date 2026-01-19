@@ -583,68 +583,77 @@
         }
 
         @media (max-width: 576px) {
-            .items-grid {
-                grid-template-columns: 1fr; /* Single column for better view */
-                gap: 25px; /* Increased gap */
-                padding: 0 5px;
+            .section-container {
+                padding: 0 12px;
+            }
+
+            .items-grid { 
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0;
                 margin: 0;
             }
-
+            
             .premium-food-card {
-                margin-bottom: 5px;
+                margin-bottom: 0;
                 width: 100%;
-                background: white;
-                border-radius: 16px;
+                border-radius: 12px;
+                background: #fff;
             }
-
-            .card-img-container {
-                height: 220px; /* Larger images */
-                border-radius: 16px;
-                margin-bottom: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Subtle shadow */
+            
+            .card-img-container { 
+                height: auto;
+                aspect-ratio: 4 / 3;
+                border-radius: 12px;
+                margin-bottom: 6px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
             }
-
+            
             .food-info {
-                padding: 0 4px;
+                padding: 0 4px 8px;
             }
-
-            .food-name-h {
-                font-size: 1.2rem; /* Larger font */
-                margin-bottom: 6px;
+            
+            .food-name-h { 
+                font-size: 0.95rem;
+                margin-bottom: 2px;
+                font-weight: 600;
             }
-
-            .discount-tag {
-                font-size: 0.9rem;
-                bottom: 12px;
-                left: 12px;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Better readability */
-            }
-
-            .meta-row {
-                gap: 8px;
-                font-size: 0.95rem; /* Standard readable size */
-                margin-bottom: 6px;
-            }
-
-            .rating-box {
-                font-size: 0.8rem;
-                padding: 2px 6px;
-            }
-
-            .food-details-text {
-                font-size: 0.9rem;
-                margin-bottom: 6px;
-            }
-
-            .price-tag {
-                font-size: 1rem;
-            }
-
-            .veg-nonveg-indicator {
-                top: 12px;
-                right: 12px;
-                padding: 2px 8px;
+            
+            .discount-tag { 
                 font-size: 0.7rem;
+                bottom: 6px;
+                left: 6px;
+                font-weight: 700;
+            }
+            
+            .meta-row { 
+                gap: 6px;
+                font-size: 0.8rem;
+                margin-bottom: 2px;
+            }
+            
+            .rating-box { 
+                font-size: 0.75rem; 
+                padding: 1px 5px;
+            }
+            
+            .food-details-text {
+                font-size: 0.8rem;
+                margin-bottom: 2px;
+                color: var(--text-light);
+            }
+            
+            .price-tag {
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+            
+            .veg-nonveg-indicator {
+                top: 6px;
+                right: 6px;
+                padding: 1px 4px;
+                font-size: 0.55rem;
             }
             
             /* Section Title Adjustment */
@@ -811,7 +820,7 @@
                         </span>
                     @endif
                 </a>
-                <a href="{{ route('food.shops.index') }}" class="nav-link-item">
+                <a href="{{ route('food.restaurants') }}" class="nav-link-item">
                     <i class="fa-solid fa-utensils"></i>
                     <span>Restaurants</span>
                 </a>
@@ -1063,7 +1072,7 @@
             <i class="fa-solid fa-bowl-food"></i>
             <span>Food</span>
         </a>
-        <a href="{{ route('food.shops.index') }}" class="mobile-nav-item {{ Route::is('food.shops.index') ? 'active' : '' }}">
+        <a href="{{ route('food.restaurants') }}" class="mobile-nav-item {{ Route::is('food.restaurants') ? 'active' : '' }}">
             <i class="fa-solid fa-utensils"></i>
             <span>Dining</span>
         </a>
