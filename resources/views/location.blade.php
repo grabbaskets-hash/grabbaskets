@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Live Location - Google Maps</title>
+    <title>Live Location - OpenStreetMap</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,10 +11,10 @@
         }
 
         .container {
-            width: 400px;
-            margin: 50px auto;
-            padding: 15px;
-            background: #fff;
+            width: 350px;
+            margin: 80px auto;
+            padding: 20px;
+            background: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -22,23 +22,20 @@
         button {
             width: 100%;
             padding: 12px;
-            background: #28a745;
+            background: #007bff;
             color: white;
             border: none;
             font-size: 16px;
-            border-radius: 5px;
             cursor: pointer;
+            border-radius: 5px;
         }
 
-        #map {
-            width: 100%;
-            height: 250px;
+        button:hover {
+            background: #0056b3;
+        }
+
+        .output {
             margin-top: 15px;
-            border-radius: 6px;
-        }
-
-        #address {
-            margin-top: 10px;
             font-size: 14px;
         }
     </style>
@@ -47,62 +44,49 @@
 <body>
 
     <div class="container">
-        <h2>📍 Live Location (Google Maps)</h2>
+        <h2>📍 Live Location (OpenStreetMap)</h2>
         <button onclick="getLocation()">Get My Location</button>
 
-        <div id="map"></div>
-        <div id="address"></div>
+        <div id="output" class="output"></div>
     </div>
 
-    <script src="script.js"></script>
-
-    <!-- Google Maps API -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFbU1UkuV2HVULSP2rnTwQWYM0xpFvG20">
-    </script>
     <script>
-        let map, marker;
-
         function getLocation() {
             if (!navigator.geolocation) {
                 alert("Geolocation not supported");
                 return;
             }
 
+            document.getElementById("output").innerHTML = "Fetching location...";
+
             navigator.geolocation.getCurrentPosition(
-                showPosition,
-                error => alert("Location permission denied"),
-                { enableHighAccuracy: true }
+                position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const addr = data.address;
+
+                            document.getElementById("output").innerHTML = `
+            <b>Latitude:</b> ${lat}<br>
+            <b>Longitude:</b> ${lon}<br><br>
+            <b>Street:</b> ${addr.road || ''}<br>
+            <b>City:</b> ${addr.city || addr.town || ''}<br>
+            <b>District:</b> ${addr.county || ''}<br>
+            <b>State:</b> ${addr.state || ''}<br>
+            <b>Country:</b> ${addr.country || ''}
+          `;
+                        });
+                },
+                error => {
+                    alert("Location permission denied");
+                }
             );
         }
 
-        function showPosition(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            const userLocation = { lat, lng };
-
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: userLocation,
-                zoom: 16
-            });
-
-            marker = new google.maps.Marker({
-                position: userLocation,
-                map: map,
-                title: "You are here"
-            });
-
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: userLocation }, (results, status) => {
-                if (status === "OK" && results[0]) {
-                    document.getElementById("address").innerHTML =
-                        "<b>Address:</b><br>" + results[0].formatted_address;
-                }
-            });
-        }
-
     </script>
-
 </body>
 
 </html>
