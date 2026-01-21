@@ -167,12 +167,12 @@
                         <span class="highlight"><strong>Roles: Technical Associate</strong></span>
                     </p>
 
-                    <p class="subtext">Internship Period: <span class="highlight">6 Months</span></p>
-                    <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹50,000</span></p>
+                    <p class="subtext">Course Period: <span class="highlight">6 Months</span></p>
+                    <p class="subtext"> Course Fee + GST: <span class="highlight">₹11,800</span></p>
                     <p class="subtext">Starting Monthly Package: <span class="highlight">₹24,000</span></p>
 
                     <button class="apply-btn mt-3"
-                        onclick="applyNow('Technical Associate', 50000, 24, 'IT Section')">
+                        onclick="applyNow('Technical Associate', 11800, 24, 'IT Section')">
                         Apply Now
                     </button>
                 </div>
@@ -190,12 +190,12 @@
                         </span>
                     </p>
 
-                    <p class="subtext">Internship Period: <span class="highlight">6 Months</span></p>
-                    <p class="subtext">Internship Fee (Paid by Student): <span class="highlight">₹50,000</span></p>
+                    <p class="subtext">Course Period: <span class="highlight">6 Months</span></p>
+                    <p class="subtext"> Course Fee + GST: <span class="highlight">₹11,800</span></p>
                     <p class="subtext">Monthly Package After Internship: <span class="highlight">₹24,000</span></p>
 
                     <button class="apply-btn mt-3"
-                        onclick="applyNow('Web Development', 50000, 24, 'IT Section')">
+                        onclick="applyNow('Web Development', 11800, 24, 'IT Section')">
                         Apply Now
                     </button>
                 </div>
